@@ -247,7 +247,7 @@ export default function AdminDashboardPage() {
                   setPasscode(e.target.value);
                   setAuthError(false);
                 }}
-                placeholder="Enter Passcode (Hint: 2006)"
+                placeholder="Enter Admin Passcode"
                 className="w-full px-4 py-4 rounded-2xl bg-slate-50 border-2 border-slate-200 text-slate-900 placeholder-slate-400 text-base font-bold text-center focus:border-[#0050FF] focus:bg-white focus:outline-none transition-all shadow-xs"
               />
             </div>

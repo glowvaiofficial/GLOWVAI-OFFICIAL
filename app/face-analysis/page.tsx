@@ -669,6 +669,14 @@ export default function FaceAnalysisPage() {
                 </p>
               </div>
 
+              {/* Transparency note */}
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 flex items-start gap-2.5 max-w-xl mx-auto">
+                <ShieldCheck className="w-4 h-4 text-[#0050FF] shrink-0 mt-0.5" />
+                <p className="text-[11px] text-slate-700 font-medium leading-relaxed">
+                  Your skin score is calculated based on your demographic category, skin concern, and climate data. Your captured photo is used only for identity verification and is processed in-browser.
+                </p>
+              </div>
+
               <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-md space-y-6">
                 <form onSubmit={handleFormSubmit} className="space-y-4">
                   <div className="space-y-1">
