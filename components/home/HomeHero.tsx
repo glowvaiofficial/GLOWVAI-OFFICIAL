@@ -57,24 +57,6 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
           <div className="lg:col-span-5">
             <div className="relative w-full max-w-[520px] mx-auto flex justify-center">
               <PhoneDemo />
-
-              <div
-                aria-hidden="true"
-                className="hidden sm:block absolute top-[12%] left-0 lg:left-2 w-[160px] -rotate-3 bg-white border border-ink/15 rounded-[10px] p-4"
-              >
-                <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">Sample report</p>
-                <p className="mt-2 font-display font-semibold text-[44px] leading-none text-ink [font-feature-settings:'tnum']">
-                  84
-                </p>
-                <p className="mt-1 text-xs text-ink-muted">Barrier strong</p>
-                <div className="mt-3 flex justify-between font-mono text-[11px] text-ink-muted">
-                  <span>Hydration depth</span>
-                  <span className="text-ink">92%</span>
-                </div>
-                <div className="mt-1.5 h-1.5 rounded-[3px] bg-ink/10 overflow-hidden">
-                  <div className="h-full w-[92%] bg-brand" />
-                </div>
-              </div>
             </div>
           </div>
         </div>
