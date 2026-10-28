@@ -50,7 +50,7 @@ export function StorySection() {
               <div className="min-w-0">
                 <h3 className="font-display font-semibold text-xl text-ink leading-tight">{f.name}</h3>
                 <p className="text-[15px] text-ink-muted">{f.role}</p>
-                <p className="text-sm text-ink-light">{f.bio}</p>
+                {f.bio ? <p className="text-sm text-ink-light">{f.bio}</p> : null}
               </div>
             </li>
           ))}

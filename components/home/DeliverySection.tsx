@@ -18,7 +18,7 @@ const inputClass =
   "w-full min-h-[52px] px-4 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20";
 
 // Brand graphic: a minute dial with the first 15 minutes marked. Drawn for GLOW VAI.
-function MinuteDial() {
+function MinuteDial({ minute }: { minute: number }) {
   const ticks = Array.from({ length: 60 }, (_, i) => i);
   return (
     <svg viewBox="0 0 200 200" aria-hidden="true" focusable="false" className="w-full max-w-[220px]">
@@ -40,7 +40,7 @@ function MinuteDial() {
           />
         );
       })}
-      <line x1="100" y1="100" x2="100" y2="22" stroke="#12161F" strokeWidth="3" strokeLinecap="round" />
+      <line x1="100" y1="100" x2="100" y2="22" stroke="#12161F" strokeWidth="3" strokeLinecap="round" transform={`rotate(${minute * 6} 100 100)`} />
       <circle cx="100" cy="100" r="5" fill="#12161F" />
     </svg>
   );
@@ -52,6 +52,7 @@ export function DeliverySection() {
   const [contact, setContact] = useState("");
   const [waitlistDone, setWaitlistDone] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [minute, setMinute] = useState(14);
 
   const handleCheck = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,12 +98,50 @@ export function DeliverySection() {
           </p>
           <p className="mt-3 font-mono text-sm uppercase tracking-[0.12em] text-ink-muted">minutes, about</p>
           <div className="mt-8 flex items-end gap-5">
-            <MinuteDial />
+            <MinuteDial minute={minute} />
             <p className="pb-2 font-mono text-xs uppercase tracking-[0.12em] text-ink-light">
               Example
               <br />
-              <span className="text-ink">about 14 min</span>
+              <span className="text-ink text-base">about {minute} min</span>
             </p>
+          </div>
+          <label htmlFor="minute-range" className="mt-5 block font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">
+            Drag to move the clock hand
+          </label>
+          <input
+            id="minute-range"
+            type="range"
+            min={1}
+            max={15}
+            value={minute}
+            onChange={(e) => setMinute(Number(e.target.value))}
+            className={`mt-2 w-full max-w-[320px] accent-[#1447E6] rounded ${focusRing}`}
+          />
+          <div className="mt-10 grid grid-cols-2 gap-4">
+            <figure className="space-y-2">
+              <div className="relative aspect-[4/3] rounded-[10px] overflow-hidden border border-ink/15 bg-paper">
+                <Image
+                  src={getAssetPath("/images/home-ai/express_delivery.png")}
+                  alt="A rider carrying a skincare order"
+                  fill
+                  sizes="(max-width: 1024px) 45vw, 300px"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="text-[13px] text-ink-light">Illustration</figcaption>
+            </figure>
+            <figure className="space-y-2">
+              <div className="relative aspect-[4/3] rounded-[10px] overflow-hidden border border-ink/15 bg-paper">
+                <Image
+                  src={getAssetPath("/images/home-ai/vendor_store.png")}
+                  alt="A partner store counter with skincare products"
+                  fill
+                  sizes="(max-width: 1024px) 45vw, 300px"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="text-[13px] text-ink-light">Illustration</figcaption>
+            </figure>
           </div>
         </div>
 
@@ -197,32 +236,7 @@ export function DeliverySection() {
             </p>
           </form>
 
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            <figure className="space-y-2">
-              <div className="relative aspect-[4/3] rounded-[10px] overflow-hidden border border-ink/15 bg-paper">
-                <Image
-                  src={getAssetPath("/images/home-ai/express_delivery.png")}
-                  alt="A rider carrying a skincare order"
-                  fill
-                  sizes="(max-width: 1024px) 45vw, 300px"
-                  className="object-cover"
-                />
-              </div>
-              <figcaption className="text-[13px] text-ink-light">Illustration</figcaption>
-            </figure>
-            <figure className="space-y-2">
-              <div className="relative aspect-[4/3] rounded-[10px] overflow-hidden border border-ink/15 bg-paper">
-                <Image
-                  src={getAssetPath("/images/home-ai/vendor_store.png")}
-                  alt="A partner store counter with skincare products"
-                  fill
-                  sizes="(max-width: 1024px) 45vw, 300px"
-                  className="object-cover"
-                />
-              </div>
-              <figcaption className="text-[13px] text-ink-light">Illustration</figcaption>
-            </figure>
-          </div>
+          
         </div>
       </div>
     </Section>

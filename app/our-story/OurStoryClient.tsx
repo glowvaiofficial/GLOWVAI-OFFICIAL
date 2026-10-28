@@ -3,426 +3,265 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Accent } from "@/components/ui/Accent";
+import { ArrowRight, MapPin, ScanLine, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
 import { storyData } from "@/config/story";
-import { ArrowLeft, ArrowRight, ScanLine, Zap, MapPin, UserCheck, Truck, Camera, ChevronRight, BookOpen, HelpCircle } from "lucide-react";
+
+const facts = [
+  { k: "Free", v: "Face scan in about 30 seconds" },
+  { k: "Local", v: "Built in Andhra Pradesh" },
+  { k: "Independent", v: "We retail skincare, we do not make it" },
+];
+
+const faqs = [
+  { q: "What is GLOW VAI?", a: "GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering." },
+  {
+    q: "Who founded GLOW VAI?",
+    a: "GLOW VAI was founded by Sardar Musthafa (Founder), Rehmit (Market Explorer), and Nalla Satvik (Co-Founder and Technical Lead) in Andhra Pradesh, India.",
+  },
+  { q: "Does GLOW VAI make its own products?", a: "No. GLOW VAI is an independent retailer and does not manufacture the products it sells." },
+  { q: "How do I contact GLOW VAI?", a: "Email contact@glowvai.in, or call or WhatsApp +91 89778 55998." },
+];
+
+const tabRing = focusRing;
 
 export default function OurStoryClient() {
-  const [selectedFounderId, setSelectedFounderId] = useState<string | null>(null);
+  const [fi, setFi] = useState(0);
+  const [ti, setTi] = useState(0);
+  const [open, setOpen] = useState<number | null>(0);
+  const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
-  const selectedFounder = storyData.founders.find((f) => f.id === selectedFounderId);
-
-  const handleSelectFounder = (id: string) => {
-    setSelectedFounderId(id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBackToStory = () => {
-    setSelectedFounderId(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const founder = storyData.founders[fi];
+  const evt = storyData.timeline[ti];
 
   return (
-    <div className="bg-white text-ink min-h-screen">
-
-      {/* ------------------------------------------------------------- */}
-      {/* 1. DETAILED INDIVIDUAL FOUNDER STORY VIEW                      */}
-      {/* ------------------------------------------------------------- */}
-      {selectedFounder ? (
-        <div className="py-10 sm:py-16 bg-ink-subtle text-ink animate-fadeIn">
-          <Container size="md">
-            
-            {/* Top Navigation Back Button */}
-            <div className="mb-8">
-              <button
-                onClick={handleBackToStory}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-skymist text-brand font-bold text-sm transition-all border-2 border-brand/30 shadow-md group cursor-pointer"
+    <div className="bg-paper text-ink">
+      {/* Hero */}
+      <Section pad="md" labelledBy="story-hero">
+        <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
+          <ol className="flex items-center gap-2">
+            <li>
+              <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li className="text-ink font-medium">Our story</li>
+          </ol>
+        </nav>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10 items-end">
+          <div className="lg:col-span-8">
+            <Eyebrow>About GLOW VAI</Eyebrow>
+            <h1
+              id="story-hero"
+              className="mt-4 font-display font-semibold text-[clamp(2.75rem,1.6rem+5.2vw,5.5rem)] leading-[0.98] tracking-[-0.035em]"
+            >
+              Skincare that starts with a <span className="text-brand">selfie.</span>
+            </h1>
+            <p className="mt-7 text-[clamp(1.125rem,1.05rem+0.4vw,1.3125rem)] leading-[1.5] text-ink-muted max-w-[52ch]">
+              GLOW VAI is an Indian skincare retail brand. We pair a free face scan with simple ordering, so choosing a routine is
+              clear and quick.
+            </p>
+            <div className="mt-9 flex flex-col sm:flex-row sm:items-center gap-4">
+              <Link href="/face-analysis">
+                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+                  <ScanLine className="w-5 h-5" aria-hidden="true" />
+                  <span>Scan my face, free</span>
+                </Button>
+              </Link>
+              <Link
+                href="/shop"
+                className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
               >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                <span>Back to Founding Team & Story</span>
-              </button>
+                <span>or browse the shop</span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
             </div>
+          </div>
+          <ul className="lg:col-span-4 border-t border-ink/20">
+            {facts.map((f) => (
+              <li key={f.k} className="py-4 border-b border-ink/20">
+                <p className="font-display font-semibold text-2xl">{f.k}</p>
+                <p className="text-[15px] text-ink-muted">{f.v}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
 
-            {/* Founder Profile Hero Header */}
-            <div className="bg-white p-8 sm:p-12 rounded-3xl border-2 border-brand/15 shadow-xl mb-12">
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                
-                {/* Founder Photo */}
-                <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-2xl overflow-hidden border-4 border-brand shadow-lg shrink-0 bg-skymist">
-                  <Image
-                    src={selectedFounder.image}
-                    alt={`${selectedFounder.name}, founder of GLOW VAI`}
-                    fill
-                    className={`object-cover ${selectedFounder.id === "rahimath" ? "object-top" : "object-center"}`}
-                    priority
-                  />
-                </div>
+      {/* Founders: pick one, read their story in place */}
+      <Section tone="deep" labelledBy="founders-title" id="founders">
+        <Eyebrow>Founding team</Eyebrow>
+        <SectionTitle id="founders-title" className="mt-4 max-w-[20ch]">
+          Meet the three founders.
+        </SectionTitle>
+        <p className="mt-4 text-ink-muted max-w-[56ch]">Pick a name to read their story.</p>
 
-                {/* Founder Info */}
-                <div className="space-y-3 text-center md:text-left flex-1">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-bold uppercase tracking-wider">
-                    <UserCheck className="w-3.5 h-3.5" />
-                    <span>{selectedFounder.role}</span>
-                  </div>
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
+          <div role="tablist" aria-label="Founders" className="lg:col-span-4 border-t border-ink/20 self-start">
+            {storyData.founders.map((f, i) => (
+              <button
+                key={f.id}
+                role="tab"
+                id={`tab-${f.id}`}
+                aria-selected={i === fi}
+                aria-controls="founder-panel"
+                type="button"
+                onClick={() => {
+                  setFi(i);
+                  setOpen(0);
+                }}
+                className={`w-full flex items-center gap-4 text-left py-4 px-3 border-b border-ink/20 ${tabRing} ${i === fi ? "bg-white" : "hover:bg-white/60"}`}
+              >
+                <span className="relative w-14 h-14 shrink-0 rounded-full overflow-hidden bg-paper">
+                  <Image src={f.image} alt="" fill sizes="56px" className={`object-cover ${f.id === "rahimath" ? "object-top" : "object-center"}`} />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-display font-semibold text-lg leading-tight">{f.name}</span>
+                  <span className="block text-sm text-ink-muted">{f.role}</span>
+                </span>
+              </button>
+            ))}
+          </div>
 
-                  <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink">
-                    {selectedFounder.name}
-                  </h1>
-
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-ink-muted">
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-brand" />
-                      {selectedFounder.location}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <ScanLine className="w-4 h-4 text-yellow-hover" />
-                      GLOW VAI Founding Partner
-                    </span>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-ink-muted leading-relaxed italic pt-1 max-w-xl">
-                    &ldquo;{selectedFounder.tagline}&rdquo;
-                  </p>
-                </div>
+          <div id="founder-panel" role="tabpanel" aria-labelledby={`tab-${founder.id}`} className="lg:col-span-8 bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-6">
+              <div className="relative aspect-[4/5] rounded-[10px] overflow-hidden bg-paper">
+                <Image
+                  src={founder.image}
+                  alt={`${founder.name}, ${founder.role} at GLOW VAI`}
+                  fill
+                  sizes="(max-width: 640px) 80vw, 200px"
+                  className={`object-cover ${founder.id === "rahimath" ? "object-top" : "object-center"}`}
+                />
+              </div>
+              <div>
+                <p className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">
+                  <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                  {founder.location}
+                </p>
+                <h3 className="mt-2 font-display font-semibold text-3xl leading-tight">{founder.name}</h3>
+                <p className="text-brand font-semibold">{founder.role}</p>
+                <p className="mt-4 text-lg leading-snug text-ink">&ldquo;{founder.tagline}&rdquo;</p>
+                <p className="mt-4 font-display font-semibold text-lg">{founder.storyTitle}</p>
+                <p className="text-sm text-ink-muted">{founder.storySubtitle}</p>
               </div>
             </div>
 
-            {/* Story Header */}
-            <div className="mb-10 text-center max-w-3xl mx-auto space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-brand">
-                FOUNDER PERSONAL STORY
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-ink">
-                {selectedFounder.storyTitle}
-              </h2>
-              <p className="text-sm text-ink-muted font-medium">
-                {selectedFounder.storySubtitle}
-              </p>
-            </div>
-
-            {/* Structured Story Sections */}
-            <div className="space-y-8 max-w-3xl mx-auto">
-              {selectedFounder.sections.map((sec, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white p-6 sm:p-8 rounded-2xl border border-ink/10 shadow-sm space-y-4 hover:border-brand/40 hover:shadow-md transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-brand text-white font-bold text-sm flex items-center justify-center shadow-sm">
-                      {idx + 1}
+            <ul className="mt-8 border-t border-ink/20">
+              {founder.sections.map((sec, i) => (
+                <li key={sec.title} className="border-b border-ink/20">
+                  <h4>
+                    <button
+                      type="button"
+                      aria-expanded={open === i}
+                      onClick={() => setOpen(open === i ? null : i)}
+                      className={`w-full flex items-center justify-between gap-4 py-4 text-left font-display font-semibold text-lg ${focusRing}`}
+                    >
+                      <span>
+                        <span className="font-mono text-sm text-brand mr-3">{String(i + 1).padStart(2, "0")}</span>
+                        {sec.title}
+                      </span>
+                      <ChevronDown className={`w-5 h-5 shrink-0 transition-transform ${open === i ? "rotate-180" : ""}`} aria-hidden="true" />
+                    </button>
+                  </h4>
+                  {open === i && (
+                    <div className="pb-5 space-y-3 text-[15px] leading-relaxed text-ink-muted max-w-[68ch]">
+                      {sec.content.map((p, k) => (
+                        <p key={k}>{p}</p>
+                      ))}
                     </div>
-                    <h3 className="font-display font-bold text-lg sm:text-xl text-ink">
-                      {sec.title}
-                    </h3>
-                  </div>
-
-                  <div className="space-y-3 pl-0 sm:pl-11 text-ink-muted text-sm sm:text-base leading-relaxed font-normal">
-                    {sec.content.map((p, pIdx) => (
-                      <p key={pIdx}>{p}</p>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Bottom Back Button */}
-            <div className="mt-12 text-center pt-8 border-t border-ink/10">
-              <button
-                onClick={handleBackToStory}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-brand hover:bg-brand-dark text-white font-bold text-sm transition-all shadow-lg hover:shadow-glow cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Return to GLOW VAI Founding Team</span>
-              </button>
-            </div>
-
-          </Container>
-        </div>
-      ) : (
-
-        /* ------------------------------------------------------------- */
-        /* 2. MAIN OUR STORY PAGE VIEW                                  */
-        /* ------------------------------------------------------------- */
-        <div className="py-12 sm:py-20">
-          <Container size="md">
-
-            {/* Breadcrumb */}
-            <nav aria-label="Breadcrumb" className="mb-8 text-xs text-ink-light">
-              <ol className="flex items-center gap-2">
-                <li>
-                  <Link href="/" className="hover:text-brand transition-colors font-medium">
-                    Home
-                  </Link>
+                  )}
                 </li>
-                <li>/</li>
-                <li className="font-semibold text-ink">Our Story & Skincare Retail Brand</li>
-              </ol>
-            </nav>
-
-            {/* ABOUT GLOW VAI OVERVIEW BLOCK */}
-            <div className="bg-skymist/50 border-2 border-brand/20 p-6 sm:p-8 rounded-3xl mb-12 space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider">
-                <ScanLine className="w-3.5 h-3.5" />
-                <span>About GLOW VAI</span>
-              </div>
-              <h2 className="font-display font-bold text-xl sm:text-2xl text-ink">
-                GLOW VAI, the Indian Skincare Retailer
-              </h2>
-              <p className="text-sm sm:text-base text-ink-muted leading-relaxed font-normal">
-                GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering. Founded in Andhra Pradesh, India, we make choosing a skincare routine clear and fast.
-              </p>
-            </div>
-
-            {/* 1. HERO SECTION */}
-            <div className="space-y-6 text-center max-w-3xl mx-auto mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand/10 border border-brand/20 text-brand text-xs font-bold uppercase tracking-wider">
-                <Zap className="w-3.5 h-3.5" />
-                <span>GLOW VAI RETAIL & FREE AI FACE SCAN</span>
-              </div>
-
-              <h1 className="font-display font-bold text-3xl sm:text-5xl lg:text-6xl text-ink leading-[1.1]">
-                Skincare that starts with a <Accent>selfie</Accent>.
-              </h1>
-
-              <p className="text-base sm:text-lg text-ink-muted leading-relaxed max-w-2xl mx-auto">
-                GLOW VAI combines a free face scan with WhatsApp ordering for skincare routines across India.
-              </p>
-            </div>
-
-            {/* QUICK HIGHLIGHT BANNER */}
-            <div className="bg-brand p-8 sm:p-10 rounded-3xl text-white shadow-2xl mb-20 relative overflow-hidden">
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-white text-brand flex items-center justify-center mx-auto shadow-md">
-                    <Camera className="w-5 h-5 text-brand" />
-                  </div>
-                  <h2 className="font-bold text-lg text-white">Free AI Face Scan</h2>
-                  <p className="text-xs text-skymist leading-relaxed">
-                    Evaluates skin hydration, barrier depth, and pore health in 30 seconds.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-mint text-ink flex items-center justify-center mx-auto shadow-md">
-                    <Zap className="w-5 h-5 text-ink" />
-                  </div>
-                  <h2 className="font-bold text-lg text-white">Authentic Skincare</h2>
-                  <p className="text-xs text-skymist leading-relaxed">
-                    Independent skincare retailer.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-yellow text-ink flex items-center justify-center mx-auto shadow-md">
-                    <Truck className="w-5 h-5 text-ink" />
-                  </div>
-                  <h2 className="font-bold text-lg text-white">WhatsApp Ordering</h2>
-                  <p className="text-xs text-skymist leading-relaxed">
-                    Direct order dispatch and fast delivery across India.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. INTERACTIVE FOUNDING TEAM CARDS */}
-            <div className="mb-28 space-y-10">
-              <div className="text-center space-y-3 max-w-2xl mx-auto">
-                <Badge variant="brand" size="md">
-                  FOUNDING TEAM
-                </Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink">
-                  Meet Our Founders
-                </h2>
-                <p className="text-sm text-ink-muted">
-                  Click on any founder card below to read their background and vision for GLOW VAI.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-                {storyData.founders.map((f) => (
-                  <div
-                    key={f.id}
-                    id={f.id}
-                    onClick={() => handleSelectFounder(f.id)}
-                    className="group bg-white rounded-3xl p-6 border-2 border-ink/10 hover:border-brand/60 shadow-sm hover:shadow-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between relative overflow-hidden"
-                  >
-                    <div className="space-y-4">
-                      {/* Photo */}
-                      <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-skymist border border-ink/10 group-hover:scale-[1.02] transition-transform duration-500">
-                        <Image
-                          src={f.image}
-                          alt={`${f.name}, ${f.role} at GLOW VAI`}
-                          fill
-                          className={`object-cover ${f.id === "rahimath" ? "object-top" : "object-center"}`}
-                        />
-                        <div className="absolute top-3 left-3 bg-ink/80 text-white text-[11px] font-bold px-3 py-1 rounded-full border border-white/20">
-                          {f.location}
-                        </div>
-                      </div>
-
-                      {/* Info */}
-                      <div className="space-y-1.5">
-                        <h3 className="font-display font-bold text-xl text-ink group-hover:text-brand transition-colors">
-                          {f.name}
-                        </h3>
-                        <p className="text-xs font-bold text-brand uppercase tracking-wider">
-                          {f.role}
-                        </p>
-                        <p className="text-xs text-ink-muted leading-relaxed pt-1 line-clamp-3">
-                          {f.bio}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="pt-5 mt-4 border-t border-ink/10">
-                      <button className="w-full py-2.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-md">
-                        <BookOpen className="w-4 h-4" />
-                        <span>Read {f.name.split(" ")[0]}&apos;s Full Story</span>
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 3. GLOW VAI STARTUP MILESTONES TIMELINE */}
-            <div className="mb-28 space-y-12">
-              <div className="text-center space-y-3 max-w-2xl mx-auto">
-                <Badge variant="skymist" size="md">
-                  CHRONOLOGICAL MILESTONES
-                </Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink">
-                  GLOW VAI: The Story Behind the Brand
-                </h2>
-                <p className="text-sm text-ink-muted">
-                  From a conversation between friends to building an AI-powered skincare retail brand in Andhra Pradesh, India.
-                </p>
-              </div>
-
-              {/* Timeline Items */}
-              <div className="relative border-l-2 border-brand/30 ml-4 sm:ml-8 space-y-10 pl-6 sm:pl-10">
-                {storyData.timeline.map((evt, idx) => (
-                  <div key={idx} className="relative group">
-
-                    {/* Dot Icon */}
-                    <div className={`absolute -left-[31px] sm:-left-[47px] top-1.5 w-6 h-6 rounded-full border-4 ${evt.isKeyMilestone ? "bg-brand border-brand/30 shadow-lg scale-125" : "bg-white border-brand"}`} />
-
-                    {/* Content Card */}
-                    <div className={`p-6 rounded-2xl border transition-all ${evt.isKeyMilestone ? "bg-skymist/70 border-brand/40 shadow-sm" : "bg-white border-ink/10 hover:border-brand/20"}`}>
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <span className="font-display font-bold text-base sm:text-lg text-brand">
-                          {evt.period}
-                        </span>
-                        {evt.badge && (
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand/10 text-brand uppercase tracking-wider">
-                            {evt.badge}
-                          </span>
-                        )}
-                      </div>
-
-                      <h3 className="font-display font-bold text-lg text-ink mb-2">
-                        {evt.title}
-                      </h3>
-
-                      <div className="space-y-1.5 text-xs sm:text-sm text-ink-muted leading-relaxed font-normal">
-                        {evt.description.map((d, dIdx) => (
-                          <p key={dIdx}>• {d}</p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 4. VISIBLE FAQ SECTION (FOR ENTITY DISAMBIGUATION & FAQ SCHEMA) */}
-            <div id="faq" className="my-20 space-y-8">
-              <div className="text-center space-y-3 max-w-2xl mx-auto">
-                <Badge variant="brand" size="md">
-                  <HelpCircle className="w-3.5 h-3.5 inline mr-1" />
-                  FREQUENTLY ASKED QUESTIONS
-                </Badge>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink">
-                  Frequently Asked Questions About GLOW VAI
-                </h2>
-                <p className="text-sm text-ink-muted">
-                  Everything you need to know about GLOW VAI, our founders, and our retail offerings.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
-                  <h3 className="font-bold text-base text-ink">What is GLOW VAI?</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
-                  <h3 className="font-bold text-base text-ink">Who founded GLOW VAI?</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    GLOW VAI was founded by SK Sardar Musthafa (Founder), Rehmit (Market Explorer), and Nalla Satvik (Co-Founder & Technical Lead) in Andhra Pradesh, India.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
-                  <h3 className="font-bold text-base text-ink">Does GLOW VAI make its own products?</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    No. GLOW VAI is an independent retailer and does not manufacture the products it sells.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
-                  <h3 className="font-bold text-base text-ink">How do I contact GLOW VAI?</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    You can reach GLOW VAI by email at contact@glowvai.in or by telephone and WhatsApp at +91 89778 55998.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 5. MISSION & COMMITMENT */}
-            <div className="my-20 py-12 px-8 bg-brand text-white rounded-3xl text-center space-y-4 shadow-2xl">
-              <span className="text-xs font-bold tracking-widest text-yellow uppercase">
-                OUR PROMISE
-              </span>
-              <p className="font-display text-xl sm:text-3xl font-bold max-w-2xl mx-auto leading-relaxed">
-                Free AI skin checks for everyone with a smartphone, and reliable skincare retail ordering directly to your doorstep.
-              </p>
-              <p className="text-xs text-skymist font-medium pt-2">
-                GLOW VAI Retail • Andhra Pradesh, India
-              </p>
-            </div>
-
-            {/* 6. CLOSING CTA */}
-            <div className="pt-4 text-center space-y-6">
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink">
-                Ready to experience GLOW VAI?
-              </h2>
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <Link href="/face-analysis">
-                  <Button variant="primary" size="lg" className="h-[52px] gap-2  gv-btn-label bg-brand hover:bg-brand-dark">
-                    <Camera className="w-5 h-5 text-white shrink-0" />
-                    <span>Start Free AI Face Scan</span>
-                  </Button>
-                </Link>
-                <Link href="/shop">
-                  <Button variant="outline" size="lg" className="h-[52px] gap-2 gv-btn-label">
-                    <span>Explore Skincare Products</span>
-                    <ArrowRight className="w-4 h-4 shrink-0" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-          </Container>
+              ))}
+            </ul>
+          </div>
         </div>
-      )}
+      </Section>
+
+      {/* Timeline: pick a period */}
+      <Section labelledBy="timeline-title">
+        <Eyebrow>Milestones</Eyebrow>
+        <SectionTitle id="timeline-title" className="mt-4 max-w-[22ch]">
+          From a conversation to a company.
+        </SectionTitle>
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
+          <div role="tablist" aria-label="Timeline" aria-orientation="vertical" className="lg:col-span-4 border-t border-ink/20 self-start">
+            {storyData.timeline.map((e, i) => (
+              <button
+                key={e.period}
+                role="tab"
+                id={`ev-${i}`}
+                aria-selected={i === ti}
+                aria-controls="event-panel"
+                type="button"
+                onClick={() => setTi(i)}
+                className={`w-full text-left py-4 px-3 border-b border-ink/20 ${tabRing} ${i === ti ? "bg-brand text-white" : "hover:bg-paper-deep"}`}
+              >
+                <span className={`block font-mono text-xs uppercase tracking-[0.12em] ${i === ti ? "text-white/85" : "text-ink-muted"}`}>{e.period}</span>
+                <span className="block font-display font-semibold text-base leading-snug">{e.title}</span>
+              </button>
+            ))}
+          </div>
+          <div id="event-panel" role="tabpanel" aria-labelledby={`ev-${ti}`} className="lg:col-span-8 border-t-2 border-ink pt-6">
+            <p className="font-mono text-sm uppercase tracking-[0.12em] text-brand">{evt.period}</p>
+            <h3 className="mt-2 font-display font-semibold text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-tight">{evt.title}</h3>
+            <ul className="mt-5 space-y-3 text-[17px] leading-relaxed text-ink-muted max-w-[62ch]">
+              {evt.description.map((d, i) => (
+                <li key={i} className="pl-5 relative before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:w-2 before:h-px before:bg-ink">
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      {/* FAQ */}
+      <Section id="faq" tone="deep" labelledBy="story-faq" pad="tight">
+        <SectionTitle id="story-faq">Questions about GLOW VAI</SectionTitle>
+        <ul className="mt-8 border-t border-ink/20 max-w-[860px]">
+          {faqs.map((f, i) => (
+            <li key={f.q} className="border-b border-ink/20">
+              <h3>
+                <button
+                  type="button"
+                  aria-expanded={faqOpen === i}
+                  onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                  className={`w-full flex items-center justify-between gap-4 py-5 text-left font-display font-semibold text-lg ${focusRing}`}
+                >
+                  {f.q}
+                  <ChevronDown className={`w-5 h-5 shrink-0 transition-transform ${faqOpen === i ? "rotate-180" : ""}`} aria-hidden="true" />
+                </button>
+              </h3>
+              {faqOpen === i && <p className="pb-5 text-ink-muted max-w-[62ch]">{f.a}</p>}
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      {/* Closing */}
+      <Section tone="ink" labelledBy="story-cta" pad="md">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div className="md:col-span-8">
+            <SectionTitle id="story-cta" tone="dark" className="max-w-[22ch]">
+              Free skin checks for everyone with a smartphone.
+            </SectionTitle>
+            <p className="mt-4 text-white/80 max-w-[52ch]">GLOW VAI Retail, Andhra Pradesh, India.</p>
+          </div>
+          <div className="md:col-span-4 flex flex-col gap-3">
+            <Link href="/face-analysis">
+              <Button variant="primary" size="lg" className="w-full bg-white !text-ink hover:bg-paper">
+                <span>Scan my face, free</span>
+              </Button>
+            </Link>
+            <Link href="/shop" className="text-white underline underline-offset-[5px] font-medium rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white">
+              Explore skincare products
+            </Link>
+          </div>
+        </div>
+      </Section>
     </div>
   );
 }

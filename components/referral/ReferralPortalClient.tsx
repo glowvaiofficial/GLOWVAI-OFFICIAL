@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Accent } from "@/components/ui/Accent";
 import { Button } from "@/components/ui/Button";
+import { ReferralLanding } from "./ReferralLanding";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { SITE_URL } from "@/lib/site-url";
 import { Gift, Share2, QrCode, ScanLine, CheckCircle2, Copy, Check, TrendingUp, Award, Clock, ArrowRight, ShieldCheck, UserCheck, Car, GraduationCap, Upload, ChevronRight, RotateCcw, MessageSquare, DollarSign, AlertCircle } from "lucide-react";
@@ -370,266 +371,38 @@ export function ReferralPortalClient() {
     setView("WELCOME");
   };
 
+  if (view === "WELCOME") {
+    return (
+      <ReferralLanding
+        onDriver={() => {
+          setCategory("DRIVER");
+          setDriverStep(1);
+          setView("DRIVER_WIZARD");
+        }}
+        onStudent={() => {
+          setCategory("STUDENT");
+          setStudentStep(1);
+          setView("STUDENT_WIZARD");
+        }}
+        onLogin={() => {
+          setLoginError("");
+          setView("LOGIN");
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="bg-white min-h-screen text-ink relative overflow-hidden bg-grid-subtle">
-      {/* Ambient Blue Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand/10 blur-[120px] rounded-full pointer-events-none -z-10" />
-
+    <div className="bg-paper min-h-screen text-ink relative overflow-hidden">
       <Container size="md" className="py-12 sm:py-20 relative z-10">
-        {/* Top Header Badge */}
-        <div className="text-center space-y-4 max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full text-xs font-bold border border-brand/20 shadow-sm">
-            <ScanLine className="w-4 h-4 text-brand" />
-            <span>GLOW VAI Partner Ecosystem</span>
-          </div>
-
-          <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink tracking-tight leading-tight">
-            Partner <span className="text-brand">Referral</span> Network
+        <div className="max-w-2xl mx-auto mb-10">
+          <button type="button" onClick={() => setView("WELCOME")} className="text-sm font-medium underline underline-offset-4 rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand">
+            Back to the referral overview
+          </button>
+          <h1 className="mt-4 font-display font-semibold text-4xl sm:text-5xl tracking-[-0.03em] leading-tight">
+            Partner <span className="text-brand">referral</span> network
           </h1>
-
-          <p className="text-sm sm:text-base text-ink-muted leading-relaxed font-medium max-w-xl mx-auto">
-            Earn <strong className="text-brand font-bold">₹10 per verified referral</strong> + <strong className="text-coral font-bold">₹1,000 milestone bonus</strong>. Instant UPI settlements directly to your bank account.
-          </p>
         </div>
-
-        {/* ----------------- SCREEN 1: WELCOME SELECTOR ----------------- */}
-        {view === "WELCOME" && (
-          <div className="space-y-8 max-w-2xl mx-auto">
-            {/* 6 AI Image Showcase Section FIRST */}
-            <div className="space-y-6">
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center gap-2 bg-brand/10 text-brand px-3.5 py-1 rounded-full text-xs font-bold border border-brand/20">
-                  <ScanLine className="w-3.5 h-3.5" />
-                  <span>Partner Program Visual Guidance</span>
-                </div>
-                <h2 className="font-display font-bold text-2xl text-ink">
-                  How You Earn With GLOW VAI
-                </h2>
-                <p className="text-xs text-ink-muted max-w-md mx-auto font-medium">
-                  Review how Auto Rickshaw posters, campus ambassador badges, and instant UPI payouts work in Vijayawada before registering below.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* 1. Auto Poster */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/auto_poster.png"
-                      alt="Seatback QR Poster inside Autos"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      1. Transit Poster
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">1. Auto Seatback QR Poster</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Mount our durable QR poster inside your auto. Passengers scan & scan skin for free.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2. Direct UPI Payout */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/upi_payout.png"
-                      alt="Instant Direct UPI Settlements"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-mint text-ink text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      2. Instant Payout
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">2. ₹10 Per Scan Instant UPI</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Direct cash transfer to Google Pay or PhonePe as soon as referral is verified.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 3. Campus Ambassador */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/campus_ambassador.png"
-                      alt="Student Campus QR Badge Program"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      3. Campus Ambassador
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">3. College QR ID Badge</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Campus ambassadors share skin scan badges with classmates across colleges.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 4. WhatsApp Share */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/whatsapp_share.png"
-                      alt="Instant WhatsApp Share Link"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-mint text-ink text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      4. WhatsApp Share
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">4. 1-Click WhatsApp Invites</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Send personalized referral links directly to your WhatsApp groups and friends.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 5. Vijayawada Hubs */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/vijayawada_hubs.png"
-                      alt="Vijayawada Hub Transit Network"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      5. Local Hubs
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">5. Vijayawada Transit Map</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Benz Circle, Bus Stand & Kanuru stands connected to neighborhood micro-hubs.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 6. Milestone Bonus */}
-                <div className="bg-white p-4 rounded-2xl border border-ink/10 hover:border-brand/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                    <Image
-                      src="/images/referral/milestone_bonus.png"
-                      alt="₹1,000 Milestone Cash Bonus"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-yellow text-ink text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      6. ₹1,000 Bonus
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-ink">6. ₹1,000 Milestone Bonus</h4>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Hit 100 verified referrals in a month to earn your extra ₹1,000 cash bonus.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => { setLoginError(""); setView("LOGIN"); }}
-                className="text-xs font-semibold text-brand hover:underline cursor-pointer"
-              >
-                Already registered? Log in as an Auto Captain or Campus Ambassador
-              </button>
-            </div>
-
-            {/* Registration Selector Cards NEXT */}
-            <div className="pt-4 space-y-6 max-w-xl mx-auto">
-              <div className="text-center space-y-1">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-brand block">
-                  Select Campaign & Register Below
-                </span>
-                <h3 className="font-display font-bold text-xl text-ink">
-                  Ready to Become a Partner?
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Option 1: Auto Driver */}
-                <div
-                  onClick={() => {
-                    setCategory("DRIVER");
-                    setDriverStep(1);
-                    setView("DRIVER_WIZARD");
-                  }}
-                  className="bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 hover:border-brand/50 shadow-sm hover:shadow-xl hover:shadow-brand/10 transition-all cursor-pointer space-y-5 flex flex-col justify-between group"
-                >
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                      <Car className="w-6 h-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-brand block">
-                        Transit Campaign
-                      </span>
-                      <h2 className="font-display font-bold text-xl text-ink group-hover:text-brand transition-colors">
-                        Auto Driver Partner
-                      </h2>
-                    </div>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Mount our seatback QR poster inside your auto. Passengers scan & earn you ₹10 per referral + ₹1,000 milestone bonus.
-                    </p>
-                  </div>
-                  <div className="pt-2">
-                    <Button variant="primary" size="md" className="w-full text-xs font-bold gap-2 bg-brand hover:bg-brand-dark text-white shadow-md shadow-brand/20">
-                      <span>Register Auto Driver</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Option 2: Student Campus Ambassador */}
-                <div
-                  onClick={() => {
-                    setCategory("STUDENT");
-                    setStudentStep(1);
-                    setView("STUDENT_WIZARD");
-                  }}
-                  className="bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 hover:border-brand/50 shadow-sm hover:shadow-xl hover:shadow-brand/10 transition-all cursor-pointer space-y-5 flex flex-col justify-between group"
-                >
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                      <GraduationCap className="w-6 h-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-brand block">
-                        Campus Campaign
-                      </span>
-                      <h2 className="font-display font-bold text-xl text-ink group-hover:text-brand transition-colors">
-                        Campus Ambassador
-                      </h2>
-                    </div>
-                    <p className="text-xs text-ink-muted leading-relaxed font-medium">
-                      Refer classmates & friends across campus. Get a custom QR badge, earn instant pocket cash, and top performance perks.
-                    </p>
-                  </div>
-                  <div className="pt-2">
-                    <Button variant="outline" size="md" className="w-full text-xs font-bold border-ink/20 hover:border-brand hover:bg-skymist text-ink gap-2">
-                      <span>Register Ambassador</span>
-                      <ArrowRight className="w-4 h-4 text-brand" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ----------------- SCREEN 2: AUTO DRIVER WIZARD ----------------- */}
         {view === "LOGIN" && (

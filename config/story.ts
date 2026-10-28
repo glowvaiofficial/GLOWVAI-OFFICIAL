@@ -54,7 +54,7 @@ export const storyData = {
       image: "/images/founders/sardhar-musthafa.jpeg",
       artDirectionNote: "SK Sardar Musthafa, founder of GLOW VAI.",
       location: "Vijayawada, Andhra Pradesh",
-      storyTitle: "SK SARDHAR MUSTHAFA: The Story of a Boy Who Decided to Build Something of His Own",
+      storyTitle: "Sardar Musthafa: The Story of a Boy Who Decided to Build Something of His Own",
       storySubtitle: "2023-2026 | A story nobody saw completely.",
       sections: [
         {
@@ -154,7 +154,7 @@ export const storyData = {
       image: "/images/founders/rahimath.jpeg",
       artDirectionNote: "Rehmit, Marketing Lead & Market Explorer.",
       location: "Hyderabad & Vijayawada, Andhra Pradesh",
-      storyTitle: "RAHIMATH: The Story of a Friend Who Became Part of a Startup Build",
+      storyTitle: "Rehmit: The Story of a Friend Who Became Part of a Startup Build",
       storySubtitle: "2023-2026 | Friendship, ambition, setbacks, and the unfinished dream of Glowvai.",
       sections: [
         {

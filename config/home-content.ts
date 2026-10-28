@@ -102,9 +102,9 @@ export const storyParagraphs = [
 export const storyQuote = "What if the best tool for understanding your skin was already in your pocket?";
 
 export const founders = [
-  { name: "Sardar Musthafa", role: "Founder and CEO", bio: "[REAL ONE-LINE BIO]", photo: "teamAtDesk", position: "object-center" },
-  { name: "Nalla Satvik", role: "Co-Founder and Technical Lead", bio: "[REAL ONE-LINE BIO]", photo: "workingMoment", position: "object-center" },
-  { name: "Rehmit", role: "[REAL TITLE]", bio: "[REAL ONE-LINE BIO]", photo: "productCloseUp", position: "object-top" },
+  { name: "Sardar Musthafa", role: "Founder and CEO", bio: "Leads the company, the partner stores and delivery.", photo: "teamAtDesk", position: "object-center" },
+  { name: "Nalla Satvik", role: "Co-Founder and Technical Lead", bio: "Builds the website, the face scan and the ordering system.", photo: "workingMoment", position: "object-center" },
+  { name: "Rehmit", role: "Co-Founder", bio: "", photo: "productCloseUp", position: "object-top" },
 ] as const;
 
 export const timeline = [
