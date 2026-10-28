@@ -24,7 +24,6 @@ are marked where I could not verify the source or licence from inside the reposi
 |---|---|---|---|
 | Familjen Grotesk | SIL Open Font License 1.1 (as listed on Google Fonts) | Headings and numerals | Licence per Google Fonts listing. Re-check at fonts.google.com before launch. |
 | Inter | SIL Open Font License 1.1 (as listed on Google Fonts) | Body text | Same as above. |
-| IBM Plex Mono | SIL Open Font License 1.1 (as listed on Google Fonts) | Time stamps, labels, table headings | Same as above. |
 
 ## Images and graphics
 Source, author and commercial-use terms for the files below are **not recorded in this repository**. Until the

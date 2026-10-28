@@ -15,26 +15,7 @@ import { formatPrice } from "@/lib/utils";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { useCartStore } from "@/lib/store/cart";
-import {
-  Sparkles,
-  Camera,
-  Lock,
-  CheckCircle2,
-  AlertCircle,
-  Share2,
-  RotateCcw,
-  ArrowRight,
-  Sun,
-  ShieldCheck,
-  Upload,
-  ExternalLink,
-  Check,
-  MapPin,
-  User,
-  Phone,
-  Mail,
-  HelpCircle,
-} from "lucide-react";
+import { ScanLine, Camera, Lock, CheckCircle2, AlertCircle, Share2, RotateCcw, ArrowRight, Sun, ShieldCheck, Upload, ExternalLink, Check, MapPin, User, Phone, Mail, HelpCircle } from "lucide-react";
 
 type FlowStep =
   | "SCAN_READY"
@@ -344,7 +325,7 @@ export function FaceAnalysisClient() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-xs text-ink">1. AI Camera Scan & Mesh</h4>
+                        <h3 className="font-display font-bold text-xs text-ink">1. AI Camera Scan & Mesh</h3>
                         <p className="text-[11px] text-ink-muted leading-relaxed">
                           Maps 128 micro-nodes across forehead, cheeks, and chin in natural lighting.
                         </p>
@@ -364,7 +345,7 @@ export function FaceAnalysisClient() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-xs text-ink">2. Barrier Hydration Depth</h4>
+                        <h3 className="font-display font-bold text-xs text-ink">2. Barrier Hydration Depth</h3>
                         <p className="text-[11px] text-ink-muted leading-relaxed">
                           Evaluates ceramide retention, trans-epidermal water loss, and pore smoothness.
                         </p>
@@ -384,7 +365,7 @@ export function FaceAnalysisClient() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-xs text-ink">3. Active Routine Match</h4>
+                        <h3 className="font-display font-bold text-xs text-ink">3. Active Routine Match</h3>
                         <p className="text-[11px] text-ink-muted leading-relaxed">
                           Selects precise Niacinamide & Salicylic Acid ratios for Vijayawada weather.
                         </p>
@@ -404,7 +385,7 @@ export function FaceAnalysisClient() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-xs text-ink">4. 30-Day Radiance Score</h4>
+                        <h3 className="font-display font-bold text-xs text-ink">4. 30-Day Radiance Score</h3>
                         <p className="text-[11px] text-ink-muted leading-relaxed">
                           Tracks skin barrier score improvement with weekly re-scan updates.
                         </p>
@@ -419,22 +400,22 @@ export function FaceAnalysisClient() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <Sun className="w-4 h-4 text-yellow-hover" />
-                          <h4 className="font-display font-bold text-xs text-ink">Natural Light</h4>
+                          <h3 className="font-display font-bold text-xs text-ink">Natural Light</h3>
                           <p className="text-[11px] text-ink-muted">Face window for clear illumination.</p>
                         </div>
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <CheckCircle2 className="w-4 h-4 text-coral" />
-                          <h4 className="font-display font-bold text-xs text-ink">Centered Face</h4>
+                          <h3 className="font-display font-bold text-xs text-ink">Centered Face</h3>
                           <p className="text-[11px] text-ink-muted">Keep face inside scanner oval.</p>
                         </div>
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <Lock className="w-4 h-4 text-brand" />
-                          <h4 className="font-display font-bold text-xs text-ink">Stored privately</h4>
+                          <h3 className="font-display font-bold text-xs text-ink">Stored privately</h3>
                           <p className="text-[11px] text-ink-muted">Delete anytime on request.</p>
                         </div>
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <ShieldCheck className="w-4 h-4 text-brand" />
-                          <h4 className="font-display font-bold text-xs text-ink">Instant Match</h4>
+                          <h3 className="font-display font-bold text-xs text-ink">Instant Match</h3>
                           <p className="text-[11px] text-ink-muted">Matched to our range.</p>
                         </div>
                       </div>
@@ -500,7 +481,7 @@ export function FaceAnalysisClient() {
                           className="w-full h-full object-cover scale-x-[-1]"
                         />
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-56 h-60 sm:h-72 rounded-[50%] border-2 border-dashed border-white/95 pointer-events-none flex flex-col items-center justify-center gap-1 shadow-2xl">
-                          <span className="text-[10px] text-white/90 font-bold bg-ink/80 px-2.5 py-0.5 rounded-full border border-white/30 backdrop-blur-sm">
+                          <span className="text-[10px] text-white/90 font-bold bg-ink/80 px-2.5 py-0.5 rounded-full border border-white/30">
                             Align Face Vertical
                           </span>
                         </div>
@@ -719,7 +700,7 @@ export function FaceAnalysisClient() {
                     <label className="block text-xs font-bold text-ink flex items-center gap-1.5">
                       <HelpCircle className="w-3.5 h-3.5 text-brand" /> Demographic Category *
                     </label>
-                    <select
+                    <select aria-label="Demographic category"
                       value={form.demographic}
                       onChange={(e) => setForm({ ...form, demographic: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink font-semibold focus:border-brand focus:bg-white focus:outline-none transition-colors"
@@ -734,7 +715,7 @@ export function FaceAnalysisClient() {
 
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-ink">Primary Skin Concern</label>
-                    <select
+                    <select aria-label="Primary skin concern"
                       value={form.skinConcern}
                       onChange={(e) => setForm({ ...form, skinConcern: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink font-semibold focus:border-brand focus:bg-white focus:outline-none transition-colors"

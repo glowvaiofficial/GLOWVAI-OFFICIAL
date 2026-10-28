@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Accent } from "@/components/ui/Accent";
-import { Lock, Unlock, Mail, Sparkles, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Lock, Unlock, Mail, ScanLine, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
 import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 interface ShopUnlockGateProps {
@@ -64,7 +64,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
       <div className="relative">
         {/* VIP Early Access Unlocked Banner */}
         <div className="bg-mint text-ink py-2.5 px-4 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-mint">
-          <Sparkles className="w-4 h-4 text-ink shrink-0" />
+          <ScanLine className="w-4 h-4 text-ink shrink-0" />
           <span>VIP Early Access Open! Use code <strong>GLOW15</strong> at checkout for 15% off.</span>
         </div>
         {children}
@@ -80,7 +80,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
       </div>
 
       {/* Glassmorphism Lock Overlay */}
-      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 bg-ink/75 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 bg-ink/75 animate-in fade-in duration-300">
         <div className="max-w-md w-full bg-white/95 text-ink p-8 sm:p-10 rounded-[32px] shadow-2xl border border-white/40 text-center space-y-6 relative overflow-hidden">
           
           {/* Decorative Glow */}
@@ -89,7 +89,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
 
           {/* Lock Badge */}
           <div className="w-14 h-14 rounded-2xl bg-skymist flex items-center justify-center text-brand mx-auto shadow-xs border border-brand/20">
-            <Lock className="w-7 h-7 text-brand animate-pulse" />
+            <Lock className="w-7 h-7 text-brand" />
           </div>
 
           <div className="space-y-2">
@@ -140,7 +140,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
               size="lg"
               type="submit"
               disabled={isSubmitting}
-              className="w-full  text-button-label gap-2"
+              className="w-full  gv-btn-label gap-2"
             >
               <Unlock className="w-4 h-4 text-ink shrink-0" />
               <span>{isSubmitting ? "Opening..." : "Get Shop Access"}</span>

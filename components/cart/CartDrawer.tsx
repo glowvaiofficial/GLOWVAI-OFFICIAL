@@ -69,7 +69,7 @@ export function CartDrawer() {
       {/* Backdrop */}
       <div
         onClick={closeCart}
-        className="fixed inset-0 bg-ink/60 backdrop-blur-xs animate-in fade-in duration-200"
+        className="fixed inset-0 bg-ink/60 animate-in fade-in duration-200"
         aria-hidden="true"
       />
 
@@ -114,7 +114,7 @@ export function CartDrawer() {
                 </p>
               </div>
               <Link href="/face-analysis" onClick={closeCart}>
-                <Button variant="primary" size="md" className="gap-2  text-button-label">
+                <Button variant="primary" size="md" className="gap-2  gv-btn-label">
                   <span>Start free scan</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -229,7 +229,7 @@ export function CartDrawer() {
 
             {/* Checkout Options */}
             {checkoutEnabled ? (
-              <Button variant="primary" size="lg" className="w-full  text-button-label">
+              <Button variant="primary" size="lg" className="w-full  gv-btn-label">
                 <span>Proceed to Checkout</span>
               </Button>
             ) : (

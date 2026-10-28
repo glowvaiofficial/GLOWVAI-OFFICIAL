@@ -92,7 +92,7 @@
     font-family: var(--font-body), sans-serif;
   }
 
-  .text-button-label {
+  .gv-btn-label {
     font-size: 0.9375rem;
     line-height: 1.4;
     font-weight: 600;

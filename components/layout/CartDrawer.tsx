@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, ShoppingBag, ArrowRight, ShieldCheck, Zap, AlertTriangle, Sparkles, Camera } from "lucide-react";
+import { X, ShoppingBag, ArrowRight, ShieldCheck, Zap, AlertTriangle, ScanLine, Camera } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Shopping Cart"
-        className="fixed inset-0 z-[100] bg-ink/60 backdrop-blur-sm flex justify-end animate-fadeIn"
+        className="fixed inset-0 z-[100] bg-ink/60 flex justify-end animate-fadeIn"
       >
         <div className="w-full max-w-md bg-white h-full flex flex-col justify-between shadow-2xl p-6 overflow-y-auto">
           
@@ -167,7 +167,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
       {/* 2. STORE MAINTENANCE MODAL */}
       {showMaintenanceModal && (
-        <div className="fixed inset-0 z-[120] bg-ink/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-[120] bg-ink/80 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border-2 border-brand/20 shadow-2xl text-center space-y-5 relative">
             <button
               onClick={() => setShowMaintenanceModal(false)}
@@ -195,7 +195,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="pt-2 flex flex-col gap-2.5">
               <Link href="/face-analysis" onClick={() => { setShowMaintenanceModal(false); onClose(); }}>
                 <Button variant="primary" size="md" className="w-full gap-2 bg-brand hover:bg-brand-dark text-white font-bold text-xs py-3">
-                  <Sparkles className="w-4 h-4 text-yellow" />
+                  <ScanLine className="w-4 h-4 text-yellow" />
                   <span>Start Free AI Face Scan</span>
                 </Button>
               </Link>

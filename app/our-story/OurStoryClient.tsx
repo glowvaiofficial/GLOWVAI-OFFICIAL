@@ -8,19 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Accent } from "@/components/ui/Accent";
 import { Button } from "@/components/ui/Button";
 import { storyData } from "@/config/story";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  Sparkles, 
-  Zap, 
-  MapPin, 
-  UserCheck, 
-  Truck, 
-  Camera, 
-  ChevronRight,
-  BookOpen,
-  HelpCircle
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, ScanLine, Zap, MapPin, UserCheck, Truck, Camera, ChevronRight, BookOpen, HelpCircle } from "lucide-react";
 
 export default function OurStoryClient() {
   const [selectedFounderId, setSelectedFounderId] = useState<string | null>(null);
@@ -90,7 +78,7 @@ export default function OurStoryClient() {
                       {selectedFounder.location}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-yellow-hover" />
+                      <ScanLine className="w-4 h-4 text-yellow-hover" />
                       GLOW VAI Founding Partner
                     </span>
                   </div>
@@ -177,7 +165,7 @@ export default function OurStoryClient() {
             {/* ABOUT GLOW VAI OVERVIEW BLOCK */}
             <div className="bg-skymist/50 border-2 border-brand/20 p-6 sm:p-8 rounded-3xl mb-12 space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5" />
+                <ScanLine className="w-3.5 h-3.5" />
                 <span>About GLOW VAI</span>
               </div>
               <h2 className="font-display font-bold text-xl sm:text-2xl text-ink">
@@ -205,33 +193,33 @@ export default function OurStoryClient() {
             </div>
 
             {/* QUICK HIGHLIGHT BANNER */}
-            <div className="bg-gradient-to-r from-brand via-brand to-brand-dark p-8 sm:p-10 rounded-3xl text-white shadow-2xl mb-20 relative overflow-hidden">
+            <div className="bg-brand p-8 sm:p-10 rounded-3xl text-white shadow-2xl mb-20 relative overflow-hidden">
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm space-y-2">
+                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
                   <div className="w-10 h-10 rounded-full bg-white text-brand flex items-center justify-center mx-auto shadow-md">
                     <Camera className="w-5 h-5 text-brand" />
                   </div>
-                  <h3 className="font-bold text-lg text-white">Free AI Face Scan</h3>
+                  <h2 className="font-bold text-lg text-white">Free AI Face Scan</h2>
                   <p className="text-xs text-skymist leading-relaxed">
                     Evaluates skin hydration, barrier depth, and pore health in 30 seconds.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm space-y-2">
+                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
                   <div className="w-10 h-10 rounded-full bg-mint text-ink flex items-center justify-center mx-auto shadow-md">
                     <Zap className="w-5 h-5 text-ink" />
                   </div>
-                  <h3 className="font-bold text-lg text-white">Authentic Skincare</h3>
+                  <h2 className="font-bold text-lg text-white">Authentic Skincare</h2>
                   <p className="text-xs text-skymist leading-relaxed">
                     Independent skincare retailer.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm space-y-2">
+                <div className="p-4 rounded-2xl bg-white/10 border border-white/20 space-y-2">
                   <div className="w-10 h-10 rounded-full bg-yellow text-ink flex items-center justify-center mx-auto shadow-md">
                     <Truck className="w-5 h-5 text-ink" />
                   </div>
-                  <h3 className="font-bold text-lg text-white">WhatsApp Ordering</h3>
+                  <h2 className="font-bold text-lg text-white">WhatsApp Ordering</h2>
                   <p className="text-xs text-skymist leading-relaxed">
                     Direct order dispatch and fast delivery across India.
                   </p>
@@ -270,7 +258,7 @@ export default function OurStoryClient() {
                           fill
                           className={`object-cover ${f.id === "rahimath" ? "object-top" : "object-center"}`}
                         />
-                        <div className="absolute top-3 left-3 bg-ink/80 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full border border-white/20">
+                        <div className="absolute top-3 left-3 bg-ink/80 text-white text-[11px] font-bold px-3 py-1 rounded-full border border-white/20">
                           {f.location}
                         </div>
                       </div>
@@ -418,13 +406,13 @@ export default function OurStoryClient() {
               </h2>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <Link href="/face-analysis">
-                  <Button variant="primary" size="lg" className="h-[52px] gap-2  text-button-label bg-brand hover:bg-brand-dark">
+                  <Button variant="primary" size="lg" className="h-[52px] gap-2  gv-btn-label bg-brand hover:bg-brand-dark">
                     <Camera className="w-5 h-5 text-white shrink-0" />
                     <span>Start Free AI Face Scan</span>
                   </Button>
                 </Link>
                 <Link href="/shop">
-                  <Button variant="outline" size="lg" className="h-[52px] gap-2 text-button-label">
+                  <Button variant="outline" size="lg" className="h-[52px] gap-2 gv-btn-label">
                     <span>Explore Skincare Products</span>
                     <ArrowRight className="w-4 h-4 shrink-0" />
                   </Button>

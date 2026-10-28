@@ -9,29 +9,7 @@ import { Accent } from "@/components/ui/Accent";
 import { Button } from "@/components/ui/Button";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { SITE_URL } from "@/lib/site-url";
-import {
-  Gift,
-  Share2,
-  QrCode,
-  Sparkles,
-  CheckCircle2,
-  Copy,
-  Check,
-  TrendingUp,
-  Award,
-  Clock,
-  ArrowRight,
-  ShieldCheck,
-  UserCheck,
-  Car,
-  GraduationCap,
-  Upload,
-  ChevronRight,
-  RotateCcw,
-  MessageSquare,
-  DollarSign,
-  AlertCircle,
-} from "lucide-react";
+import { Gift, Share2, QrCode, ScanLine, CheckCircle2, Copy, Check, TrendingUp, Award, Clock, ArrowRight, ShieldCheck, UserCheck, Car, GraduationCap, Upload, ChevronRight, RotateCcw, MessageSquare, DollarSign, AlertCircle } from "lucide-react";
 
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxMKXA3nFFIlX4mmbTjrOMwSa1Vu7JSgx6HIlKqmT6jLcZ0qz5ppqWFcLczaIR1RxkAuw/exec";
@@ -401,12 +379,12 @@ export function ReferralPortalClient() {
         {/* Top Header Badge */}
         <div className="text-center space-y-4 max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full text-xs font-bold border border-brand/20 shadow-sm">
-            <Sparkles className="w-4 h-4 text-brand" />
+            <ScanLine className="w-4 h-4 text-brand" />
             <span>GLOW VAI Partner Ecosystem</span>
           </div>
 
           <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink tracking-tight leading-tight">
-            Partner <span className="bg-gradient-to-r from-brand via-brand-light to-brand-dark bg-clip-text text-transparent">Referral</span> Network
+            Partner <span className="text-brand">Referral</span> Network
           </h1>
 
           <p className="text-sm sm:text-base text-ink-muted leading-relaxed font-medium max-w-xl mx-auto">
@@ -421,12 +399,12 @@ export function ReferralPortalClient() {
             <div className="space-y-6">
               <div className="text-center space-y-2">
                 <div className="inline-flex items-center gap-2 bg-brand/10 text-brand px-3.5 py-1 rounded-full text-xs font-bold border border-brand/20">
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <ScanLine className="w-3.5 h-3.5" />
                   <span>Partner Program Visual Guidance</span>
                 </div>
-                <h3 className="font-display font-bold text-2xl text-ink">
+                <h2 className="font-display font-bold text-2xl text-ink">
                   How You Earn With GLOW VAI
-                </h3>
+                </h2>
                 <p className="text-xs text-ink-muted max-w-md mx-auto font-medium">
                   Review how Auto Rickshaw posters, campus ambassador badges, and instant UPI payouts work in Vijayawada before registering below.
                 </p>
@@ -795,7 +773,7 @@ export function ReferralPortalClient() {
 
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-ink">Primary Hub / Stand Location *</label>
-                    <select
+                    <select aria-label="Primary hub or stand location"
                       value={dHub}
                       onChange={(e) => setDHub(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none bg-white font-medium"
@@ -1130,7 +1108,7 @@ export function ReferralPortalClient() {
                   {partnerId}
                 </span>
                 <span className="text-[10px] font-semibold text-ink bg-mint px-2 py-0.5 rounded-full flex items-center gap-1 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-brand" />
                   <span>LIVE ACTIVE</span>
                 </span>
               </div>
@@ -1180,7 +1158,7 @@ export function ReferralPortalClient() {
             </div>
 
             {/* Animated Milestone Track (Bright Royal Blue Gradient) */}
-            <div className="bg-gradient-to-r from-brand via-brand-light to-brand-dark text-white p-6 rounded-3xl space-y-4 shadow-xl border border-brand/30">
+            <div className="bg-brand text-white p-6 rounded-3xl space-y-4 shadow-xl border border-brand/30">
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-white">Target Milestone (₹1,000 Bonus)</span>
                 <span className="text-yellow font-semibold px-2.5 py-0.5 rounded-full bg-white/10 border border-white/20">
@@ -1188,9 +1166,9 @@ export function ReferralPortalClient() {
                 </span>
               </div>
 
-              <div className="relative w-full h-4 bg-white/20 rounded-full overflow-hidden border border-white/30 flex items-center p-0.5 backdrop-blur-sm">
+              <div className="relative w-full h-4 bg-white/20 rounded-full overflow-hidden border border-white/30 flex items-center p-0.5">
                 <div
-                  className="h-full bg-gradient-to-r from-yellow to-yellow-hover rounded-full transition-all duration-700 shadow-md"
+                  className="h-full bg-brand rounded-full transition-all duration-700 shadow-md"
                   style={{ width: `${Math.min(100, Math.max(5, (metrics.count / 100) * 100))}%` }}
                 />
               </div>

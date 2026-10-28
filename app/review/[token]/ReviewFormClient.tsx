@@ -205,7 +205,7 @@ export function ReviewFormClient({ token }: { token: string }) {
                 size="md"
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full  text-button-label mt-2"
+                className="w-full  gv-btn-label mt-2"
               >
                 {isSubmitting ? "Submitting..." : "Submit Review"}
               </Button>

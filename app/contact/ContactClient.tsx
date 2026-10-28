@@ -150,7 +150,7 @@ export function ContactClient() {
 
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-ink">Topic *</label>
-                    <select
+                    <select aria-label="Topic"
                       value={form.topic}
                       onChange={(e) => setForm({ ...form, topic: e.target.value as any })}
                       className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none bg-white font-semibold"
@@ -210,7 +210,7 @@ export function ContactClient() {
                   size="md"
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full  text-button-label mt-2"
+                  className="w-full  gv-btn-label mt-2"
                 >
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>

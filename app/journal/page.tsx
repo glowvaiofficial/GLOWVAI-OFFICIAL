@@ -8,7 +8,7 @@ import { SITE_URL } from "@/lib/site-url";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildWebPageSchema } from "@/lib/seo/schema/webpage";
 import { journalArticles } from "@/config/journal";
-import { BookOpen, Clock, ArrowRight, Sparkles, User, ShieldCheck } from "lucide-react";
+import { BookOpen, Clock, ArrowRight, ScanLine, User, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Skincare Basics & Routine Guides",
@@ -154,7 +154,7 @@ export default function JournalPage() {
         {/* Free Face Scan CTA */}
         <div className="bg-ink text-white rounded-3xl p-8 sm:p-12 text-center space-y-5">
           <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-semibold text-mint">
-            <Sparkles className="w-3.5 h-3.5" />
+            <ScanLine className="w-3.5 h-3.5" />
             <span>AI Skin Telemetry</span>
           </div>
           <h2 className="font-display font-bold text-2xl sm:text-3xl text-white">

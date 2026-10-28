@@ -131,7 +131,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
             variant="primary"
             size="lg"
             onClick={handleAddToCart}
-            className="flex-1  text-button-label gap-2"
+            className="flex-1  gv-btn-label gap-2"
           >
             {isAdded ? (
               <>

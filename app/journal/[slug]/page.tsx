@@ -9,16 +9,7 @@ import { SITE_URL } from "@/lib/site-url";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { journalArticles } from "@/config/journal";
 import { ORG_ID, WEBSITE_ID } from "@/lib/seo/entity-graph";
-import {
-  Clock,
-  ArrowLeft,
-  User,
-  ShieldCheck,
-  Sparkles,
-  AlertCircle,
-  Share2,
-  CheckCircle2,
-} from "lucide-react";
+import { Clock, ArrowLeft, User, ShieldCheck, ScanLine, AlertCircle, Share2, CheckCircle2 } from "lucide-react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -223,7 +214,7 @@ export default async function JournalArticlePage({ params }: Props) {
         {/* Conversion CTA Footer Banner */}
         <div className="max-w-[68ch] mx-auto mt-12 bg-ink text-white rounded-3xl p-6 sm:p-10 text-center space-y-4 shadow-lg">
           <div className="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full text-xs font-semibold text-mint">
-            <Sparkles className="w-3.5 h-3.5" />
+            <ScanLine className="w-3.5 h-3.5" />
             <span>Match Your Skin</span>
           </div>
           <h3 className="font-display font-bold text-2xl text-white">

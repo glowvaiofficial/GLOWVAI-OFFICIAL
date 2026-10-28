@@ -85,7 +85,7 @@ export default function FAQPage() {
         </div>
 
         {/* Contact Support Box */}
-        <div className="max-w-3xl mx-auto bg-gradient-to-r from-brand to-brand-dark text-white p-8 sm:p-10 rounded-3xl shadow-xl border border-brand/30 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-3xl mx-auto bg-brand text-white p-8 sm:p-10 rounded-3xl shadow-xl border border-brand/30 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
             <h2 className="font-display font-bold text-2xl text-white">Still have questions?</h2>
             <p className="text-xs sm:text-sm text-white/80 font-medium">

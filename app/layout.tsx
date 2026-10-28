@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Familjen_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
+import { Familjen_Grotesk, Inter } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
@@ -14,21 +14,15 @@ const displayFont = Familjen_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  weight: ["600", "700"],
   preload: true,
-});
-
-const monoFont = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-  weight: ["400"],
-  preload: false,
 });
 
 const bodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
+  weight: ["400", "600"],
   preload: true,
 });
 
@@ -103,7 +97,7 @@ export default async function RootLayout({
   const locationData = await getLocationFromIP();
 
   return (
-    <html lang="en-IN" className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable}`}>
+    <html lang="en-IN" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="shortcut icon" href="/favicon.svg" />

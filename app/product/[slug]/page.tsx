@@ -166,7 +166,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </p>
               </div>
               <Link href="/face-analysis" className="shrink-0">
-                <Button variant="primary" size="md" className="gap-2  text-button-label">
+                <Button variant="primary" size="md" className="gap-2  gv-btn-label">
                   <Camera className="w-4 h-4 text-ink shrink-0" />
                   <span>Start free scan</span>
                 </Button>

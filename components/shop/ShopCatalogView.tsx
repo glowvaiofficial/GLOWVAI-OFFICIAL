@@ -13,7 +13,7 @@ import { ShopUnlockGate } from "@/components/shop/ShopUnlockGate";
 import { filterProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { Product } from "@/config/products";
-import { Camera, Sparkles, Filter, X } from "lucide-react";
+import { Camera, ScanLine, Filter, X } from "lucide-react";
 
 interface ShopCatalogViewProps {
   allProducts: Product[];
@@ -194,7 +194,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
 
               {products.length === 0 ? (
                 <div className="py-20 text-center space-y-4 bg-skymist/30 rounded-3xl p-8 border border-ink/10">
-                  <Sparkles className="w-10 h-10 text-brand mx-auto" />
+                  <ScanLine className="w-10 h-10 text-brand mx-auto" />
                   <h3 className="font-display font-bold text-xl text-ink">Nothing matches your search</h3>
                   <p className="text-xs text-ink-muted">Clear a filter or take a free face scan to find your custom routine.</p>
                   <div className="flex justify-center gap-3">
@@ -252,9 +252,9 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                               <span className="text-[10px] font-bold text-brand uppercase tracking-wider block">
                                 {prod.skinTypes.join(" • ")}
                               </span>
-                              <h3 className="font-display font-bold text-sm text-ink group-hover:text-brand transition-colors line-clamp-1">
+                              <h2 className="font-display font-bold text-sm text-ink group-hover:text-brand transition-colors line-clamp-1">
                                 {prod.name}
-                              </h3>
+                              </h2>
                               <p className="text-xs text-ink-muted line-clamp-2 font-normal">
                                 {prod.tagline}
                               </p>

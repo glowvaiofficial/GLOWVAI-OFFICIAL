@@ -76,7 +76,7 @@ export function DataRequestForm() {
 
           <div className="space-y-1">
             <label className="block text-xs font-bold text-ink">Request Type *</label>
-            <select
+            <select aria-label="Request type"
               value={dataReq.type}
               onChange={(e) => setDataReq({ ...dataReq, type: e.target.value as any })}
               className="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 text-xs focus:outline-none focus:border-brand bg-white font-semibold"

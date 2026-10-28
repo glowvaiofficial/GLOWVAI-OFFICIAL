@@ -2,23 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import {
-  Lock,
-  Unlock,
-  Search,
-  Download,
-  RefreshCw,
-  Sparkles,
-  ImageIcon,
-  Users,
-  CheckCircle2,
-  AlertCircle,
-  LogOut,
-  Mail,
-  Send,
-  Eye,
-  ExternalLink,
-} from "lucide-react";
+import { Lock, Unlock, Search, Download, RefreshCw, ScanLine, ImageIcon, Users, CheckCircle2, AlertCircle, LogOut, Mail, Send, Eye, ExternalLink } from "lucide-react";
 import { AdminLead } from "@/lib/adminData";
 import { fetchLeadsFromSheet } from "@/lib/googleSheet";
 import { generateGlowVaiEmailHTML, sendResendEmail, isEmailProxyConfigured } from "@/lib/resend";
@@ -157,7 +141,7 @@ export default function AdminDashboardPage() {
   // -------------------------------------------------------------
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white via-ink-subtle to-skymist/50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-paper flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white border border-ink/10 rounded-[32px] p-8 sm:p-10 shadow-2xl space-y-6 text-ink text-center relative overflow-hidden">
 
           <div className="w-16 h-16 rounded-2xl bg-brand text-white flex items-center justify-center mx-auto shadow-lg shadow-brand/30">
@@ -238,7 +222,7 @@ export default function AdminDashboardPage() {
     <main className="min-h-screen bg-ink-subtle text-ink font-sans pb-20">
 
       {/* Brand Header Banner */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-ink/10 px-4 sm:px-8 py-4 flex items-center justify-between shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 border-b border-ink/10 px-4 sm:px-8 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-baseline gap-1.5">
             <span className="font-display font-bold text-2xl tracking-tight text-brand">
@@ -298,7 +282,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-ink-light uppercase tracking-wider">Total Rows Captured</span>
               <div className="w-10 h-10 rounded-2xl bg-skymist text-brand flex items-center justify-center border border-brand/10">
-                <Sparkles className="w-5 h-5" />
+                <ScanLine className="w-5 h-5" />
               </div>
             </div>
             <p className="font-display font-bold text-3xl text-ink">{leads.length}</p>
@@ -352,7 +336,7 @@ export default function AdminDashboardPage() {
                   : "text-ink-muted hover:text-ink hover:bg-ink-subtle"
               }`}
             >
-              <Sparkles className="w-4 h-4" />
+              <ScanLine className="w-4 h-4" />
               <span>Face Scan Leads ({leads.length})</span>
             </button>
 
@@ -505,7 +489,7 @@ export default function AdminDashboardPage() {
 
                 <div className="space-y-1">
                   <label className="font-bold text-ink-muted block">Select Email Template</label>
-                  <select
+                  <select aria-label="Email template"
                     value={emailTemplateType}
                     onChange={(e) => {
                       const val = e.target.value as typeof emailTemplateType;

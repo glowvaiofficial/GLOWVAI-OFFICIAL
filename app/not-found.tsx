@@ -25,13 +25,13 @@ export default function NotFound() {
 
           <div className="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link href="/shop">
-              <Button variant="primary" size="md" className="gap-2  text-button-label">
+              <Button variant="primary" size="md" className="gap-2  gv-btn-label">
                 <ShoppingBag className="w-4 h-4 text-ink shrink-0" />
                 <span>Explore Shop</span>
               </Button>
             </Link>
             <Link href="/face-analysis">
-              <Button variant="outline" size="md" className="gap-2 text-button-label">
+              <Button variant="outline" size="md" className="gap-2 gv-btn-label">
                 <Camera className="w-4 h-4 text-brand shrink-0" />
                 <span>Start Free Scan</span>
               </Button>
