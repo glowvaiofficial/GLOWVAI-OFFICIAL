@@ -10,37 +10,6 @@ import { focusRing } from "./shared";
 // Alternate headlines kept ready (not rendered):
 // B: "Skincare that starts with a selfie."  C: "Scan today. Glow by tonight."
 
-function ScanOverlay() {
-  return (
-    <svg
-      role="img"
-      aria-label="Illustration of a face being scanned on a phone"
-      viewBox="0 0 200 400"
-      className="absolute inset-0 w-full h-full"
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <g fill="none" stroke="#7CF5C8" strokeLinecap="round">
-        <ellipse cx="100" cy="165" rx="56" ry="74" strokeWidth="2.5" />
-        <ellipse cx="100" cy="165" rx="38" ry="52" strokeWidth="1.2" opacity=".45" />
-        <path d="M100 91 V239 M44 165 H156" strokeWidth="1.2" opacity=".45" />
-      </g>
-      <g fill="#7CF5C8">
-        <circle cx="78" cy="140" r="4" />
-        <circle cx="122" cy="140" r="4" />
-        <circle cx="100" cy="170" r="4" />
-        <circle cx="82" cy="205" r="4" />
-        <circle cx="118" cy="205" r="4" />
-      </g>
-      <g fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M24 70 V50 a8 8 0 0 1 8 -8 H52" />
-        <path d="M148 42 H168 a8 8 0 0 1 8 8 V70" />
-        <path d="M24 290 V310 a8 8 0 0 0 8 8 H52" />
-        <path d="M148 318 H168 a8 8 0 0 0 8 -8 V290" />
-      </g>
-    </svg>
-  );
-}
-
 function PhoneVisual() {
   return (
     <div className="relative w-[58%] min-[480px]:w-[min(280px,60%)] lg:w-[min(320px,66%)] aspect-[9/19] rounded-[40px] border-8 border-ink bg-ink">
@@ -54,16 +23,6 @@ function PhoneVisual() {
           sizes="(max-width: 1024px) 60vw, 320px"
           className="object-cover opacity-90"
         />
-        <ScanOverlay />
-        <div aria-hidden="true" className="gv-scan-line" />
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 p-4 bg-ink/75">
-          <p className="font-mono text-xs text-white/80 mb-2">Scanning... 0:12</p>
-          <div className="flex gap-1.5">
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className={`h-1.5 flex-1 rounded-[3px] ${i < 2 ? "bg-[#7CF5C8]" : "bg-white/25"}`} />
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
