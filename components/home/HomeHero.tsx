@@ -21,8 +21,26 @@ function PhoneVisual() {
           fill
           priority
           sizes="(max-width: 1024px) 60vw, 320px"
-          className="object-cover opacity-90"
+          className="object-cover gv-xray"
         />
+        <div aria-hidden="true" className="absolute inset-0 gv-xray-tint" />
+        <svg aria-hidden="true" viewBox="0 0 200 400" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M24 70 V50 a8 8 0 0 1 8 -8 H52" />
+            <path d="M148 42 H168 a8 8 0 0 1 8 8 V70" />
+            <path d="M24 290 V310 a8 8 0 0 0 8 8 H52" />
+            <path d="M148 318 H168 a8 8 0 0 0 8 -8 V290" />
+          </g>
+        </svg>
+        <div aria-hidden="true" className="gv-scan-line" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 p-4 bg-ink/75">
+          <p className="font-mono text-xs text-white/80 mb-2">Scanning... 0:12</p>
+          <div className="flex gap-1.5">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className={`h-1.5 flex-1 rounded-[3px] ${i < 2 ? "bg-white" : "bg-white/25"}`} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
