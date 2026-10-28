@@ -185,8 +185,8 @@ export function PhoneDemo() {
   const Screen = screens[active];
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="relative w-[58%] min-[480px]:w-[min(280px,60%)] lg:w-[min(320px,66%)] aspect-[9/19] rounded-[40px] border-8 border-brand bg-brand">
+    <div className="flex flex-col items-center w-full sm:w-[62%]">
+      <div className="relative w-[58%] min-[480px]:w-[min(280px,60%)] sm:w-[min(300px,90%)] aspect-[9/19] rounded-[40px] border-8 border-brand bg-brand">
         <div aria-hidden="true" className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[22px] rounded-full bg-brand z-20" />
         <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-white" aria-live="polite">
           <Screen />

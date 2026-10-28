@@ -58,13 +58,13 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
             <div className="relative h-[520px] lg:h-[680px] w-full max-w-[520px] mx-auto">
               <div aria-hidden="true" className="absolute inset-[6%_6%_6%_10%] rounded-[24px] bg-paper-deep" />
 
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center sm:justify-end">
                 <PhoneDemo />
               </div>
 
               <div
                 aria-hidden="true"
-                className="absolute top-[8%] left-0 w-[170px] sm:w-[210px] -rotate-3 bg-white border border-ink/15 rounded-[10px] p-4"
+                className="absolute top-[8%] left-0 w-[150px] sm:w-[170px] -rotate-3 bg-white border border-ink/15 rounded-[10px] p-4"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">Sample report</p>
                 <p className="mt-2 font-display font-semibold text-[44px] leading-none text-ink [font-feature-settings:'tnum']">
