@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { Accent } from "@/components/ui/Accent";
 import { Button } from "@/components/ui/Button";
 import { Camera, ArrowRight, CheckCircle2, AlertCircle, Mail } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 export function FinalCTABanner() {
   const [email, setEmail] = useState("");
@@ -31,13 +32,14 @@ export function FinalCTABanner() {
     setStatus("loading");
 
     try {
-      const res = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, consent, website }),
+      const ok = await submitPublicForm("Newsletter", {
+        email,
+        source: "final-cta",
+        consent: consent ? "yes" : "no",
+        website,
       });
 
-      if (!res.ok) throw new Error("Subscription failed");
+      if (!ok) throw new Error("Subscription failed");
 
       setStatus("success");
     } catch {
@@ -106,8 +108,8 @@ export function FinalCTABanner() {
             </div>
 
             {status === "success" ? (
-              <div className="bg-mint text-emerald-950 p-4 rounded-2xl border border-emerald-300 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+              <div className="bg-mint text-ink p-4 rounded-2xl border border-mint text-xs font-semibold flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-ink shrink-0" />
                 <span>You&apos;re in. Check your inbox.</span>
               </div>
             ) : (

@@ -17,8 +17,8 @@ export function Badge({
   const variants = {
     skymist: "bg-skymist text-brand border border-brand/15",
     blush: "bg-blush text-ink border border-coral/20",
-    mint: "bg-mint text-emerald-950 border border-emerald-300/40",
-    yellow: "bg-yellow text-ink border border-yellow-500/30 font-bold",
+    mint: "bg-mint text-ink border border-ink/10",
+    yellow: "bg-yellow text-ink border border-yellow-hover/40 font-bold",
     brand: "bg-brand text-white font-semibold",
     coral: "bg-coral text-ink font-bold",
     outline: "border border-ink/20 text-ink-muted bg-white",

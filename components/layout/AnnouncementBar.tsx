@@ -44,7 +44,7 @@ export function AnnouncementBar({ city = "Vijayawada" }: AnnouncementBarProps) {
             href="tel:+918977855998"
             className="flex items-center gap-1 text-[11px] text-white/90 hover:text-yellow transition-colors font-medium"
           >
-            <Phone className="w-3 h-3 text-emerald-400" />
+            <Phone className="w-3 h-3 text-mint" />
             <span>+91 89778 55998</span>
           </a>
         </div>

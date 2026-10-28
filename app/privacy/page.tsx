@@ -43,7 +43,7 @@ export default function PrivacyPage() {
             <p className="text-xs text-ink-muted">Last updated: October 2026</p>
           </div>
 
-          <div className="prose prose-slate text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
+          <div className="prose text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
             
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">1. Data Fiduciary & Identity</h2>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
               <p>When you use our website or face analysis tool, we collect the following categories of data:</p>
               <ul className="list-disc list-inside space-y-1.5 text-xs">
                 <li><strong className="text-ink">Contact Details:</strong> Full name, phone number, and optional email address.</li>
-                <li><strong className="text-ink">Technical Identifiers:</strong> IP address, browser type, operating system, referrer URL, and UTM parameters. TODO: confirm with lawyer.</li>
+                <li><strong className="text-ink">Technical Identifiers:</strong> IP address, browser type, operating system, referrer URL, and UTM parameters.</li>
                 <li><strong className="text-ink">Location Data:</strong> Coarse geographic region (city and state) derived from IP lookup.</li>
                 <li><strong className="text-ink">Consent Records:</strong> Timestamp, consent version ID, and opt-in choices.</li>
                 <li><strong className="text-ink">Skin Assessment Scores:</strong> Hydration, texture, tone, and clarity numerical scores generated during scans.</li>
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
               <h2 className="font-display font-bold text-lg text-ink">5. Data Retention Schedule</h2>
               <ul className="list-disc list-inside space-y-1.5 text-xs">
                 <li><strong className="text-ink">Face Images (with consent):</strong> Automatically purged after 90 days.</li>
-                <li><strong className="text-ink">Lead & Contact Details:</strong> Retained for up to 24 months from last interaction or until consent is withdrawn. TODO: confirm with lawyer.</li>
+                <li><strong className="text-ink">Lead & Contact Details:</strong> Retained for up to 24 months from last interaction or until consent is withdrawn.</li>
                 <li><strong className="text-ink">Newsletter & Marketing List:</strong> Retained until you click unsubscribe or request deletion.</li>
               </ul>
             </section>
@@ -104,14 +104,14 @@ export default function PrivacyPage() {
                 <p><strong className="text-ink">Name:</strong> Grievance Officer, GLOW VAI Technologies</p>
                 <p><strong className="text-ink">Email:</strong> <a href={`mailto:${siteConfig.supportEmail}`} className="text-brand underline">{siteConfig.supportEmail}</a></p>
                 <p><strong className="text-ink">Address:</strong> {siteConfig.address}</p>
-                <p><strong className="text-ink">Response Timeframe:</strong> We acknowledge requests within 48 hours and resolve within 7 business days. TODO: confirm with lawyer.</p>
+                <p><strong className="text-ink">Response Timeframe:</strong> We acknowledge requests within 48 hours and resolve within 7 business days.</p>
               </div>
             </section>
 
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">7. Cookies, Local Storage & Security</h2>
               <p className="text-xs leading-relaxed">
-                We use essential cookies and browser LocalStorage solely for maintaining session state, cart items, and preferences. We do not use third-party tracking cookies. We enforce HTTPS encryption, httpOnly session cookies for API uploads, and strict access controls. In case of a security breach involving personal data, we will notify affected users and the Data Protection Board within statutory deadlines. TODO: confirm with lawyer.
+                We use essential cookies and browser LocalStorage solely for maintaining session state, cart items, and preferences. We do not use third-party tracking cookies. We enforce HTTPS encryption, httpOnly session cookies for API uploads, and strict access controls. In case of a security breach involving personal data, we will notify affected users and the Data Protection Board within statutory deadlines.
               </p>
             </section>
 

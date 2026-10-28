@@ -6,17 +6,35 @@ import { Badge } from "@/components/ui/Badge";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { ShieldCheck, RotateCcw, AlertCircle, Mail, CheckCircle2 } from "lucide-react";
 
+import { SITE_URL } from "@/lib/site-url";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildWebPageSchema } from "@/lib/seo/schema/webpage";
+
 export const metadata: Metadata = {
   title: "Returns & Refund Policy",
   description: "Learn about the GLOW VAI 14-day Skin Satisfaction Guarantee and return policy.",
-  alternates: { canonical: "/returns" },
+  alternates: { canonical: `${SITE_URL}/returns` },
+  openGraph: {
+    title: "Returns & Refund Policy | GLOW VAI",
+    description: "Learn about the GLOW VAI 14-day Skin Satisfaction Guarantee and return policy.",
+    url: `${SITE_URL}/returns`,
+  },
 };
 
 export default function ReturnsPage() {
   const isProd = process.env.NODE_ENV === "production";
+  const pageSchema = {
+    "@context": "https://schema.org",
+    ...buildWebPageSchema(
+      "/returns",
+      "Returns & Refund Policy | GLOW VAI",
+      "Learn about the GLOW VAI 14-day Skin Satisfaction Guarantee and return policy."
+    ),
+  };
 
   return (
     <div className="bg-white py-12 sm:py-20 text-ink min-h-screen">
+      <JsonLd data={pageSchema} />
       <Container size="md">
         
         {!isProd && (
@@ -37,7 +55,7 @@ export default function ReturnsPage() {
             <p className="text-xs text-ink-muted">Last updated: October 2026</p>
           </div>
 
-          <div className="prose prose-slate text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
+          <div className="prose text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
             
             <section className="bg-skymist/40 p-5 rounded-2xl border border-brand/15 text-ink space-y-2">
               <h2 className="font-display font-bold text-base text-brand flex items-center gap-2">
@@ -54,7 +72,7 @@ export default function ReturnsPage() {
               <p>To qualify for a return or replacement under our satisfaction guarantee:</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>The return request must be submitted within 14 calendar days of delivery.</li>
-                <li>The product must be at least 50% unconsumed (determined by weight/volume upon inspection). TODO: confirm with lawyer.</li>
+                <li>The product must be at least 50% unconsumed (determined by weight or volume upon inspection).</li>
                 <li>Items marked as final clearance or promotional gifts are non-refundable.</li>
               </ul>
             </section>
@@ -71,21 +89,21 @@ export default function ReturnsPage() {
               <ol className="list-decimal list-inside space-y-1.5 text-xs">
                 <li>Email support at <a href={`mailto:${siteConfig.supportEmail}`} className="text-brand font-bold underline">{siteConfig.supportEmail}</a> or message us on WhatsApp.</li>
                 <li>Provide your order number, phone number, and a brief description of why the formula did not suit your skin.</li>
-                <li>Our support team will send you return instructions or schedule a pickup. TODO: confirm with lawyer.</li>
+                <li>Our support team will send you return instructions or arrange a doorstep reverse pickup where available.</li>
               </ol>
             </section>
 
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">5. Refund Processing Timeline</h2>
               <p className="text-xs">
-                Once your return is inspected and approved, refunds are credited back to your original payment method within 5 to 7 business days. TODO: confirm with lawyer.
+                Once your return is inspected and approved, refunds are credited back to your original payment method or UPI account within 5 to 7 business days.
               </p>
             </section>
 
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">6. Non-Returnable Items</h2>
               <p className="text-xs">
-                For hygiene and safety reasons under Indian cosmetics regulations, opened lip products or products that have been completely consumed cannot be returned unless verified as defective upon delivery. TODO: confirm with lawyer.
+                For hygiene and safety reasons under Indian cosmetics regulations, opened lip products or products that have been completely consumed cannot be returned unless verified as defective upon delivery.
               </p>
             </section>
 

@@ -61,10 +61,13 @@ export function JournalTeaser() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Featured Wide Article (2 Cols / 8 Cols desktop) */}
-          <article className="lg:col-span-7 group bg-white rounded-3xl overflow-hidden border border-ink/10 hover:border-brand/30 hover:shadow-card transition-all flex flex-col justify-between">
+          <Link
+            href={`/journal/${featured.slug}`}
+            className="lg:col-span-7 group bg-white rounded-3xl overflow-hidden border border-ink/10 hover:border-brand/30 hover:shadow-card transition-all flex flex-col justify-between block"
+          >
             <div>
               <div className="relative w-full aspect-[16/9] overflow-hidden bg-skymist">
-                <PlaceholderImage alt={featured.title} caption={featured.imageSlot} />
+                <PlaceholderImage alt={featured.title} caption={featured.imageSlot || "Editorial skincare guide"} />
                 <div className="absolute top-4 left-4 z-10">
                   <Badge variant="brand" size="sm">
                     {featured.category}
@@ -85,17 +88,18 @@ export function JournalTeaser() {
               </div>
             </div>
             <div className="p-6 sm:p-8 pt-0 flex items-center text-sm font-bold text-brand group-hover:text-coral transition-colors gap-1">
-              <span>Read Article</span>
+              <span>Read Full Guide</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
-          </article>
+          </Link>
 
           {/* Stacked Articles on Right (5 Cols desktop) */}
           <div className="lg:col-span-5 space-y-6 flex flex-col justify-between">
             {others.map((article) => (
-              <article
+              <Link
                 key={article.id}
-                className="group bg-white rounded-3xl p-6 border border-ink/10 hover:border-brand/30 hover:shadow-card transition-all space-y-3"
+                href={`/journal/${article.slug}`}
+                className="group bg-white rounded-3xl p-6 border border-ink/10 hover:border-brand/30 hover:shadow-card transition-all space-y-3 block"
               >
                 <div className="flex items-center justify-between">
                   <Badge variant="skymist" size="sm">
@@ -113,10 +117,10 @@ export function JournalTeaser() {
                   {article.excerpt}
                 </p>
                 <div className="pt-2 flex items-center text-xs font-bold text-brand group-hover:text-coral transition-colors gap-1">
-                  <span>Read Article</span>
+                  <span>Read Guide</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

@@ -10,7 +10,13 @@
     "lint": "next lint",
     "seo:sitemap": "npx tsx scripts/check-sitemap.ts",
     "seo:links": "npx tsx scripts/check-links.ts",
-    "seo:test": "npx tsx scripts/check-sitemap.ts && npx tsx scripts/check-links.ts"
+    "test:entity": "npx tsx scripts/test-entity.ts",
+    "test:schema": "npx tsx scripts/test-schema.ts",
+    "test:email-analytics": "npx tsx scripts/test-email-analytics.ts",
+    "check:dns": "npx tsx scripts/check-email-dns.ts",
+    "export:merchant-feed": "npx tsx scripts/export-merchant-feed.ts",
+    "test": "npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
+    "seo:test": "npx tsx scripts/check-sitemap.ts && npx tsx scripts/check-links.ts && npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +28,8 @@
     "next": "^16.3.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "resend": "^6.32.1",
+    "svix": "^2.8.0",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5",
     "zustand": "^5.0.15"

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="128" fill="#0050FF"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="12"/>
+  <text x="256" y="270" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="140" fill="#FFFFFF" text-anchor="middle" letter-spacing="-2">GLOW</text>
+  <text x="256" y="390" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="95" fill="#FFD84D" text-anchor="middle" letter-spacing="8">VAI</text>
+  <path d="M410 80 L420 110 L450 120 L420 130 L410 160 L400 130 L370 120 L400 110 Z" fill="#FFD84D"/>
+</svg>

@@ -1,7 +1,4 @@
-/**
- * Privacy-Preserving Analytics Stub
- * Collects zero PII or raw images. Tracks conversion milestones & drop-offs only.
- */
+export * from "./analytics/index";
 
 export type AnalyticsEvent =
   | { name: "scan_form_view" }

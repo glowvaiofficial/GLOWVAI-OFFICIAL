@@ -61,7 +61,7 @@ export function GlowVaiBot() {
     const q = query.toLowerCase();
 
     if (q.includes("scan") || q.includes("face") || q.includes("ai") || q.includes("skin") || q.includes("telemetry")) {
-      return "GLOW VAI's AI Skin Scan takes 30 seconds right in your browser! It evaluates 12 micro-nodes, hydration levels, pore depth, barrier health, and your 30-day radiance score. It is 100% free, private (processed on-device), and recommends exact Minimalist & Derma Co routines.";
+      return "GLOW VAI's AI Skin Scan takes 30 seconds right in your browser! It evaluates 12 micro-nodes, hydration levels, pore depth, barrier health, and your 30-day radiance score. It is completely free, private (processed on-device), and recommends exact Minimalist & Derma Co routines.";
     }
 
     if (q.includes("delivery") || q.includes("dark store") || q.includes("15 min") || q.includes("quick") || q.includes("vijayawada")) {
@@ -73,11 +73,11 @@ export function GlowVaiBot() {
     }
 
     if (q.includes("founder") || q.includes("sardhar") || q.includes("sathveek") || q.includes("satvik") || q.includes("rahimath") || q.includes("rehmat") || q.includes("team")) {
-      return "GLOW VAI was founded by three visionaries in Andhra Pradesh:\n\n1. Sardhar Musthafa (Founder & CEO) - Sparked the vision on Feb 18, 2025.\n2. Sathveek Nalla (Co-Founder & Technical Lead) - Joined Sep 15, 2026, building our high-speed AI engine & platform.\n3. Rahimath (Marketing Lead & Market Explorer) - Drives customer research and regional expansion.";
+      return "GLOW VAI was founded by three visionaries in Andhra Pradesh:\n\n1. Sardar Musthafa (Founder & CEO) - Sparked the vision on Feb 18, 2025.\n2. Nalla Satvik (Co-Founder & Technical Lead) - Joined Sep 15, 2026, building our high-speed AI engine & platform.\n3. Rehmit (Marketing Lead & Market Explorer) - Drives customer research and regional expansion.";
     }
 
     if (q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("help")) {
-      return "Hey there! How can I assist your skincare journey today? You can try our free AI Face Scan or learn how our Vijayawada 15-Minute Dark Store delivers dermatologically matched routines!";
+      return "Hey there! How can I help with your skin today? You can try our free AI Face Scan or learn how our Vijayawada 15-Minute Dark Store delivers dermatologically matched routines!";
     }
 
     return "GLOW VAI is an AI-powered Quick-Commerce Skincare Dark Store network. We offer free 30-second AI camera skin checks and 15-minute doorstep express delivery in Vijayawada! You can test your skin now or join our ₹10/scan UPI referral program.";
@@ -120,9 +120,9 @@ export function GlowVaiBot() {
         {!isOpen && (
           <div 
             onClick={() => setIsOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 hover:bg-slate-900 text-white text-xs font-bold shadow-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all hover:scale-105"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-ink/90 hover:bg-ink text-white text-xs font-bold shadow-xl border border-white/20 backdrop-blur-md cursor-pointer transition-all hover:scale-105"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
             <span>GLOW VAI AI Bot</span>
           </div>
         )}
@@ -130,14 +130,14 @@ export function GlowVaiBot() {
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Open GLOW VAI AI Assistant Chatbot"
-          className="relative w-14 h-14 rounded-full bg-[#0050FF] hover:bg-blue-600 text-white shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group border-2 border-white cursor-pointer"
+          className="relative w-14 h-14 rounded-full bg-brand hover:bg-brand-dark text-white shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group border-2 border-white cursor-pointer"
         >
           {isOpen ? (
             <X className="w-6 h-6 text-white" />
           ) : (
             <>
               <Sparkles className="w-6 h-6 text-yellow animate-bounce" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-mint border-2 border-white animate-pulse" />
             </>
           )}
         </button>
@@ -145,20 +145,20 @@ export function GlowVaiBot() {
 
       {/* 2. CHATBOT WINDOW MODAL */}
       {isOpen && (
-        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[92vw] sm:w-[380px] h-[520px] max-h-[80vh] bg-white rounded-3xl shadow-2xl border-2 border-blue-100 flex flex-col overflow-hidden animate-fadeIn backdrop-blur-2xl">
-          
+        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[92vw] sm:w-[380px] h-[520px] max-h-[80vh] bg-white rounded-3xl shadow-2xl border-2 border-skymist flex flex-col overflow-hidden animate-fadeIn backdrop-blur-2xl">
+
           {/* Chatbot Header */}
-          <div className="bg-gradient-to-r from-[#0050FF] to-blue-600 p-4 text-white flex items-center justify-between shadow-md">
+          <div className="bg-gradient-to-r from-brand to-brand-dark p-4 text-white flex items-center justify-between shadow-md">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-display font-extrabold text-sm text-white flex items-center gap-1.5">
+                <h3 className="font-display font-semibold text-sm text-white flex items-center gap-1.5">
                   GLOW VAI AI Assistant
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-mint" />
                 </h3>
-                <p className="text-[10px] text-blue-100 font-medium">Quick-Commerce & Skin Telemetry</p>
+                <p className="text-[10px] text-white/80 font-medium">Quick-Commerce & Skin Telemetry</p>
               </div>
             </div>
 
@@ -171,17 +171,17 @@ export function GlowVaiBot() {
           </div>
 
           {/* Quick Nav Bar inside Chat */}
-          <div className="bg-blue-50 px-3 py-2 border-b border-blue-100 flex items-center justify-between text-[11px] font-bold text-[#0050FF]">
+          <div className="bg-skymist px-3 py-2 border-b border-skymist flex items-center justify-between text-[11px] font-bold text-brand">
             <Link href="/face-analysis" onClick={() => setIsOpen(false)} className="hover:underline flex items-center gap-1">
               <Camera className="w-3.5 h-3.5" />
               <span>Face Scan</span>
             </Link>
-            <span className="text-slate-300">•</span>
+            <span className="text-ink-light">•</span>
             <Link href="/our-story" onClick={() => setIsOpen(false)} className="hover:underline flex items-center gap-1">
               <Zap className="w-3.5 h-3.5" />
               <span>Dark Store</span>
             </Link>
-            <span className="text-slate-300">•</span>
+            <span className="text-ink-light">•</span>
             <Link href="/referral" onClick={() => setIsOpen(false)} className="hover:underline flex items-center gap-1">
               <Gift className="w-3.5 h-3.5" />
               <span>₹10 Referral</span>
@@ -189,14 +189,14 @@ export function GlowVaiBot() {
           </div>
 
           {/* Message List */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-slate-50/50">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-ink-subtle/50">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex gap-2.5 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 {msg.sender === "bot" && (
-                  <div className="w-7 h-7 rounded-full bg-[#0050FF] text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
+                  <div className="w-7 h-7 rounded-full bg-brand text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
                     AI
                   </div>
                 )}
@@ -204,14 +204,14 @@ export function GlowVaiBot() {
                 <div
                   className={`max-w-[82%] p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                     msg.sender === "user"
-                      ? "bg-[#0050FF] text-white font-medium rounded-br-none shadow-sm"
-                      : "bg-white text-slate-800 border border-slate-200 rounded-bl-none shadow-sm whitespace-pre-line"
+                      ? "bg-brand text-white font-medium rounded-br-none shadow-sm"
+                      : "bg-white text-ink border border-ink/10 rounded-bl-none shadow-sm whitespace-pre-line"
                   }`}
                 >
                   <p>{msg.text}</p>
                   <span
                     className={`block text-[9px] mt-1 ${
-                      msg.sender === "user" ? "text-blue-200 text-right" : "text-slate-400"
+                      msg.sender === "user" ? "text-white/70 text-right" : "text-ink-light"
                     }`}
                   >
                     {msg.timestamp}
@@ -219,7 +219,7 @@ export function GlowVaiBot() {
                 </div>
 
                 {msg.sender === "user" && (
-                  <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
+                  <div className="w-7 h-7 rounded-full bg-ink text-white flex items-center justify-center shrink-0 text-xs font-bold mt-1 shadow-xs">
                     <User className="w-4 h-4" />
                   </div>
                 )}
@@ -227,8 +227,8 @@ export function GlowVaiBot() {
             ))}
 
             {isTyping && (
-              <div className="flex gap-2 items-center text-xs text-slate-400 italic pl-9">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#0050FF]" />
+              <div className="flex gap-2 items-center text-xs text-ink-light italic pl-9">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-brand" />
                 <span>GLOW VAI AI is typing...</span>
               </div>
             )}
@@ -237,12 +237,12 @@ export function GlowVaiBot() {
           </div>
 
           {/* Quick Suggestions Chips */}
-          <div className="px-3 py-2 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="px-3 py-2 bg-white border-t border-ink/10 flex gap-1.5 overflow-x-auto no-scrollbar">
             {QUICK_QUESTIONS.map((q, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSendMessage(q)}
-                className="shrink-0 text-[10px] font-semibold bg-blue-50 hover:bg-[#0050FF] text-[#0050FF] hover:text-white px-2.5 py-1 rounded-full border border-blue-200 transition-colors"
+                className="shrink-0 text-[10px] font-semibold bg-skymist hover:bg-brand text-brand hover:text-white px-2.5 py-1 rounded-full border border-skymist transition-colors"
               >
                 {q}
               </button>
@@ -255,19 +255,19 @@ export function GlowVaiBot() {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="p-3 bg-white border-t border-slate-200 flex items-center gap-2"
+            className="p-3 bg-white border-t border-ink/10 flex items-center gap-2"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask GLOW VAI Assistant..."
-              className="flex-1 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0050FF] text-slate-900 placeholder:text-slate-400"
+              className="flex-1 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl bg-ink-subtle border border-ink/10 focus:outline-none focus:ring-2 focus:ring-brand text-ink placeholder:text-ink-light"
             />
             <button
               type="submit"
               disabled={!input.trim()}
-              className="p-2.5 rounded-xl bg-[#0050FF] hover:bg-blue-600 disabled:opacity-40 text-white transition-colors cursor-pointer shadow-sm"
+              className="p-2.5 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-40 text-white transition-colors cursor-pointer shadow-sm"
             >
               <Send className="w-4 h-4" />
             </button>

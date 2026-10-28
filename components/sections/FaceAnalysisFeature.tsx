@@ -89,7 +89,7 @@ export function FaceAnalysisFeature() {
             {/* Stepper (<ol>) with 2px Dotted Line */}
             <ol className="relative pl-6 space-y-6 border-l-2 border-dashed border-brand/30 my-6">
               <li className="relative group">
-                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-extrabold text-xs flex items-center justify-center shadow-xs">
+                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-bold text-xs flex items-center justify-center shadow-xs">
                   1
                 </div>
                 <div className="space-y-0.5">
@@ -101,7 +101,7 @@ export function FaceAnalysisFeature() {
               </li>
 
               <li className="relative group">
-                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-extrabold text-xs flex items-center justify-center shadow-xs">
+                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-bold text-xs flex items-center justify-center shadow-xs">
                   2
                 </div>
                 <div className="space-y-0.5">
@@ -113,7 +113,7 @@ export function FaceAnalysisFeature() {
               </li>
 
               <li className="relative group">
-                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-extrabold text-xs flex items-center justify-center shadow-xs">
+                <div className="absolute -left-[31px] top-0.5 w-6 h-6 rounded-full bg-white border-2 border-brand text-brand font-display font-bold text-xs flex items-center justify-center shadow-xs">
                   3
                 </div>
                 <div className="space-y-0.5">
@@ -145,7 +145,7 @@ export function FaceAnalysisFeature() {
               </div>
 
               <div className="flex items-center gap-2 text-xs text-ink-muted pt-1">
-                <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
+                <Lock className="w-4 h-4 text-brand shrink-0" />
                 <span>We never store your photo. Only your score is saved, and only with your consent.</span>
               </div>
             </div>
@@ -164,24 +164,24 @@ export function FaceAnalysisFeature() {
 
             {/* Floating Scan Marker Badge Near Top-Left */}
             <div className="absolute -top-3 left-0 sm:left-4 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-lg border border-brand/20 text-xs font-bold text-brand flex items-center gap-2 z-30 animate-bounce-short">
-              <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400" />
+              <Sparkles className="w-4 h-4 text-yellow-hover fill-yellow" />
               <span>4 skin markers checked</span>
             </div>
 
             {/* True Vertical Smartphone Frame (Width ~300px, Height ~580px, 9:18.5 aspect, 44px corner radius) */}
-            <div className="relative w-[295px] sm:w-[320px] h-[570px] sm:h-[600px] rounded-[48px] bg-ink p-2.5 shadow-2xl border-[4px] border-slate-800 transform -rotate-2 hover:rotate-0 transition-all duration-500 z-10 group">
+            <div className="relative w-[295px] sm:w-[320px] h-[570px] sm:h-[600px] rounded-[48px] bg-ink p-2.5 shadow-2xl border-[4px] border-ink transform -rotate-2 hover:rotate-0 transition-all duration-500 z-10 group">
               
               {/* Side Phone Buttons */}
-              <div className="absolute -left-[5px] top-24 w-[5px] h-10 bg-slate-700 rounded-l-md" />
-              <div className="absolute -left-[5px] top-38 w-[5px] h-10 bg-slate-700 rounded-l-md" />
-              <div className="absolute -right-[5px] top-28 w-[5px] h-14 bg-slate-700 rounded-r-md" />
+              <div className="absolute -left-[5px] top-24 w-[5px] h-10 bg-ink/70 rounded-l-md" />
+              <div className="absolute -left-[5px] top-38 w-[5px] h-10 bg-ink/70 rounded-l-md" />
+              <div className="absolute -right-[5px] top-28 w-[5px] h-14 bg-ink/70 rounded-r-md" />
 
               {/* Screen Inner Container */}
-              <div className="w-full h-full bg-slate-950 rounded-[40px] overflow-hidden text-white relative flex flex-col justify-between p-3.5 border border-white/10">
+              <div className="w-full h-full bg-ink rounded-[40px] overflow-hidden text-white relative flex flex-col justify-between p-3.5 border border-white/10">
                 
                 {/* Background Image: High Quality Face Selfie Scan */}
                 <Image
-                  src={getAssetPath("/images/hero/face-scan-selfie.png")}
+                  src={getAssetPath("/images/hero/face-scan-selfie.webp")}
                   alt="Real-time face analysis selfie scan"
                   fill
                   priority
@@ -200,32 +200,32 @@ export function FaceAnalysisFeature() {
                 </div>
 
                 {/* Face Scanner HUD Grid & Laser Sweep Overlay */}
-                <div className="absolute inset-x-3 top-14 bottom-14 border-2 border-dashed border-cyan-400/60 rounded-3xl z-10 pointer-events-none flex flex-col justify-between p-2.5">
+                <div className="absolute inset-x-3 top-14 bottom-14 border-2 border-dashed border-brand/60 rounded-3xl z-10 pointer-events-none flex flex-col justify-between p-2.5">
                   {/* Corner HUD Markers & Top Badge */}
                   <div className="flex justify-between items-start w-full">
-                    <div className="w-3.5 h-3.5 border-t-2 border-l-2 border-cyan-400" />
-                    
+                    <div className="w-3.5 h-3.5 border-t-2 border-l-2 border-brand" />
+
                     {/* Live Status Badge (Positioned at Top of HUD - Away from Face) */}
                     <div className="bg-brand/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-md border border-white/20">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-mint animate-ping" />
                       <span>Live AI Scan</span>
                     </div>
 
-                    <div className="w-3.5 h-3.5 border-t-2 border-r-2 border-cyan-400" />
+                    <div className="w-3.5 h-3.5 border-t-2 border-r-2 border-brand" />
                   </div>
 
                   {/* Bottom Corner HUD Markers */}
                   <div className="flex justify-between w-full">
-                    <div className="w-3.5 h-3.5 border-b-2 border-l-2 border-cyan-400" />
-                    <div className="w-3.5 h-3.5 border-b-2 border-r-2 border-cyan-400" />
+                    <div className="w-3.5 h-3.5 border-b-2 border-l-2 border-brand" />
+                    <div className="w-3.5 h-3.5 border-b-2 border-r-2 border-brand" />
                   </div>
 
                   {/* Scanning Laser Beam Line */}
-                  <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_12px_#22d3ee] animate-scan-laser" />
+                  <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-brand-light to-transparent shadow-glow animate-scan-laser" />
                 </div>
 
                 {/* Floating Marker Pins on Face (Positioned cleanly on sides) */}
-                <div className="absolute top-20 left-4 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-cyan-400/50 text-[9px] font-bold text-cyan-300 z-10 shadow-md">
+                <div className="absolute top-20 left-4 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-brand/50 text-[9px] font-bold text-brand-light z-10 shadow-md">
                   • Hydration: 82%
                 </div>
                 <div className="absolute top-28 right-4 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-coral/50 text-[9px] font-bold text-coral-light z-10 shadow-md">
@@ -235,7 +235,7 @@ export function FaceAnalysisFeature() {
                 {/* Bottom Action Button (Positioned at absolute bottom below chin & face) */}
                 <div className="relative z-20 w-full pt-1 mt-auto">
                   <Link href="/face-analysis" className="block w-full">
-                    <button className="w-full py-2 bg-gradient-to-r from-brand via-blue-600 to-brand text-white font-extrabold text-[11px] rounded-xl shadow-lg hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-1.5 border border-white/20">
+                    <button className="w-full py-2 bg-gradient-to-r from-brand via-brand-light to-brand text-white font-bold text-[11px] rounded-xl shadow-lg hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-1.5 border border-white/20">
                       <Sparkles className="w-3.5 h-3.5 text-yellow" />
                       <span>Start free scan now</span>
                     </button>
@@ -254,7 +254,7 @@ export function FaceAnalysisFeature() {
                 <Image src={sampleProds[0].image} alt={sampleProds[0].name} fill className="object-cover" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-extrabold text-ink truncate">{sampleProds[0].name}</p>
+                <p className="text-[10px] font-bold text-ink truncate">{sampleProds[0].name}</p>
                 <p className="text-[9px] text-coral font-bold">Matched for Texture 64</p>
               </div>
             </div>
@@ -296,8 +296,8 @@ export function FaceAnalysisFeature() {
               </p>
             </div>
 
-            <div className="bg-mint/60 p-5 rounded-3xl border border-emerald-300/30 space-y-2 snap-center shrink-0 w-[78%] sm:w-auto">
-              <div className="w-9 h-9 rounded-2xl bg-white flex items-center justify-center text-emerald-700 border border-ink/10">
+            <div className="bg-mint/60 p-5 rounded-3xl border border-ink/10 space-y-2 snap-center shrink-0 w-[78%] sm:w-auto">
+              <div className="w-9 h-9 rounded-2xl bg-white flex items-center justify-center text-ink border border-ink/10">
                 <Sun className="w-4 h-4" />
               </div>
               <h4 className="font-display font-bold text-lg text-ink">Tone</h4>
@@ -306,7 +306,7 @@ export function FaceAnalysisFeature() {
               </p>
             </div>
 
-            <div className="bg-yellow/30 p-5 rounded-3xl border border-yellow-500/30 space-y-2 snap-center shrink-0 w-[78%] sm:w-auto transform sm:translate-y-2">
+            <div className="bg-yellow/30 p-5 rounded-3xl border border-yellow-hover/30 space-y-2 snap-center shrink-0 w-[78%] sm:w-auto transform sm:translate-y-2">
               <div className="w-9 h-9 rounded-2xl bg-white flex items-center justify-center text-ink border border-ink/10">
                 <Shield className="w-4 h-4" />
               </div>
@@ -326,7 +326,7 @@ export function FaceAnalysisFeature() {
               <span>Photo stays on your phone</span>
             </span>
             <span className="flex items-center gap-1.5 font-semibold text-ink">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-brand shrink-0" />
               <span>Saved only with your consent</span>
             </span>
             {siteConfig.supportEmail && (

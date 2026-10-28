@@ -81,7 +81,7 @@ export function FAQSection() {
                   href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-3 rounded-full shadow-xs transition-colors self-start"
+                  className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold text-xs px-4 py-3 rounded-full shadow-xs transition-colors self-start"
                 >
                   <MessageCircle className="w-4 h-4 fill-white shrink-0" />
                   <span>Still curious? Chat on WhatsApp</span>

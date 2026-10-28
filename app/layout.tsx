@@ -1,10 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Serif, DM_Sans } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { HeaderAndFooterWrapper } from "@/components/layout/HeaderAndFooterWrapper";
 import { getLocationFromIP } from "@/lib/location";
 import { SITE_URL } from "@/lib/site-url";
+import { CookieNotice } from "@/components/consent/CookieNotice";
+import { GA4Script } from "@/components/analytics/GA4Script";
+import { RouteTracker } from "@/components/analytics/RouteTracker";
 
 const displayFont = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -48,9 +52,6 @@ export const metadata: Metadata = {
     template: "%s | GLOW VAI",
   },
   description: "Scan your face for free, get a plain-language skin report, and shop a routine that fits.",
-  alternates: {
-    canonical: "./",
-  },
   authors: [{ name: siteConfig.name, url: SITE_URL }],
   creator: siteConfig.name,
   icons: {
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: "/og.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "GLOW VAI skincare",
@@ -77,9 +78,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GLOW VAI | Skincare that starts with a face scan",
-    description: "Scan your face for free, get a plain-language skin report, and shop a routine that fits.",
-    images: ["/og.jpg"],
+    images: ["/opengraph-image"],
     creator: "@glowvai",
   },
   robots: {
@@ -111,12 +110,15 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen bg-white text-ink flex flex-col font-sans selection:bg-brand selection:text-white">
+        <GA4Script />
+        <Suspense fallback={null}>
+          <RouteTracker />
+        </Suspense>
         <HeaderAndFooterWrapper city={locationData.city}>
           {children}
         </HeaderAndFooterWrapper>
+        <CookieNotice />
       </body>
     </html>
   );
 }
-
-

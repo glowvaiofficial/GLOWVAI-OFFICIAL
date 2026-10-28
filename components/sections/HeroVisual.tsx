@@ -91,11 +91,11 @@ export function HeroVisual({ city = "Hyderabad" }: HeroVisualProps) {
       <div className="absolute top-2 left-0 bg-white/95 backdrop-blur-md p-3 rounded-2xl shadow-card border border-ink/10 animate-float space-y-1.5 z-30 max-w-[190px] w-full">
         <div className="flex items-center justify-between gap-1">
           <span className="text-[9px] font-bold text-ink-muted uppercase tracking-wider">SAMPLE REPORT</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-mint animate-pulse" />
         </div>
         <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-2xl font-extrabold text-brand">84</span>
-          <span className="text-[9px] font-bold text-emerald-800 bg-mint px-2 py-0.5 rounded-full">
+          <span className="font-display text-2xl font-bold text-brand">84</span>
+          <span className="text-[9px] font-bold text-ink bg-mint px-2 py-0.5 rounded-full">
             Barrier strong
           </span>
         </div>
@@ -111,7 +111,7 @@ export function HeroVisual({ city = "Hyderabad" }: HeroVisualProps) {
       </div>
 
       {/* Card B: Mid-Right Ingredient Chip (Butter Yellow, Ink text) */}
-      <div className="absolute top-[40%] right-[0px] bg-yellow text-ink px-3 py-1.5 rounded-xl shadow-md border border-yellow-600/20 font-semibold text-xs flex items-center gap-1.5 z-30 animate-float-delayed">
+      <div className="absolute top-[40%] right-[0px] bg-yellow text-ink px-3 py-1.5 rounded-xl shadow-md border border-yellow-hover/20 font-semibold text-xs flex items-center gap-1.5 z-30 animate-float-delayed">
         <Sparkles className="w-3.5 h-3.5 text-ink fill-ink shrink-0" />
         <span>2% Niacinamide + Cica</span>
       </div>

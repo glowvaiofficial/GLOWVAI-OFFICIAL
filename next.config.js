@@ -1,17 +1,13 @@
-const isProd = process.env.NODE_ENV === 'production';
-const isCustomDomain = process.env.CUSTOM_DOMAIN !== 'false';
-const repoName = isCustomDomain ? '' : '/GLOWVAI-';
+const isStaticExport = process.env.DEPLOY_TARGET === 'github-pages';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  basePath: isProd ? repoName : '',
-  assetPrefix: isProd && repoName ? `${repoName}/` : '',
+  ...(isStaticExport ? { output: 'export' } : {}),
   env: {
-    CUSTOM_DOMAIN: isCustomDomain ? 'true' : 'false',
+    CUSTOM_DOMAIN: 'true',
   },
   images: {
-    unoptimized: true,
+    ...(isStaticExport ? { unoptimized: true } : {}),
     remotePatterns: [
       {
         protocol: 'https',

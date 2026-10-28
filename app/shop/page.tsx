@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     title: "Shop Dermaceutical Skincare | GLOW VAI",
     description: "Explore clean, transparent skincare formulas built for Indian weather. Fast delivery to your doorstep.",
     url: `${siteConfig.url}/shop`,
-    images: [{ url: `${siteConfig.url}/og.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${siteConfig.url}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Shop Dermaceutical Skincare | GLOW VAI",
     description: "Explore clean, transparent skincare formulas built for Indian weather. Fast delivery to your doorstep.",
-    images: [`${siteConfig.url}/og.jpg`],
+    images: [`${siteConfig.url}/opengraph-image`],
   },
 };
 

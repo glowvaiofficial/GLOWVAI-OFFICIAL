@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { submitPublicForm } from "@/lib/forms/submit";
 
 export interface WhatsAppOrderItem {
   sku: string;
@@ -43,17 +44,15 @@ export async function createWhatsAppOrderUrl(
     `Please confirm availability and delivery time.`,
   ].join("\n");
 
-  // Non-blocking POST to /api/order-intent
+  // Non-blocking submission to the Sheets backend
   try {
-    fetch("/api/order-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        order_ref: orderRef,
-        items: items.map((it) => ({ sku: it.sku, qty: it.qty })),
-        pincode,
-        source_page: sourcePage,
-      }),
+    submitPublicForm("OrderIntents", {
+      order_ref: orderRef,
+      items_json: JSON.stringify(items.map((it) => ({ sku: it.sku, qty: it.qty }))),
+      subtotal,
+      pincode,
+      source_page: sourcePage,
+      status: "new",
     }).catch(() => {});
   } catch {}
 

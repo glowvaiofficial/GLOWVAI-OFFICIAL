@@ -34,7 +34,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
       size: selectedSize,
       price: activePrice,
       mrp: activeMrp,
-      image: getAssetPath(product.images[0] || "/images/hero/product.png"),
+      image: getAssetPath(product.images[0] || "/images/hero/product.webp"),
       quantity,
     });
     setIsAdded(true);
@@ -62,7 +62,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
       {/* Price & Taxes */}
       <div className="space-y-1 border-y border-ink/10 py-4">
         <div className="flex items-baseline gap-3">
-          <span className="font-display font-extrabold text-3xl text-brand">
+          <span className="font-display font-bold text-3xl text-brand">
             {formatPrice(activePrice)}
           </span>
           {activeMrp && activeMrp > activePrice && (
@@ -153,9 +153,9 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
             href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}?text=${whatsappMessage}`}
             target="_blank"
             rel="noreferrer"
-            className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-2xl shadow-sm transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-mint hover:bg-mint/70 text-ink font-bold text-xs py-3 px-4 rounded-2xl shadow-sm transition-colors"
           >
-            <MessageCircle className="w-4 h-4 fill-white shrink-0" />
+            <MessageCircle className="w-4 h-4 fill-ink shrink-0" />
             <span>Buy via WhatsApp</span>
           </a>
         )}

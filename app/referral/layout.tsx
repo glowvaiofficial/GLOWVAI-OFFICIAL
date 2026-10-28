@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     title: `Partner Referral Program | ${BRAND_NAME}`,
     description: "Earn ₹10 per verified referral + ₹1,000 milestone bonus as an Auto Driver Partner or Student Campus Ambassador with GLOW VAI.",
     url: `${SITE_URL}/referral`,
-    images: [{ url: `${SITE_URL}/og.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: `Partner Referral Program | ${BRAND_NAME}`,
     description: "Earn ₹10 per verified referral + ₹1,000 milestone bonus as an Auto Driver Partner or Student Campus Ambassador with GLOW VAI.",
-    images: [`${SITE_URL}/og.jpg`],
+    images: [`${SITE_URL}/opengraph-image`],
   },
 };
 

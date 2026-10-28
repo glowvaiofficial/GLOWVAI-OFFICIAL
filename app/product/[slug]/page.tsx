@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   const titleClean = (product.seo.title || product.name).replace(/\s*\|\s*GLOW VAI/gi, "");
   const canonicalUrl = getAbsoluteUrl(`/product/${product.slug}`);
-  const ogImageUrl = product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/og.jpg`;
+  const ogImageUrl = product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/opengraph-image`;
 
   return {
     title: titleClean,
@@ -63,6 +63,9 @@ export async function generateMetadata({ params }: ProductPageProps) {
   };
 }
 
+import { buildProductSchema, buildBreadcrumbSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/seo/JsonLd";
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
@@ -74,34 +77,24 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const related = getRelatedProducts(product.slug, 3);
   const discount = computeDiscountPercent(product.price, product.mrp);
 
-  const productSchema = {
+  const breadcrumbs = [
+    { name: "Home", urlPath: "/" },
+    { name: "Shop", urlPath: "/shop" },
+    { name: product.name },
+  ];
+
+  const productGraph = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    image: product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/og.jpg`,
-    description: product.description,
-    sku: product.id,
-    brand: {
-      "@type": "Brand",
-      name: product.marketerName || BRAND_NAME,
-    },
-    offers: {
-      "@type": "Offer",
-      url: getAbsoluteUrl(`/product/${product.slug}`),
-      priceCurrency: "INR",
-      price: product.price,
-      itemCondition: "https://schema.org/NewCondition",
-      availability: "https://schema.org/InStock",
-    },
+    "@graph": [
+      buildProductSchema(product, []),
+      buildBreadcrumbSchema(breadcrumbs, `/product/${product.slug}`),
+    ],
   };
 
   return (
     <div className="bg-white py-10 sm:py-16 text-ink min-h-screen">
       <CartDrawer />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
+      <JsonLd data={productGraph} />
 
       <Container>
         
@@ -131,7 +124,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           <div className="lg:col-span-7 space-y-4">
             <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden bg-skymist border border-ink/10 shadow-lg">
               <Image
-                src={getAssetPath(product.images[0] || "/images/hero/product.png")}
+                src={getAssetPath(product.images[0] || "/images/hero/product.webp")}
                 alt={product.name}
                 fill
                 priority
@@ -255,7 +248,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               {related.map((rel) => (
                 <div key={rel.id} className="p-4 rounded-3xl border border-ink/10 bg-white space-y-3 flex flex-col justify-between">
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-skymist border border-ink/10">
-                    <Image src={getAssetPath(rel.images[0] || "/images/hero/product.png")} alt={rel.name} fill className="object-cover" />
+                    <Image src={getAssetPath(rel.images[0] || "/images/hero/product.webp")} alt={rel.name} fill className="object-cover" />
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-ink line-clamp-1">{rel.name}</h3>

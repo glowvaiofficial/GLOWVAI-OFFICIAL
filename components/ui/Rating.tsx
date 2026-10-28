@@ -38,7 +38,7 @@ export function Rating({
               className={cn(
                 iconSizes[size],
                 isFull || isHalf
-                  ? "fill-yellow text-amber-400"
+                  ? "fill-yellow text-yellow-hover"
                   : "fill-ink/10 text-ink/20"
               )}
             />

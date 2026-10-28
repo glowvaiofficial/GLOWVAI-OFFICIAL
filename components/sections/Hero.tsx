@@ -29,24 +29,24 @@ export function Hero({ city = "Vijayawada" }: HeroProps) {
             
             {/* Eyebrow: Express pill + location badge */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm">
-              <span className="text-eyebrow bg-[#0050FF] text-white px-3 py-1 rounded-full shadow-xs flex items-center gap-1.5 font-bold">
+              <span className="text-eyebrow bg-brand text-white px-3 py-1 rounded-full shadow-xs flex items-center gap-1.5 font-bold">
                 <Zap className="w-3 h-3 text-yellow fill-yellow shrink-0" />
                 <span>15-minute doorstep express</span>
               </span>
-              <span className="text-slate-600 font-medium flex items-center gap-1 text-xs sm:text-sm">
+              <span className="text-ink-muted font-medium flex items-center gap-1 text-xs sm:text-sm">
                 <MapPin className="w-3.5 h-3.5 text-coral shrink-0" />
                 <span>Delivering to {city}</span>
               </span>
             </div>
 
             {/* Main H1 Headline */}
-            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold text-ink leading-[1.1] tracking-tight">
               Your bestie says you’re <Accent underline>glowing</Accent>. Let’s see if your skin agrees. 👀
             </h1>
 
             {/* Subheadline */}
-            <p className="text-sm sm:text-base lg:text-lg text-slate-600 font-normal leading-relaxed max-w-xl">
-              Scan your face in 30 seconds for an instant diagnostic & personalized routine. Delivered to your doorstep in 15 minutes.
+            <p className="text-sm sm:text-base lg:text-lg text-ink-muted font-normal leading-relaxed max-w-xl">
+              Scan your face in 30 seconds for an instant skin check & personalized routine. Delivered to your doorstep in 15 minutes.
             </p>
 
             {/* Action Buttons Row */}
@@ -55,7 +55,7 @@ export function Hero({ city = "Vijayawada" }: HeroProps) {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="w-full sm:w-auto h-[52px] flex items-center justify-center gap-2 bg-[#0050FF] hover:bg-[#003CD6] text-white font-bold shadow-md rounded-2xl text-xs sm:text-sm px-6"
+                  className="w-full sm:w-auto h-[52px] flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold shadow-md rounded-2xl text-xs sm:text-sm px-6"
                 >
                   <Sparkles className="w-5 h-5 text-yellow shrink-0" />
                   <span>Scan my face, it&apos;s free</span>
@@ -66,7 +66,7 @@ export function Hero({ city = "Vijayawada" }: HeroProps) {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto h-[52px] flex items-center justify-center gap-2 text-slate-800 font-bold border-2 border-slate-200 hover:bg-slate-50 rounded-2xl text-xs sm:text-sm px-6"
+                  className="w-full sm:w-auto h-[52px] flex items-center justify-center gap-2 text-ink font-bold border-2 border-ink/10 hover:bg-ink-subtle rounded-2xl text-xs sm:text-sm px-6"
                 >
                   <span>Shop routine products</span>
                   <ArrowRight className="w-4 h-4 shrink-0" />
@@ -75,34 +75,34 @@ export function Hero({ city = "Vijayawada" }: HeroProps) {
             </div>
 
             {/* Proof Row */}
-            <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-slate-600 font-medium">
+            <div className="pt-4 border-t border-ink/10 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-ink-muted font-medium">
               {hasVerifiedRating && (
                 <div className="flex items-center gap-1.5">
                   <Star className="w-4 h-4 text-yellow fill-yellow shrink-0" />
-                  <span className="font-bold text-slate-900">{siteConfig.rating}</span>
+                  <span className="font-bold text-ink">{siteConfig.rating}</span>
                 </div>
               )}
 
               {hasVerifiedCustomerCount && (
-                <div className="flex items-center gap-1.5 text-slate-600">
-                  <Users className="w-4 h-4 text-[#0050FF] shrink-0" />
-                  <span className="font-semibold text-slate-900">{siteConfig.customerCount}</span>
+                <div className="flex items-center gap-1.5 text-ink-muted">
+                  <Users className="w-4 h-4 text-brand shrink-0" />
+                  <span className="font-semibold text-ink">{siteConfig.customerCount}</span>
                 </div>
               )}
 
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-800">Free AI Face Scan</span>
+                <ShieldCheck className="w-4 h-4 text-brand shrink-0" />
+                <span className="font-semibold text-ink">Free AI Face Scan</span>
               </div>
 
               <div className="flex items-center gap-1.5">
-                <Lock className="w-4 h-4 text-[#0050FF] shrink-0" />
-                <span className="font-semibold text-slate-800">100% Private Browser Scan</span>
+                <Lock className="w-4 h-4 text-brand shrink-0" />
+                <span className="font-semibold text-ink">Private On-Device Scan</span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Clock className="w-4 h-4 text-coral shrink-0" />
-                <span className="font-semibold text-slate-800">15-min delivery in Vijayawada</span>
+                <span className="font-semibold text-ink">15-min delivery in Vijayawada</span>
               </div>
             </div>
           </div>

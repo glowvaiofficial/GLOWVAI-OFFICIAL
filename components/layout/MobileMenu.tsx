@@ -53,10 +53,10 @@ export function MobileMenu({
           className="flex items-center gap-2 select-none"
         >
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display font-extrabold text-2xl tracking-tight text-[#0050FF]">
+            <span className="font-display font-bold text-2xl tracking-tight text-brand">
               GLOW VAI
             </span>
-            <span className="text-[10px] font-extrabold tracking-widest text-amber-600 uppercase bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-yellow/30 px-2 py-0.5 rounded-md border border-yellow-hover">
               Quick Commerce
             </span>
           </div>
@@ -87,7 +87,7 @@ export function MobileMenu({
               <span>{link.title}</span>
               <div className="flex items-center gap-2">
                 {link.badge && (
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full border border-emerald-300">
+                  <span className="text-xs bg-mint text-ink font-semibold px-2.5 py-0.5 rounded-full border border-mint">
                     {link.badge}
                   </span>
                 )}

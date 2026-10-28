@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/sections/Hero";
 import { TrustStrip } from "@/components/sections/TrustStrip";
 import { FaceAnalysisFeature } from "@/components/sections/FaceAnalysisFeature";
@@ -13,11 +14,30 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTABanner } from "@/components/sections/FinalCTABanner";
 import { getLocationFromIP } from "@/lib/location";
 
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildHomeGraph } from "@/lib/seo/entity-graph";
+import { SITE_URL } from "@/lib/site-url";
+
+export const metadata: Metadata = {
+  title: "GLOW VAI | Skincare that starts with a face scan",
+  description: "Scan your face for free, get a plain-language skin report, and shop curated Minimalist and The Derma Co routines with WhatsApp ordering in India.",
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: {
+    title: "GLOW VAI | Skincare that starts with a face scan",
+    description: "Scan your face for free, get a plain-language skin report, and shop curated Minimalist and The Derma Co routines with WhatsApp ordering in India.",
+    url: SITE_URL,
+  },
+};
+
 export default async function HomePage() {
   const locationData = await getLocationFromIP();
+  const homeGraph = buildHomeGraph();
 
   return (
     <>
+      <JsonLd data={homeGraph} />
       {/* Section 1: Hero */}
       <Hero city={locationData.city} />
 

@@ -87,7 +87,7 @@ export function TrustStrip() {
                 ))}
               </ul>
 
-              {/* Duplicated Track for Seamless Loop (aria-hidden) */}
+              {/* Duplicated Track for Continuous Loop (aria-hidden) */}
               <ul aria-hidden="true" className="flex items-center gap-6 sm:gap-10 shrink-0">
                 <span className="w-1 h-1 rounded-full bg-brand shrink-0 hidden sm:inline-block" />
                 {verifiedClaims.map((item, idx) => (

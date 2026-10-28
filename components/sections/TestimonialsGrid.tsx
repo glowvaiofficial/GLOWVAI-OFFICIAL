@@ -9,6 +9,7 @@ import { Accent } from "@/components/ui/Accent";
 import { Rating } from "@/components/ui/Rating";
 import { testimonials, Testimonial } from "@/config/testimonials";
 import { CheckCircle2, Star, X, MessageSquare, AlertCircle } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 export function TestimonialsGrid() {
   const approvedTestimonials = testimonials.filter((t) => t.consentToPublish === true);
@@ -41,13 +42,17 @@ export function TestimonialsGrid() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      const ok = await submitPublicForm("Feedback", {
+        first_name: form.firstName,
+        city: form.city,
+        skin_type: form.skinType,
+        product: form.productTried,
+        rating: form.rating,
+        message: form.message,
+        consent_to_publish: form.consentToPublish ? "yes" : "no",
       });
 
-      if (!res.ok) throw new Error("Failed to submit feedback");
+      if (!ok) throw new Error("Failed to submit feedback");
 
       setSuccessMsg(true);
       setIsSubmitting(false);
@@ -178,7 +183,7 @@ export function TestimonialsGrid() {
                     <div className="flex items-center justify-between text-[11px]">
                       <span>{t.skinType} skin</span>
                       {t.verifiedPurchase && (
-                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                        <span className="text-brand font-semibold flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Verified Purchase</span>
                         </span>
@@ -215,8 +220,8 @@ export function TestimonialsGrid() {
               </div>
 
               {successMsg ? (
-                <div className="bg-mint text-emerald-950 p-6 rounded-2xl border border-emerald-300 text-center space-y-2">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-700 mx-auto" />
+                <div className="bg-mint text-ink p-6 rounded-2xl border border-mint text-center space-y-2">
+                  <CheckCircle2 className="w-10 h-10 text-ink mx-auto" />
                   <h4 className="font-bold text-lg">Thank you. We read every one.</h4>
                   <p className="text-xs">Your response has been safely recorded.</p>
                   <Button

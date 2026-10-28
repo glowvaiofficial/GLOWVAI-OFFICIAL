@@ -42,7 +42,7 @@ export default function TermsPage() {
             <p className="text-xs text-ink-muted">Last updated: October 2026</p>
           </div>
 
-          <div className="prose prose-slate text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
+          <div className="prose text-sm leading-relaxed space-y-6 text-ink-muted border-t border-ink/10 pt-6">
             
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">1. Acceptance of Terms</h2>
@@ -75,14 +75,14 @@ export default function TermsPage() {
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">5. Pricing, Orders & Cancellation</h2>
               <p className="text-xs">
-                All prices are listed in Indian Rupees (INR) and are inclusive of GST. Orders may be cancelled within 10 minutes of placement or before dispatch. We reserve the right to cancel orders due to stock unavailability or pricing errors. TODO: confirm with lawyer.
+                All prices are listed in Indian Rupees (INR) and are inclusive of GST. Orders may be cancelled within 10 minutes of placement or before dispatch. We reserve the right to cancel orders due to stock unavailability or pricing errors.
               </p>
             </section>
 
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">6. Shipping & Delivery Terms</h2>
               <p className="text-xs">
-                Delivery estimates (such as doorstep express delivery) are operational goals based on hub proximity and traffic conditions. Deliveries may experience delays during extreme weather or high volume periods. For full details on returns, see our <Link href="/returns" className="text-brand font-bold underline">Returns & Refund Policy</Link>. TODO: confirm with lawyer.
+                Delivery estimates (such as doorstep express delivery) are operational goals based on hub proximity and traffic conditions. Deliveries may experience delays during extreme weather or high volume periods. For full details on returns, see our <Link href="/returns" className="text-brand font-bold underline">Returns & Refund Policy</Link>.
               </p>
             </section>
 
@@ -96,14 +96,14 @@ export default function TermsPage() {
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">8. Limitation of Liability</h2>
               <p className="text-xs">
-                To the maximum extent permitted by Indian law, {siteConfig.legalName} shall not be liable for indirect, incidental, or consequential damages arising from website usage or product application beyond the purchase price of the product. TODO: confirm with lawyer.
+                To the maximum extent permitted by Indian law, {siteConfig.legalName} shall not be liable for indirect, incidental, or consequential damages arising from website usage or product application beyond the purchase price of the product.
               </p>
             </section>
 
             <section className="space-y-2">
               <h2 className="font-display font-bold text-lg text-ink">9. Governing Law & Dispute Resolution</h2>
               <p className="text-xs">
-                These terms are governed by the laws of India. Any disputes arising out of these terms shall be subject to the exclusive jurisdiction of courts located in Hyderabad, Telangana. TODO: confirm with lawyer.
+                These terms are governed by the laws of India. Any disputes arising out of these terms shall be subject to the exclusive jurisdiction of courts located in Hyderabad, Telangana.
               </p>
             </section>
 

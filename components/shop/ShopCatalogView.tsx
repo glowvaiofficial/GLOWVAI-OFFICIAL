@@ -235,7 +235,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                           <Link href={`/product/${prod.slug}`} className="space-y-3 block">
                             <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-skymist border border-ink/10">
                               <Image
-                                src={getAssetPath(prod.images[0] || "/images/hero/product.png")}
+                                src={getAssetPath(prod.images[0] || "/images/hero/product.webp")}
                                 alt={prod.name}
                                 fill
                                 sizes="(max-width: 768px) 50vw, 33vw"
@@ -263,7 +263,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
 
                           <div className="pt-2 border-t border-ink/10 flex items-center justify-between">
                             <div>
-                              <span className="font-display font-extrabold text-sm text-brand block">
+                              <span className="font-display font-bold text-sm text-brand block">
                                 {formatPrice(prod.price)}
                               </span>
                               {prod.mrp && prod.mrp > prod.price && (

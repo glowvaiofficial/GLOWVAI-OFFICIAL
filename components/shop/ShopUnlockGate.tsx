@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Accent } from "@/components/ui/Accent";
 import { Lock, Unlock, Mail, Sparkles, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 interface ShopUnlockGateProps {
   children: React.ReactNode;
@@ -42,11 +43,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
 
     setIsSubmitting(true);
     try {
-      await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, consent: true }),
-      }).catch(() => {});
+      await submitPublicForm("Newsletter", { email, source: "shop-unlock", consent: "yes" });
 
       sessionStorage.setItem("gv_shop_unlocked", "true");
       setIsUnlocked(true);
@@ -66,9 +63,9 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
     return (
       <div className="relative">
         {/* VIP Early Access Unlocked Banner */}
-        <div className="bg-mint text-emerald-950 py-2.5 px-4 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-emerald-300">
-          <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
-          <span>VIP Early Access Unlocked! Use code <strong>GLOW15</strong> at checkout for 15% off.</span>
+        <div className="bg-mint text-ink py-2.5 px-4 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-mint">
+          <Sparkles className="w-4 h-4 text-ink shrink-0" />
+          <span>VIP Early Access Open! Use code <strong>GLOW15</strong> at checkout for 15% off.</span>
         </div>
         {children}
       </div>
@@ -99,8 +96,8 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
             <Badge variant="brand" size="md">
               VIP Early Access Only
             </Badge>
-            <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-ink leading-tight">
-              Unlock the <Accent>GLOW VAI</Accent> Shop
+            <h2 className="font-display font-bold text-2xl sm:text-3xl text-ink leading-tight">
+              Get into the <Accent>GLOW VAI</Accent> Shop
             </h2>
             <p className="text-xs sm:text-sm text-ink-muted leading-relaxed max-w-sm mx-auto">
               Drop your email address below to reveal catalog prices, early access stock allocations, and get an instant 15% discount.
@@ -146,13 +143,13 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
               className="w-full shadow-coral-glow text-button-label gap-2"
             >
               <Unlock className="w-4 h-4 text-ink shrink-0" />
-              <span>{isSubmitting ? "Unlocking..." : "Unlock Shop Access"}</span>
+              <span>{isSubmitting ? "Opening..." : "Get Shop Access"}</span>
             </Button>
           </form>
 
           <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-ink-muted border-t border-ink/10">
             <ShieldCheck className="w-4 h-4 text-brand shrink-0" />
-            <span>Instant Access • Zero Spam • 100% Privacy</span>
+            <span>Instant Access • Zero Spam • Complete Privacy</span>
           </div>
 
         </div>

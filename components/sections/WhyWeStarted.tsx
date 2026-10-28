@@ -17,7 +17,7 @@ export function WhyWeStarted() {
     <section className="py-16 sm:py-28 bg-white border-t border-ink/10 relative overflow-hidden">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
+
           {/* Left Column (5 cols desktop): Narrative & Pull-Quote */}
           <div className="lg:col-span-5 space-y-6">
             <span className="text-eyebrow text-brand font-semibold tracking-wider uppercase block">
@@ -55,7 +55,7 @@ export function WhyWeStarted() {
 
           {/* Right Column (7 cols desktop): Clean 3-Founder Showcase Grid & Timeline */}
           <div className="lg:col-span-7 relative flex flex-col justify-center items-center lg:items-end space-y-4">
-            
+
             {/* 3-Founder Card Showcase Container */}
             <div className="relative w-full max-w-[560px] bg-skymist/50 backdrop-blur-md p-3.5 sm:p-5 rounded-[36px] border border-brand/15 shadow-xl space-y-3">
               <div className="flex items-center justify-between border-b border-brand/10 pb-2 px-1">
@@ -66,19 +66,19 @@ export function WhyWeStarted() {
                 <span className="text-[10px] text-ink-muted font-medium">3 Founders</span>
               </div>
 
-              {/* 3 Founder Cards Side-by-Side (0 Overlaps - All 3 Faces 100% Clear) */}
+              {/* 3 Founder Cards Side-by-Side (0 Overlaps - All 3 Faces Fully Clear) */}
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5">
-                
-                {/* Founder 1: Sardhar Musthafa */}
+
+                {/* Founder 1: Sardar Musthafa */}
                 <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-md border-2 sm:border-4 border-white bg-white group hover:scale-[1.03] transition-transform">
                   <PlaceholderImage
                     src={assetConfig.story.teamAtDesk.src}
-                    alt="Sardhar Musthafa - Founder & CEO"
+                    alt="Sardar Musthafa - Founder & CEO"
                     caption={assetConfig.story.teamAtDesk.caption}
                     objectPosition="object-center"
                   />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent p-2 text-white">
-                    <p className="text-[10px] sm:text-xs font-extrabold leading-tight">Sardhar</p>
+                    <p className="text-[10px] sm:text-xs font-bold leading-tight">Sardar</p>
                     <p className="text-[8px] sm:text-[9px] text-yellow font-semibold truncate">Founder, Vision</p>
                   </div>
                 </div>
@@ -87,26 +87,26 @@ export function WhyWeStarted() {
                 <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-md border-2 sm:border-4 border-white bg-white group hover:scale-[1.03] transition-transform">
                   <PlaceholderImage
                     src={assetConfig.story.workingMoment.src}
-                    alt="Sathveek Nalla - Co-Founder & Tech Lead"
+                    alt="Nalla Satvik - Co-Founder & Technical Lead"
                     caption={assetConfig.story.workingMoment.caption}
                     objectPosition="object-center"
                   />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent p-2 text-white">
-                    <p className="text-[10px] sm:text-xs font-extrabold leading-tight">Sathveek Nalla</p>
-                    <p className="text-[8px] sm:text-[9px] text-cyan-300 font-semibold truncate">Co-Founder & Tech Lead</p>
+                    <p className="text-[10px] sm:text-xs font-bold leading-tight">Nalla Satvik</p>
+                    <p className="text-[8px] sm:text-[9px] text-skymist font-semibold truncate">Co-Founder & Technical Lead</p>
                   </div>
                 </div>
 
-                {/* Founder 3: Rahimath (object-top so face is 100% visible) */}
+                {/* Founder 3: Rehmit (object-top so face is fully visible) */}
                 <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-2xl overflow-hidden shadow-md border-2 sm:border-4 border-white bg-white group hover:scale-[1.03] transition-transform">
                   <PlaceholderImage
                     src={assetConfig.story.productCloseUp.src}
-                    alt="Rahimath - Market Explorer"
+                    alt="Rehmit - Market Explorer"
                     caption={assetConfig.story.productCloseUp.caption}
                     objectPosition="object-top"
                   />
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-ink/95 via-ink/60 to-transparent p-2 text-white">
-                    <p className="text-[10px] sm:text-xs font-extrabold leading-tight">Rahimath</p>
+                    <p className="text-[10px] sm:text-xs font-bold leading-tight">Rehmit</p>
                     <p className="text-[8px] sm:text-[9px] text-coral-light font-semibold truncate">Market Explorer</p>
                   </div>
                 </div>
@@ -138,3 +138,6 @@ export function WhyWeStarted() {
     </section>
   );
 }
+
+
+

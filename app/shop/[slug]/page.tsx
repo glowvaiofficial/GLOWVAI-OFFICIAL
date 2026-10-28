@@ -55,13 +55,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description: seo.metaDescription,
       url: canonicalUrl,
       type: "website",
-      images: [{ url: `${SITE_URL}/og.jpg`, width: 1200, height: 630 }],
+      images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: seo.title,
       description: seo.metaDescription,
-      images: [`${SITE_URL}/og.jpg`],
+      images: [`${SITE_URL}/opengraph-image`],
     },
   };
 }
@@ -92,6 +92,9 @@ function getFilteredProductsForSlug(slug: string): Product[] {
   return filterProducts();
 }
 
+import { buildCollectionPageSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/seo/JsonLd";
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   const seo = seoCategoryCopy[slug];
@@ -102,66 +105,23 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const products = getFilteredProductsForSlug(slug);
 
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Home",
-        item: SITE_URL,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Shop",
-        item: `${SITE_URL}/shop`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: seo.h1,
-        item: `${SITE_URL}/shop/${slug}`,
-      },
-    ],
-  };
+  const breadcrumbs = [
+    { name: "Home", urlPath: "/" },
+    { name: "Shop", urlPath: "/shop" },
+    { name: seo.h1 },
+  ];
 
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    numberOfItems: products.length,
-    itemListElement: products.map((p, idx) => ({
-      "@type": "ListItem",
-      position: idx + 1,
-      item: {
-        "@type": "Product",
-        name: p.name,
-        url: `${SITE_URL}/product/${p.slug}`,
-        offers: {
-          "@type": "Offer",
-          price: p.price,
-          priceCurrency: "INR",
-          availability: "https://schema.org/InStock",
-        },
-      },
-    })),
-  };
+  const collectionGraph = buildCollectionPageSchema(
+    seo.h1,
+    `/shop/${slug}`,
+    seo.intro,
+    products as any,
+    breadcrumbs
+  );
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema).replace(/</g, "\\u003c"),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(itemListSchema).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={collectionGraph} />
 
       <main className="min-h-screen bg-sand/30 py-12 sm:py-16">
         <Container>

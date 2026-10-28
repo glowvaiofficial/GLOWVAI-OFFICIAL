@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { dataRequestSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/Button";
 import { CheckCircle2 } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 export function DataRequestForm() {
   const [dataReq, setDataReq] = useState({
@@ -27,13 +28,13 @@ export function DataRequestForm() {
 
     setReqStatus("loading");
     try {
-      const res = await fetch("/api/data-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataReq),
+      const ok = await submitPublicForm("DataRequests", {
+        contact: dataReq.contact.includes("@") ? dataReq.contact.trim() : normalizePhone(dataReq.contact),
+        type: dataReq.type,
+        website: dataReq.website,
       });
 
-      if (!res.ok) throw new Error("Request failed");
+      if (!ok) throw new Error("Request failed");
       setReqStatus("success");
     } catch {
       setReqStatus("error");
@@ -44,8 +45,8 @@ export function DataRequestForm() {
   return (
     <div className="space-y-4">
       {reqStatus === "success" ? (
-        <div className="bg-mint text-emerald-950 p-4 rounded-2xl border border-emerald-300 text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+        <div className="bg-mint text-ink p-4 rounded-2xl border border-mint text-xs font-semibold flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 text-ink shrink-0" />
           <span>Request received. We will process it within statutory timeframes (7 days).</span>
         </div>
       ) : (

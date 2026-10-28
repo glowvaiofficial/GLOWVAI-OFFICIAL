@@ -32,7 +32,7 @@ export default async function Image() {
             fontWeight: 700,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            color: "#93C5FD",
+            color: "#3373FF",
             marginBottom: 20,
           }}
         >
@@ -41,22 +41,22 @@ export default async function Image() {
         <div
           style={{
             fontSize: 64,
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1.1,
             marginBottom: 30,
             maxWidth: 900,
           }}
         >
-          Your bestie says you’re glowing. Let’s see if your skin agrees.
+          Your bestie says you’re glowing. See for yourself.
         </div>
         <div
           style={{
             fontSize: 28,
-            color: "#DBEAFE",
+            color: "#E6EEFF",
             maxWidth: 800,
           }}
         >
-          Scan your face in 30 seconds for an instant diagnostic & personalized routine.
+          Scan your face in 30 seconds for an instant skin check and routine picks.
         </div>
       </div>
     ),

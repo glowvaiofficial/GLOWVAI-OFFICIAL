@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { serviceablePincodes } from "@/config/serviceablePincodes";
 import { deliveryStatsClaims, cityCoverageClaims, fastDeliveryClaim } from "@/config/claims";
 import { Zap, MapPin, Search, CheckCircle2, AlertCircle, ShoppingBag, Box, Bike, Home } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 export function QuickDeliveryExplainer() {
   const isFastDeliveryVerified = fastDeliveryClaim.verified;
@@ -58,11 +59,7 @@ export function QuickDeliveryExplainer() {
     e.preventDefault();
     if (waitlistEmail && waitlistEmail.includes("@")) {
       setIsSubmittingWaitlist(true);
-      await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: waitlistEmail, pincode }),
-      }).catch(() => {});
+      await submitPublicForm("Waitlist", { email: waitlistEmail, pincode, source: "delivery-banner", consent: "yes" });
       setIsSubmittingWaitlist(false);
       setWaitlistSuccess(true);
     }
@@ -72,17 +69,17 @@ export function QuickDeliveryExplainer() {
   const verifiedCities = cityCoverageClaims.filter((item) => item.verified === true);
 
   return (
-    <section id="delivery" className="py-16 sm:py-24 bg-slate-50 border border-slate-200/80 text-slate-900 rounded-[40px] my-12 relative overflow-hidden shadow-sm">
+    <section id="delivery" className="py-16 sm:py-24 bg-ink-subtle border border-ink/10 text-ink rounded-[40px] my-12 relative overflow-hidden shadow-sm">
       <Container>
         {/* Section Header */}
         <div className="space-y-3 max-w-2xl mb-12">
-          <span className="text-xs font-bold tracking-widest text-[#0050FF] uppercase block">
+          <span className="text-xs font-bold tracking-widest text-brand uppercase block">
             How it reaches you
           </span>
-          <h2 className="font-display text-h2-section text-slate-900 text-wrap-balance">
-            Order from your couch. Someone nearby <Accent className="text-[#0050FF]">brings</Accent> it over.
+          <h2 className="font-display text-h2-section text-ink text-wrap-balance">
+            Order from your couch. Someone nearby <Accent className="text-brand">brings</Accent> it over.
           </h2>
-          <p className="text-body-lg text-slate-600 font-normal">
+          <p className="text-body-lg text-ink-muted font-normal">
             We store fresh formulations in temperature-controlled neighborhood micro hubs for instant doorstep dispatch.
           </p>
         </div>
@@ -108,19 +105,19 @@ export function QuickDeliveryExplainer() {
               return (
                 <ol
                   key={s.step}
-                  className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-md space-y-3 relative group hover:border-[#0050FF]/40 hover:shadow-lg transition-all list-none m-0"
+                  className="bg-white rounded-3xl p-6 border border-ink/10 shadow-md space-y-3 relative group hover:border-brand/40 hover:shadow-lg transition-all list-none m-0"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-display font-extrabold text-2xl text-[#0050FF]">
+                    <span className="font-display font-bold text-2xl text-brand">
                       {s.step}
                     </span>
-                    <div className="w-9 h-9 rounded-2xl bg-blue-50 text-[#0050FF] flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-2xl bg-skymist text-brand flex items-center justify-center">
                       <Icon className="w-4.5 h-4.5" />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-bold text-base text-slate-900">{s.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
+                    <h3 className="font-bold text-base text-ink">{s.title}</h3>
+                    <p className="text-xs text-ink-muted leading-relaxed">{s.desc}</p>
                   </div>
                 </ol>
               );
@@ -135,36 +132,36 @@ export function QuickDeliveryExplainer() {
           <div className="lg:col-span-6 space-y-6">
             
             {/* Live-feeling Mini Delivery Map Card with Light Clean White UI */}
-            <div className="bg-white p-6 rounded-3xl border-2 border-blue-200/80 relative overflow-hidden space-y-4 shadow-xl text-slate-900">
-              
+            <div className="bg-white p-6 rounded-3xl border-2 border-brand/20 relative overflow-hidden space-y-4 shadow-xl text-ink">
+
               {/* Header Bar */}
               <div className="flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-2.5">
                   <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-mint"></span>
                   </span>
-                  <span className="text-xs font-extrabold tracking-wider text-[#0050FF] uppercase">
+                  <span className="text-xs font-bold tracking-wider text-brand uppercase">
                     Vijayawada Dark Store Dispatch #HYD-DS04
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold bg-amber-400 text-slate-900 px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                  <span className="text-[10px] font-semibold bg-yellow text-ink px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                     LIVE RADAR
                   </span>
                 </div>
               </div>
 
               {/* Dynamic Radar Scanner Viewport (Bright Sky Mist Theme) */}
-              <div className="relative w-full h-44 bg-blue-50/70 rounded-2xl border border-blue-200 overflow-hidden flex items-center justify-center">
-                
+              <div className="relative w-full h-44 bg-skymist/70 rounded-2xl border border-skymist overflow-hidden flex items-center justify-center">
+
                 {/* Radar Grid Lines */}
                 <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0050FF_1px,transparent_1px)] [background-size:16px_16px]" />
-                
+
                 {/* Radar Concentric Pulsing Rings */}
-                <div className="absolute w-40 h-40 rounded-full border border-blue-400/40 animate-ping opacity-30" />
-                <div className="absolute w-28 h-28 rounded-full border border-blue-500/30" />
-                <div className="absolute w-16 h-16 rounded-full border border-blue-500/40" />
+                <div className="absolute w-40 h-40 rounded-full border border-brand/40 animate-ping opacity-30" />
+                <div className="absolute w-28 h-28 rounded-full border border-brand/30" />
+                <div className="absolute w-16 h-16 rounded-full border border-brand/40" />
 
                 {/* Sweeping Radar Scanner Line */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -185,7 +182,7 @@ export function QuickDeliveryExplainer() {
                   <path
                     d="M 50 120 C 130 120, 160 40, 350 40"
                     fill="none"
-                    stroke="#F59E0B"
+                    stroke="#FFD84D"
                     strokeWidth="3.5"
                     strokeDasharray="8 8"
                     className="animate-pulse"
@@ -193,46 +190,46 @@ export function QuickDeliveryExplainer() {
                 </svg>
 
                 {/* Micro-Hub Pin (Start Point) */}
-                <div className="absolute left-4 bottom-4 bg-[#0050FF] text-white px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1.5 shadow-md z-20">
-                  <Box className="w-3.5 h-3.5 text-amber-300" />
+                <div className="absolute left-4 bottom-4 bg-brand text-white px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1.5 shadow-md z-20">
+                  <Box className="w-3.5 h-3.5 text-yellow" />
                   <div>
                     <div className="leading-tight">Micro-Hub</div>
-                    <div className="text-[8px] text-blue-100 font-medium">Dark Store #04</div>
+                    <div className="text-[8px] text-skymist font-medium">Dark Store #04</div>
                   </div>
                 </div>
 
                 {/* Animated Rider Icon Traveling along the route */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-amber-400 text-slate-900 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5 shadow-lg ring-4 ring-amber-400/30 animate-bounce z-20">
-                  <Bike className="w-4 h-4 text-slate-900" />
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow text-ink px-3 py-1.5 rounded-full text-[11px] font-semibold flex items-center gap-1.5 shadow-lg ring-4 ring-yellow/30 animate-bounce z-20">
+                  <Bike className="w-4 h-4 text-ink" />
                   <span>EV Rider</span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-mint animate-ping" />
                 </div>
 
                 {/* Your Door Pin (End Point) */}
-                <div className="absolute right-4 top-4 bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1.5 shadow-md z-20">
+                <div className="absolute right-4 top-4 bg-brand text-white px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1.5 shadow-md z-20">
                   <Home className="w-3.5 h-3.5 text-white" />
                   <div>
                     <div className="leading-tight">Your Doorstep</div>
-                    <div className="text-[8px] text-emerald-100 font-medium">Vijayawada</div>
+                    <div className="text-[8px] text-skymist font-medium">Vijayawada</div>
                   </div>
                 </div>
               </div>
 
               {/* Rider Telemetry & Live Countdown Bar (Light Slate Theme) */}
               <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
-                  <span className="text-[9px] font-extrabold text-[#0050FF] uppercase tracking-wider block">Live Speed & Temp</span>
-                  <div className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                <div className="bg-ink-subtle p-3 rounded-2xl border border-ink/10 space-y-1">
+                  <span className="text-[9px] font-bold text-brand uppercase tracking-wider block">Live Speed & Temp</span>
+                  <div className="text-xs font-bold text-ink flex items-center justify-between">
                     <span>⚡ 32 km/h</span>
-                    <span className="text-emerald-600 font-extrabold">❄️ 4°C Cold</span>
+                    <span className="text-brand font-bold">❄️ 4°C Cold</span>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
-                  <span className="text-[9px] font-extrabold text-[#0050FF] uppercase tracking-wider block">Doorstep ETA</span>
-                  <div className="text-xs font-extrabold text-slate-900 flex items-center justify-between">
-                    <span className="text-amber-600 font-extrabold">~{demoCountdown} Mins</span>
-                    <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">On Schedule</span>
+                <div className="bg-ink-subtle p-3 rounded-2xl border border-ink/10 space-y-1">
+                  <span className="text-[9px] font-bold text-brand uppercase tracking-wider block">Doorstep ETA</span>
+                  <div className="text-xs font-bold text-ink flex items-center justify-between">
+                    <span className="text-coral font-bold">~{demoCountdown} Mins</span>
+                    <span className="text-[10px] text-ink font-bold bg-mint px-2 py-0.5 rounded-md border border-mint">On Schedule</span>
                   </div>
                 </div>
               </div>
@@ -243,7 +240,7 @@ export function QuickDeliveryExplainer() {
               <div className="grid grid-cols-2 gap-3">
                 {verifiedStats.map((st) => (
                   <div key={st.id} className="bg-skymist/40 p-4 rounded-2xl border border-brand/10">
-                    <p className="font-display font-extrabold text-2xl text-brand tabular-nums">{st.value}</p>
+                    <p className="font-display font-bold text-2xl text-brand tabular-nums">{st.value}</p>
                     <p className="text-xs text-ink-muted font-medium">{st.label}</p>
                   </div>
                 ))}
@@ -317,8 +314,8 @@ export function QuickDeliveryExplainer() {
             )}
 
             {status === "available" && (
-              <div className="bg-mint text-emerald-950 p-3.5 rounded-xl text-xs font-bold flex items-center gap-2 border border-emerald-300">
-                <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+              <div className="bg-mint text-ink p-3.5 rounded-xl text-xs font-bold flex items-center gap-2 border border-mint">
+                <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
                 <span>We deliver here! Micro-Hub active for doorstep express.</span>
               </div>
             )}
@@ -330,7 +327,7 @@ export function QuickDeliveryExplainer() {
                   <span>Not yet live in your area. Join the waitlist:</span>
                 </div>
                 {waitlistSuccess ? (
-                  <p className="text-emerald-800 font-semibold pt-1">
+                  <p className="text-ink font-semibold pt-1">
                     Added to waitlist! We will notify you when we open your pincode.
                   </p>
                 ) : (

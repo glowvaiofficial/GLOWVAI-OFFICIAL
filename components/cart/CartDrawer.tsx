@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/Button";
 import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight, Lock, MessageCircle } from "lucide-react";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 
 export function CartDrawer() {
   const {
@@ -51,11 +52,7 @@ export function CartDrawer() {
   const handleJoinWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
     if (waitlistEmail && waitlistEmail.includes("@")) {
-      await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: waitlistEmail, pincode: "CART" }),
-      }).catch(() => {});
+      await submitPublicForm("Waitlist", { email: waitlistEmail, pincode: "CART", source: "cart", consent: "yes" });
       setWaitlistSuccess(true);
     }
   };
@@ -219,7 +216,7 @@ export function CartDrawer() {
                 <span className="font-bold text-ink">{formatPrice(subtotal)}</span>
               </div>
               {savings > 0 && (
-                <div className="flex justify-between text-emerald-700 font-semibold">
+                <div className="flex justify-between text-brand font-semibold">
                   <span>Total Savings:</span>
                   <span>- {formatPrice(savings)}</span>
                 </div>
@@ -243,7 +240,7 @@ export function CartDrawer() {
                     href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}?text=${whatsappMessage}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-3 px-4 rounded-2xl shadow-md transition-colors"
+                    className="w-full flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold text-xs py-3 px-4 rounded-2xl shadow-md transition-colors"
                   >
                     <MessageCircle className="w-4 h-4 fill-white" />
                     <span>Order via WhatsApp</span>
@@ -254,7 +251,7 @@ export function CartDrawer() {
                 <div className="bg-white p-3.5 rounded-2xl border border-ink/10 text-xs space-y-2">
                   <span className="font-bold text-ink block">Online checkout coming soon:</span>
                   {waitlistSuccess ? (
-                    <p className="text-emerald-800 font-semibold">
+                    <p className="text-brand font-semibold">
                       Added to checkout waitlist! We will notify you when online payments go live.
                     </p>
                   ) : (

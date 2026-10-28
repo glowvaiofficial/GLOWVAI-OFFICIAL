@@ -63,7 +63,7 @@ export interface JournalArticle {
 export const announcementMessages = [
   "⚡ Fresh formulations delivered to your doorstep in ~15 mins.",
   "✨ Take our 30-sec free face scan and get ₹200 off your first order!",
-  "🌿 100% Dermatologist tested, zero toxic fillers, cruelty free",
+  "🌿 Dermatologist tested, zero toxic fillers, cruelty free",
 ];
 
 export const heroContent = {
@@ -74,7 +74,7 @@ export const heroContent = {
     { text: "Your skin has opinions. We listen, then deliver.", accentWord: "listen" },
   ],
   selectedHeadlineIndex: 0,
-  subheadline: "Your bestie says you’re glowing. Let’s see if your skin agrees. 👀 Scan your face in 30 seconds for an instant diagnostic & personalized routine.",
+  subheadline: "Your bestie says you’re glowing. Let’s see if your skin agrees. 👀 Scan your face in 30 seconds for an instant skin check & personalized routine.",
   primaryCTA: "Scan my face, it's free",
   secondaryCTA: "Shop now",
   ratingText: "4.95 / 5 star rating",
@@ -293,10 +293,10 @@ export const founderStory = {
     `We asked a simple question: If we can get hot food and groceries in 10 minutes, why are we buying cosmetics made 8 months ago that sit in warehouses for weeks?`,
     `That is when ${BRAND_NAME} was born. We built a network of fresh, small-batch formulations tailored specifically for Indian skin tones and humid weather. Paired with our 30-second camera scan, you get hyper-personalized skin routine recommendations.`,
   ],
-  founderName: "SK Sardhar Musthafa",
+  founderName: "SK Sardar Musthafa",
   founderRole: "Co-Founder",
   founderImage: "/images/founders/sardhar-musthafa.jpeg",
-  founderImageAlt: "SK Sardhar Musthafa, co-founder of GLOW VAI",
+  founderImageAlt: "SK Sardar Musthafa, co-founder of GLOW VAI",
   artDirectionNote: "Warm candid studio photograph of founder.",
   timeline: [
     { year: "2023", title: "The Frustration", desc: "Founders test 40+ products during peak monsoon; 80% cause breakouts in humid weather." },
@@ -349,7 +349,7 @@ export const quickDeliveryContent = {
   stats: [
     { value: "Fast", label: "Doorstep Delivery" },
     { value: "Fresh", label: "Small-Batch Runs" },
-    { value: "100%", label: "Transparent INCI" },
+    { value: "Full", label: "Transparent INCI" },
     { value: "Free", label: "Camera Skin Scan" },
   ],
   activeCities: ["Hyderabad", "Bengaluru", "Mumbai", "Delhi NCR", "Chennai"],

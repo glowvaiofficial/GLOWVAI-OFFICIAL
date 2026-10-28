@@ -4,41 +4,8 @@
  * All sample products carry INCI lists and Indian cosmetics labelling fields.
  */
 
-export interface ProductVariant {
-  size: string;
-  price: number;
-  mrp: number;
-}
-
-export interface Product {
-  id: string;
-  sku?: string;
-  slug: string;
-  name: string;
-  tagline: string;
-  description: string;
-  category: "serum" | "moisturiser" | "sunscreen" | "cleanser" | "lip" | "body";
-  concerns: string[]; // e.g. ["dryness", "dullness", "acne", "sun-care"]
-  skinTypes: string[]; // e.g. ["Normal", "Dry", "Oily", "Combination", "Sensitive"]
-  price: number; // INR Rupees
-  mrp: number; // INR Rupees
-  size: string;
-  sizes?: ProductVariant[];
-  images: string[];
-  ingredients: string; // Full INCI list
-  keyIngredients: string[];
-  howToUse: string[];
-  cautions: string;
-  shelfLife: string;
-  countryOfOrigin: string;
-  marketerName: string;
-  marketerAddress: string;
-  status: "draft" | "published";
-  seo: {
-    title: string;
-    description: string;
-  };
-}
+import { Product, ProductVariant } from "@/types/product";
+export type { Product, ProductVariant };
 
 export const sampleProducts: Product[] = [
   {

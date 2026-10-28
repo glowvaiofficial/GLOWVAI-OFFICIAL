@@ -16,10 +16,10 @@ function GlowVaiLogo() {
   return (
     <div className="flex items-center gap-2 select-none group">
       <div className="flex items-baseline gap-1.5">
-        <span className="font-display font-extrabold text-2xl tracking-tight text-[#0050FF] group-hover:text-blue-700 transition-colors">
+        <span className="font-display font-bold text-2xl tracking-tight text-brand group-hover:text-brand-dark transition-colors">
           GLOW VAI
         </span>
-        <span className="text-[10px] font-extrabold tracking-widest text-amber-500 uppercase bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 shadow-2xs">
+        <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-yellow/30 px-2 py-0.5 rounded-md border border-yellow-hover shadow-2xs">
           Quick Commerce
         </span>
       </div>
@@ -78,7 +78,7 @@ export function Navbar() {
                 >
                   <span>{link.title}</span>
                   {link.badge && (
-                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-0.5 rounded-full shadow-2xs border border-white/40 animate-pulse">
+                    <span className="text-[10px] font-semibold bg-mint text-ink px-2 py-0.5 rounded-full shadow-2xs border border-ink/10 animate-pulse">
                       {link.badge}
                     </span>
                   )}
@@ -91,7 +91,7 @@ export function Navbar() {
                 >
                   <span>{link.title}</span>
                   {link.badge && (
-                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-coral to-amber-500 text-white px-2 py-0.5 rounded-full shadow-2xs border border-white/40 animate-pulse">
+                    <span className="text-[10px] font-semibold bg-coral text-ink px-2 py-0.5 rounded-full shadow-2xs border border-white/40 animate-pulse">
                       {link.badge}
                     </span>
                   )}
@@ -110,7 +110,7 @@ export function Navbar() {
             >
               <ShoppingBag className="w-5 h-5 text-ink group-hover:scale-110 transition-transform" />
               {cartItemCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4.5 h-4.5 rounded-full bg-coral text-ink font-extrabold text-[11px] flex items-center justify-center shadow-xs ring-2 ring-white">
+                <span className="absolute top-1.5 right-1.5 w-4.5 h-4.5 rounded-full bg-coral text-ink font-bold text-[11px] flex items-center justify-center shadow-xs ring-2 ring-white">
                   {cartItemCount}
                 </span>
               )}
