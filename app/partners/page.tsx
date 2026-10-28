@@ -19,17 +19,17 @@ export default function PartnersPage() {
   const link = `underline underline-offset-4 rounded ${focusRing}`;
   const items = [
     {
-      title: "Partner stores",
+      title: "Partner stores", href: "/partners/stores",
       body: (
         <>
           Pack and hand over orders near customers. Write to{" "}
           <a className={link} href={`mailto:${mail}?subject=Partner store`}>{mail}</a>. See{" "}
-          <Link className={link} href="/store">partner stores</Link>.
+          <Link className={link} href="/partners/stores">what we look for</Link>.
         </>
       ),
     },
     {
-      title: "Brands and suppliers",
+      title: "Brands and suppliers", href: "/partners/brands",
       body: (
         <>
           Want your products stocked? Send your catalogue and licences to{" "}
@@ -38,7 +38,7 @@ export default function PartnersPage() {
       ),
     },
     {
-      title: "Riders",
+      title: "Riders", href: "/partners/rider",
       body: (
         <>
           Deliver in your area. Write to <a className={link} href={`mailto:${mail}?subject=Rider`}>{mail}</a> with your area and vehicle.

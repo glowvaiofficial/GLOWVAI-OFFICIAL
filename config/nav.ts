@@ -48,10 +48,14 @@ export const footerLinks = {
     { title: "Referral program", href: "/referral" },
     { title: "Careers", href: "/careers" },
     { title: "Press", href: "/press" },
+    { title: "Brand kit", href: "/press/brand-kit" },
   ],
   help: [
     { title: "Help center", href: "/help" },
     { title: "Track order", href: "/track-order" },
+    { title: "Orders and cancellations", href: "/help/orders" },
+    { title: "Payments", href: "/help/payments" },
+    { title: "Face scan help", href: "/help/face-scan" },
     { title: "Delivery", href: "/delivery" },
     { title: "Returns and refunds", href: "/returns" },
     { title: "FAQ", href: "/faq" },
@@ -59,14 +63,17 @@ export const footerLinks = {
   ],
   partners: [
     { title: "Partner with us", href: "/partners" },
-    { title: "Partner stores", href: "/store" },
-    { title: "Become a rider", href: "/partners" },
+    { title: "Partner stores", href: "/partners/stores" },
+    { title: "Brands and suppliers", href: "/partners/brands" },
+    { title: "Become a rider", href: "/partners/rider" },
     { title: "Auto and campus partners", href: "/referral" },
   ],
   legal: [
     { title: "Privacy policy", href: "/privacy" },
     { title: "Terms", href: "/terms" },
     { title: "Grievance redressal", href: "/grievance" },
+    { title: "Accessibility", href: "/accessibility" },
+    { title: "Site map", href: "/site-map" },
   ],
 };
 

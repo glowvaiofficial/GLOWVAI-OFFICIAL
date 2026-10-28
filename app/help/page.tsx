@@ -15,6 +15,9 @@ export const metadata: Metadata = {
 };
 
 const topics = [
+  { title: "Orders and cancellations", href: "/help/orders", body: "Place, change or cancel an order." },
+  { title: "Payments", href: "/help/payments", body: "How you pay and what to do if something goes wrong." },
+  { title: "Face scan help", href: "/help/face-scan", body: "Get a good result and know where your photo goes." },
   { title: "Track an order", href: "/track-order", body: "Check where your order is." },
   { title: "Delivery", href: "/delivery", body: "How the 15-minute estimate works and what can slow it." },
   { title: "Returns and refunds", href: "/returns", body: "What you can return and how long refunds take." },

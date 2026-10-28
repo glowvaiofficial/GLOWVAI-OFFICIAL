@@ -139,8 +139,8 @@ export function Footer() {
       </div>
 
       <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 pt-14">
-        <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 pb-12">
-          <div className="col-span-2 lg:col-span-3 space-y-5">
+        <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 pb-12 items-start">
+          <div className="col-span-2 lg:col-span-4 space-y-5">
             <Link href="/" className={`inline-block rounded ${focusRing}`} aria-label={`${BRAND_NAME} home`}>
               <span className="font-display font-bold text-[26px] tracking-[-0.02em] text-brand">GLOW VAI</span>
             </Link>
@@ -215,8 +215,8 @@ export function Footer() {
         </div>
 
         {/* Department emails */}
-        <div className="border-t border-ink/15 py-10 grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-8">
-          <div className="lg:col-span-7">
+        <div className="border-t border-ink/15 py-10 grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-8">
+          <div className="lg:col-span-8">
             <h2 className="font-display font-semibold text-lg text-ink">Write to the right team</h2>
             <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
               {departmentEmails.map((d) => (
@@ -229,7 +229,7 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-4">
             <h2 className="font-display font-semibold text-lg text-ink">Skin tips, once in a while.</h2>
             <p className="text-sm text-ink-muted mt-1 mb-4">No spam. Unsubscribe any time.</p>
             <NewsletterForm />

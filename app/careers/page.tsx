@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 };
 
 const areas = [
-  { title: "Marketing, sales and revenue", body: "Grow the brand, run campaigns, work with partner stores and campus and auto partners." },
-  { title: "Operations and delivery", body: "Run partner-store packing, riders and the 15-minute delivery promise." },
-  { title: "Engineering and product", body: "Build the face scan, the shop and the order system." },
-  { title: "Customer care", body: "Help customers by WhatsApp and email, in English and Telugu." },
+  { title: "Marketing, sales and revenue", href: "/careers/marketing-sales-revenue", body: "Grow the brand, run campaigns, work with partner stores and campus and auto partners." },
+  { title: "Operations and delivery", href: "/careers/operations-delivery", body: "Run partner-store packing, riders and the 15-minute delivery promise." },
+  { title: "Engineering and product", href: "/careers/engineering-product", body: "Build the face scan, the shop and the order system." },
+  { title: "Customer care", href: "/careers/customer-care", body: "Help customers by WhatsApp and email, in English and Telugu." },
 ];
 
 export default function CareersPage() {
