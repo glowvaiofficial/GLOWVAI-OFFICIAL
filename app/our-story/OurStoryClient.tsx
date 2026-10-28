@@ -184,7 +184,7 @@ export default function OurStoryClient() {
                 GLOW VAI, the Indian Skincare Retailer
               </h2>
               <p className="text-sm sm:text-base text-ink-muted leading-relaxed font-normal">
-                GLOW VAI is an Indian skincare retail brand offering a free AI face scan and instant WhatsApp ordering for authentic Minimalist and The Derma Co products. Founded in Andhra Pradesh, India, we make dermatological routine selection clear, fast, and reliable.
+                GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering. Founded in Andhra Pradesh, India, we make choosing a skincare routine clear and fast.
               </p>
             </div>
 
@@ -200,7 +200,7 @@ export default function OurStoryClient() {
               </h1>
 
               <p className="text-base sm:text-lg text-ink-muted leading-relaxed max-w-2xl mx-auto">
-                GLOW VAI combines instant browser face skin analysis with WhatsApp ordering for authentic Minimalist and The Derma Co skincare routines across India.
+                GLOW VAI combines a free face scan with WhatsApp ordering for skincare routines across India.
               </p>
             </div>
 
@@ -223,7 +223,7 @@ export default function OurStoryClient() {
                   </div>
                   <h3 className="font-bold text-lg text-white">Authentic Skincare</h3>
                   <p className="text-xs text-skymist leading-relaxed">
-                    Independent retailer of Minimalist and The Derma Co routines.
+                    Independent skincare retailer.
                   </p>
                 </div>
 
@@ -371,7 +371,7 @@ export default function OurStoryClient() {
                 <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
                   <h3 className="font-bold text-base text-ink">What is GLOW VAI?</h3>
                   <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    GLOW VAI is an Indian skincare retail brand offering a free AI face scan and instant WhatsApp ordering for authentic Minimalist and The Derma Co products.
+                    GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering.
                   </p>
                 </div>
 
@@ -383,9 +383,9 @@ export default function OurStoryClient() {
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border border-ink/10 shadow-sm space-y-2">
-                  <h3 className="font-bold text-base text-ink">Is GLOW VAI the same as Minimalist or The Derma Co?</h3>
+                  <h3 className="font-bold text-base text-ink">Does GLOW VAI make its own products?</h3>
                   <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                    No. GLOW VAI is an independent retailer of Minimalist and The Derma Co products and does not manufacture them.
+                    No. GLOW VAI is an independent retailer and does not manufacture the products it sells.
                   </p>
                 </div>
 
@@ -418,7 +418,7 @@ export default function OurStoryClient() {
               </h2>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <Link href="/face-analysis">
-                  <Button variant="primary" size="lg" className="h-[52px] gap-2 shadow-coral-glow text-button-label bg-brand hover:bg-brand-dark">
+                  <Button variant="primary" size="lg" className="h-[52px] gap-2  text-button-label bg-brand hover:bg-brand-dark">
                     <Camera className="w-5 h-5 text-white shrink-0" />
                     <span>Start Free AI Face Scan</span>
                   </Button>

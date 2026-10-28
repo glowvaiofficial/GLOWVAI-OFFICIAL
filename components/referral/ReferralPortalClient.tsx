@@ -900,7 +900,7 @@ export function ReferralPortalClient() {
                       variant="primary"
                       size="md"
                       disabled={isSubmitting}
-                      className="w-1/2 shadow-coral-glow"
+                      className="w-1/2 "
                     >
                       {isSubmitting ? "Generating QR..." : "Get QR Code"}
                     </Button>
@@ -1099,7 +1099,7 @@ export function ReferralPortalClient() {
                       variant="primary"
                       size="md"
                       disabled={isSubmitting}
-                      className="w-1/2 shadow-coral-glow"
+                      className="w-1/2 "
                     >
                       {isSubmitting ? "Generating QR..." : "Get Ambassador QR"}
                     </Button>

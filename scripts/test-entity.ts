@@ -123,7 +123,7 @@ function runEntityTests() {
   urlCheck(aboutGraph);
 
   // Test 8: Visual Description Match Check
-  const visibleAboutText = "GLOW VAI is an Indian skincare retail brand offering a free AI face scan and instant WhatsApp ordering for authentic Minimalist and The Derma Co products.";
+  const visibleAboutText = "GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering.";
   if (entityConfig.brand.description !== visibleAboutText) {
     console.error(`❌ Schema description does not match visible About text!\nSchema: "${entityConfig.brand.description}"\nVisible: "${visibleAboutText}"`);
     errors++;

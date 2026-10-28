@@ -216,7 +216,7 @@ export default async function JournalArticlePage({ params }: Props) {
         <div className="max-w-[68ch] mx-auto mt-14 pt-6 border-t border-ink/10 text-xs text-ink-muted space-y-1.5">
           <p className="font-semibold text-ink">Retail Disclosure</p>
           <p>
-            GLOW VAI is an independent retailer of Minimalist and The Derma Co formulations in India. We do not manufacture these products, and our recommendations are curated based on climate suitability and skin metrics.
+            GLOW VAI is an independent skincare retailer in India. We do not manufacture these products, and our recommendations are based on your scan results.
           </p>
         </div>
 

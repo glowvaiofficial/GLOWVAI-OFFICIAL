@@ -2,30 +2,30 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { navLinks } from "@/config/nav";
 import { BRAND_NAME } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import { Sparkles, ShoppingBag, Search, Menu } from "lucide-react";
+import { ShoppingBag, Menu } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 import { CartDrawer } from "./CartDrawer";
-import { cn, getAssetPath } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
 
 function GlowVaiLogo() {
   return (
-    <div className="flex items-center gap-2 select-none group">
-      <div className="flex items-baseline gap-1.5">
-        <span className="font-display font-bold text-2xl tracking-tight text-brand group-hover:text-brand-dark transition-colors">
-          GLOW VAI
-        </span>
-        <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-yellow/30 px-2 py-0.5 rounded-md border border-yellow-hover shadow-2xs">
-          Quick Commerce
-        </span>
-      </div>
+    <div className="flex items-center gap-2.5 select-none group">
+      <span className="font-display font-bold text-[26px] leading-none tracking-[-0.02em] text-brand group-hover:text-brand-dark transition-colors">
+        GLOW VAI
+      </span>
+      <span className="hidden min-[480px]:inline text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
+        Quick commerce
+      </span>
     </div>
   );
 }
+
+const focusRing =
+  "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,109 +36,95 @@ export function Navbar() {
   const cartItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
+    handleScroll();
+    const openCart = () => setIsCartOpen(true);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("gv:open-cart", openCart);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("gv:open-cart", openCart);
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[300] focus:bg-white focus:text-ink focus:px-4 focus:py-3 focus:rounded-[10px] focus:border-2 focus:border-brand"
+      >
+        Skip to main content
+      </a>
+
       <header
         className={cn(
-          "sticky top-0 z-40 w-full transition-all duration-300",
-          isScrolled
-            ? "bg-white/95 backdrop-blur-xl border-b border-ink/10 shadow-md py-2.5 sm:py-3"
-            : "bg-white/90 backdrop-blur-md py-3 sm:py-3.5 border-b border-ink/5"
+          "sticky top-0 z-40 w-full bg-white border-b border-ink/10 flex items-center transition-[min-height] duration-150",
+          isScrolled ? "min-h-16" : "min-h-16 lg:min-h-[76px]"
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Brand Logo (~120px wide SVG) */}
+        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="group flex items-center p-1 -ml-1 rounded-2xl hover:opacity-90 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            aria-label={`${BRAND_NAME} Home`}
+            className={cn("-ml-1 p-1 rounded-lg", focusRing)}
+            aria-label={`${BRAND_NAME} home`}
           >
             <GlowVaiLogo />
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
-            {navLinks.map((link) => {
-              const isExternal = link.href.startsWith("http");
-              return isExternal ? (
-                <a
-                  key={link.title}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative px-3.5 py-2 text-[14px] font-bold text-ink/80 hover:text-brand hover:bg-skymist/70 rounded-xl transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                >
-                  <span>{link.title}</span>
-                  {link.badge && (
-                    <span className="text-[10px] font-semibold bg-mint text-ink px-2 py-0.5 rounded-full shadow-2xs border border-ink/10 animate-pulse">
-                      {link.badge}
-                    </span>
-                  )}
-                </a>
-              ) : (
-                <Link
-                  key={link.title}
-                  href={link.href}
-                  className="relative px-3.5 py-2 text-[14px] font-bold text-ink/80 hover:text-brand hover:bg-skymist/70 rounded-xl transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                >
-                  <span>{link.title}</span>
-                  {link.badge && (
-                    <span className="text-[10px] font-semibold bg-coral text-ink px-2 py-0.5 rounded-full shadow-2xs border border-white/40 animate-pulse">
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-3" aria-label="Primary">
+            {navLinks.map((link) => (
+              <Link
+                key={link.title}
+                href={link.href}
+                className={cn(
+                  "px-3.5 py-2 text-[15px] font-medium text-ink hover:text-brand transition-colors rounded-lg",
+                  focusRing
+                )}
+              >
+                {link.title}
+              </Link>
+            ))}
           </nav>
 
-          {/* Right Action Buttons & Primary CTA */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Shopping Cart Trigger */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setIsCartOpen(true)}
-              aria-label={`Shopping cart with ${cartItemCount} items`}
-              className="relative p-2.5 rounded-xl text-ink/80 hover:text-brand hover:bg-skymist/70 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand group"
+              aria-label={`Cart, ${cartItemCount} ${cartItemCount === 1 ? "item" : "items"}`}
+              className={cn(
+                "relative w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] border-[1.5px] border-ink/20 text-ink hover:border-ink transition-colors cursor-pointer",
+                focusRing
+              )}
             >
-              <ShoppingBag className="w-5 h-5 text-ink group-hover:scale-110 transition-transform" />
+              <ShoppingBag className="w-5 h-5" aria-hidden="true" />
               {cartItemCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-4.5 h-4.5 rounded-full bg-coral text-ink font-bold text-[11px] flex items-center justify-center shadow-xs ring-2 ring-white">
+                <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-brand text-white font-semibold text-[11px] flex items-center justify-center ring-2 ring-white">
                   {cartItemCount}
                 </span>
               )}
             </button>
 
-            {/* Scan My Face Primary Action Button */}
             <div className="hidden sm:block">
-              <Link href="/face-analysis">
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow hover:scale-[1.03] transition-transform text-button-label font-bold rounded-xl px-4 py-2 text-xs">
-                  <Sparkles className="w-4 h-4 text-ink animate-spin-slow" />
+              <Link href="/face-analysis" data-track="scan_cta_click" data-track-location="nav">
+                <Button variant="dark" size="sm">
                   <span>Scan my face</span>
                 </Button>
               </Link>
             </div>
 
-            {/* Mobile Hamburger Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open Navigation Menu"
-              className="md:hidden p-2.5 rounded-xl text-ink hover:bg-skymist/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              aria-label="Open navigation menu"
+              className={cn(
+                "md:hidden w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] text-ink hover:bg-skymist transition-colors cursor-pointer",
+                focusRing
+              )}
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu & Cart Drawer Modals */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
@@ -146,10 +132,7 @@ export function Navbar() {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 }

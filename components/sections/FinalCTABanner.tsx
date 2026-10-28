@@ -72,7 +72,7 @@ export function FinalCTABanner() {
                 <Button
                   variant="primary"
                   size="lg"
-                  className="h-[52px] px-8 text-button-label gap-2 shadow-coral-glow"
+                  className="h-[52px] px-8 text-button-label gap-2 "
                 >
                   <Camera className="w-5 h-5 text-ink shrink-0" />
                   <span>Start free scan</span>
@@ -140,7 +140,7 @@ export function FinalCTABanner() {
                     size="md"
                     type="submit"
                     disabled={status === "loading"}
-                    className="shadow-coral-glow shrink-0 text-button-label"
+                    className=" shrink-0 text-button-label"
                   >
                     {status === "loading" ? "Subscribing..." : "Subscribe"}
                   </Button>

@@ -71,7 +71,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
             </span>
           )}
           {discount > 0 && (
-            <span className="bg-coral text-ink font-bold text-xs px-2.5 py-0.5 rounded-full">
+            <span className="bg-ink text-white font-bold text-xs px-2.5 py-0.5 rounded-full">
               {discount}% OFF
             </span>
           )}
@@ -131,7 +131,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
             variant="primary"
             size="lg"
             onClick={handleAddToCart}
-            className="flex-1 shadow-coral-glow text-button-label gap-2"
+            className="flex-1  text-button-label gap-2"
           >
             {isAdded ? (
               <>
@@ -165,7 +165,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
       <div className="pt-2 border-t border-ink/10 grid grid-cols-2 gap-2 text-[11px] text-ink-muted">
         <div className="flex items-center gap-1.5">
           <Lock className="w-3.5 h-3.5 text-brand shrink-0" />
-          <span>On-Device Privacy</span>
+          <span>Photos stored privately</span>
         </div>
         <div className="flex items-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-brand shrink-0" />

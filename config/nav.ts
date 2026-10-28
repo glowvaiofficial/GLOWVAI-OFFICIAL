@@ -27,34 +27,36 @@ export const routesReady: Record<string, boolean> = {
 
 export const navLinks: NavItem[] = [
   { title: "Shop", href: "/shop" },
-  { title: "Our Story", href: "/our-story" },
-  { title: "Face Analysis", href: "/face-analysis", badge: "Free" },
-  { title: "Referral Program", href: "/referral", badge: "Earn" },
+  { title: "How it works", href: "/#how-it-works" },
+  { title: "Our story", href: "/our-story" },
+  { title: "Referral", href: "/referral" },
 ];
 
 export const footerLinks = {
   shop: [
-    { title: "All Products", href: "/shop" },
-    { title: "Acne Care", href: "/shop?concern=acne" },
-    { title: "Dullness & Glow", href: "/shop?concern=dullness" },
-    { title: "Dryness & Hydration", href: "/shop?concern=dryness" },
-    { title: "Sun Care", href: "/shop?concern=sun-care" },
+    { title: "All products", href: "/shop" },
+    { title: "Breakouts and pores", href: "/shop?concern=acne" },
+    { title: "Dullness and glow", href: "/shop?concern=dullness" },
+    { title: "Dehydration", href: "/shop?concern=dryness" },
+    { title: "Dark spots", href: "/shop?concern=pigmentation" },
+    { title: "Sun protection", href: "/shop?concern=sun-care" },
   ],
   company: [
-    { title: "Our Story", href: "/our-story" },
-    { title: "Referral Program (Earn)", href: "/referral" },
+    { title: "Our story", href: "/our-story" },
+    { title: "Referral program", href: "/referral" },
     { title: "Journal", href: "/journal" },
-    { title: "Face Scan AI", href: "/face-analysis" },
-    { title: "Contact Us", href: "/contact" },
+    { title: "Face scan", href: "/face-analysis" },
+    { title: "Contact", href: "/contact" },
   ],
   help: [
-    { title: "15-Min Delivery", href: "/delivery" },
-    { title: "FAQ & Support", href: "/faq" },
-    { title: "Returns & Refund Policy", href: "/returns" },
+    { title: "Delivery", href: "/delivery" },
+    { title: "FAQ and support", href: "/faq" },
+    { title: "Returns and refunds", href: "/returns" },
+    { title: "Partner stores", href: "/store" },
   ],
   legal: [
-    { title: "Privacy Policy", href: "/privacy" },
-    { title: "Terms & Conditions", href: "/terms" },
+    { title: "Privacy policy", href: "/privacy" },
+    { title: "Terms", href: "/terms" },
   ],
 };
 

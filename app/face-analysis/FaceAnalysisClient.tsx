@@ -10,6 +10,7 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { analyse, detectFace, DEMOGRAPHIC_BASE_SCORES, AnalysisReport } from "@/lib/analysis";
 import { getRecommendedProducts, EXCEL_DATABASE_PRODUCTS } from "@/lib/recommend";
 import { parseUserAgent, fetchClientIP, requestLocationWithOSPermission } from "@/lib/clientInfo";
+import { PRIVACY_STATEMENT, MEDICAL_NOTE } from "@/config/privacy-copy";
 import { formatPrice } from "@/lib/utils";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
@@ -309,7 +310,7 @@ export function FaceAnalysisClient() {
                     Step 1 of 3: AI Face Scan
                   </Badge>
                   <h1 className="font-display font-bold text-3xl sm:text-4xl text-ink leading-tight">
-                    Instant <span className="font-accent italic text-brand">Skin Check</span> Scan
+                    Instant <span className="text-brand">Skin Check</span> Scan
                   </h1>
                   <p className="text-xs sm:text-sm text-ink-muted max-w-lg mx-auto">
                     Center your face in good natural light and click the shutter button below for a 5-second skin check.
@@ -358,7 +359,7 @@ export function FaceAnalysisClient() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute top-2 left-2 bg-coral text-ink text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                        <div className="absolute top-2 left-2 bg-ink text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
                           02. Barrier Telemetry
                         </div>
                       </div>
@@ -374,7 +375,7 @@ export function FaceAnalysisClient() {
                       <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
                         <Image
                           src="/images/face-analysis/routine_match.png"
-                          alt="Minimalist & Derma Co Formulation Match"
+                          alt="Product match preview"
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
@@ -428,13 +429,13 @@ export function FaceAnalysisClient() {
                         </div>
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <Lock className="w-4 h-4 text-brand" />
-                          <h4 className="font-display font-bold text-xs text-ink">On-Device Private</h4>
-                          <p className="text-[11px] text-ink-muted">Analysed strictly in browser.</p>
+                          <h4 className="font-display font-bold text-xs text-ink">Stored privately</h4>
+                          <p className="text-[11px] text-ink-muted">Delete anytime on request.</p>
                         </div>
                         <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
                           <ShieldCheck className="w-4 h-4 text-brand" />
                           <h4 className="font-display font-bold text-xs text-ink">Instant Match</h4>
-                          <p className="text-[11px] text-ink-muted">Matches Minimalist & Derma Co.</p>
+                          <p className="text-[11px] text-ink-muted">Matched to our range.</p>
                         </div>
                       </div>
 
@@ -455,6 +456,14 @@ export function FaceAnalysisClient() {
                           </button>
                         </div>
                       )}
+
+                      <div className="rounded-2xl bg-ink-subtle border border-ink/10 p-4 space-y-2 text-sm text-ink-muted">
+                        <p>
+                          We use your camera to take a photo for your skin check. {PRIVACY_STATEMENT}
+                        </p>
+                        <p>The scan is for users aged 18 and over. [CONFIRM AGE POLICY]</p>
+                        <p>{MEDICAL_NOTE}</p>
+                      </div>
 
                       <div className="space-y-3 pt-2">
                         <Button
@@ -586,7 +595,7 @@ export function FaceAnalysisClient() {
                         />
                       </div>
                       <p className="font-display font-bold text-[11px] text-ink">Routine Match</p>
-                      <p className="text-[10px] text-ink-light">Minimalist & Derma Co</p>
+                      <p className="text-[10px] text-ink-light">Our range</p>
                     </div>
                   </div>
                 </div>

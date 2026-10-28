@@ -43,7 +43,7 @@ export default function DeliveryPage() {
             Fresh Skincare at Your Doorstep in <span className="text-brand">~15 Minutes</span>
           </h1>
           <p className="text-base sm:text-lg text-ink-muted font-normal leading-relaxed">
-            GLOW VAI operates hyper-local temperature-controlled micro-hubs stocked with Minimalist, The Derma Co, and custom AI formulation routines.
+            GLOW VAI orders are packed at partner stores in Vijayawada and sent by rider.
           </p>
         </div>
 

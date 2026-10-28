@@ -99,7 +99,7 @@ export function generateGlowVaiEmailHTML(
                   <tr>
                     <td style="background-color: #F8FAFC; padding: 20px; text-align: center; border-top: 1px solid #E2E8F0; font-size: 11px; color: #94A3B8;">
                       © ${new Date().getFullYear()} GLOW VAI Quick-Commerce • Vijayawada, Andhra Pradesh, India<br>
-                      On-device computer vision scan. Cosmetic skin insights, not medical advice.
+                      Cosmetic skin insights, not medical advice.
                     </td>
                   </tr>
 

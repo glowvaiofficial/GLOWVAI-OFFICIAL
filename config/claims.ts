@@ -3,9 +3,9 @@
 export type Claim = { id: string; text: string; verified: boolean; proof?: string };
 
 export const photoWording = {
-  short: "Your photo is analysed on your phone. Storing it is optional.",
-  full: "We analyse your photo on your phone. If you tick the optional box, we also save it in a private folder to improve your report. We delete it after 90 days, or sooner if you ask.",
-  faq: "Only if you tick the optional box. Then it is kept privately for up to 90 days.",
+  short: "Photos stored privately. Delete anytime.",
+  full: "Your photo is sent to us only when you submit your report, and it is stored privately. Delete your data anytime at contact@glowvai.in.",
+  faq: "Your photo is sent to us only when you submit your report, and it is stored privately. Delete your data anytime at contact@glowvai.in.",
 };
 
 export const claims: Record<string, Claim> = {
@@ -60,7 +60,7 @@ export const brandValuesClaims = {
   },
   madeForIndianSkin: {
     title: "Authorized Stock",
-    text: "Fresh, genuine products directly from Minimalist & The Derma Co.",
+    text: "[CONFIRM BRAND SOURCE]",
     verified: true,
   },
 };

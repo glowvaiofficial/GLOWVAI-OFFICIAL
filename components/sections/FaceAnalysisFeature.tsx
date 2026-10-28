@@ -130,7 +130,7 @@ export function FaceAnalysisFeature() {
             <div className="pt-2 space-y-3">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Link href="/face-analysis" className="w-full sm:w-auto">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto h-[52px] gap-2 shadow-coral-glow text-button-label">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto h-[52px] gap-2  text-button-label">
                     <ScanFace className="w-5 h-5 text-ink shrink-0" />
                     <span>Start free scan</span>
                   </Button>

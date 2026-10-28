@@ -143,7 +143,7 @@ export function TestimonialsGrid() {
                   variant="primary"
                   size="lg"
                   onClick={() => setIsDialogOpen(true)}
-                  className="shadow-coral-glow text-button-label gap-2"
+                  className=" text-button-label gap-2"
                 >
                   <MessageSquare className="w-4 h-4 text-ink shrink-0" />
                   <span>Share feedback</span>
@@ -371,7 +371,7 @@ export function TestimonialsGrid() {
                       size="sm"
                       type="submit"
                       disabled={isSubmitting}
-                      className="shadow-coral-glow"
+                      className=""
                     >
                       {isSubmitting ? "Submitting..." : "Submit Feedback"}
                     </Button>

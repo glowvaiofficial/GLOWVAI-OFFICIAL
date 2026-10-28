@@ -4,33 +4,37 @@
 
 @layer base {
   :root {
-    --bg-page: #FFFFFF;
-    --color-brand: #0050FF;
-    --color-coral: #FF6B57;
+    --bg-page: #F6F3EE;
+    --color-brand: #1447E6;
+    --color-coral: #1447E6;
     --color-yellow: #FFD84D;
-    --color-skymist: #E6EEFF;
-    --color-blush: #FFE6EA;
-    --color-mint: #DDF7EC;
-    --color-ink: #0B1220;
+    --color-skymist: #ECE7DF;
+    --color-blush: #F6F3EE;
+    --color-mint: #D9F7EA;
+    --color-ink: #12161F;
   }
 
   html {
+    color-scheme: light;
+    scroll-padding-top: 96px;
     scroll-behavior: smooth;
-    background-color: #FFFFFF;
-    color: #0B1220;
+    background-color: #F6F3EE;
+    color: #12161F;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #FFFFFF !important;
-    color: #0B1220;
+    background-color: #F6F3EE !important;
+    color: #12161F;
+    font-size: 1.0625rem;
+    line-height: 1.6;
     font-family: var(--font-body), sans-serif;
     overflow-x: hidden;
   }
 
   ::selection {
-    background-color: #0050FF;
+    background-color: #1447E6;
     color: #FFFFFF;
   }
 
@@ -156,4 +160,40 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Scan visual: one animated line, disabled for reduced motion */
+@keyframes gv-scan {
+  0% { top: 8%; }
+  50% { top: 88%; }
+  100% { top: 8%; }
+}
+
+.gv-scan-line {
+  position: absolute;
+  top: 8%;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: #7CF5C8;
+  box-shadow: 0 0 12px 2px rgba(124, 245, 200, 0.7);
+  animation: gv-scan 3s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gv-scan-line { animation: none; top: 45%; }
+  html { scroll-behavior: auto; }
+}
+
+/* Section fade-in, once */
+@keyframes gv-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Windows High Contrast: keep borders, do not rely on shadows or colour alone */
+@media (forced-colors: active) {
+  .gv-scan-line { background: Highlight; box-shadow: none; }
+  [role="progressbar"] > div { background: Highlight; forced-color-adjust: none; }
+  a, button { forced-color-adjust: auto; }
 }

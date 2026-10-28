@@ -114,7 +114,7 @@ export function CartDrawer() {
                 </p>
               </div>
               <Link href="/face-analysis" onClick={closeCart}>
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
+                <Button variant="primary" size="md" className="gap-2  text-button-label">
                   <span>Start free scan</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -229,7 +229,7 @@ export function CartDrawer() {
 
             {/* Checkout Options */}
             {checkoutEnabled ? (
-              <Button variant="primary" size="lg" className="w-full shadow-coral-glow text-button-label">
+              <Button variant="primary" size="lg" className="w-full  text-button-label">
                 <span>Proceed to Checkout</span>
               </Button>
             ) : (

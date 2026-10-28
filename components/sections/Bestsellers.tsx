@@ -117,7 +117,7 @@ export function Bestsellers() {
                 variant="primary"
                 size="md"
                 onClick={() => handleQuickAdd(featuredProduct.id)}
-                className="gap-2 shadow-coral-glow text-button-label"
+                className="gap-2  text-button-label"
               >
                 {addedIds[featuredProduct.id] ? (
                   <>

@@ -140,7 +140,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
               size="lg"
               type="submit"
               disabled={isSubmitting}
-              className="w-full shadow-coral-glow text-button-label gap-2"
+              className="w-full  text-button-label gap-2"
             >
               <Unlock className="w-4 h-4 text-ink shrink-0" />
               <span>{isSubmitting ? "Opening..." : "Get Shop Access"}</span>

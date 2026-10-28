@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Serif, DM_Sans } from "next/font/google";
+import { Familjen_Grotesk, IBM_Plex_Mono, Inter } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
@@ -10,33 +10,30 @@ import { CookieNotice } from "@/components/consent/CookieNotice";
 import { GA4Script } from "@/components/analytics/GA4Script";
 import { RouteTracker } from "@/components/analytics/RouteTracker";
 
-const displayFont = Bricolage_Grotesque({
+const displayFont = Familjen_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
-  weight: ["500", "600", "700"],
   preload: true,
 });
 
-const accentFont = Instrument_Serif({
+const monoFont = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-accent",
+  variable: "--font-mono",
   display: "swap",
   weight: ["400"],
-  style: ["italic"],
   preload: false,
 });
 
-const bodyFont = DM_Sans({
+const bodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
-  weight: ["400", "500", "600"],
   preload: true,
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0050FF",
+  themeColor: "#1447E6",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -55,9 +52,12 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.name, url: SITE_URL }],
   creator: siteConfig.name,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   manifest: "/site.webmanifest",
   openGraph: {
@@ -103,7 +103,7 @@ export default async function RootLayout({
   const locationData = await getLocationFromIP();
 
   return (
-    <html lang="en-IN" className={`${displayFont.variable} ${accentFont.variable} ${bodyFont.variable}`}>
+    <html lang="en-IN" className={`${displayFont.variable} ${monoFont.variable} ${bodyFont.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="shortcut icon" href="/favicon.svg" />

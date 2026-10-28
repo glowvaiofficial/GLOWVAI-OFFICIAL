@@ -26,11 +26,11 @@ const faqList = [
   },
   {
     question: "Is the AI Face Scan free and private?",
-    answer: "Yes! Our computer vision facial scan is completely free and runs locally on your browser. Your facial image is never uploaded or shared by default."
+    answer: "Yes. The scan is free. Your photo is sent to us only when you submit your report, and it is stored privately. Delete your data anytime at contact@glowvai.in."
   },
   {
     question: "What products are available on GLOW VAI?",
-    answer: "We stock authentic formulations from Minimalist, The Derma Co, and custom routine sets targeting acne, dullness, hyperpigmentation, and sun damage."
+    answer: "We stock skincare routines for acne, dullness, dark spots, dryness and sun protection. See the shop for the full range."
   },
   {
     question: "What happens if a product arrives damaged?",

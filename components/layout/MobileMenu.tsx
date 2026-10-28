@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { navLinks } from "@/config/nav";
 import { BRAND_NAME } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import { X, Sparkles, ShoppingBag, ArrowRight } from "lucide-react";
+import { X, ShoppingBag, ArrowRight } from "lucide-react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -20,19 +20,44 @@ export function MobileMenu({
   cartCount,
   onOpenCart,
 }: MobileMenuProps) {
-  // Lock body scroll and trap Escape key
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Lock scroll, trap focus, hide the page behind the sheet, restore focus on close
   useEffect(() => {
     if (!isOpen) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const behind = Array.from(document.querySelectorAll<HTMLElement>("header, #main, footer"));
+    behind.forEach((el) => el.setAttribute("inert", ""));
     document.body.style.overflow = "hidden";
+    document.querySelector<HTMLElement>("[data-menu-close]")?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "auto";
+      behind.forEach((el) => el.removeAttribute("inert"));
+      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
+      opener?.focus();
     };
   }, [isOpen, onClose]);
 
@@ -40,10 +65,11 @@ export function MobileMenu({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Navigation Menu"
-      className="fixed inset-0 z-[100] bg-white flex flex-col justify-between p-6 animate-in fade-in duration-200"
+      aria-label="Navigation menu"
+      className="fixed inset-y-0 right-0 z-[100] w-[min(88vw,360px)] bg-white flex flex-col justify-between p-6 shadow-[0_24px_56px_rgba(10,27,77,.18)] animate-in slide-in-from-right duration-200"
     >
       {/* Top Header */}
       <div className="flex items-center justify-between border-b border-ink/10 pb-4">
@@ -53,11 +79,11 @@ export function MobileMenu({
           className="flex items-center gap-2 select-none"
         >
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display font-bold text-2xl tracking-tight text-brand">
+            <span className="font-display font-bold text-[26px] leading-none tracking-[-0.02em] text-brand">
               GLOW VAI
             </span>
-            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-yellow/30 px-2 py-0.5 rounded-md border border-yellow-hover">
-              Quick Commerce
+            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
+              Quick commerce
             </span>
           </div>
         </Link>
@@ -65,62 +91,33 @@ export function MobileMenu({
         <button
           onClick={onClose}
           aria-label="Close menu"
-          className="w-10 h-10 rounded-full bg-ink/5 hover:bg-ink/10 flex items-center justify-center text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="w-11 h-11 rounded-full hover:bg-skymist flex items-center justify-center text-ink transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          data-menu-close
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Main Links */}
-      <nav className="flex flex-col space-y-5 my-auto py-6">
-        {navLinks.map((link) => {
-          const isExternal = link.href.startsWith("http");
-          return isExternal ? (
-            <a
-              key={link.title}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onClose}
-              className="group flex items-center justify-between font-display text-2xl font-bold text-ink hover:text-brand transition-colors py-1"
-            >
-              <span>{link.title}</span>
-              <div className="flex items-center gap-2">
-                {link.badge && (
-                  <span className="text-xs bg-mint text-ink font-semibold px-2.5 py-0.5 rounded-full border border-mint">
-                    {link.badge}
-                  </span>
-                )}
-                <ArrowRight className="w-5 h-5 text-ink/30 group-hover:text-brand group-hover:translate-x-1 transition-all" />
-              </div>
-            </a>
-          ) : (
-            <Link
-              key={link.title}
-              href={link.href}
-              onClick={onClose}
-              className="group flex items-center justify-between font-display text-2xl font-bold text-ink hover:text-brand transition-colors py-1"
-            >
-              <span>{link.title}</span>
-              <div className="flex items-center gap-2">
-                {link.badge && (
-                  <span className="text-xs bg-blush text-ink font-semibold px-2.5 py-0.5 rounded-full border border-coral/20">
-                    {link.badge}
-                  </span>
-                )}
-                <ArrowRight className="w-5 h-5 text-ink/30 group-hover:text-brand group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-          );
-        })}
+      <nav className="flex flex-col my-auto py-4" aria-label="Mobile">
+        {navLinks.map((link) => (
+          <Link
+            key={link.title}
+            href={link.href}
+            onClick={onClose}
+            className="flex items-center justify-between min-h-14 text-xl font-medium text-ink hover:text-brand transition-colors border-b border-ink/10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            <span>{link.title}</span>
+            <ArrowRight className="w-5 h-5 text-ink-light" aria-hidden="true" />
+          </Link>
+        ))}
       </nav>
 
       {/* Bottom Action Area & Contact Info */}
       <div className="space-y-3 pt-4 border-t border-ink/10">
         <Link href="/face-analysis" onClick={onClose} className="block w-full">
-          <Button variant="primary" size="lg" className="w-full flex items-center justify-center gap-2 shadow-coral-glow">
-            <Sparkles className="w-5 h-5" />
-            <span>Scan My Face (Free)</span>
+          <Button variant="primary" size="md" className="w-full">
+            <span>Scan my face</span>
           </Button>
         </Link>
 
@@ -129,10 +126,10 @@ export function MobileMenu({
             onClose();
             onOpenCart();
           }}
-          className="w-full flex items-center justify-center gap-2 bg-skymist text-brand font-bold py-3.5 px-4 rounded-2xl border border-brand/20"
+          className="w-full min-h-[52px] flex items-center justify-center gap-2 bg-white text-ink font-semibold px-4 rounded-[10px] border-[1.5px] border-ink/20 hover:border-ink transition-colors cursor-pointer"
         >
           <ShoppingBag className="w-5 h-5" />
-          <span>View Cart ({cartCount})</span>
+          <span>View cart ({cartCount})</span>
         </button>
 
         {/* Contact & Social Links in Mobile Drawer */}

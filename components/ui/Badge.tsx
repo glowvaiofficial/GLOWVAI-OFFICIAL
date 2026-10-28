@@ -16,11 +16,11 @@ export function Badge({
 }: BadgeProps) {
   const variants = {
     skymist: "bg-skymist text-brand border border-brand/15",
-    blush: "bg-blush text-ink border border-coral/20",
+    blush: "bg-blush text-ink border border-ink/10",
     mint: "bg-mint text-ink border border-ink/10",
-    yellow: "bg-yellow text-ink border border-yellow-hover/40 font-bold",
+    yellow: "bg-yellow text-ink font-semibold",
     brand: "bg-brand text-white font-semibold",
-    coral: "bg-coral text-ink font-bold",
+    coral: "bg-ink text-white font-semibold",
     outline: "border border-ink/20 text-ink-muted bg-white",
   };
 

@@ -35,12 +35,12 @@ export const storyData = {
 
   eyebrow: "GLOW VAI QUICK-COMMERCE STARTUP STORY",
   headline: "Not just a skincare store: an AI-powered Quick-Commerce Dark Store network.",
-  intro: "Glow VAI connects on-device dermatological AI telemetry with hyperlocal micro-hubs (Dark Stores) in Vijayawada. From instant 30-second skin analysis to 15-minute doorstep cosmetic delivery.",
+  intro: "Glow VAI connects AI skin-check technology with hyperlocal micro-hubs (Dark Stores) in Vijayawada. From instant 30-second skin analysis to 15-minute doorstep cosmetic delivery.",
   problem: "Traditional skincare shopping requires guessing in supermarket aisles or waiting days for e-commerce deliveries. People spend fortunes on wrong products without knowing their actual skin metrics.",
-  turn: "We built Glow VAI to combine instant camera skin checks with hyperlocal 15-minute dark store fulfillment.",
-  origin: `${BRAND_NAME} began with three founders across Vijayawada, Visakhapatnam, and Hyderabad. What if your phone could diagnose skin hydration and barrier depth in 30 seconds, and deliver exact matching serums to your doorstep in 15 minutes?`,
-  howItWorks: "Your camera measures micro-nodes and moisture barriers. Our Vijayawada dark store dispatches exact Minimalist & Derma Co routines via instant courier.",
-  mission: "Democratise dermatological intelligence and instant beauty commerce. Making AI skin analysis completely free and delivering routine essentials in 15 minutes to every neighborhood.",
+  turn: "We built GLOW VAI to combine a quick camera skin check with delivery from partner stores in about 15 minutes.",
+  origin: `${BRAND_NAME} began with three founders across Vijayawada, Visakhapatnam, and Hyderabad. What if your phone could analyse skin hydration and barrier depth in 30 seconds, and deliver a matched routine to your doorstep in about 15 minutes?`,
+  howItWorks: "Your camera reads texture, hydration, tone and clarity. A partner store in Vijayawada packs the routine and a rider brings it to you.",
+  mission: "Make choosing skincare simple and fast. A free skin scan, and your routine delivered in about 15 minutes where we cover.",
   cosmeticNote: "Cosmetic skin insights, not medical advice.",
   signoff: `Welcome to ${BRAND_NAME} Quick-Commerce.`,
 
@@ -218,7 +218,7 @@ export const storyData = {
           title: "A Story of Curiosity, Creativity, and Relentless Ambition",
           content: [
             "The path of Nalla Satvik is the story of a young dreamer who refuses to limit himself to a single identity. From exploring the world of programming and game development to building AI-powered applications, experimenting with entrepreneurship, and pursuing opportunities in the technology industry, Satvik represents a generation that wants to do more than simply follow a conventional career path. He wants to create, innovate, and build something of his own.",
-            "As a B.Tech student specializing in computer science and emerging technologies, Satvik began developing his technical skills through curiosity and experimentation. Programming was not merely a subject to study; it became a way to transform ideas into reality. Whether exploring Python, web development, artificial intelligence, or software engineering, he continuously looked for opportunities to learn beyond the classroom."
+            "As a B.Tech student specializing in computer science and emerging technologies, Satvik began developing his technical skills through curiosity and experimentation. Programming was not merely a subject to study; it became a way to turn ideas into working things. He explored Python, web development, artificial intelligence and software engineering, and kept looking for ways to learn beyond the classroom."
           ]
         },
         {
@@ -247,7 +247,7 @@ export const storyData = {
           content: [
             "On September 15, 2026, Satvik reconnected with Sardar Musthafa and joined Glow VAI as Co-Founder and Technical Lead. Bringing his deep experience in Next.js, React, Python, and AI systems, Satvik took charge of building the high-speed AI skin telemetry engine, scanning algorithms, and quick-commerce dark store infrastructure.",
             "What makes Satvik's path meaningful is not the number of technologies he has explored or projects he has imagined. It is his willingness to keep learning across different fields, confront unfamiliar challenges, and search for ways to turn his abilities into something valuable.",
-            "His story is still unfolding. He is simultaneously a student, developer, aspiring entrepreneur, and independent creator, learning how to transform ambition into consistent progress. Nalla Satvik's story is not about having everything figured out. It is about building the person capable of achieving what he dreams of. Every experiment, unsuccessful attempt, new skill, and completed project contributes to that process.",
+            "His story is still unfolding. He is simultaneously a student, developer, aspiring entrepreneur, and independent creator, learning how to turn ambition into steady progress. Nalla Satvik's story is not about having everything figured out. It is about building the person capable of achieving what he dreams of. Every experiment, unsuccessful attempt, new skill, and completed project contributes to that process.",
             "His ultimate goal is to move beyond merely learning technology and become someone who uses it to build meaningful products, create opportunities, and establish an independent identity in the digital world. The story continues, and the most important chapter may still be ahead."
           ]
         }
@@ -355,7 +355,7 @@ export const storyData = {
       title: "Building the AI Quick-Commerce Dark Store Network",
       description: [
         "Operating 15-minute express delivery micro-hubs in Vijayawada.",
-        "Combining on-device dermatological AI checks with direct doorstep fulfillment."
+        "Combining AI skin checks with direct doorstep fulfillment."
       ],
       badge: "LIVE TODAY",
       isKeyMilestone: true

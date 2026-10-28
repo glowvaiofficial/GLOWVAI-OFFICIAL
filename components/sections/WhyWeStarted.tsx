@@ -45,7 +45,7 @@ export function WhyWeStarted() {
 
             <div className="pt-2">
               <Link href="/our-story">
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
+                <Button variant="primary" size="md" className="gap-2  text-button-label">
                   <span>Read our full story</span>
                   <ArrowRight className="w-4 h-4 shrink-0" />
                 </Button>

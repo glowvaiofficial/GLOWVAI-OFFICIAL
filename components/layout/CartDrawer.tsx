@@ -73,7 +73,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <div className="space-y-1">
                   <h3 className="font-display font-bold text-lg text-ink">Your cart is currently empty</h3>
                   <p className="text-xs text-ink-muted max-w-xs mx-auto">
-                    Take a 30-second free AI Face Scan or explore our Minimalist & Derma Co routines!
+                    Take a 30-second free AI Face Scan or explore our routines.
                   </p>
                 </div>
                 <div className="pt-2 flex flex-col gap-2">
@@ -188,7 +188,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 GLOW VAI Store is Under Maintenance
               </h3>
               <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-                We are currently restocking our Vijayawada Dark Store micro-hubs with fresh Minimalist & The Derma Co inventory and upgrading 15-minute rider dispatch systems. Online ordering will resume shortly!
+                We are restocking and upgrading our Vijayawada delivery setup. Online ordering will resume shortly.
               </p>
             </div>
 

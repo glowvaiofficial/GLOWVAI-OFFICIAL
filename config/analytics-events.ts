@@ -34,6 +34,13 @@ export interface GA4Item {
 export interface EventParamsMap {
   page_view: { page_path: string; page_title?: string; page_location?: string };
   cta_click: { cta_id: string; location: string };
+  scan_cta_click: { location: string };
+  shop_cta_click: { location: string };
+  concern_card_click: { concern_slug: string };
+  product_view: { product_slug: string };
+  feedback_submit: { has_rating: boolean };
+  newsletter_subscribe: Record<string, never> | { source?: string };
+  scroll_depth: { percent: 25 | 50 | 75 | 100 };
   faq_open: { question_id: string };
   search: { search_term: string };
   pincode_check: { result: "serviceable" | "not_serviceable" | "invalid" };
@@ -62,7 +69,7 @@ export interface EventParamsMap {
   view_item_list: { item_list_id?: string; item_list_name?: string; items: GA4Item[] };
   select_item: { item_list_id?: string; items: GA4Item[] };
   view_item: { currency?: "INR"; value?: number; items: GA4Item[] };
-  add_to_cart: { currency?: "INR"; value?: number; items: GA4Item[] };
+  add_to_cart: { currency?: "INR"; value?: number; items?: GA4Item[]; product_slug?: string; price?: number; source?: string };
   remove_from_cart: { currency?: "INR"; value?: number; items: GA4Item[] };
   view_cart: { currency?: "INR"; value?: number; items: GA4Item[] };
   begin_checkout: { currency: "INR"; value: number; items: GA4Item[]; method: "whatsapp" };
@@ -91,6 +98,13 @@ export type GA4EventName = keyof EventParamsMap;
 export const ALLOWED_EVENT_NAMES = new Set<GA4EventName>([
   "page_view",
   "cta_click",
+  "scan_cta_click",
+  "shop_cta_click",
+  "concern_card_click",
+  "product_view",
+  "feedback_submit",
+  "newsletter_subscribe",
+  "scroll_depth",
   "faq_open",
   "search",
   "pincode_check",

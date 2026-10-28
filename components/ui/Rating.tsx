@@ -25,6 +25,8 @@ export function Rating({
     lg: "w-5 h-5",
   };
 
+  if (!reviewCount) return null;
+
   return (
     <div className={cn("inline-flex items-center gap-1.5", className)}>
       <div className="flex items-center gap-0.5">

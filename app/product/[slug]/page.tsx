@@ -132,7 +132,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 className="object-cover"
               />
               {discount > 0 && (
-                <div className="absolute top-4 left-4 bg-coral text-ink font-bold text-xs px-3 py-1 rounded-full shadow-xs">
+                <div className="absolute top-4 left-4 bg-ink text-white font-bold text-xs px-3 py-1 rounded-full shadow-xs">
                   {discount}% OFF
                 </div>
               )}
@@ -166,7 +166,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </p>
               </div>
               <Link href="/face-analysis" className="shrink-0">
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
+                <Button variant="primary" size="md" className="gap-2  text-button-label">
                   <Camera className="w-4 h-4 text-ink shrink-0" />
                   <span>Start free scan</span>
                 </Button>

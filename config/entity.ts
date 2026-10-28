@@ -62,7 +62,7 @@ export const entityConfig: EntityConfig = {
     name: "GLOW VAI",
     alternateName: ["Glow Vai", "GlowVai"],
     url: SITE_URL,
-    description: "GLOW VAI is an Indian skincare retail brand offering a free AI face scan and instant WhatsApp ordering for authentic Minimalist and The Derma Co products.",
+    description: "GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering.",
     slogan: "Skincare that starts with a selfie.",
     email: "contact@glowvai.in",
     telephone: "+91 89778 55998",

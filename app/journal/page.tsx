@@ -161,7 +161,7 @@ export default function JournalPage() {
             Find Your Routine with a 30-Second Face Scan
           </h2>
           <p className="text-xs sm:text-sm text-white/75 max-w-lg mx-auto leading-relaxed">
-            Let our camera scan check your skin parameters and recommend authentic Minimalist and The Derma Co formulations in seconds.
+            Take the free scan and see which products match your results.
           </p>
           <div className="pt-2 flex flex-wrap justify-center gap-3">
             <Link href="/face-analysis">
@@ -177,7 +177,7 @@ export default function JournalPage() {
           </div>
           <div className="pt-3 flex items-center justify-center gap-2 text-[11px] text-white/60">
             <ShieldCheck className="w-3.5 h-3.5 text-mint" />
-            <span>On-Device Analysis • Zero Photo Uploads • Completely Free</span>
+            <span>Photos stored privately • Free scan</span>
           </div>
         </div>
 

@@ -210,7 +210,7 @@ export function ContactClient() {
                   size="md"
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full shadow-coral-glow text-button-label mt-2"
+                  className="w-full  text-button-label mt-2"
                 >
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>

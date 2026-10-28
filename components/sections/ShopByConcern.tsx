@@ -159,7 +159,7 @@ export function ShopByConcern() {
 
             <div className="pt-6 z-10">
               <Link href="/face-analysis">
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
+                <Button variant="primary" size="md" className="gap-2  text-button-label">
                   <Camera className="w-4.5 h-4.5 text-ink" />
                   <span>Start free face scan</span>
                 </Button>

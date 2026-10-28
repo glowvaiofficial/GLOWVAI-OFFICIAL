@@ -28,7 +28,7 @@ export function JournalTeaser() {
               </p>
             </div>
             <Link href="#newsletter" className="shrink-0">
-              <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
+              <Button variant="primary" size="md" className="gap-2  text-button-label">
                 <Sparkles className="w-4 h-4 text-ink shrink-0" />
                 <span>Get Notified</span>
               </Button>

@@ -96,7 +96,7 @@ export function DataRequestForm() {
             size="sm"
             type="submit"
             disabled={reqStatus === "loading"}
-            className="w-full shadow-coral-glow"
+            className="w-full "
           >
             {reqStatus === "loading" ? "Submitting..." : "Submit Data Request"}
           </Button>

@@ -224,7 +224,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                               <p className="text-xs text-ink-muted">Scan your face in 30 seconds for a plain-language match.</p>
                             </div>
                             <Link href="/face-analysis">
-                              <Button variant="primary" size="sm" className="w-full text-xs shadow-coral-glow">
+                              <Button variant="primary" size="sm" className="w-full text-xs ">
                                 Start scan
                               </Button>
                             </Link>
@@ -242,7 +242,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                               />
                               {discount > 0 && (
-                                <div className="absolute top-2 left-2 bg-coral text-ink font-bold text-[10px] px-2 py-0.5 rounded-full">
+                                <div className="absolute top-2 left-2 bg-ink text-white font-bold text-[10px] px-2 py-0.5 rounded-full">
                                   {discount}% OFF
                                 </div>
                               )}

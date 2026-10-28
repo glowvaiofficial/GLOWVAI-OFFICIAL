@@ -1,4 +1,6 @@
 import { getRenderableEntityConfig, entityConfig } from "@/config/entity";
+import { buildFAQSchema } from "@/lib/seo/schema/faq";
+import { faqItems } from "@/config/content";
 import { SITE_URL } from "@/lib/site-url";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
@@ -93,16 +95,33 @@ export function buildFounderNodes(): Record<string, any>[] {
 }
 
 export function buildHomeGraph(): Record<string, any> {
+  const routineSlugs = [
+    "velvet-cloud-cica-cleanser",
+    "clarity-pop-niacinamide-serum",
+    "dew-barrier-daily-hydrator",
+    "sun-shield-invisible-fluid-spf50",
+  ];
   return {
     "@context": "https://schema.org",
     "@graph": [
       buildOrganizationNode(),
       buildWebSiteNode(),
+      buildFAQSchema(faqItems, "/"),
+      {
+        "@type": "ItemList",
+        "@id": `${SITE_URL}/#routine`,
+        "name": "Starter routine",
+        "itemListElement": routineSlugs.map((slug, i) => ({
+          "@type": "ListItem",
+          "position": i + 1,
+          "url": `${SITE_URL}/product/${slug}`,
+        })),
+      },
       {
         "@type": "WebPage",
         "@id": `${SITE_URL}/#webpage`,
         "url": `${SITE_URL}/`,
-        "name": "GLOW VAI | Skincare Retailer and Free AI Face Scan",
+        "name": "GLOW VAI | Free AI Skin Scan and 15-Min Skincare Delivery",
         "description": entityConfig.brand.description,
         "publisher": { "@id": ORG_ID },
         "inLanguage": "en-IN",
@@ -124,7 +143,7 @@ export function buildAboutPageGraph(): Record<string, any> {
         "name": "What is GLOW VAI?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "GLOW VAI is an Indian skincare retail brand offering a free AI face scan and instant WhatsApp ordering for authentic Minimalist and The Derma Co products.",
+          "text": "GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering.",
         },
       },
       {
@@ -137,10 +156,10 @@ export function buildAboutPageGraph(): Record<string, any> {
       },
       {
         "@type": "Question",
-        "name": "Is GLOW VAI the same as Minimalist or The Derma Co?",
+        "name": "Does GLOW VAI make its own products?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No. GLOW VAI is an independent retailer of Minimalist and The Derma Co products and does not manufacture them.",
+          "text": "No. GLOW VAI is an independent retailer and does not manufacture the products it sells.",
         },
       },
       {

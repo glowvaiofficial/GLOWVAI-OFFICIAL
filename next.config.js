@@ -1,5 +1,25 @@
 const isStaticExport = process.env.DEPLOY_TARGET === 'github-pages';
 
+// Hosts the site actually calls (checked in code): Google Apps Script (forms, sheet),
+// Google Sheets (admin read), Google Analytics (after consent), IP and location lookup
+// used by the scan, and the QR image service used by the referral portal.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://api.qrserver.com https://www.google-analytics.com https://www.googletagmanager.com https://*.googleusercontent.com https://drive.google.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://script.google.com https://script.googleusercontent.com https://docs.google.com https://api.ipify.org https://ipapi.co https://nominatim.openstreetmap.org https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+  "media-src 'self' blob:",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+
+// Static files that load their own third-party scripts keep their own rules.
+const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html).*';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   ...(isStaticExport ? { output: 'export' } : {}),
@@ -8,6 +28,7 @@ const nextConfig = {
   },
   images: {
     ...(isStaticExport ? { unoptimized: true } : {}),
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +36,50 @@ const nextConfig = {
       },
     ],
   },
+  ...(isStaticExport
+    ? {}
+    : {
+        async redirects() {
+          return [
+            {
+              source: '/:path*',
+              has: [{ type: 'host', value: 'www.glowvai.in' }],
+              destination: 'https://glowvai.in/:path*',
+              permanent: true,
+            },
+          ];
+        },
+        async headers() {
+          return [
+            {
+              source: `/(${exceptStaticPortals})`,
+              headers: [
+                { key: 'Content-Security-Policy', value: csp },
+                { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+                { key: 'X-Content-Type-Options', value: 'nosniff' },
+                { key: 'X-Frame-Options', value: 'DENY' },
+                { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+              ],
+            },
+            {
+              source: '/((?!face-analysis).*)',
+              headers: [{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' }],
+            },
+            {
+              source: '/face-analysis',
+              headers: [{ key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=()' }],
+            },
+            {
+              source: '/',
+              headers: [{ key: 'Cache-Control', value: 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400' }],
+            },
+            {
+              source: '/images/:path*',
+              headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }],
+            },
+          ];
+        },
+      }),
 };
 
 module.exports = nextConfig;

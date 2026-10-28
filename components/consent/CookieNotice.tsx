@@ -72,38 +72,32 @@ export function CookieNotice() {
   return (
     <div
       role="dialog"
-      aria-label="Privacy and Cookie Notice"
-      className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6 bg-slate-900/95 backdrop-blur-md text-white border-t border-slate-800 shadow-2xl transition-all animate-fade-in"
+      aria-label="Privacy and analytics choice"
+      className="fixed bottom-24 md:bottom-4 left-4 right-4 sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[24px] p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]"
     >
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex-1 pr-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-1">
-            Privacy and Analytics Consent
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            We use analytics to see which pages help people. We never send your name, phone, email, or photos. Learn more in our{" "}
-            <Link href="/privacy#cookies" className="text-blue-400 hover:text-blue-300 underline font-medium">
-              Privacy Policy
-            </Link>.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
-          <button
-            id="btn-accept-analytics"
-            onClick={() => updateConsent(true)}
-            className="flex-1 md:flex-none px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md active:scale-95 text-center min-h-[44px]"
-          >
-            Accept analytics
-          </button>
-          <button
-            id="btn-decline-analytics"
-            onClick={() => updateConsent(false)}
-            className="flex-1 md:flex-none px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm rounded-xl border border-slate-700 transition-all active:scale-95 text-center min-h-[44px]"
-          >
-            No thanks
-          </button>
-        </div>
+      <h2 className="font-display font-semibold text-base text-ink">Analytics, your choice</h2>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+        We use analytics to see which pages help people. We never send your name, phone, email or photos.{" "}
+        <Link href="/privacy#cookies" className="text-brand underline underline-offset-[3px] font-medium">
+          Privacy policy
+        </Link>
+        .
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <button
+          id="btn-accept-analytics"
+          onClick={() => updateConsent(true)}
+          className="min-h-11 px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          Accept
+        </button>
+        <button
+          id="btn-decline-analytics"
+          onClick={() => updateConsent(false)}
+          className="min-h-11 px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          Reject
+        </button>
       </div>
     </div>
   );
