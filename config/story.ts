@@ -148,7 +148,7 @@ export const storyData = {
     {
       id: "rahimath",
       name: "Rehmit",
-      role: "Marketing Lead & Market Explorer",
+      role: "Co-Founder and Head of Marketing, Sales and Revenue",
       tagline: "Understands what customers need and connects the brand with the people who need it.",
       bio: "Founding partner who ignited the first Glow VAI conversation in February 2025. Leads customer research and market expansion.",
       image: "/images/founders/rahimath.jpeg",

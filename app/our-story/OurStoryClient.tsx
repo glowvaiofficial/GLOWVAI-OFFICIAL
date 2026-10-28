@@ -18,7 +18,7 @@ const faqs = [
   { q: "What is GLOW VAI?", a: "GLOW VAI is an Indian skincare retail brand offering a free face scan and WhatsApp ordering." },
   {
     q: "Who founded GLOW VAI?",
-    a: "GLOW VAI was founded by Sardar Musthafa (Founder), Rehmit (Market Explorer), and Nalla Satvik (Co-Founder and Technical Lead) in Andhra Pradesh, India.",
+    a: "GLOW VAI was founded by Sardar Musthafa (Founder), Rehmit (Co-Founder and Head of Marketing, Sales and Revenue), and Nalla Satvik (Co-Founder and Technical Lead) in Andhra Pradesh, India.",
   },
   { q: "Does GLOW VAI make its own products?", a: "No. GLOW VAI is an independent retailer and does not manufacture the products it sells." },
   { q: "How do I contact GLOW VAI?", a: "Email contact@glowvai.in, or call or WhatsApp +91 89778 55998." },

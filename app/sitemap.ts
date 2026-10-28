@@ -27,6 +27,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/faq`, lastModified: sourceDate("app/faq/page.tsx"), changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/returns`, lastModified: sourceDate("app/returns/page.tsx"), changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/delivery`, lastModified: sourceDate("app/delivery/page.tsx"), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${SITE_URL}/help`, lastModified: sourceDate("app/help/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/track-order`, lastModified: sourceDate("app/track-order/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/careers`, lastModified: sourceDate("app/careers/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/partners`, lastModified: sourceDate("app/partners/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/grievance`, lastModified: sourceDate("app/grievance/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/press`, lastModified: sourceDate("app/press/page.tsx"), changeFrequency: "monthly", priority: 0.5 },
     ...(journalArticles.filter((a) => a.status === "published").length >= 3
       ? [{ url: `${SITE_URL}/journal`, lastModified: sourceDate("app/journal/page.tsx"), changeFrequency: "weekly" as const, priority: 0.8 }]
       : []),

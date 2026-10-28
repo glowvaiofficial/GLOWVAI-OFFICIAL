@@ -104,7 +104,7 @@ export const storyQuote = "What if the best tool for understanding your skin was
 export const founders = [
   { name: "Sardar Musthafa", role: "Founder and CEO", bio: "Leads the company, the partner stores and delivery.", photo: "teamAtDesk", position: "object-center" },
   { name: "Nalla Satvik", role: "Co-Founder and Technical Lead", bio: "Builds the website, the face scan and the ordering system.", photo: "workingMoment", position: "object-center" },
-  { name: "Rehmit", role: "Co-Founder", bio: "", photo: "productCloseUp", position: "object-top" },
+  { name: "Rehmit", role: "Co-Founder and Head of Marketing, Sales and Revenue", bio: "Leads marketing, sales and revenue growth.", photo: "productCloseUp", position: "object-top" },
 ] as const;
 
 export const timeline = [

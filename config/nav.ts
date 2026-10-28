@@ -43,20 +43,30 @@ export const footerLinks = {
   ],
   company: [
     { title: "Our story", href: "/our-story" },
-    { title: "Referral program", href: "/referral" },
     { title: "Journal", href: "/journal" },
     { title: "Face scan", href: "/face-analysis" },
-    { title: "Contact", href: "/contact" },
+    { title: "Referral program", href: "/referral" },
+    { title: "Careers", href: "/careers" },
+    { title: "Press", href: "/press" },
   ],
   help: [
+    { title: "Help center", href: "/help" },
+    { title: "Track order", href: "/track-order" },
     { title: "Delivery", href: "/delivery" },
-    { title: "FAQ and support", href: "/faq" },
     { title: "Returns and refunds", href: "/returns" },
+    { title: "FAQ", href: "/faq" },
+    { title: "Contact us", href: "/contact" },
+  ],
+  partners: [
+    { title: "Partner with us", href: "/partners" },
     { title: "Partner stores", href: "/store" },
+    { title: "Become a rider", href: "/partners" },
+    { title: "Auto and campus partners", href: "/referral" },
   ],
   legal: [
     { title: "Privacy policy", href: "/privacy" },
     { title: "Terms", href: "/terms" },
+    { title: "Grievance redressal", href: "/grievance" },
   ],
 };
 

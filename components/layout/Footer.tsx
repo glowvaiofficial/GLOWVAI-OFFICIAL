@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, ScanLine, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { departmentEmails } from "@/config/emails";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { footerLinks } from "@/config/nav";
 import { MEDICAL_NOTE } from "@/config/privacy-copy";
@@ -116,10 +117,30 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-skymist/60 border-t border-ink/10 pt-[72px] pb-8">
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-ink/10">
-          <div className="space-y-5 sm:col-span-2 lg:col-span-1">
+    <footer className="bg-paper-deep border-t border-ink/10">
+      {/* Trust row */}
+      <div className="border-b border-ink/15">
+        <ul className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-6 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+          {[
+            { Icon: ScanLine, t: "Free face scan", d: "About 30 seconds" },
+            { Icon: Truck, t: "Delivery by rider", d: "About 15 min in covered areas" },
+            { Icon: ShieldCheck, t: "Private by design", d: "Delete your data anytime" },
+            { Icon: Headphones, t: "Real support", d: "WhatsApp and email" },
+          ].map(({ Icon, t, d }) => (
+            <li key={t} className="flex items-center gap-3">
+              <Icon className="w-7 h-7 text-brand shrink-0" aria-hidden="true" />
+              <div>
+                <p className="font-display font-semibold text-[15px] leading-tight text-ink">{t}</p>
+                <p className="text-[13px] text-ink-muted">{d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 pt-14">
+        <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 pb-12">
+          <div className="col-span-2 lg:col-span-3 space-y-5">
             <Link href="/" className={`inline-block rounded ${focusRing}`} aria-label={`${BRAND_NAME} home`}>
               <span className="font-display font-bold text-[26px] tracking-[-0.02em] text-brand">GLOW VAI</span>
             </Link>
@@ -144,7 +165,6 @@ export function Footer() {
                 <span>Vijayawada &amp; Visakhapatnam, Andhra Pradesh, India</span>
               </li>
             </ul>
-
             <div className="flex items-center gap-3 pt-1">
               {siteConfig.socials.instagram && (
                 <a
@@ -188,18 +208,35 @@ export function Footer() {
             </div>
           </div>
 
-          <FooterColumn title="Shop" links={footerLinks.shop} />
-          <FooterColumn title="Company" links={footerLinks.company} />
-          <FooterColumn title="Help" links={footerLinks.help} />
+          <div className="lg:col-span-2"><FooterColumn title="Shop" links={footerLinks.shop} /></div>
+          <div className="lg:col-span-2"><FooterColumn title="Company" links={footerLinks.company} /></div>
+          <div className="lg:col-span-2"><FooterColumn title="Help" links={footerLinks.help} /></div>
+          <div className="lg:col-span-2"><FooterColumn title="Partners" links={footerLinks.partners} /></div>
+        </div>
 
-          <div className="sm:col-span-2 lg:col-span-1">
+        {/* Department emails */}
+        <div className="border-t border-ink/15 py-10 grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-8">
+          <div className="lg:col-span-7">
+            <h2 className="font-display font-semibold text-lg text-ink">Write to the right team</h2>
+            <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+              {departmentEmails.map((d) => (
+                <li key={d.key} className="flex items-baseline justify-between gap-3 border-b border-ink/10 py-2 text-[14px]">
+                  <span className="text-ink-muted">{d.label}</span>
+                  <a href={`mailto:${d.email}`} className={`text-ink hover:text-brand underline underline-offset-4 decoration-ink/25 rounded ${focusRing}`}>
+                    {d.email}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="lg:col-span-5">
             <h2 className="font-display font-semibold text-lg text-ink">Skin tips, once in a while.</h2>
             <p className="text-sm text-ink-muted mt-1 mb-4">No spam. Unsubscribe any time.</p>
             <NewsletterForm />
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[13px] text-ink-muted text-center md:text-left">
+        <div className="border-t border-ink/15 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[13px] text-ink-muted text-center md:text-left">
           <p>&copy; {currentYear} {BRAND_NAME}. All rights reserved.</p>
           <p>{MEDICAL_NOTE}</p>
           <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
