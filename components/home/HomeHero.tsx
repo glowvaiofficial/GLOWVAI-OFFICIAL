@@ -1,50 +1,13 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PRIVACY_SHORT } from "@/config/privacy-copy";
-import { getAssetPath } from "@/lib/utils";
 import { focusRing } from "./shared";
+import { PhoneDemo } from "./PhoneDemo";
 
 // Alternate headlines kept ready (not rendered):
 // B: "Skincare that starts with a selfie."  C: "Scan today. Glow by tonight."
-
-function PhoneVisual() {
-  return (
-    <div className="relative w-[58%] min-[480px]:w-[min(280px,60%)] lg:w-[min(320px,66%)] aspect-[9/19] rounded-[40px] border-8 border-ink bg-ink">
-      <div aria-hidden="true" className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[90px] h-[22px] rounded-full bg-ink z-20" />
-      <div className="relative w-full h-full rounded-[32px] overflow-hidden bg-ink">
-        <Image
-          src={getAssetPath("/images/hero/face-scan-selfie.webp")}
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1024px) 60vw, 320px"
-          className="object-cover gv-xray"
-        />
-        <div aria-hidden="true" className="absolute inset-0 gv-xray-tint" />
-        <svg aria-hidden="true" viewBox="0 0 200 400" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
-          <g fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M24 70 V50 a8 8 0 0 1 8 -8 H52" />
-            <path d="M148 42 H168 a8 8 0 0 1 8 8 V70" />
-            <path d="M24 290 V310 a8 8 0 0 0 8 8 H52" />
-            <path d="M148 318 H168 a8 8 0 0 0 8 -8 V290" />
-          </g>
-        </svg>
-        <div aria-hidden="true" className="gv-scan-line" />
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 p-4 bg-ink/75">
-          <p className="font-mono text-xs text-white/80 mb-2">Scanning... 0:12</p>
-          <div className="flex gap-1.5">
-            {[0, 1, 2, 3].map((i) => (
-              <span key={i} className={`h-1.5 flex-1 rounded-[3px] ${i < 2 ? "bg-white" : "bg-white/25"}`} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
   return (
@@ -96,7 +59,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
               <div aria-hidden="true" className="absolute inset-[6%_6%_6%_10%] rounded-[24px] bg-paper-deep" />
 
               <div className="absolute inset-0 flex items-center justify-center">
-                <PhoneVisual />
+                <PhoneDemo />
               </div>
 
               <div
