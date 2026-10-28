@@ -48,69 +48,123 @@ function ScanScreen() {
 }
 
 function OrderScreen() {
+  const items = routineProducts.slice(0, 3);
+  const [on, setOn] = useState<boolean[]>(items.map(() => true));
+  const [placed, setPlaced] = useState(false);
+  const count = on.filter(Boolean).length;
   return (
-    <div className="w-full h-full bg-white pt-9 px-3.5 pb-3 flex flex-col">
-      <p className="font-display font-semibold text-ink text-sm">Your routine</p>
-      <ul className="mt-2 space-y-2 flex-1 overflow-hidden">
-        {routineProducts.slice(0, 3).map((p) => (
-          <li key={p.slug} className="flex items-center gap-2.5 border border-ink/15 rounded-[10px] p-2">
-            <div className="relative w-10 h-10 shrink-0 rounded-md bg-paper overflow-hidden">
-              <Image src={getAssetPath(p.image)} alt="" fill sizes="40px" className="object-contain" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">{p.step}</p>
-              <p className="text-[11px] font-semibold text-ink leading-tight line-clamp-2">{p.name}</p>
-            </div>
-            <Check className="w-4 h-4 text-brand ml-auto shrink-0" aria-hidden="true" />
+    <div className="w-full h-full bg-white pt-10 px-3.5 pb-3.5 flex flex-col gap-2.5">
+      <div className="flex items-baseline justify-between">
+        <p className="font-display font-semibold text-ink text-base">Your routine</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">Tap to edit</p>
+      </div>
+      <ul className="flex-1 flex flex-col gap-2.5">
+        {items.map((p, i) => (
+          <li key={p.slug} className="flex-1">
+            <button
+              type="button"
+              aria-pressed={on[i]}
+              onClick={() => { setPlaced(false); setOn(on.map((v, j) => (j === i ? !v : v))); }}
+              className={`w-full h-full flex items-center gap-3 rounded-[10px] border p-2.5 text-left focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-brand ${on[i] ? "border-brand bg-paper" : "border-ink/15 opacity-60"}`}
+            >
+              <div className="relative w-14 h-14 shrink-0 rounded-md bg-white overflow-hidden">
+                <Image src={getAssetPath(p.image)} alt="" fill sizes="56px" className="object-contain" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">{p.step}</p>
+                <p className="text-xs font-semibold text-ink leading-tight line-clamp-2">{p.name}</p>
+              </div>
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${on[i] ? "bg-brand text-white" : "border-2 border-ink/30"}`}>
+                {on[i] && <Check className="w-3 h-3" aria-hidden="true" />}
+              </span>
+            </button>
           </li>
         ))}
       </ul>
-      <div className="mt-2 rounded-[10px] bg-brand text-white text-center text-sm font-semibold py-2.5">Place order</div>
+      <button
+        type="button"
+        onClick={() => setPlaced(true)}
+        disabled={count === 0}
+        className="rounded-[10px] bg-brand text-white text-sm font-semibold py-3 disabled:opacity-50 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+      >
+        {placed ? "Order placed" : `Place order (${count} ${count === 1 ? "item" : "items"})`}
+      </button>
     </div>
   );
 }
 
 function PayScreen() {
+  const [sel, setSel] = useState(0);
+  const [paid, setPaid] = useState(false);
   return (
-    <div className="w-full h-full bg-white pt-9 px-3.5 pb-3 flex flex-col">
-      <p className="font-display font-semibold text-ink text-sm">Choose how to pay</p>
-      <ul className="mt-3 space-y-2 flex-1">
+    <div className="w-full h-full bg-white pt-10 px-3.5 pb-3.5 flex flex-col gap-2.5">
+      <p className="font-display font-semibold text-ink text-base">Choose how to pay</p>
+      <ul className="flex-1 flex flex-col gap-2.5">
         {payOptions.map((o, i) => (
-          <li
-            key={o}
-            className={`flex items-center justify-between rounded-[10px] border px-3 py-3 text-[13px] font-semibold text-ink ${
-              i === 0 ? "border-brand bg-paper" : "border-ink/15"
-            }`}
-          >
-            {o}
-            <span className={`w-4 h-4 rounded-full border-2 ${i === 0 ? "border-brand bg-brand" : "border-ink/30"}`} />
+          <li key={o} className="flex-1">
+            <button
+              type="button"
+              aria-pressed={sel === i}
+              onClick={() => { setPaid(false); setSel(i); }}
+              className={`w-full h-full flex items-center justify-between rounded-[10px] border px-3.5 text-sm font-semibold text-ink focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-brand ${sel === i ? "border-brand bg-paper" : "border-ink/15"}`}
+            >
+              {o}
+              <span className={`w-5 h-5 rounded-full border-2 ${sel === i ? "border-brand bg-brand" : "border-ink/30"}`} />
+            </button>
           </li>
         ))}
       </ul>
-      <div className="rounded-[10px] bg-brand text-white text-center text-sm font-semibold py-2.5">Pay and confirm</div>
+      <button
+        type="button"
+        onClick={() => setPaid(true)}
+        className="rounded-[10px] bg-brand text-white text-sm font-semibold py-3 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+      >
+        {paid ? `Confirmed: ${payOptions[sel]}` : "Pay and confirm"}
+      </button>
     </div>
   );
 }
 
 function DeliverScreen() {
+  const [stage, setStage] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setStage((x) => (x + 1) % 3), 1600);
+    return () => clearInterval(t);
+  }, []);
+  const labels = ["Order packed", "Rider on the way", "At your door"];
   return (
-    <div className="w-full h-full bg-white pt-9 px-3.5 pb-3 flex flex-col">
-      <p className="font-display font-semibold text-ink text-sm">Out for delivery</p>
-      <div className="mt-4 flex-1 flex flex-col items-center justify-center text-center">
-        <div className="w-16 h-16 rounded-full bg-brand text-white flex items-center justify-center">
-          <Bike className="w-8 h-8" aria-hidden="true" />
-        </div>
-        <p className="mt-3 font-display font-semibold text-4xl text-ink leading-none">~15</p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-muted mt-1">minutes, estimate</p>
+    <div className="w-full h-full bg-white flex flex-col">
+      <div className="relative flex-1 bg-paper-deep overflow-hidden">
+        <svg viewBox="0 0 200 220" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <g stroke="#fff" strokeWidth="9" fill="none">
+            <path d="M0 50 H200 M0 120 H200 M0 185 H200 M40 0 V220 M110 0 V220 M170 0 V220" />
+          </g>
+          <path id="gv-route" d="M40 185 V120 H110 V50 H170" fill="none" stroke="#1447E6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="1 8" />
+          <rect x="32" y="177" width="16" height="16" rx="3" fill="#12161F" />
+          <circle cx="170" cy="50" r="9" fill="#1447E6" />
+          <circle cx="170" cy="50" r="3.5" fill="#fff" />
+          <circle r="7" fill="#1447E6" stroke="#fff" strokeWidth="3">
+            <animateMotion dur="6s" repeatCount="indefinite" path="M40 185 V120 H110 V50 H170" />
+          </circle>
+        </svg>
+        <p className="absolute top-10 left-3.5 font-display font-semibold text-ink text-base">Out for delivery</p>
+        <p className="absolute bottom-2 left-3.5 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">Partner store</p>
+        <p className="absolute top-[72px] right-3.5 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">You</p>
       </div>
-      <ol className="space-y-1.5 text-[11px] text-ink">
-        {["Order packed", "Rider on the way", "At your door"].map((t, i) => (
-          <li key={t} className="flex items-center gap-2">
-            <span className={`w-2.5 h-2.5 rounded-full ${i < 2 ? "bg-brand" : "bg-ink/20"}`} />
-            {t}
-          </li>
-        ))}
-      </ol>
+      <div className="px-3.5 py-3 flex flex-col gap-2.5">
+        <div className="flex items-end justify-between">
+          <p className="font-display font-semibold text-5xl text-ink leading-none">~15</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-muted pb-1">minutes, estimate</p>
+        </div>
+        <ol className="grid grid-cols-3 gap-1.5">
+          {labels.map((t, i) => (
+            <li key={t}>
+              <span className={`block h-1.5 rounded-[3px] ${i <= stage ? "bg-brand" : "bg-ink/15"}`} />
+              <span className={`mt-1 block text-[10px] leading-tight ${i === stage ? "text-ink font-semibold" : "text-ink-muted"}`}>{t}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   );
 }
