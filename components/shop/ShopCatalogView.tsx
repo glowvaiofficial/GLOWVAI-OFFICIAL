@@ -13,7 +13,37 @@ import { ShopUnlockGate } from "@/components/shop/ShopUnlockGate";
 import { filterProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { Product } from "@/config/products";
-import { Camera, ScanLine, Filter, X } from "lucide-react";
+import { useCartStore } from "@/lib/store/cart";
+import { Camera, ScanLine, Filter, X, Check, ShoppingBag } from "lucide-react";
+
+function QuickAdd({ prod }: { prod: Product }) {
+  const addItem = useCartStore((s) => s.addItem);
+  const [done, setDone] = React.useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        addItem({
+          id: `${prod.id}-${prod.size}`,
+          slug: prod.slug,
+          name: prod.name,
+          size: prod.size,
+          price: prod.price,
+          mrp: prod.mrp,
+          image: getAssetPath(prod.images[0] || "/images/hero/product.webp"),
+          quantity: 1,
+        });
+        setDone(true);
+        setTimeout(() => setDone(false), 1800);
+      }}
+      aria-label={`Add ${prod.name} to bag`}
+      className="inline-flex items-center gap-1.5 min-h-[40px] px-3 rounded-[10px] bg-brand text-white text-xs font-semibold hover:bg-brand-dark focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+    >
+      {done ? <Check className="w-4 h-4" aria-hidden="true" /> : <ShoppingBag className="w-4 h-4" aria-hidden="true" />}
+      <span aria-live="polite">{done ? "Added" : "Add"}</span>
+    </button>
+  );
+}
 
 interface ShopCatalogViewProps {
   allProducts: Product[];
@@ -272,11 +302,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                                 </span>
                               )}
                             </div>
-                            <Link href={`/product/${prod.slug}`}>
-                              <Button variant="outline" size="sm" className="text-xs px-3 py-1.5">
-                                View
-                              </Button>
-                            </Link>
+                            <QuickAdd prod={prod} />
                           </div>
                         </div>
                       </React.Fragment>
