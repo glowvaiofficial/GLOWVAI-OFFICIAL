@@ -13,7 +13,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="bg-paper pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-[72px] lg:pb-24 lg:min-h-[640px] flex items-center overflow-hidden"
+      className="bg-paper pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-8 lg:pb-8 lg:min-h-[calc(100svh-120px)] flex items-center overflow-hidden"
     >
       <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
@@ -49,22 +49,18 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
             </div>
             <p className="mt-3 text-[15px] text-ink-light">Takes about 30 seconds. Face a window.</p>
 
-            <p className="mt-12 pt-6 border-t border-ink/15 font-mono text-[13px] leading-relaxed text-ink-muted">
+            <p className="mt-8 pt-5 border-t border-ink/15 font-mono text-[13px] leading-relaxed text-ink-muted">
               Free scan &middot; {PRIVACY_SHORT} &middot; About 15 min delivery in {city}
             </p>
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative h-[520px] lg:h-[680px] w-full max-w-[520px] mx-auto">
-              <div aria-hidden="true" className="absolute inset-[6%_6%_6%_10%] rounded-[24px] bg-paper-deep" />
-
-              <div className="absolute inset-0 flex items-center justify-center sm:justify-end">
-                <PhoneDemo />
-              </div>
+            <div className="relative w-full max-w-[520px] mx-auto flex justify-center">
+              <PhoneDemo />
 
               <div
                 aria-hidden="true"
-                className="absolute top-[8%] left-0 w-[150px] sm:w-[170px] -rotate-3 bg-white border border-ink/15 rounded-[10px] p-4"
+                className="hidden sm:block absolute top-[12%] left-0 lg:left-2 w-[160px] -rotate-3 bg-white border border-ink/15 rounded-[10px] p-4"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">Sample report</p>
                 <p className="mt-2 font-display font-semibold text-[44px] leading-none text-ink [font-feature-settings:'tnum']">

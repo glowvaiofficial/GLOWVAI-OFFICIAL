@@ -184,17 +184,6 @@ export function FeaturedProducts() {
           </div>
         )}
       </Section>
-
-      {/* Full-bleed band: breaks the container on purpose */}
-      <div className="relative w-full h-[260px] sm:h-[360px] lg:h-[460px] bg-paper-deep">
-        <Image
-          src={getAssetPath("/images/home-ai/products_shelf.png")}
-          alt="Skincare products arranged on a shelf"
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-      </div>
     </>
   );
 }
