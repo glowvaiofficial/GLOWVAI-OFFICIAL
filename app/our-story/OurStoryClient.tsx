@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, ScanLine, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, ScanLine, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
 import { storyData } from "@/config/story";
@@ -204,16 +204,45 @@ export default function OurStoryClient() {
               </button>
             ))}
           </div>
-          <div id="event-panel" role="tabpanel" aria-labelledby={`ev-${ti}`} className="lg:col-span-8 border-t-2 border-ink pt-6">
-            <p className="font-mono text-sm uppercase tracking-[0.12em] text-brand">{evt.period}</p>
-            <h3 className="mt-2 font-display font-semibold text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-tight">{evt.title}</h3>
-            <ul className="mt-5 space-y-3 text-[17px] leading-relaxed text-ink-muted max-w-[62ch]">
-              {evt.description.map((d, i) => (
-                <li key={i} className="pl-5 relative before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:w-2 before:h-px before:bg-ink">
-                  {d}
-                </li>
-              ))}
-            </ul>
+          <div id="event-panel" role="tabpanel" aria-labelledby={`ev-${ti}`} className="lg:col-span-8 border-t-2 border-ink pt-6 flex flex-col justify-between gap-10 min-h-[420px]">
+            <div>
+              <p className="font-mono text-sm uppercase tracking-[0.12em] text-brand">{evt.period}</p>
+              <h3 className="mt-2 font-display font-semibold text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-tight">{evt.title}</h3>
+              <ul className="mt-5 space-y-3 text-[17px] leading-relaxed text-ink-muted max-w-[62ch]">
+                {evt.description.map((d, i) => (
+                  <li key={i} className="pl-5 relative before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:w-2 before:h-px before:bg-ink">
+                    {d}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p aria-hidden="true" className="font-display font-semibold leading-[0.8] tracking-[-0.06em] text-brand text-[clamp(7rem,4rem+12vw,13rem)] [font-feature-settings:'tnum']">
+                {String(ti + 1).padStart(2, "0")}
+                <span className="text-ink/25 text-[0.35em] tracking-normal"> / {String(storyData.timeline.length).padStart(2, "0")}</span>
+              </p>
+              <div className="mt-6 h-1.5 rounded-[3px] bg-ink/10 overflow-hidden" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={storyData.timeline.length} aria-valuenow={ti + 1}>
+                <div className="h-full bg-brand transition-all" style={{ width: `${((ti + 1) / storyData.timeline.length) * 100}%` }} />
+              </div>
+              <div className="mt-5 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTi(Math.max(0, ti - 1))}
+                  disabled={ti === 0}
+                  className={`inline-flex items-center gap-2 min-h-[48px] px-5 rounded-[10px] border border-ink/25 bg-white font-semibold disabled:opacity-40 ${focusRing}`}
+                >
+                  <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Previous
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTi(Math.min(storyData.timeline.length - 1, ti + 1))}
+                  disabled={ti === storyData.timeline.length - 1}
+                  className={`inline-flex items-center gap-2 min-h-[48px] px-5 rounded-[10px] bg-brand text-white font-semibold disabled:opacity-40 ${focusRing}`}
+                >
+                  Next <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </Section>
