@@ -62,20 +62,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const categoryRoutes: MetadataRoute.Sitemap = [
-    "minimalist",
-    "the-derma-co",
-    "face-serums",
-    "face-washes",
-    "sunscreen",
-    "moisturizers",
-  ].map((slug) => ({
-    url: `${SITE_URL}/shop/${slug}`,
-    lastModified: sourceDate("app/shop/[slug]/page.tsx"),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
-
   const productRoutes: MetadataRoute.Sitemap = getProducts().map((product) => ({
     url: `${SITE_URL}/product/${product.slug}`,
     lastModified: sourceDate("config/products.ts"),
@@ -90,5 +76,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ]
     : [];
 
-  return [...coreRoutes, ...categoryRoutes, ...productRoutes, ...legalRoutes];
+  return [...coreRoutes, ...productRoutes, ...legalRoutes];
 }
