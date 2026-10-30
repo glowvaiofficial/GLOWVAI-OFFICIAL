@@ -7,12 +7,23 @@ import { ArrowRight, Clock, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Section, SectionTitle, focusRing } from "./shared";
 import { bestsellerProducts } from "@/config/content";
-import { useCartStore } from "@/lib/store";
+import { useCartStore } from "@/lib/store/cart";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { track } from "@/lib/analytics";
 import { routineProducts, brandSourcePlaceholder } from "@/config/home-content";
 
 const routine = routineProducts;
+
+type Bestseller = (typeof bestsellerProducts)[number];
+const toCartItem = (p: Bestseller) => ({
+  id: p.id,
+  slug: p.slug,
+  name: p.name,
+  size: p.size,
+  price: p.price,
+  mrp: p.originalPrice ?? p.price,
+  image: getAssetPath(p.image),
+});
 
 const chip = "text-[13px] font-medium px-2.5 py-1 rounded-[10px] bg-paper text-ink";
 
@@ -33,7 +44,7 @@ export function FeaturedProducts() {
   const handleAdd = (id: string) => {
     const item = items.find((i) => i.data.id === id);
     if (item) track("add_to_cart", { product_slug: item.slug, price: item.data.price, source: "landing_card" });
-    addItem(id);
+    if (item) addItem(toCartItem(item.data));
     setAdded((prev) => ({ ...prev, [id]: true }));
     setTimeout(() => setAdded((prev) => ({ ...prev, [id]: false })), 1500);
     flash("Added to bag");
@@ -42,7 +53,7 @@ export function FeaturedProducts() {
   const handleAddAll = () => {
     items.forEach((i) => {
       track("add_to_cart", { product_slug: i.slug, price: i.data.price, source: "routine_button" });
-      addItem(i.data.id);
+      addItem(toCartItem(i.data));
     });
     flash("Full routine added to bag");
   };

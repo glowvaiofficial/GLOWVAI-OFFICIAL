@@ -3,19 +3,18 @@
 import React, { useReducer, useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
 import { analyse, detectFace, DEMOGRAPHIC_BASE_SCORES, AnalysisReport } from "@/lib/analysis";
-import { getRecommendedProducts, EXCEL_DATABASE_PRODUCTS } from "@/lib/recommend";
 import { parseUserAgent, fetchClientIP, requestLocationWithOSPermission } from "@/lib/clientInfo";
 import { PRIVACY_STATEMENT, MEDICAL_NOTE } from "@/config/privacy-copy";
-import { formatPrice } from "@/lib/utils";
-import { BRAND_NAME, siteConfig } from "@/config/site";
+import { formatPrice, getAssetPath } from "@/lib/utils";
 import { trackEvent } from "@/lib/analytics";
 import { useCartStore } from "@/lib/store/cart";
-import { ScanLine, Camera, Lock, CheckCircle2, AlertCircle, Share2, RotateCcw, ArrowRight, Sun, ShieldCheck, Upload, ExternalLink, Check, MapPin, User, Phone, Mail, HelpCircle } from "lucide-react";
+import { bestsellerProducts } from "@/config/content";
+import { routineProducts } from "@/config/home-content";
+import { Camera, AlertCircle, RotateCcw, ArrowRight, Sun, Glasses, UserRound, Upload, ExternalLink, Check, ShoppingBag, MessageCircle } from "lucide-react";
 
 type FlowStep =
   | "SCAN_READY"
@@ -60,33 +59,48 @@ function flowReducer(state: FlowContext, action: FlowAction): FlowContext {
         errorMessage: action.message || "Face not detected. Please capture or upload a photo with your face clearly in view.",
       };
     case "FACE_DETECTED":
-      return {
-        ...state,
-        step: "FORM_ENTRY",
-        capturedImage: action.capturedImage,
-      };
+      return { ...state, step: "FORM_ENTRY", capturedImage: action.capturedImage };
     case "FORM_SUBMIT_START":
       return { ...state, isSubmittingForm: true };
     case "FORM_SUBMIT_SUCCESS":
-      return {
-        ...state,
-        isSubmittingForm: false,
-        step: "RESULT",
-        report: action.report,
-        sessionId: action.sessionId,
-      };
+      return { ...state, isSubmittingForm: false, step: "RESULT", report: action.report, sessionId: action.sessionId };
     case "RETAKE":
-      return {
-        ...state,
-        step: "SCAN_READY",
-        report: null,
-        capturedImage: null,
-        errorMessage: "",
-      };
+      return { ...state, step: "SCAN_READY", report: null, capturedImage: null, errorMessage: "" };
     default:
       return state;
   }
 }
+
+const input =
+  "w-full min-h-[52px] px-4 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20";
+
+const tips = [
+  { Icon: Sun, t: "Face a window", d: "Even daylight gives the clearest photo." },
+  { Icon: Glasses, t: "Remove glasses", d: "Nothing should cover your eyes or cheeks." },
+  { Icon: UserRound, t: "Hair off your face", d: "Keep your forehead and jawline in view." },
+];
+
+const steps = [
+  { img: "/images/face-analysis/camera_scan.png", alt: "A face being scanned by a phone camera", t: "Take a photo", d: "Use your camera or upload a selfie. Good light helps." },
+  { img: "/images/face-analysis/barrier_depth.png", alt: "Skin hydration check illustration", t: "We score four things", d: "Hydration, texture, tone and clarity, each out of 100." },
+  { img: "/images/face-analysis/routine_match.png", alt: "Skincare products matched to a scan", t: "Get a routine", d: "We suggest a routine from our own range." },
+  { img: "/images/face-analysis/glow_results.png", alt: "A skin score improving over time", t: "Scan again later", d: "Repeat the scan to see how your scores change." },
+];
+
+const gallery = [
+  { src: "/images/face-scan/indian_female.png", alt: "A woman taking a face scan on her phone", cap: "Scan on your phone" },
+  { src: "/images/face-scan/indian_male.png", alt: "A man taking a face scan on his phone", cap: "Works for everyone" },
+  { src: "/images/face-scan/skin_grid.png", alt: "A grid of skin samples", cap: "Four scores" },
+  { src: "/images/home-ai/express_delivery.png", alt: "A rider carrying a skincare order", cap: "Delivery by rider" },
+  { src: "/images/hero/product.webp", alt: "A skincare product", cap: "Matched routine" },
+];
+
+const scoreLabels: { key: keyof AnalysisReport["subScores"]; label: string }[] = [
+  { key: "hydration", label: "Hydration" },
+  { key: "texture", label: "Texture" },
+  { key: "tone", label: "Tone" },
+  { key: "clarity", label: "Clarity" },
+];
 
 export function FaceAnalysisClient() {
   const [flow, dispatch] = useReducer(flowReducer, {
@@ -112,6 +126,7 @@ export function FaceAnalysisClient() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [inAppBrowser, setInAppBrowser] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [addedAll, setAddedAll] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -127,7 +142,6 @@ export function FaceAnalysisClient() {
       if (/FBAN|FBAV|Instagram/i.test(ua)) {
         setInAppBrowser(true);
       }
-
       fetchClientIP().then((ip) => setClientIp(ip));
     }
   }, []);
@@ -268,161 +282,98 @@ export function FaceAnalysisClient() {
           },
         }),
         mode: "no-cors",
-      }).catch(() => { });
-    } catch { }
+      }).catch(() => {});
+    } catch {}
 
     dispatch({ type: "FORM_SUBMIT_SUCCESS", report, sessionId });
   };
 
-  const recommendedProducts = EXCEL_DATABASE_PRODUCTS.slice(0, 5);
+  // Routine from our own range, in routine order.
+  const routine = routineProducts
+    .map((r) => bestsellerProducts.find((p) => p.slug === r.slug))
+    .filter((p): p is (typeof bestsellerProducts)[number] => Boolean(p));
+
+  const addProduct = (p: (typeof bestsellerProducts)[number]) =>
+    addItem({
+      id: p.id,
+      slug: p.slug,
+      name: p.name,
+      size: p.size,
+      price: p.price,
+      mrp: p.originalPrice ?? p.price,
+      image: getAssetPath(p.image),
+    });
+
+  const scanning = flow.step === "SCAN_READY" || flow.step === "CAMERA_RUNNING" || flow.step === "ANALYSING" || flow.step === "CAMERA_DENIED";
 
   return (
-    <div className="bg-white text-ink font-sans min-h-screen flex flex-col justify-between selection:bg-brand selection:text-white">
+    <div className="bg-paper text-ink">
       <CartDrawer />
 
-      <main className="py-8 sm:py-12 flex-1 bg-ink-subtle/50">
-        <Container size="md">
-          {(flow.step === "SCAN_READY" ||
-            flow.step === "CAMERA_RUNNING" ||
-            flow.step === "ANALYSING") && (
-              <div className="max-w-3xl mx-auto space-y-8">
-                <div className="text-center space-y-3">
-                  <Badge variant="brand" size="md" className="bg-brand/10 text-brand border-brand/20 px-3.5 py-1 font-bold">
-                    Step 1 of 3: AI Face Scan
-                  </Badge>
-                  <h1 className="font-display font-bold text-3xl sm:text-4xl text-ink leading-tight">
-                    Instant <span className="text-brand">Skin Check</span> Scan
-                  </h1>
-                  <p className="text-xs sm:text-sm text-ink-muted max-w-lg mx-auto">
-                    Center your face in good natural light and click the shutter button below for a 5-second skin check.
-                  </p>
+      {scanning && (
+        <>
+          <Section pad="tight" labelledBy="scan-title">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10 items-start">
+              <div className="lg:col-span-6">
+                <Eyebrow>Free face scan</Eyebrow>
+                <h1
+                  id="scan-title"
+                  ref={headingRef}
+                  tabIndex={-1}
+                  className="mt-4 font-display font-semibold text-[clamp(2.5rem,1.6rem+4.5vw,4.75rem)] leading-[1] tracking-[-0.03em] outline-none"
+                >
+                  Know your skin in <span className="text-brand">30 seconds.</span>
+                </h1>
+                <p className="mt-6 text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] leading-[1.5] text-ink-muted max-w-[46ch]">
+                  Take a selfie, answer two quick questions, and get a plain report with a routine to match.
+                </p>
+
+                <ul className="mt-8 border-t border-ink/20">
+                  {tips.map(({ Icon, t, d }) => (
+                    <li key={t} className="flex items-center gap-4 py-4 border-b border-ink/20">
+                      <Icon className="w-6 h-6 text-brand shrink-0" aria-hidden="true" />
+                      <div>
+                        <p className="font-display font-semibold text-lg leading-tight">{t}</p>
+                        <p className="text-[15px] text-ink-muted">{d}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-6 space-y-2 text-[14px] leading-relaxed text-ink-muted max-w-[56ch]">
+                  <p>We use your camera to take a photo for your skin check. {PRIVACY_STATEMENT}</p>
+                  <p>The scan is for users aged 18 and over. [CONFIRM AGE POLICY]</p>
+                  <p>{MEDICAL_NOTE}</p>
                 </div>
+              </div>
 
-                <div className="bg-white border border-ink/10 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
-                  <div className="text-center space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-brand block">
-                      Advanced AI Skin Engine
-                    </span>
-                    <h2 className="font-display font-bold text-2xl text-ink">
-                      4-Step Skin Telemetry Technology
-                    </h2>
-                    <p className="text-xs text-ink-muted max-w-md mx-auto font-medium">
-                      Review how our browser AI evaluates hydration, pore depth, barrier defense, and radiance score.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-                    <div className="bg-ink-subtle p-4 rounded-2xl border border-ink/10 space-y-3 group hover:border-brand/40 transition-all">
-                      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
+              <div className="lg:col-span-6">
+                <div className="bg-white border border-ink/15 rounded-[24px] p-4 sm:p-6">
+                  {flow.step === "SCAN_READY" && (
+                    <>
+                      <div className="relative aspect-[4/5] sm:aspect-[5/4] rounded-[10px] overflow-hidden bg-paper-deep">
                         <Image
-                          src="/images/face-analysis/camera_scan.png"
-                          alt="AI Camera Scan & Mesh Mapping"
+                          src={getAssetPath("/images/hero/face-scan-selfie.webp")}
+                          alt="Example of a selfie being scanned on a phone"
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          priority
+                          sizes="(max-width: 1024px) 90vw, 560px"
+                          className="object-cover"
                         />
-                        <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                          01. Facial Mesh
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-xs text-ink">1. AI Camera Scan & Mesh</h3>
-                        <p className="text-[11px] text-ink-muted leading-relaxed">
-                          Maps 128 micro-nodes across forehead, cheeks, and chin in natural lighting.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-ink-subtle p-4 rounded-2xl border border-ink/10 space-y-3 group hover:border-brand/40 transition-all">
-                      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                        <Image
-                          src="/images/face-analysis/barrier_depth.png"
-                          alt="Barrier Hydration Depth Check"
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-2 left-2 bg-ink text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                          02. Barrier Telemetry
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-xs text-ink">2. Barrier Hydration Depth</h3>
-                        <p className="text-[11px] text-ink-muted leading-relaxed">
-                          Evaluates ceramide retention, trans-epidermal water loss, and pore smoothness.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-ink-subtle p-4 rounded-2xl border border-ink/10 space-y-3 group hover:border-brand/40 transition-all">
-                      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                        <Image
-                          src="/images/face-analysis/routine_match.png"
-                          alt="Product match preview"
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-2 left-2 bg-mint text-ink text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                          03. Active Match
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-xs text-ink">3. Active Routine Match</h3>
-                        <p className="text-[11px] text-ink-muted leading-relaxed">
-                          Selects precise Niacinamide & Salicylic Acid ratios for Vijayawada weather.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="bg-ink-subtle p-4 rounded-2xl border border-ink/10 space-y-3 group hover:border-brand/40 transition-all">
-                      <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-ink-subtle border border-ink/10">
-                        <Image
-                          src="/images/face-analysis/glow_results.png"
-                          alt="30-Day Radiance Score Tracking"
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-2 left-2 bg-yellow text-ink text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
-                          04. Score Growth
-                        </div>
-                      </div>
-                      <div>
-                        <h3 className="font-display font-bold text-xs text-ink">4. 30-Day Radiance Score</h3>
-                        <p className="text-[11px] text-ink-muted leading-relaxed">
-                          Tracks skin barrier score improvement with weekly re-scan updates.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-ink/10 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 text-center">
-                  {flow.step === "SCAN_READY" ? (
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-                        <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
-                          <Sun className="w-4 h-4 text-yellow-hover" />
-                          <h3 className="font-display font-bold text-xs text-ink">Natural Light</h3>
-                          <p className="text-[11px] text-ink-muted">Face window for clear illumination.</p>
-                        </div>
-                        <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
-                          <CheckCircle2 className="w-4 h-4 text-coral" />
-                          <h3 className="font-display font-bold text-xs text-ink">Centered Face</h3>
-                          <p className="text-[11px] text-ink-muted">Keep face inside scanner oval.</p>
-                        </div>
-                        <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
-                          <Lock className="w-4 h-4 text-brand" />
-                          <h3 className="font-display font-bold text-xs text-ink">Stored privately</h3>
-                          <p className="text-[11px] text-ink-muted">Delete anytime on request.</p>
-                        </div>
-                        <div className="bg-ink-subtle p-3.5 rounded-2xl border border-ink/10 space-y-1">
-                          <ShieldCheck className="w-4 h-4 text-brand" />
-                          <h3 className="font-display font-bold text-xs text-ink">Instant Match</h3>
-                          <p className="text-[11px] text-ink-muted">Matched to our range.</p>
-                        </div>
+                        <svg aria-hidden="true" viewBox="0 0 200 250" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+                          <g fill="none" stroke="#fff" strokeWidth="3" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round">
+                            <path vectorEffect="non-scaling-stroke" d="M20 50 V32 a8 8 0 0 1 8 -8 H46" />
+                            <path vectorEffect="non-scaling-stroke" d="M154 24 H172 a8 8 0 0 1 8 8 V50" />
+                            <path vectorEffect="non-scaling-stroke" d="M20 200 V218 a8 8 0 0 0 8 8 H46" />
+                            <path vectorEffect="non-scaling-stroke" d="M154 226 H172 a8 8 0 0 0 8 -8 V200" />
+                          </g>
+                        </svg>
+                        <div aria-hidden="true" className="gv-scan-line" />
                       </div>
 
                       {inAppBrowser && (
-                        <div className="bg-yellow/20 p-3 rounded-2xl border border-yellow-hover/40 text-xs text-ink space-y-2">
-                          <p>In-app browser detected. Open in Chrome or Safari for best camera quality:</p>
+                        <div className="mt-4 rounded-[10px] border border-ink/20 bg-paper p-4 text-[15px] space-y-2">
+                          <p>You are in an in-app browser. Open this page in Chrome or Safari for a better camera.</p>
                           <button
                             type="button"
                             onClick={() => {
@@ -430,346 +381,336 @@ export function FaceAnalysisClient() {
                               setIsCopied(true);
                               setTimeout(() => setIsCopied(false), 2000);
                             }}
-                            className="bg-yellow text-ink px-3 py-1.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 mx-auto"
+                            className={`inline-flex items-center gap-2 font-semibold underline underline-offset-4 rounded ${focusRing}`}
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            <span>{isCopied ? "Link Copied!" : "Copy Page Link"}</span>
+                            <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                            {isCopied ? "Link copied" : "Copy page link"}
                           </button>
                         </div>
                       )}
 
-                      <div className="rounded-2xl bg-ink-subtle border border-ink/10 p-4 space-y-2 text-sm text-ink-muted">
-                        <p>
-                          We use your camera to take a photo for your skin check. {PRIVACY_STATEMENT}
-                        </p>
-                        <p>The scan is for users aged 18 and over. [CONFIRM AGE POLICY]</p>
-                        <p>{MEDICAL_NOTE}</p>
-                      </div>
-
-                      <div className="space-y-3 pt-2">
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          onClick={handleOpenCamera}
-                          className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm"
-                        >
-                          <Camera className="w-5 h-5" />
-                          <span>Start Camera Scan</span>
+                      <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button variant="primary" size="lg" onClick={handleOpenCamera} className="w-full">
+                          <Camera className="w-5 h-5" aria-hidden="true" />
+                          <span>Start camera</span>
                         </Button>
-
-                        <div className="relative flex py-2 items-center">
-                          <div className="flex-grow border-t border-ink/10"></div>
-                          <span className="flex-shrink mx-4 text-xs font-semibold text-ink-light">OR</span>
-                          <div className="flex-grow border-t border-ink/10"></div>
-                        </div>
-
-                        <label className="w-full flex items-center justify-center gap-2 bg-ink-subtle hover:bg-ink-subtle text-ink font-semibold text-xs py-3.5 px-4 rounded-2xl border border-ink/10 cursor-pointer transition-colors">
-                          <Upload className="w-4 h-4 text-brand" />
-                          <span>Upload Photo / Selfie</span>
-                          <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                        <label
+                          className={`inline-flex items-center justify-center gap-2 min-h-[60px] px-9 rounded-[10px] border-[1.5px] border-ink/20 bg-white text-lg font-semibold text-ink cursor-pointer hover:border-ink focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-[3px] focus-within:outline-brand`}
+                        >
+                          <Upload className="w-5 h-5" aria-hidden="true" />
+                          <span>Upload a photo</span>
+                          <input type="file" accept="image/*" onChange={handleFileUpload} className="sr-only" />
                         </label>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden bg-ink border-4 border-brand shadow-lg flex items-center justify-center">
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          muted
-                          className="w-full h-full object-cover scale-x-[-1]"
+                    </>
+                  )}
+
+                  {flow.step === "CAMERA_RUNNING" && (
+                    <>
+                      <div className="relative aspect-[4/5] sm:aspect-[5/4] rounded-[10px] overflow-hidden bg-ink">
+                        <video ref={videoRef} autoPlay playsInline muted aria-label="Camera preview" className="w-full h-full object-cover scale-x-[-1]" />
+                        <div
+                          aria-hidden="true"
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[46%] aspect-[4/5] rounded-[50%] border-2 border-dashed border-white pointer-events-none"
                         />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-56 h-60 sm:h-72 rounded-[50%] border-2 border-dashed border-white/95 pointer-events-none flex flex-col items-center justify-center gap-1 shadow-2xl">
-                          <span className="text-[10px] text-white/90 font-bold bg-ink/80 px-2.5 py-0.5 rounded-full border border-white/30">
-                            Align Face Vertical
-                          </span>
-                        </div>
-
-                        <div className="absolute bottom-4 left-0 right-0 flex justify-center">
-                          <button
-                            type="button"
-                            onClick={handleShutterClick}
-                            className="bg-brand hover:bg-brand-dark text-white font-bold text-xs px-6 py-3 rounded-full border-2 border-white shadow-xl flex items-center gap-2 transition-transform hover:scale-105 active:scale-95"
-                          >
-                            <Camera className="w-4 h-4 text-white" />
-                            <span>📷 Click Shutter / Take Photo</span>
-                          </button>
-                        </div>
+                        <p className="absolute top-3 left-1/2 -translate-x-1/2 text-[13px] font-medium text-white bg-ink/80 rounded-[10px] px-3 py-1">
+                          Keep your face inside the oval
+                        </p>
                       </div>
+                      <Button variant="primary" size="lg" onClick={handleShutterClick} className="mt-5 w-full">
+                        <Camera className="w-5 h-5" aria-hidden="true" />
+                        <span>Take photo</span>
+                      </Button>
+                    </>
+                  )}
 
-                      <div className="text-xs font-semibold text-ink-light">
-                        Center your face in the oval frame and press the blue shutter button to capture photo.
+                  {flow.step === "ANALYSING" && (
+                    <div role="status" aria-live="polite" className="relative aspect-[4/5] sm:aspect-[5/4] rounded-[10px] overflow-hidden bg-paper-deep flex flex-col items-center justify-center text-center gap-3">
+                      <div aria-hidden="true" className="gv-scan-line" />
+                      <p className="font-display font-semibold text-2xl">Checking your photo</p>
+                      <p className="text-ink-muted">This takes a few seconds.</p>
+                    </div>
+                  )}
+
+                  {flow.step === "CAMERA_DENIED" && (
+                    <div className="rounded-[10px] bg-paper p-6 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="w-6 h-6 text-[#9B1C1C]" aria-hidden="true" />
+                        <p className="font-display font-semibold text-xl">We could not open your camera</p>
+                      </div>
+                      <p className="text-ink-muted">Allow camera access in your browser, or upload a photo instead.</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button variant="primary" size="md" onClick={() => dispatch({ type: "RETAKE" })} className="w-full">
+                          Try again
+                        </Button>
+                        <label className={`inline-flex items-center justify-center gap-2 min-h-[52px] px-7 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold cursor-pointer hover:border-ink focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-[3px] focus-within:outline-brand`}>
+                          <Upload className="w-5 h-5" aria-hidden="true" />
+                          <span>Upload a photo</span>
+                          <input type="file" accept="image/*" onChange={handleFileUpload} className="sr-only" />
+                        </label>
                       </div>
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          </Section>
 
-                <div className="space-y-3 pt-4">
-                  <h3 className="font-display font-bold text-lg text-ink text-center">
-                    Trusted AI Face Scan Technology
-                  </h3>
-                  <p className="text-xs text-ink-light text-center max-w-md mx-auto">
-                    Over 18,000+ Indian men and women analyze their skin parameters using mobile scan tech.
-                  </p>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
-                    <div className="bg-white p-2.5 rounded-2xl border border-ink/10 shadow-sm space-y-2 text-center">
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-ink-subtle">
-                        <Image
-                          src="/images/face-scan/indian_female.png"
-                          alt="Indian woman AI face scan on mobile"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="font-display font-bold text-[11px] text-ink">Female AI Scan</p>
-                      <p className="text-[10px] text-ink-light">Live skin check</p>
-                    </div>
-
-                    <div className="bg-white p-2.5 rounded-2xl border border-ink/10 shadow-sm space-y-2 text-center">
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-ink-subtle">
-                        <Image
-                          src="/images/face-scan/indian_male.png"
-                          alt="Indian man AI face scan on mobile"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="font-display font-bold text-[11px] text-ink">Male AI Scan</p>
-                      <p className="text-[10px] text-ink-light">Texture reading</p>
-                    </div>
-
-                    <div className="bg-white p-2.5 rounded-2xl border border-ink/10 shadow-sm space-y-2 text-center">
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-ink-subtle">
-                        <Image
-                          src="/images/face-scan/skin_grid.png"
-                          alt="AI skin check moisture grid"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="font-display font-bold text-[11px] text-ink">Skin Grid</p>
-                      <p className="text-[10px] text-ink-light">Pixel sampling</p>
-                    </div>
-
-                    <div className="bg-white p-2.5 rounded-2xl border border-ink/10 shadow-sm space-y-2 text-center">
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-ink-subtle">
-                        <Image
-                          src="/images/home-ai/express_delivery.png"
-                          alt="15-minute express delivery in Vijayawada"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="font-display font-bold text-[11px] text-ink">15-Min Delivery</p>
-                      <p className="text-[10px] text-ink-light">Vijayawada hub</p>
-                    </div>
-
-                    <div className="bg-white p-2.5 rounded-2xl border border-ink/10 shadow-sm space-y-2 text-center col-span-2 sm:col-span-1">
-                      <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-ink-subtle">
-                        <Image
-                          src="/images/hero/product.webp"
-                          alt="Skincare routine match"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <p className="font-display font-bold text-[11px] text-ink">Routine Match</p>
-                      <p className="text-[10px] text-ink-light">Our range</p>
-                    </div>
+          <Section tone="deep" pad="tight" labelledBy="how-title">
+            <Eyebrow>How it works</Eyebrow>
+            <SectionTitle id="how-title" className="mt-4 max-w-[20ch]">
+              Four steps, no sign-up.
+            </SectionTitle>
+            <ol className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+              {steps.map((s, i) => (
+                <li key={s.t}>
+                  <div className="relative aspect-[16/10] rounded-[10px] overflow-hidden border border-ink/15 bg-paper">
+                    <Image src={s.img} alt={s.alt} fill sizes="(max-width: 640px) 100vw, 25vw" className="object-cover" />
                   </div>
+                  <p className="mt-4 font-mono text-xs tracking-[0.12em] text-ink-muted">0{i + 1}</p>
+                  <h3 className="font-display font-semibold text-xl">{s.t}</h3>
+                  <p className="mt-1 text-[15px] text-ink-muted">{s.d}</p>
+                </li>
+              ))}
+            </ol>
+          </Section>
+
+          <Section pad="tight" labelledBy="gallery-title">
+            <SectionTitle id="gallery-title">What you will see</SectionTitle>
+            <ul className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {gallery.map((g) => (
+                <li key={g.src}>
+                  <div className="relative aspect-square rounded-[10px] overflow-hidden border border-ink/15 bg-paper-deep">
+                    <Image src={g.src} alt={g.alt} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover" />
+                  </div>
+                  <p className="mt-2 text-[15px] font-medium">{g.cap}</p>
+                  <p className="text-[13px] text-ink-light">Illustration</p>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        </>
+      )}
+
+      {flow.step === "FACE_NOT_DETECTED" && (
+        <Section pad="md" labelledBy="nf-title">
+          <div className="max-w-[560px] mx-auto bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8">
+            <AlertCircle className="w-8 h-8 text-[#9B1C1C]" aria-hidden="true" />
+            <h1 id="nf-title" ref={headingRef} tabIndex={-1} className="mt-3 font-display font-semibold text-3xl outline-none">
+              We could not find a face
+            </h1>
+            <p role="alert" className="mt-2 text-ink-muted">
+              {flow.errorMessage || "We could not detect a face in the photo. No score was made."}
+            </p>
+            <ul className="mt-5 border-t border-ink/20">
+              {["Centre your face in the frame", "Face a window for daylight", "Take the photo when your face is clear"].map((t) => (
+                <li key={t} className="flex items-center gap-3 py-3 border-b border-ink/20">
+                  <Check className="w-5 h-5 text-brand shrink-0" aria-hidden="true" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+            <Button variant="primary" size="lg" onClick={() => dispatch({ type: "RETAKE" })} className="mt-6 w-full">
+              Try again
+            </Button>
+          </div>
+        </Section>
+      )}
+
+      {flow.step === "FORM_ENTRY" && (
+        <Section pad="md" labelledBy="form-title">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8 items-start">
+            <div className="lg:col-span-5">
+              <Eyebrow>Step 2 of 3</Eyebrow>
+              <h1 id="form-title" ref={headingRef} tabIndex={-1} className="mt-4 font-display font-semibold text-[clamp(2rem,1.4rem+3vw,3.5rem)] leading-[1.02] tracking-[-0.025em] outline-none">
+                Face found. Two details to get your report.
+              </h1>
+              {flow.capturedImage && (
+                <div className="mt-6 relative aspect-[4/3] max-w-[360px] rounded-[10px] overflow-hidden border border-ink/15 bg-paper-deep">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={flow.capturedImage} alt="Your photo" className="w-full h-full object-cover" />
                 </div>
-              </div>
-            )}
+              )}
+              <p className="mt-5 text-[15px] leading-relaxed text-ink-muted max-w-[46ch]">{PRIVACY_STATEMENT}</p>
+              <p className="mt-2 text-[14px] text-ink-light max-w-[46ch]">{MEDICAL_NOTE}</p>
+            </div>
 
-          {flow.step === "FACE_NOT_DETECTED" && (
-            <div className="max-w-md mx-auto bg-white p-6 sm:p-8 rounded-3xl border border-coral/20 shadow-md space-y-6 text-center">
-              <div className="w-14 h-14 bg-blush border border-coral/20 rounded-full flex items-center justify-center mx-auto text-coral">
-                <AlertCircle className="w-7 h-7" />
-              </div>
-
-              <div className="space-y-2">
-                <Badge variant="brand" className="bg-blush text-ink border-coral/20 font-bold px-3 py-0.5">
-                  Face Not Found Error
-                </Badge>
-                <h2 ref={headingRef} tabIndex={-1} className="font-display font-bold text-2xl text-ink">
-                  Face Not Detected
-                </h2>
-                <p className="text-xs text-ink-muted leading-relaxed">
-                  {flow.errorMessage || "We could not detect a human face in the image frame. No score will be generated."}
-                </p>
-              </div>
-
-              <div className="bg-ink-subtle p-4 rounded-2xl border border-ink/10 text-left space-y-2 text-xs">
-                <p className="font-display font-bold text-ink">To fix this error:</p>
-                <ul className="list-disc pl-4 text-ink-muted space-y-1">
-                  <li>Ensure your face is centered inside the camera frame</li>
-                  <li>Stand facing natural window light</li>
-                  <li>Click the blue shutter button when your face is clearly visible</li>
-                </ul>
+            <form onSubmit={handleFormSubmit} noValidate className="lg:col-span-7 bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8 space-y-5">
+              <div>
+                <label htmlFor="fa-name" className="block text-sm font-semibold">Full name</label>
+                <input id="fa-name" type="text" autoComplete="name" required placeholder="Ananya Roy" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} aria-invalid={!!errors.name} aria-describedby={errors.name ? "fa-name-err" : undefined} className={`${input} mt-2`} />
+                {errors.name && <p id="fa-name-err" role="alert" className="mt-1 text-sm text-[#9B1C1C]">{errors.name}</p>}
               </div>
 
               <div>
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => dispatch({ type: "RETAKE" })}
-                  className="w-full bg-brand hover:bg-brand-dark text-white font-bold text-xs py-3.5 rounded-xl"
-                >
-                  Try Scan Again
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {flow.step === "FORM_ENTRY" && (
-            <div className="max-w-xl mx-auto space-y-6">
-              <div className="text-center space-y-2">
-                <Badge variant="brand" size="md" className="bg-brand/10 text-brand border-brand/20 px-3 py-1 font-bold">
-                  Step 2 of 3: User Details
-                </Badge>
-                <h2 className="font-display font-bold text-2xl sm:text-3xl text-ink">
-                  Enter Details to Get Your Report
-                </h2>
-                <p className="text-xs text-ink-muted max-w-md mx-auto">
-                  Face detected! Select your demographic category to calculate your target skin score and routine.
-                </p>
+                <label htmlFor="fa-phone" className="block text-sm font-semibold">Mobile number</label>
+                <div className="mt-2 flex gap-2">
+                  <span className="inline-flex items-center px-4 rounded-[10px] border-[1.5px] border-ink/30 bg-paper text-ink-muted font-semibold">+91</span>
+                  <input id="fa-phone" type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} required placeholder="9876543210" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })} aria-invalid={!!errors.phone} aria-describedby={errors.phone ? "fa-phone-err" : undefined} className={input} />
+                </div>
+                {errors.phone && <p id="fa-phone-err" role="alert" className="mt-1 text-sm text-[#9B1C1C]">{errors.phone}</p>}
               </div>
 
-              <div className="bg-skymist border border-brand/20 rounded-2xl px-4 py-3 flex items-start gap-2.5 max-w-xl mx-auto">
-                <ShieldCheck className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                <p className="text-[11px] text-ink-muted font-medium leading-relaxed">
-                  Your skin score is calculated based on your demographic category, skin concern, and climate data. Your captured photo is used only for identity verification and is processed in-browser.
-                </p>
+              <div>
+                <label htmlFor="fa-email" className="block text-sm font-semibold">Email <span className="font-normal text-ink-muted">(optional)</span></label>
+                <input id="fa-email" type="email" autoComplete="email" placeholder="ananya@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={`${input} mt-2`} />
               </div>
 
-              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 shadow-md space-y-6">
-                <form onSubmit={handleFormSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-brand" /> Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Ananya Roy"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink placeholder-ink-light focus:border-brand focus:bg-white focus:outline-none transition-colors"
-                    />
-                    {errors.name && <p className="text-[11px] font-bold text-coral">{errors.name}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-brand" /> Mobile Number (+91) *
-                    </label>
-                    <div className="flex gap-2">
-                      <span className="px-3.5 py-3 rounded-xl bg-ink-subtle text-ink-muted font-bold text-xs border border-ink/10 flex items-center justify-center">
-                        +91
-                      </span>
-                      <input
-                        type="tel"
-                        required
-                        inputMode="tel"
-                        maxLength={10}
-                        placeholder="9876543210"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink placeholder-ink-light focus:border-brand focus:bg-white focus:outline-none transition-colors"
-                      />
-                    </div>
-                    {errors.phone && <p className="text-[11px] font-bold text-coral">{errors.phone}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-brand" /> Email Address (Optional)
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="ananya@example.com"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink placeholder-ink-light focus:border-brand focus:bg-white focus:outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink flex items-center gap-1.5">
-                      <HelpCircle className="w-3.5 h-3.5 text-brand" /> Demographic Category *
-                    </label>
-                    <select aria-label="Demographic category"
-                      value={form.demographic}
-                      onChange={(e) => setForm({ ...form, demographic: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink font-semibold focus:border-brand focus:bg-white focus:outline-none transition-colors"
-                    >
-                      {Object.entries(DEMOGRAPHIC_BASE_SCORES).map(([key, val]) => (
-                        <option key={key} value={key}>
-                          {val.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink">Primary Skin Concern</label>
-                    <select aria-label="Primary skin concern"
-                      value={form.skinConcern}
-                      onChange={(e) => setForm({ ...form, skinConcern: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-ink-subtle border border-ink/10 text-xs text-ink font-semibold focus:border-brand focus:bg-white focus:outline-none transition-colors"
-                    >
-                      <option value="hydration">Dehydration & Dryness</option>
-                      <option value="acne">Active Acne & Excess Oil</option>
-                      <option value="pigmentation">Dark Spots & Sun Pigmentation</option>
-                      <option value="aging">Fine Lines & Barrier Loss</option>
-                      <option value="sensitive">Redness & Sensitive Skin</option>
-                    </select>
-                  </div>
-
-                  <div className="pt-3">
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      size="lg"
-                      disabled={flow.isSubmittingForm}
-                      className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3.5 rounded-xl shadow-md text-xs flex items-center justify-center gap-2"
-                    >
-                      <span>Get My Skin Report & Recommendations</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {flow.step === "RESULT" && flow.report && (
-            <div className="max-w-3xl mx-auto space-y-8">
-              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 shadow-md space-y-6">
-                <div className="flex items-center justify-between border-b border-ink/10 pb-4">
-                  <div>
-                    <span className="text-[11px] font-bold text-brand uppercase tracking-wider block">
-                      Skin Check Summary
-                    </span>
-                    <h2 ref={headingRef} tabIndex={-1} className="font-display font-bold text-2xl text-ink">
-                      Skin Check Report
-                    </h2>
-                  </div>
-                  <button
-                    onClick={() => dispatch({ type: "RETAKE" })}
-                    className="flex items-center gap-1.5 text-xs font-bold text-ink-muted bg-ink-subtle px-3 py-2 rounded-xl border border-ink/10 hover:bg-ink-subtle transition-colors"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-brand" />
-                    <span>New Scan</span>
-                  </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label htmlFor="fa-demo" className="block text-sm font-semibold">Who is this scan for?</label>
+                  <select id="fa-demo" value={form.demographic} onChange={(e) => setForm({ ...form, demographic: e.target.value })} className={`${input} mt-2`}>
+                    {Object.entries(DEMOGRAPHIC_BASE_SCORES).map(([key, val]) => (
+                      <option key={key} value={key}>{val.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="fa-concern" className="block text-sm font-semibold">Main skin concern</label>
+                  <select id="fa-concern" value={form.skinConcern} onChange={(e) => setForm({ ...form, skinConcern: e.target.value })} className={`${input} mt-2`}>
+                    <option value="hydration">Dryness and dehydration</option>
+                    <option value="acne">Breakouts and oil</option>
+                    <option value="pigmentation">Dark spots</option>
+                    <option value="aging">Fine lines</option>
+                    <option value="sensitive">Redness and sensitivity</option>
+                  </select>
                 </div>
               </div>
+
+              <Button type="submit" variant="primary" size="lg" disabled={flow.isSubmittingForm} className="w-full">
+                <span>{flow.isSubmittingForm ? "Making your report..." : "Get my report"}</span>
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
+              </Button>
+            </form>
+          </div>
+        </Section>
+      )}
+
+      {flow.step === "RESULT" && flow.report && (
+        <>
+          <Section pad="md" labelledBy="result-title">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <Eyebrow>Step 3 of 3 · Your report</Eyebrow>
+                <h1 id="result-title" ref={headingRef} tabIndex={-1} className="mt-4 font-display font-semibold text-[clamp(2rem,1.4rem+3vw,3.5rem)] leading-[1.02] tracking-[-0.025em] outline-none">
+                  Here is your skin check.
+                </h1>
+              </div>
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "RETAKE" })}
+                className={`inline-flex items-center gap-2 min-h-[48px] px-5 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold hover:border-ink ${focusRing}`}
+              >
+                <RotateCcw className="w-4 h-4" aria-hidden="true" />
+                New scan
+              </button>
             </div>
-          )}
-        </Container>
-      </main>
+
+            <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10 items-start">
+              <div className="lg:col-span-5">
+                <p aria-hidden="true" className="font-display font-semibold leading-[0.8] tracking-[-0.06em] text-brand text-[clamp(7rem,4rem+10vw,12rem)] [font-feature-settings:'tnum']">
+                  {flow.report.overall}
+                </p>
+                <p className="mt-3 font-mono text-sm uppercase tracking-[0.12em] text-ink-muted">
+                  <span className="sr-only">Overall score: {flow.report.overall} </span>out of 100, overall
+                </p>
+                <p className="mt-6 text-lg leading-snug max-w-[40ch]">{flow.report.summary}</p>
+              </div>
+
+              <div className="lg:col-span-7">
+                <ul className="border-t border-ink/20">
+                  {scoreLabels.map(({ key, label }) => {
+                    const v = flow.report!.subScores[key];
+                    return (
+                      <li key={key} className="py-4 border-b border-ink/20">
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-display font-semibold text-xl">{label}</span>
+                          <span className="font-mono text-lg [font-feature-settings:'tnum']">{v}</span>
+                        </div>
+                        <div className="mt-2 h-2 rounded-[3px] bg-ink/10 overflow-hidden" role="progressbar" aria-label={label} aria-valuenow={v} aria-valuemin={0} aria-valuemax={100}>
+                          <div className="h-full bg-brand" style={{ width: `${v}%` }} />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {flow.report.concerns.length > 0 && (
+                  <div className="mt-6">
+                    <h2 className="font-display font-semibold text-xl">What to focus on</h2>
+                    <ul className="mt-2 space-y-1.5 text-ink-muted">
+                      {flow.report.concerns.map((c) => (
+                        <li key={c} className="pl-5 relative before:content-[''] before:absolute before:left-0 before:top-[0.7em] before:w-2 before:h-px before:bg-ink">{c}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <p className="mt-6 text-[14px] text-ink-light max-w-[56ch]">{MEDICAL_NOTE}</p>
+              </div>
+            </div>
+          </Section>
+
+          <Section tone="deep" pad="md" labelledBy="routine-title">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <div>
+                <Eyebrow>Matched to your report</Eyebrow>
+                <SectionTitle id="routine-title" className="mt-4">Your routine.</SectionTitle>
+              </div>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => {
+                  routine.forEach(addProduct);
+                  setAddedAll(true);
+                  setTimeout(() => setAddedAll(false), 2500);
+                }}
+              >
+                {addedAll ? <Check className="w-5 h-5" aria-hidden="true" /> : <ShoppingBag className="w-5 h-5" aria-hidden="true" />}
+                <span aria-live="polite">{addedAll ? "Routine added to bag" : "Add full routine"}</span>
+              </Button>
+            </div>
+
+            <ul className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              {routine.map((p) => (
+                <li key={p.id} className="bg-white border border-ink/15 rounded-[10px] p-3 flex flex-col">
+                  <Link href={`/product/${p.slug}`} className={`block rounded ${focusRing}`}>
+                    <div className="relative aspect-[4/5] rounded-[8px] overflow-hidden bg-paper">
+                      <Image src={getAssetPath(p.image)} alt={p.altText} fill sizes="(max-width: 1024px) 50vw, 25vw" className="object-cover" />
+                    </div>
+                    <h3 className="mt-3 font-display font-semibold text-base leading-snug">{p.name}</h3>
+                  </Link>
+                  <p className="mt-1 font-semibold">
+                    {formatPrice(p.price)}
+                    {p.originalPrice && p.originalPrice > p.price && <span className="ml-2 text-sm font-normal text-ink-light line-through">{formatPrice(p.originalPrice)}</span>}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => addProduct(p)}
+                    className={`mt-3 min-h-[44px] rounded-[10px] bg-brand text-white font-semibold text-sm hover:bg-brand-dark ${focusRing}`}
+                  >
+                    Add to bag
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-10 border-t border-ink/20 pt-6 flex flex-col sm:flex-row sm:items-center gap-4">
+              <a
+                href={`https://wa.me/918977855998?text=${encodeURIComponent(`Hello GLOW VAI, I did the face scan (score ${flow.report.overall}/100). Please help me order my routine.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-2 font-semibold underline underline-offset-[5px] rounded ${focusRing}`}
+              >
+                <MessageCircle className="w-5 h-5" aria-hidden="true" />
+                Order on WhatsApp
+              </a>
+              <Link href="/shop" className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+                Browse the full shop
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </Section>
+        </>
+      )}
     </div>
   );
 }
