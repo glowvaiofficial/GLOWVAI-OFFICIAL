@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Section, SectionTitle, focusRing } from "./shared";
 import { filterProducts } from "@/lib/catalog";
 import { concernCards } from "@/config/home-content";
+import { concernPages } from "@/config/concerns";
 
 // Layout: a big-type index (no cards, no icons). Counts come from the real catalogue.
 export function ShopByConcernSection() {
@@ -33,7 +34,7 @@ export function ShopByConcernSection() {
                   <div className="min-w-0">
                     <h3 className="font-display font-semibold text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] leading-[1.05] tracking-[-0.02em] text-ink group-hover:text-brand transition-colors">
                       <Link
-                        href={`/shop?concern=${c.slug}`}
+                        href={concernPages.find((p) => p.key === c.slug) ? `/concerns/${concernPages.find((p) => p.key === c.slug)!.slug}` : `/shop?concern=${c.slug}`}
                         data-track="concern_card_click"
                         data-track-concern_slug={c.slug}
                         className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-[3px] focus-visible:after:outline-offset-[-3px] focus-visible:after:outline-brand"

@@ -46,6 +46,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/press/brand-kit`, lastModified: sourceDate("app/press/brand-kit/page.tsx"), changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/accessibility`, lastModified: sourceDate("app/accessibility/page.tsx"), changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE_URL}/site-map`, lastModified: sourceDate("app/site-map/page.tsx"), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${SITE_URL}/concerns/breakouts-and-pores`, lastModified: sourceDate("config/concerns.ts"), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/concerns/dullness-and-glow`, lastModified: sourceDate("config/concerns.ts"), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/concerns/dehydration`, lastModified: sourceDate("config/concerns.ts"), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/concerns/dark-spots`, lastModified: sourceDate("config/concerns.ts"), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/concerns/sun-protection`, lastModified: sourceDate("config/concerns.ts"), changeFrequency: "weekly", priority: 0.8 },
     ...(journalArticles.filter((a) => a.status === "published").length >= 3
       ? [{ url: `${SITE_URL}/journal`, lastModified: sourceDate("app/journal/page.tsx"), changeFrequency: "weekly" as const, priority: 0.8 }]
       : []),

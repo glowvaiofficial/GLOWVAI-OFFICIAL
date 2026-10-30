@@ -35,20 +35,21 @@ export const navLinks: NavItem[] = [
 export const footerLinks = {
   shop: [
     { title: "All products", href: "/shop" },
-    { title: "Breakouts and pores", href: "/shop?concern=acne" },
-    { title: "Dullness and glow", href: "/shop?concern=dullness" },
-    { title: "Dehydration", href: "/shop?concern=dryness" },
-    { title: "Dark spots", href: "/shop?concern=pigmentation" },
-    { title: "Sun protection", href: "/shop?concern=sun-care" },
+    { title: "Breakouts and pores", href: "/concerns/breakouts-and-pores" },
+    { title: "Dullness and glow", href: "/concerns/dullness-and-glow" },
+    { title: "Dehydration", href: "/concerns/dehydration" },
+    { title: "Dark spots", href: "/concerns/dark-spots" },
+    { title: "Sun protection", href: "/concerns/sun-protection" },
+    { title: "Free face scan", href: "/face-analysis" },
   ],
   company: [
     { title: "Our story", href: "/our-story" },
     { title: "Journal", href: "/journal" },
-    { title: "Face scan", href: "/face-analysis" },
     { title: "Referral program", href: "/referral" },
     { title: "Careers", href: "/careers" },
     { title: "Press", href: "/press" },
     { title: "Brand kit", href: "/press/brand-kit" },
+    { title: "Accessibility", href: "/accessibility" },
   ],
   help: [
     { title: "Help center", href: "/help" },
@@ -58,8 +59,6 @@ export const footerLinks = {
     { title: "Face scan help", href: "/help/face-scan" },
     { title: "Delivery", href: "/delivery" },
     { title: "Returns and refunds", href: "/returns" },
-    { title: "FAQ", href: "/faq" },
-    { title: "Contact us", href: "/contact" },
   ],
   partners: [
     { title: "Partner with us", href: "/partners" },
@@ -67,12 +66,13 @@ export const footerLinks = {
     { title: "Brands and suppliers", href: "/partners/brands" },
     { title: "Become a rider", href: "/partners/rider" },
     { title: "Auto and campus partners", href: "/referral" },
+    { title: "FAQ", href: "/faq" },
+    { title: "Contact us", href: "/contact" },
   ],
   legal: [
     { title: "Privacy policy", href: "/privacy" },
     { title: "Terms", href: "/terms" },
     { title: "Grievance redressal", href: "/grievance" },
-    { title: "Accessibility", href: "/accessibility" },
     { title: "Site map", href: "/site-map" },
   ],
 };
