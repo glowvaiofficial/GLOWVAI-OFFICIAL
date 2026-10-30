@@ -170,7 +170,7 @@ export function FeaturedProducts() {
             <span>Add full routine</span>
           </Button>
         </div>
-        <p className="mt-4 text-sm text-ink-light max-w-[62ch]">{brandSourcePlaceholder}</p>
+        {brandSourcePlaceholder && <p className="mt-4 text-sm text-ink-light max-w-[62ch]">{brandSourcePlaceholder}</p>}
         <Link
           href="/shop"
           className={`md:hidden mt-4 inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] rounded ${focusRing}`}

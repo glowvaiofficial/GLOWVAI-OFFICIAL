@@ -59,8 +59,8 @@ export const brandValuesClaims = {
     verified: true,
   },
   madeForIndianSkin: {
-    title: "Authorized Stock",
-    text: "[CONFIRM BRAND SOURCE]",
+    title: "Clear Labels",
+    text: "Every product page lists ingredients, size and price.",
     verified: true,
   },
 };

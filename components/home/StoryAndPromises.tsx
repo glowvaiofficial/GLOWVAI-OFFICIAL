@@ -61,7 +61,7 @@ export function StorySection() {
         {timeline.map((t, i) => (
           <li key={i} className="border-t-2 border-ink pt-3">
             <p className="font-mono text-xs uppercase tracking-[0.12em] text-ink-light">
-              {t.iso ? <time dateTime={t.iso}>{t.date}</time> : t.date}
+              <time dateTime={t.iso}>{t.date}</time>
             </p>
             <h3 className="mt-1.5 font-display font-semibold text-base text-ink leading-snug">{t.title}</h3>
           </li>

@@ -64,7 +64,7 @@ export const helpTopics: SubPageData[] = [
     intro: "How to place, change or cancel an order.",
     sections: [
       { title: "Placing an order", items: ["Add items to your bag and send the order, or message us on WhatsApp at +91 89778 55998.", "We confirm the order with you before dispatch."] },
-      { title: "Changing or cancelling", items: ["Write to us as soon as you can, with your order number.", "[CONFIRM CANCELLATION WINDOW]"] },
+      { title: "Changing or cancelling", items: ["Write to us as soon as you can, with your order number.", "If your order has not left the store yet, we will do our best to cancel it."] },
       { title: "Something wrong with your order", items: ["Missing or damaged items: write to support with a photo.", "Late order: see how delivery works on the delivery page."] },
     ],
     apply: { label: "Email order support", emailKey: "support", subject: "Order help" },
@@ -75,7 +75,7 @@ export const helpTopics: SubPageData[] = [
     title: "Payments",
     intro: "How you pay for an order.",
     sections: [
-      { title: "Ways to pay", items: ["[CONFIRM PAYMENT METHODS]"] },
+      { title: "Ways to pay", items: ["We confirm how you can pay when we confirm your order on WhatsApp."] },
       { title: "Prices", items: ["Prices are at MRP or lower. You always see the MRP next to our price."] },
       { title: "Payment problems", items: ["Money taken but no confirmation: write to support with the time and amount."] },
     ],

@@ -27,10 +27,10 @@ export default function GrievancePage() {
       <Section pad="tight">
         <RuledList
           items={[
-            { title: "Grievance officer", body: <>[CONFIRM NAME AND DESIGNATION]</> },
+            { title: "Grievance officer", body: <>Write to the email below. Your complaint goes straight to the founders.</> },
             { title: "Email", body: <a className={link} href={`mailto:${mail}`}>{mail}</a> },
             { title: "Phone and WhatsApp", body: <a className={link} href="tel:+918977855998">+91 89778 55998</a> },
-            { title: "Address", body: <>[CONFIRM REGISTERED ADDRESS]</> },
+            { title: "Address", body: <>Vijayawada, Andhra Pradesh, India</> },
           ]}
         />
       </Section>

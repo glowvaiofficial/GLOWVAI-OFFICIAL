@@ -342,7 +342,7 @@ export function FaceAnalysisClient() {
 
                 <div className="mt-6 space-y-2 text-[14px] leading-relaxed text-ink-muted max-w-[56ch]">
                   <p>We use your camera to take a photo for your skin check. {PRIVACY_STATEMENT}</p>
-                  <p>The scan is for users aged 18 and over. [CONFIRM AGE POLICY]</p>
+                  <p>The scan is for users aged 18 and over.</p>
                   <p>{MEDICAL_NOTE}</p>
                 </div>
               </div>

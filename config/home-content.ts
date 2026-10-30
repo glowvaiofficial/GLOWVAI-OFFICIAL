@@ -84,11 +84,11 @@ export const routineProducts = [
 ] as const;
 
 export const brandSourcePlaceholder =
-  "[CONFIRM BRAND SOURCE: for example ‘Sourced from authorised partners.’]";
+  "";
 
 export const deliverySteps = [
   { title: "Order", body: "Pick a routine or take the scan.", icon: "bag" },
-  { title: "Packed", body: "A partner store near you packs it. [CONFIRM: store type]", icon: "box" },
+  { title: "Packed", body: "A partner store near you packs it.", icon: "box" },
   { title: "Rider on the way", body: "Your rider heads to your address.", icon: "bike" },
   { title: "At your door", body: "About 15 minutes in covered areas.", icon: "home" },
 ] as const;
@@ -110,8 +110,8 @@ export const founders = [
 export const timeline = [
   { date: "Feb 2025", iso: "2025-02", title: "The first conversation" },
   { date: "Mar 2025", iso: "2025-03", title: "Listening to the beauty industry" },
-  { date: "[DATE]", iso: "", title: "[REAL MILESTONE: for example first test scans]" },
-  { date: "[DATE]", iso: "", title: "[REAL MILESTONE: for example Vijayawada launch]" },
+  { date: "Jan 2026", iso: "2026-01", title: "GLOW VAI V1 goes live" },
+  { date: "Sep 2026", iso: "2026-09", title: "Satvik joins as Co-Founder and Technical Lead" },
 ] as const;
 
 export const promises = [
@@ -120,16 +120,16 @@ export const promises = [
   { n: "03", title: "Fair prices", body: "Prices are at MRP or lower. You always see the MRP next to our price." },
   {
     n: "04",
-    title: "Genuine stock",
-    body: "[CONFIRM EXACT SOURCING: for example ‘Products come from authorised partners and arrive sealed.’]",
+    title: "Clear labels",
+    body: "Every product page lists the ingredients, size and price, so you know what you are buying.",
   },
 ] as const;
 
 export const referralStrip = {
   eyebrow: "Referral program",
-  title: "Invite a friend. You both earn wallet credit.",
+  title: "Share GLOW VAI. Get paid.",
   terms:
-    "[CONFIRM TERMS: for example ‘When a friend completes their first scan and order, you each get INR 100 in wallet credit.’]",
+    "Auto drivers and campus ambassadors earn ₹10 per verified referral, plus a ₹1,000 bonus at 100 verified referrals in a month.",
   button: "Join the referral program",
 } as const;
 

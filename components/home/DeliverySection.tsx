@@ -205,10 +205,13 @@ export function DeliverySection() {
             <div id="pincode-result" aria-live="polite" className="mt-3 min-h-6 text-[15px]">
               {status === "available" && <p className="font-semibold text-[#0B5C3B]">Delivery is available in your area.</p>}
               {status === "invalid" && <p className="text-[#9B1C1C]">Enter a 6-digit pincode.</p>}
-              {status === "pending-list" && <p className="text-ink-muted">[REAL PINCODE LIST NEEDED]</p>}
-              {status === "unavailable" && (
+              {(status === "unavailable" || status === "pending-list") && (
                 <div className="space-y-3">
-                  <p className="text-ink-muted">Not available here yet. Leave your number and we will tell you when we arrive.</p>
+                  <p className="text-ink-muted">
+                    {status === "pending-list"
+                      ? `We are still adding delivery areas. Leave your number and we will tell you if we deliver to ${pincode}.`
+                      : "Not available here yet. Leave your number and we will tell you when we arrive."}
+                  </p>
                   {waitlistDone ? (
                     <p className="font-semibold text-ink">Thanks. We will be in touch.</p>
                   ) : (
