@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CartDrawer } from "@/components/cart/CartDrawer";
-import { ShopUnlockGate } from "@/components/shop/ShopUnlockGate";
 import { Section, Eyebrow, focusRing } from "@/components/home/shared";
 import { filterProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
@@ -95,8 +94,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
     <div className="bg-paper text-ink">
       <CartDrawer />
 
-      <ShopUnlockGate>
-        <Section pad="tight" labelledBy="shop-title">
+              <Section pad="tight" labelledBy="shop-title">
           <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
             <ol className="flex items-center gap-2">
               <li>
@@ -245,8 +243,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
             </Link>
           </div>
         </Section>
-      </ShopUnlockGate>
-    </div>
+          </div>
   );
 }
 
