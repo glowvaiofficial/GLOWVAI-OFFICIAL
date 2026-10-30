@@ -63,7 +63,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
     return (
       <div className="relative">
         {/* VIP Early Access Unlocked Banner */}
-        <div className="bg-mint text-ink py-2.5 px-4 text-center text-xs font-bold flex items-center justify-center gap-2 border-b border-mint">
+        <div className="bg-paper-deep text-ink py-3 px-4 text-center text-sm font-medium flex items-center justify-center gap-2 border-b border-ink/15">
           <ScanLine className="w-4 h-4 text-ink shrink-0" />
           <span>VIP Early Access Open! Use code <strong>GLOW15</strong> at checkout for 15% off.</span>
         </div>
@@ -75,20 +75,16 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
   return (
     <div className="relative min-h-[85vh] overflow-hidden">
       {/* Semi-Transparent Blurred Background Content */}
-      <div className="filter blur-md pointer-events-none select-none opacity-40 transition-all duration-500">
+      <div className="pointer-events-none select-none opacity-30" aria-hidden="true">
         {children}
       </div>
 
       {/* Glassmorphism Lock Overlay */}
-      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 bg-ink/75 animate-in fade-in duration-300">
-        <div className="max-w-md w-full bg-white/95 text-ink p-8 sm:p-10 rounded-[32px] shadow-2xl border border-white/40 text-center space-y-6 relative overflow-hidden">
+      <div className="absolute inset-0 z-30 flex items-center justify-center p-4 sm:p-6 bg-paper/85">
+        <div className="max-w-md w-full bg-white text-ink p-8 sm:p-10 rounded-[24px] border border-ink/15 text-center space-y-6">
           
-          {/* Decorative Glow */}
-          <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-brand/10 pointer-events-none" />
-          <div className="absolute -bottom-12 -left-12 w-36 h-36 rounded-full bg-yellow/20 pointer-events-none" />
-
           {/* Lock Badge */}
-          <div className="w-14 h-14 rounded-2xl bg-skymist flex items-center justify-center text-brand mx-auto shadow-xs border border-brand/20">
+          <div className="w-14 h-14 rounded-[10px] bg-paper flex items-center justify-center text-brand mx-auto border border-ink/15">
             <Lock className="w-7 h-7 text-brand" />
           </div>
 
@@ -112,7 +108,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
                 placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-2xl border-2 border-ink/15 text-xs font-semibold focus:border-brand focus:outline-none pr-10"
+                className="w-full min-h-[52px] px-4 pr-10 rounded-[10px] border-[1.5px] border-ink/30 text-[15px] font-medium focus:border-brand focus:outline-none focus:ring-[3px] focus:ring-brand/20"
               />
               <Mail className="w-4 h-4 text-ink-muted absolute right-4 top-4" />
             </div>
@@ -129,7 +125,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
             </label>
 
             {errorMsg && (
-              <div className="bg-blush text-ink p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border border-coral/30">
+              <div role="alert" className="bg-paper text-ink p-3 rounded-[10px] text-sm font-medium flex items-center gap-2 border border-ink/20">
                 <AlertCircle className="w-4 h-4 text-coral shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -147,7 +143,7 @@ export function ShopUnlockGate({ children }: ShopUnlockGateProps) {
             </Button>
           </form>
 
-          <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-ink-muted border-t border-ink/10">
+          <div className="pt-4 flex items-center justify-center gap-2 text-[13px] text-ink-muted border-t border-ink/15">
             <ShieldCheck className="w-4 h-4 text-brand shrink-0" />
             <span>Instant Access • Zero Spam • Complete Privacy</span>
           </div>

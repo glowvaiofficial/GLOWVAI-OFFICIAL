@@ -1,24 +1,46 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Accent } from "@/components/ui/Accent";
-import { Button } from "@/components/ui/Button";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ShopUnlockGate } from "@/components/shop/ShopUnlockGate";
+import { Section, Eyebrow, focusRing } from "@/components/home/shared";
 import { filterProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { Product } from "@/config/products";
 import { useCartStore } from "@/lib/store/cart";
-import { Camera, ScanLine, Filter, X, Check, ShoppingBag } from "lucide-react";
+import { Check, ShoppingBag, ScanLine } from "lucide-react";
+
+interface ShopCatalogViewProps {
+  allProducts: Product[];
+}
+
+const concerns = [
+  { key: "dryness", label: "Dehydration" },
+  { key: "dullness", label: "Dullness" },
+  { key: "acne", label: "Breakouts" },
+  { key: "pigmentation", label: "Dark spots" },
+  { key: "sun-care", label: "Sun protection" },
+];
+
+const skinTypes = ["Oily", "Dry", "Combination", "Sensitive", "Normal"];
+
+const sorts = [
+  { label: "Featured", value: "featured" },
+  { label: "Price: low to high", value: "price-asc" },
+  { label: "Price: high to low", value: "price-desc" },
+];
+
+const chip = (active: boolean) =>
+  `inline-flex items-center min-h-[44px] px-4 rounded-[10px] border text-[15px] font-medium whitespace-nowrap ${focusRing} ${
+    active ? "bg-brand border-brand text-white" : "bg-white border-ink/20 text-ink hover:border-ink"
+  }`;
 
 function QuickAdd({ prod }: { prod: Product }) {
   const addItem = useCartStore((s) => s.addItem);
-  const [done, setDone] = React.useState(false);
+  const [done, setDone] = useState(false);
   return (
     <button
       type="button"
@@ -37,16 +59,12 @@ function QuickAdd({ prod }: { prod: Product }) {
         setTimeout(() => setDone(false), 1800);
       }}
       aria-label={`Add ${prod.name} to bag`}
-      className="inline-flex items-center gap-1.5 min-h-[40px] px-3 rounded-[10px] bg-brand text-white text-xs font-semibold hover:bg-brand-dark focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+      className={`w-full inline-flex items-center justify-center gap-2 min-h-[44px] rounded-[10px] bg-brand text-white font-semibold text-sm hover:bg-brand-dark ${focusRing}`}
     >
       {done ? <Check className="w-4 h-4" aria-hidden="true" /> : <ShoppingBag className="w-4 h-4" aria-hidden="true" />}
-      <span aria-live="polite">{done ? "Added" : "Add"}</span>
+      <span aria-live="polite">{done ? "Added" : "Add to bag"}</span>
     </button>
   );
-}
-
-interface ShopCatalogViewProps {
-  allProducts: Product[];
 }
 
 function CatalogContent({ allProducts }: { allProducts: Product[] }) {
@@ -59,13 +77,8 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
   const sort = (searchParams.get("sort") as "featured" | "price-asc" | "price-desc") || undefined;
   const q = searchParams.get("q") || undefined;
 
-  const products = filterProducts({
-    concern,
-    skinType: skin,
-    category,
-    sort,
-    query: q,
-  });
+  const products = filterProducts({ concern, skinType: skin, category, sort, query: q });
+  const anyFilter = Boolean(concern || skin || category || q);
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -74,245 +87,164 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
     } else {
       params.delete(key);
     }
-    router.push(`/shop?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `/shop?${qs}` : "/shop", { scroll: false });
   };
 
   return (
-    <div className="bg-white py-12 sm:py-20 text-ink min-h-screen">
+    <div className="bg-paper text-ink">
       <CartDrawer />
 
       <ShopUnlockGate>
-        <Container>
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-6 text-xs text-ink-muted">
+        <Section pad="tight" labelledBy="shop-title">
+          <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
             <ol className="flex items-center gap-2">
               <li>
-                <Link href="/" className="hover:text-brand transition-colors">
+                <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>
                   Home
                 </Link>
               </li>
-              <li>/</li>
-              <li className="font-semibold text-ink">Shop</li>
+              <li aria-hidden="true">/</li>
+              <li className="text-ink font-medium">Shop</li>
             </ol>
           </nav>
 
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 pb-8 border-b border-ink/10">
-            <div className="space-y-2">
-              <Badge variant="brand" size="md">
-                Formulated for Indian Weather
-              </Badge>
-              <h1 className="font-display font-semibold text-h1-page text-ink leading-tight">
-                Shop <Accent>routines</Accent> & formulas
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-8 border-b border-ink/20">
+            <div>
+              <Eyebrow>Formulated for Indian weather</Eyebrow>
+              <h1 id="shop-title" className="mt-4 font-display font-semibold text-[clamp(2.5rem,1.6rem+4.5vw,5rem)] leading-[1] tracking-[-0.03em]">
+                Shop routines.
               </h1>
-              <p className="text-sm text-ink-muted">
-                Showing {products.length} {products.length === 1 ? "product" : "products"}
+              <p className="mt-4 text-ink-muted" aria-live="polite">
+                {products.length} {products.length === 1 ? "product" : "products"}
+                {anyFilter ? " match your filters" : ""}
               </p>
             </div>
-
-            <Link href="/face-analysis">
-              <Button variant="outline" size="md" className="gap-2 shrink-0">
-                <Camera className="w-4 h-4 text-brand" />
-                <span>Not sure? Scan your face</span>
-              </Button>
+            <Link
+              href="/face-analysis"
+              className={`inline-flex items-center justify-center gap-2 min-h-[52px] px-6 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold hover:border-ink shrink-0 ${focusRing}`}
+            >
+              <ScanLine className="w-5 h-5 text-brand" aria-hidden="true" />
+              Not sure? Scan your face
             </Link>
           </div>
 
-          {/* Layout Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Desktop Filter Sidebar */}
-            <aside className="hidden lg:block lg:col-span-3 space-y-6 bg-skymist/30 p-6 rounded-3xl border border-ink/10 sticky top-[100px]">
-              <div className="flex items-center justify-between border-b border-ink/10 pb-3">
-                <h3 className="font-bold text-sm text-ink flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-brand" />
-                  <span>Filters</span>
-                </h3>
-                {(concern || skin || category || sort) && (
-                  <Link href="/shop" className="text-[11px] font-bold text-coral hover:underline">
-                    Clear all
-                  </Link>
-                )}
+          {/* Filters: concern chips, skin-type chips, sort and clear */}
+          <div className="py-6 border-b border-ink/20 space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-8">
+              <p className="font-mono text-xs uppercase tracking-[0.12em] text-ink-muted w-24 shrink-0">Concern</p>
+              <div role="group" aria-label="Filter by concern" className="flex flex-wrap gap-2">
+                {concerns.map((c) => (
+                  <button key={c.key} type="button" aria-pressed={concern === c.key} onClick={() => updateFilter("concern", c.key)} className={chip(concern === c.key)}>
+                    {c.label}
+                  </button>
+                ))}
               </div>
-
-              {/* Filter by Concern */}
-              <div className="space-y-2">
-                <h4 className="font-bold text-xs text-ink uppercase tracking-wider">Concern</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {["dryness", "dullness", "acne", "sun-care"].map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => updateFilter("concern", c)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors inline-block ${
-                        concern === c
-                          ? "bg-brand text-white border-brand font-bold"
-                          : "bg-white text-ink border-ink/15 hover:border-brand"
-                      }`}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
+            </div>
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-8">
+              <p className="font-mono text-xs uppercase tracking-[0.12em] text-ink-muted w-24 shrink-0">Skin type</p>
+              <div role="group" aria-label="Filter by skin type" className="flex flex-wrap gap-2">
+                {skinTypes.map((st) => (
+                  <button key={st} type="button" aria-pressed={skin === st} onClick={() => updateFilter("skin", st)} className={chip(skin === st)}>
+                    {st}
+                  </button>
+                ))}
               </div>
-
-              {/* Filter by Skin Type */}
-              <div className="space-y-2 pt-2 border-t border-ink/10">
-                <h4 className="font-bold text-xs text-ink uppercase tracking-wider">Skin Type</h4>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Oily", "Dry", "Combination", "Sensitive", "Normal"].map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => updateFilter("skin", st)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors inline-block ${
-                        skin === st
-                          ? "bg-brand text-white border-brand font-bold"
-                          : "bg-white text-ink border-ink/15 hover:border-brand"
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sort Options */}
-              <div className="space-y-2 pt-2 border-t border-ink/10">
-                <h4 className="font-bold text-xs text-ink uppercase tracking-wider">Sort By</h4>
-                <div className="space-y-1 text-xs font-medium text-ink">
-                  {[
-                    { label: "Featured", value: "featured" },
-                    { label: "Price: Low to High", value: "price-asc" },
-                    { label: "Price: High to Low", value: "price-desc" },
-                  ].map((s) => (
-                    <button
-                      key={s.value}
-                      onClick={() => updateFilter("sort", s.value)}
-                      className={`w-full text-left block px-3 py-2 rounded-xl transition-colors ${
-                        sort === s.value ? "bg-brand text-white font-bold" : "hover:bg-skymist"
-                      }`}
-                    >
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+              <div className="flex items-center gap-4 flex-wrap">
+                <label htmlFor="shop-sort" className="font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">
+                  Sort
+                </label>
+                <select
+                  id="shop-sort"
+                  value={sort ?? "featured"}
+                  onChange={(e) => updateFilter("sort", e.target.value === "featured" ? "" : e.target.value)}
+                  className={`min-h-[44px] px-4 rounded-[10px] border-[1.5px] border-ink/20 bg-white text-[15px] font-medium ${focusRing}`}
+                >
+                  {sorts.map((s) => (
+                    <option key={s.value} value={s.value}>
                       {s.label}
-                    </button>
+                    </option>
                   ))}
+                </select>
+              </div>
+              {anyFilter && (
+                <Link href="/shop" className={`font-medium underline underline-offset-4 rounded ${focusRing}`}>
+                  Clear all filters
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* Products */}
+          <div className="pt-10">
+            {products.length === 0 ? (
+              <div className="border border-ink/15 bg-white rounded-[24px] p-8 sm:p-10 max-w-[640px]">
+                <h2 className="font-display font-semibold text-2xl">Nothing matches those filters.</h2>
+                <p className="mt-2 text-ink-muted">Clear a filter, or scan your face to get a routine matched to your skin.</p>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <Link href="/shop" className={`inline-flex items-center justify-center min-h-[52px] px-7 rounded-[10px] bg-brand text-white font-semibold ${focusRing}`}>
+                    Clear filters
+                  </Link>
+                  <Link href="/face-analysis" className={`inline-flex items-center justify-center min-h-[52px] px-7 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold ${focusRing}`}>
+                    Scan my face
+                  </Link>
                 </div>
               </div>
-            </aside>
-
-            {/* Product Grid */}
-            <main className="lg:col-span-9 space-y-6">
-              {/* Active Filter Chips */}
-              {(concern || skin || category) && (
-                <div className="flex flex-wrap items-center gap-2 pb-2">
-                  <span className="text-xs text-ink-muted">Active filters:</span>
-                  {concern && (
-                    <Badge variant="brand" size="sm" className="gap-1">
-                      <span>Concern: {concern}</span>
-                      <button onClick={() => updateFilter("concern", "")}>
-                        <X className="w-3 h-3 hover:text-yellow" />
-                      </button>
-                    </Badge>
-                  )}
-                  {skin && (
-                    <Badge variant="skymist" size="sm" className="gap-1">
-                      <span>Skin: {skin}</span>
-                      <button onClick={() => updateFilter("skin", "")}>
-                        <X className="w-3 h-3 hover:text-coral" />
-                      </button>
-                    </Badge>
-                  )}
-                </div>
-              )}
-
-              {products.length === 0 ? (
-                <div className="py-20 text-center space-y-4 bg-skymist/30 rounded-3xl p-8 border border-ink/10">
-                  <ScanLine className="w-10 h-10 text-brand mx-auto" />
-                  <h3 className="font-display font-bold text-xl text-ink">Nothing matches your search</h3>
-                  <p className="text-xs text-ink-muted">Clear a filter or take a free face scan to find your custom routine.</p>
-                  <div className="flex justify-center gap-3">
-                    <Link href="/shop">
-                      <Button variant="outline" size="sm">Clear all filters</Button>
-                    </Link>
-                    <Link href="/face-analysis">
-                      <Button variant="primary" size="sm">Start face scan</Button>
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                  {products.map((prod, idx) => {
-                    const discount = computeDiscountPercent(prod.price, prod.mrp);
-                    const is7th = (idx + 1) % 7 === 0;
-
-                    return (
-                      <React.Fragment key={prod.id}>
-                        {is7th && (
-                          <div className="bg-skymist/60 rounded-3xl p-6 border border-brand/20 flex flex-col justify-between text-center space-y-3">
-                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-brand mx-auto shadow-xs">
-                              <Camera className="w-5 h-5" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="font-display font-bold text-base text-ink">Not sure what suits you?</h4>
-                              <p className="text-xs text-ink-muted">Scan your face in 30 seconds for a plain-language match.</p>
-                            </div>
-                            <Link href="/face-analysis">
-                              <Button variant="primary" size="sm" className="w-full text-xs ">
-                                Start scan
-                              </Button>
-                            </Link>
-                          </div>
-                        )}
-
-                        <div className="group bg-white rounded-3xl p-4 border border-ink/10 hover:border-brand/30 hover:shadow-card transition-all flex flex-col justify-between space-y-3">
-                          <Link href={`/product/${prod.slug}`} className="space-y-3 block">
-                            <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-skymist border border-ink/10">
-                              <Image
-                                src={getAssetPath(prod.images[0] || "/images/hero/product.webp")}
-                                alt={prod.name}
-                                fill
-                                sizes="(max-width: 768px) 50vw, 33vw"
-                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
-                              {discount > 0 && (
-                                <div className="absolute top-2 left-2 bg-ink text-white font-bold text-[10px] px-2 py-0.5 rounded-full">
-                                  {discount}% OFF
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="space-y-1">
-                              <span className="text-[10px] font-bold text-brand uppercase tracking-wider block">
-                                {prod.skinTypes.join(" • ")}
-                              </span>
-                              <h2 className="font-display font-bold text-sm text-ink group-hover:text-brand transition-colors line-clamp-1">
-                                {prod.name}
-                              </h2>
-                              <p className="text-xs text-ink-muted line-clamp-2 font-normal">
-                                {prod.tagline}
-                              </p>
-                            </div>
-                          </Link>
-
-                          <div className="pt-2 border-t border-ink/10 flex items-center justify-between">
-                            <div>
-                              <span className="font-display font-bold text-sm text-brand block">
-                                {formatPrice(prod.price)}
-                              </span>
-                              {prod.mrp && prod.mrp > prod.price && (
-                                <span className="text-[10px] text-ink-muted line-through block">
-                                  {formatPrice(prod.mrp)}
-                                </span>
-                              )}
-                            </div>
-                            <QuickAdd prod={prod} />
-                          </div>
+            ) : (
+              <ul className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
+                {products.map((prod) => {
+                  const discount = computeDiscountPercent(prod.price, prod.mrp);
+                  return (
+                    <li key={prod.id} className="flex flex-col">
+                      <Link href={`/product/${prod.slug}`} className={`group block rounded-[10px] ${focusRing}`}>
+                        <div className="relative aspect-[4/5] rounded-[10px] overflow-hidden border border-ink/15 bg-paper-deep">
+                          <Image
+                            src={getAssetPath(prod.images[0] || "/images/hero/product.webp")}
+                            alt={prod.name}
+                            fill
+                            sizes="(max-width: 1024px) 50vw, 25vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                          />
+                          {discount > 0 && (
+                            <span className="absolute top-3 left-3 bg-white text-ink font-mono text-[11px] uppercase tracking-[0.1em] px-2 py-1 rounded-[6px]">
+                              {discount}% off
+                            </span>
+                          )}
                         </div>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              )}
-            </main>
+                        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                          {prod.skinTypes.slice(0, 2).join(" · ")}
+                        </p>
+                        <h2 className="mt-1 font-display font-semibold text-lg leading-snug group-hover:underline underline-offset-4">{prod.name}</h2>
+                        <p className="mt-1 text-[15px] text-ink-muted line-clamp-2">{prod.tagline}</p>
+                      </Link>
+                      <p className="mt-4 font-semibold text-lg">
+                        {formatPrice(prod.price)}
+                        {prod.mrp > prod.price && <span className="ml-2 text-sm font-normal text-ink-light line-through">{formatPrice(prod.mrp)}</span>}
+                      </p>
+                      <div className="mt-3">
+                        <QuickAdd prod={prod} />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
-        </Container>
+        </Section>
+
+        <Section tone="deep" pad="tight" labelledBy="shop-help">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h2 id="shop-help" className="font-display font-semibold text-2xl">Not sure what suits you?</h2>
+              <p className="mt-2 text-ink-muted max-w-[52ch]">The free scan takes about 30 seconds and suggests a routine from this shop.</p>
+            </div>
+            <Link href="/face-analysis" className={`inline-flex items-center justify-center min-h-[52px] px-7 rounded-[10px] bg-brand text-white font-semibold shrink-0 ${focusRing}`}>
+              Scan my face, free
+            </Link>
+          </div>
+        </Section>
       </ShopUnlockGate>
     </div>
   );
@@ -320,7 +252,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
 
 export function ShopCatalogView({ allProducts }: ShopCatalogViewProps) {
   return (
-    <Suspense fallback={<div className="py-20 text-center text-ink/60">Loading shop catalog...</div>}>
+    <Suspense fallback={<div className="py-20 text-center text-ink-muted">Loading the shop…</div>}>
       <CatalogContent allProducts={allProducts} />
     </Suspense>
   );
