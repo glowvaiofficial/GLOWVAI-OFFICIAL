@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 import { z } from "zod";
 
 const reviewSubmitSchema = z.object({
@@ -29,6 +30,10 @@ async function callSheet(payload: object) {
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimit(`review:${clientIp(request)}`, 5, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limited.retryAfter) } });
+  }
   try {
     const body = await request.json().catch(() => null);
     const validated = reviewSubmitSchema.safeParse(body);

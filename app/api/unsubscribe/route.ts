@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 import { verifyUnsubscribeToken } from "@/lib/email/tokens";
 import { addSuppression } from "@/lib/email/suppression";
 import { storage } from "@/lib/storage";
@@ -37,6 +38,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = rateLimit(`unsubscribe:${clientIp(req)}`, 10, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limited.retryAfter) } });
+  }
   let token = req.nextUrl.searchParams.get("token") || "";
   let emailToUnsub = "";
 
