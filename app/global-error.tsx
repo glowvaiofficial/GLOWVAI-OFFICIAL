@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 
 export default function GlobalError({
   reset,
@@ -11,25 +10,27 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white text-ink flex items-center justify-center min-h-screen p-6 font-sans">
-        <div className="max-w-md w-full text-center space-y-4 p-8 rounded-3xl border border-ink/10 bg-skymist/30 shadow-lg">
-          <h1 className="font-display font-bold text-2xl text-ink">Something went wrong</h1>
-          <p className="text-xs text-ink-muted">A critical error occurred. Please try reloading the page.</p>
-          <div className="flex justify-center gap-3 pt-2">
+      <body className="bg-paper text-ink flex items-center justify-center min-h-screen p-6 font-sans">
+        <main className="max-w-[560px] w-full space-y-5">
+          <p className="font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">Something went wrong</p>
+          <h1 className="font-display font-semibold text-4xl leading-tight">The site hit a problem.</h1>
+          <p className="text-ink-muted text-[17px]">Please reload the page. If it keeps happening, email contact@glowvai.in.</p>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
+              type="button"
               onClick={() => reset()}
-              className="bg-brand text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-xs"
+              className="min-h-[52px] px-7 rounded-[10px] bg-brand text-white font-semibold hover:bg-brand-dark focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
             >
-              Reload Page
+              Reload page
             </button>
-            <Link
+            <a
               href="/"
-              className="bg-white text-ink text-xs font-bold px-4 py-2.5 rounded-xl border border-ink/15"
+              className="min-h-[52px] inline-flex items-center justify-center px-7 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold hover:border-ink focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
             >
-              Home
-            </Link>
+              Home page
+            </a>
           </div>
-        </div>
+        </main>
       </body>
     </html>
   );

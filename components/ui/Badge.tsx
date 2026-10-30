@@ -15,10 +15,10 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variants = {
-    skymist: "bg-skymist text-brand border border-brand/15",
-    blush: "bg-blush text-ink border border-ink/10",
-    mint: "bg-mint text-ink border border-ink/10",
-    yellow: "bg-yellow text-ink font-semibold",
+    skymist: "bg-paper-deep text-brand border border-ink/20",
+    blush: "bg-paper-deep text-ink border border-ink/10",
+    mint: "bg-paper-deep text-ink border border-ink/10",
+    yellow: "bg-paper-deep text-ink font-semibold",
     brand: "bg-brand text-white font-semibold",
     coral: "bg-ink text-white font-semibold",
     outline: "border border-ink/20 text-ink-muted bg-white",

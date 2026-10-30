@@ -4,7 +4,6 @@ import React, { Suspense, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Section, Eyebrow, focusRing } from "@/components/home/shared";
 import { filterProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
@@ -92,8 +91,6 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
 
   return (
     <div className="bg-paper text-ink">
-      <CartDrawer />
-
               <Section pad="tight" labelledBy="shop-title">
           <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
             <ol className="flex items-center gap-2">

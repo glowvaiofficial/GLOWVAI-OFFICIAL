@@ -7,7 +7,7 @@ import { BRAND_NAME } from "@/config/site";
 import { Button } from "@/components/ui/Button";
 import { ShoppingBag, Menu } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
-import { CartDrawer } from "./CartDrawer";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
 
@@ -30,7 +30,7 @@ const focusRing =
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const openCart = useCartStore((s) => s.openCart);
 
   const cartItems = useCartStore((s) => s.items);
   const cartItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -38,7 +38,6 @@ export function Navbar() {
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
     handleScroll();
-    const openCart = () => setIsCartOpen(true);
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("gv:open-cart", openCart);
     return () => {
@@ -58,7 +57,7 @@ export function Navbar() {
 
       <header
         className={cn(
-          "sticky top-0 z-40 w-full bg-white border-b border-ink/10 flex items-center transition-[min-height] duration-150",
+          "sticky top-0 z-40 w-full bg-white border-b border-ink/10 flex items-center transition-[min-height]",
           isScrolled ? "min-h-16" : "min-h-16 lg:min-h-[76px]"
         )}
       >
@@ -88,7 +87,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => openCart()}
               aria-label={`Cart, ${cartItemCount} ${cartItemCount === 1 ? "item" : "items"}`}
               className={cn(
                 "relative w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] border-[1.5px] border-ink/20 text-ink hover:border-ink transition-colors cursor-pointer",
@@ -115,7 +114,7 @@ export function Navbar() {
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open navigation menu"
               className={cn(
-                "md:hidden w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] text-ink hover:bg-skymist transition-colors cursor-pointer",
+                "md:hidden w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] text-ink hover:bg-paper-deep transition-colors cursor-pointer",
                 focusRing
               )}
             >
@@ -129,10 +128,10 @@ export function Navbar() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         cartCount={cartItemCount}
-        onOpenCart={() => setIsCartOpen(true)}
+        onOpenCart={() => openCart()}
       />
 
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartDrawer />
     </>
   );
 }

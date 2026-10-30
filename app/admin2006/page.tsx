@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-ink-subtle flex items-center justify-center text-ink-muted">
+      <div className="min-h-screen bg-paper-deep flex items-center justify-center text-ink-muted">
         <RefreshCw className="w-8 h-8 animate-spin text-brand" />
       </div>
     );
@@ -142,14 +142,14 @@ export default function AdminDashboardPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-paper flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white border border-ink/10 rounded-[32px] p-8 sm:p-10 shadow-2xl space-y-6 text-ink text-center relative overflow-hidden">
+        <div className="max-w-md w-full bg-white border border-ink/10 rounded-[32px] p-8 sm:p-10 space-y-6 text-ink text-center relative overflow-hidden">
 
-          <div className="w-16 h-16 rounded-2xl bg-brand text-white flex items-center justify-center mx-auto shadow-lg shadow-brand/30">
+          <div className="w-16 h-16 rounded-[10px] bg-brand text-white flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8 text-white" />
           </div>
 
           <div className="space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-widest text-brand bg-skymist px-3 py-1 rounded-full border border-brand/20 inline-block">
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand bg-paper-deep px-3 py-1 rounded-full border border-ink/20 inline-block">
               MASTER SYSTEM ACCESS
             </span>
             <h1 className="font-display font-bold text-3xl text-ink">
@@ -171,12 +171,12 @@ export default function AdminDashboardPage() {
                   setAuthError(false);
                 }}
                 placeholder="Enter Admin Passcode"
-                className="w-full px-4 py-4 rounded-2xl bg-ink-subtle border-2 border-ink/10 text-ink placeholder-ink-light text-base font-bold text-center focus:border-brand focus:bg-white focus:outline-none transition-all shadow-xs"
+                className="w-full px-4 py-4 rounded-[10px] bg-paper-deep border-2 border-ink/10 text-ink placeholder-ink-light text-base font-bold text-center focus:border-brand focus:bg-white focus:outline-none transition-all"
               />
             </div>
 
             {authError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-[10px] text-xs font-bold flex items-center justify-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                 <span>Invalid Passcode. Access Denied.</span>
               </div>
@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
 
             <button
               type="submit"
-              className="w-full py-4 px-6 rounded-2xl bg-brand hover:bg-brand-dark text-white font-semibold text-sm shadow-xl shadow-brand/25 transition-transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-4 px-6 rounded-[10px] bg-brand hover:bg-brand-dark text-white font-semibold text-sm transition-transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer"
             >
               <Unlock className="w-4 h-4" />
               <span>Enter Master Console</span>
@@ -219,16 +219,16 @@ export default function AdminDashboardPage() {
   });
 
   return (
-    <main className="min-h-screen bg-ink-subtle text-ink font-sans pb-20">
+    <main className="min-h-screen bg-paper-deep text-ink font-sans pb-20">
 
       {/* Brand Header Banner */}
-      <header className="sticky top-0 z-50 bg-white/95 border-b border-ink/10 px-4 sm:px-8 py-4 flex items-center justify-between shadow-sm">
+      <header className="sticky top-0 z-50 bg-white border-b border-ink/10 px-4 sm:px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-baseline gap-1.5">
             <span className="font-display font-bold text-2xl tracking-tight text-brand">
               GLOW VAI
             </span>
-            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-yellow px-2 py-0.5 rounded-md border border-yellow-hover">
+            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase bg-paper-deep px-2 py-0.5 rounded-md border border-ink/20-hover">
               Admin Portal
             </span>
           </Link>
@@ -238,7 +238,7 @@ export default function AdminDashboardPage() {
           <button
             onClick={loadLeads}
             disabled={isLoadingLeads}
-            className="hidden sm:flex items-center gap-2 bg-skymist text-brand hover:bg-skymist/70 px-3.5 py-2 rounded-xl border border-brand/20 text-xs font-bold transition-colors cursor-pointer disabled:opacity-60"
+            className="hidden sm:flex items-center gap-2 bg-paper-deep text-brand hover:bg-paper px-3.5 py-2 rounded-[10px] border border-ink/20 text-xs font-bold transition-colors cursor-pointer disabled:opacity-60"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLeads ? "animate-spin" : ""}`} />
             <span>{isLoadingLeads ? "Syncing..." : "Refresh from Sheet"}</span>
@@ -246,7 +246,7 @@ export default function AdminDashboardPage() {
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-ink-subtle hover:bg-blush text-ink-muted hover:text-coral text-xs font-bold border border-ink/10 transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-[10px] bg-paper-deep hover:bg-paper-deep text-ink-muted hover:text-coral text-xs font-bold border border-ink/10 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span className="hidden sm:inline">Lock / Exit</span>
@@ -258,7 +258,7 @@ export default function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 space-y-8">
 
         {loadError && (
-          <div className="bg-blush border border-coral/30 text-ink p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm">
+          <div className="bg-paper-deep border border-ink/20 text-ink p-4 rounded-[10px] text-xs font-bold flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-coral shrink-0" />
               <span>Couldn&apos;t load real leads: {loadError}</span>
@@ -278,10 +278,10 @@ export default function AdminDashboardPage() {
         {/* Summary Metric Cards (all derived from real sheet data) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 
-          <div className="bg-white p-6 rounded-3xl border border-ink/10 shadow-md space-y-2">
+          <div className="bg-white p-6 rounded-[24px] border border-ink/10 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-ink-light uppercase tracking-wider">Total Rows Captured</span>
-              <div className="w-10 h-10 rounded-2xl bg-skymist text-brand flex items-center justify-center border border-brand/10">
+              <span className="text-xs font-bold text-ink-light uppercase tracking-[0.1em]">Total Rows Captured</span>
+              <div className="w-10 h-10 rounded-[10px] bg-paper-deep text-brand flex items-center justify-center border border-ink/20">
                 <ScanLine className="w-5 h-5" />
               </div>
             </div>
@@ -289,10 +289,10 @@ export default function AdminDashboardPage() {
             <p className="text-xs text-ink-muted font-semibold">All scan sessions, including incomplete</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-ink/10 shadow-md space-y-2">
+          <div className="bg-white p-6 rounded-[24px] border border-ink/10 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-ink-light uppercase tracking-wider">Completed Leads</span>
-              <div className="w-10 h-10 rounded-2xl bg-mint text-ink flex items-center justify-center border border-mint">
+              <span className="text-xs font-bold text-ink-light uppercase tracking-[0.1em]">Completed Leads</span>
+              <div className="w-10 h-10 rounded-[10px] bg-paper-deep text-ink flex items-center justify-center border border-ink/20">
                 <Users className="w-5 h-5" />
               </div>
             </div>
@@ -300,10 +300,10 @@ export default function AdminDashboardPage() {
             <p className="text-xs text-ink-muted font-semibold">{uniquePhones} unique phone numbers</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-ink/10 shadow-md space-y-2">
+          <div className="bg-white p-6 rounded-[24px] border border-ink/10 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-ink-light uppercase tracking-wider">Leads With Photo</span>
-              <div className="w-10 h-10 rounded-2xl bg-yellow text-ink flex items-center justify-center border border-yellow-hover">
+              <span className="text-xs font-bold text-ink-light uppercase tracking-[0.1em]">Leads With Photo</span>
+              <div className="w-10 h-10 rounded-[10px] bg-paper-deep text-ink flex items-center justify-center border border-ink/20-hover">
                 <ImageIcon className="w-5 h-5" />
               </div>
             </div>
@@ -311,10 +311,10 @@ export default function AdminDashboardPage() {
             <p className="text-xs text-ink-muted font-semibold">Face scan image saved to Drive</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-ink/10 shadow-md space-y-2">
+          <div className="bg-white p-6 rounded-[24px] border border-ink/10 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-ink-light uppercase tracking-wider">Email Proxy</span>
-              <div className="w-10 h-10 rounded-2xl bg-skymist text-brand flex items-center justify-center border border-brand/10">
+              <span className="text-xs font-bold text-ink-light uppercase tracking-[0.1em]">Email Proxy</span>
+              <div className="w-10 h-10 rounded-[10px] bg-paper-deep text-brand flex items-center justify-center border border-ink/20">
                 <Mail className="w-5 h-5" />
               </div>
             </div>
@@ -325,15 +325,15 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Tab Navigation & Action Controls */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-3 rounded-3xl border border-ink/10 shadow-sm">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-3 rounded-[24px] border border-ink/10">
 
           <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
             <button
               onClick={() => setActiveTab("leads")}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-4 py-2.5 rounded-[10px] text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === "leads"
-                  ? "bg-brand text-white shadow-md"
-                  : "text-ink-muted hover:text-ink hover:bg-ink-subtle"
+                  ? "bg-brand text-white"
+                  : "text-ink-muted hover:text-ink hover:bg-paper-deep"
               }`}
             >
               <ScanLine className="w-4 h-4" />
@@ -342,10 +342,10 @@ export default function AdminDashboardPage() {
 
             <button
               onClick={() => setActiveTab("emails")}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-4 py-2.5 rounded-[10px] text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === "emails"
-                  ? "bg-brand text-white shadow-md"
-                  : "text-ink-muted hover:text-ink hover:bg-ink-subtle"
+                  ? "bg-brand text-white"
+                  : "text-ink-muted hover:text-ink hover:bg-paper-deep"
               }`}
             >
               <Mail className="w-4 h-4" />
@@ -361,7 +361,7 @@ export default function AdminDashboardPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search rows..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-ink-subtle border border-ink/10 text-ink text-xs font-semibold placeholder-ink-light focus:outline-none focus:border-brand"
+                  className="w-full px-3.5 py-2 rounded-[10px] bg-paper-deep border border-ink/10 text-ink text-xs font-semibold placeholder-ink-light focus:outline-none focus:border-brand"
                 />
                 <Search className="w-4 h-4 text-ink-light absolute right-3 top-2.5" />
               </div>
@@ -369,7 +369,7 @@ export default function AdminDashboardPage() {
               <button
                 onClick={() => handleExportCSV(leads, "glowvai_leads")}
                 disabled={leads.length === 0}
-                className="px-3.5 py-2 bg-ink-subtle hover:bg-ink/10 text-ink-muted font-bold text-xs rounded-xl flex items-center gap-1.5 border border-ink/10 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                className="px-3.5 py-2 bg-paper-deep hover:bg-ink/10 text-ink-muted font-bold text-xs rounded-[10px] flex items-center gap-1.5 border border-ink/10 transition-colors cursor-pointer shrink-0 disabled:opacity-50"
               >
                 <Download className="w-4 h-4 text-brand" />
                 <span className="hidden sm:inline">Export CSV</span>
@@ -382,7 +382,7 @@ export default function AdminDashboardPage() {
         {/* TAB 1: FACE SCAN LEADS TABLE (real data from Google Sheet) */}
         {/* ------------------------------------------------------------- */}
         {activeTab === "leads" && (
-          <div className="bg-white rounded-3xl border border-ink/10 overflow-hidden shadow-lg">
+          <div className="bg-white rounded-[24px] border border-ink/10 overflow-hidden">
             {isLoadingLeads && leads.length === 0 ? (
               <div className="p-12 flex flex-col items-center justify-center gap-3 text-ink-muted">
                 <RefreshCw className="w-6 h-6 animate-spin text-brand" />
@@ -396,7 +396,7 @@ export default function AdminDashboardPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-ink-subtle text-ink-muted uppercase text-[10px] font-semibold tracking-wider border-b border-ink/10">
+                  <thead className="bg-paper-deep text-ink-muted uppercase text-[10px] font-semibold tracking-[0.1em] border-b border-ink/10">
                     <tr>
                       <th className="p-4">Customer</th>
                       <th className="p-4">Phone / Email</th>
@@ -409,7 +409,7 @@ export default function AdminDashboardPage() {
                   </thead>
                   <tbody className="divide-y divide-ink/10 font-medium">
                     {filteredLeads.map((item) => (
-                      <tr key={item.rowIndex} className="hover:bg-skymist/40 transition-colors">
+                      <tr key={item.rowIndex} className="hover:bg-paper transition-colors">
                         <td className="p-4 font-bold text-ink">{item.name || "-"}</td>
                         <td className="p-4 text-ink-muted">
                           <div className="font-semibold text-ink">{item.phone || "-"}</div>
@@ -452,9 +452,9 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
             {/* Form Left (5 cols) */}
-            <div className="lg:col-span-5 bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 shadow-lg space-y-5">
+            <div className="lg:col-span-5 bg-white p-6 sm:p-8 rounded-[24px] border border-ink/10 space-y-5">
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-brand uppercase tracking-widest bg-skymist px-2.5 py-0.5 rounded-full border border-brand/20">
+                <span className="text-[10px] font-semibold text-brand uppercase tracking-widest bg-paper-deep px-2.5 py-0.5 rounded-full border border-ink/20">
                   Resend Email Integration
                 </span>
                 <h2 className="font-display font-bold text-2xl text-ink">Dispatch Styled Email</h2>
@@ -472,7 +472,7 @@ export default function AdminDashboardPage() {
                     value={emailRecipient}
                     onChange={(e) => setEmailRecipient(e.target.value)}
                     placeholder="customer@glowvai.in"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-ink-subtle border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
+                    className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
                   />
                 </div>
 
@@ -483,7 +483,7 @@ export default function AdminDashboardPage() {
                     value={emailCustomerName}
                     onChange={(e) => setEmailCustomerName(e.target.value)}
                     placeholder="Customer name"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-ink-subtle border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
+                    className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
                   />
                 </div>
 
@@ -498,7 +498,7 @@ export default function AdminDashboardPage() {
                       if (val === "order_confirmation") setEmailSubject("Order Confirmed | GLOW VAI 15-Min Express");
                       if (val === "support_reply") setEmailSubject("GLOW VAI Support Response");
                     }}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-ink-subtle border border-ink/20 text-ink font-bold focus:outline-none focus:border-brand"
+                    className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-bold focus:outline-none focus:border-brand"
                   >
                     <option value="scan_report">AI Face Scan Skin Report Template</option>
                     <option value="order_confirmation">Express Order Confirmation Template</option>
@@ -513,12 +513,12 @@ export default function AdminDashboardPage() {
                     required
                     value={emailSubject}
                     onChange={(e) => setEmailSubject(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-ink-subtle border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
+                    className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
                   />
                 </div>
 
                 {emailSendStatus && (
-                  <div className="bg-skymist border border-brand/20 text-brand p-3 rounded-xl text-xs font-bold flex items-center gap-2">
+                  <div className="bg-paper-deep border border-ink/20 text-brand p-3 rounded-[10px] text-xs font-bold flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 shrink-0" />
                     <span>{emailSendStatus}</span>
                   </div>
@@ -527,7 +527,7 @@ export default function AdminDashboardPage() {
                 <button
                   type="submit"
                   disabled={isSendingEmail}
-                  className="w-full py-3.5 px-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold text-xs shadow-lg transition-transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  className="w-full py-3.5 px-4 rounded-[10px] bg-brand hover:bg-brand-dark text-white font-semibold text-xs transition-transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                 >
                   <Send className="w-4 h-4" />
                   <span>{isSendingEmail ? "Sending via Resend API..." : "Send Email Now"}</span>
@@ -536,23 +536,23 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* Live Template HTML Preview Right (7 cols) */}
-            <div className="lg:col-span-7 bg-white p-6 rounded-3xl border border-ink/10 shadow-lg space-y-4">
+            <div className="lg:col-span-7 bg-white p-6 rounded-[24px] border border-ink/10 space-y-4">
               <div className="flex items-center justify-between border-b border-ink/10 pb-3">
                 <span className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
                   <Eye className="w-4 h-4 text-brand" />
                   <span>Live GLOW VAI Styled Template Preview</span>
                 </span>
-                <span className="text-[10px] font-bold bg-mint text-ink px-2.5 py-0.5 rounded-full border border-mint">
+                <span className="text-[10px] font-bold bg-paper-deep text-ink px-2.5 py-0.5 rounded-full border border-ink/20">
                   Resend Ready
                 </span>
               </div>
 
-              <div className="border border-ink/10 rounded-2xl p-2 bg-ink-subtle overflow-hidden max-h-[500px] overflow-y-auto">
+              <div className="border border-ink/10 rounded-[10px] p-2 bg-paper-deep overflow-hidden max-h-[500px] overflow-y-auto">
                 <iframe
                   srcDoc={generateGlowVaiEmailHTML(emailTemplateType, {
                     name: emailCustomerName || "Valued Glow Customer",
                   })}
-                  className="w-full h-[450px] rounded-xl border-none"
+                  className="w-full h-[450px] rounded-[10px] border-none"
                   title="Email Template Preview"
                 />
               </div>

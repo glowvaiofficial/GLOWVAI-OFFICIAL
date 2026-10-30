@@ -4,7 +4,6 @@ import React, { useReducer, useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
 import { analyse, detectFace, DEMOGRAPHIC_BASE_SCORES, AnalysisReport } from "@/lib/analysis";
 import { parseUserAgent, fetchClientIP, requestLocationWithOSPermission } from "@/lib/clientInfo";
@@ -308,8 +307,6 @@ export function FaceAnalysisClient() {
 
   return (
     <div className="bg-paper text-ink">
-      <CartDrawer />
-
       {scanning && (
         <>
           <Section pad="tight" labelledBy="scan-title">

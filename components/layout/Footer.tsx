@@ -56,7 +56,7 @@ function NewsletterForm() {
 
   if (status === "success") {
     return (
-      <p role="status" aria-live="polite" className="text-[15px] text-ink bg-mint rounded-[10px] px-4 py-3">
+      <p role="status" aria-live="polite" className="text-[15px] text-ink bg-paper-deep rounded-[10px] px-4 py-3">
         Thanks. You are subscribed.
       </p>
     );

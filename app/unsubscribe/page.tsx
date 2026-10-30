@@ -3,7 +3,10 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BRAND_NAME } from "@/config/site";
+import { Section, Eyebrow, focusRing } from "@/components/home/shared";
+
+const input =
+  "w-full min-h-[52px] px-4 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20";
 
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
@@ -46,7 +49,7 @@ function UnsubscribeContent() {
         setStatus("success");
       } else {
         setStatus("error");
-        setErrorMessage(data.error || "Failed to unsubscribe. Please try again.");
+        setErrorMessage(data.error || "We could not unsubscribe you. Please try again.");
       }
     } catch {
       setStatus("error");
@@ -55,70 +58,73 @@ function UnsubscribeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl text-center">
-        <h1 className="text-2xl font-black text-white tracking-wider mb-2">
-          {BRAND_NAME}
-        </h1>
-        <p className="text-sm text-slate-400 mb-6">Email Subscription Management</p>
+    <div className="bg-paper text-ink">
+      <Section pad="md" labelledBy="unsub-title">
+        <div className="max-w-[560px]">
+          <Eyebrow>Email preferences</Eyebrow>
+          <h1 id="unsub-title" className="mt-4 font-display font-semibold text-[clamp(2.5rem,1.6rem+4.5vw,4.5rem)] leading-[1] tracking-[-0.03em]">
+            Unsubscribe.
+          </h1>
 
-        {status === "success" ? (
-          <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 p-6 rounded-2xl mb-6">
-            <h2 className="text-lg font-bold mb-2">Unsubscribed Successfully</h2>
-            <p className="text-xs text-emerald-400 leading-relaxed">
-              Your email address has been removed from GLOW VAI marketing updates. Transactional order updates will still be delivered if you place future orders.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleUnsubscribe} className="space-y-4">
-            <div className="text-left">
-              <label htmlFor="unsub-email" className="block text-xs font-semibold text-slate-300 mb-1">
-                Email Address
-              </label>
-              <input
-                id="unsub-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {status === "error" && (
-              <p className="text-xs text-rose-400 text-left bg-rose-950/40 p-3 rounded-lg border border-rose-900">
-                {errorMessage}
+          {status === "success" ? (
+            <div role="status" className="mt-10 border border-ink/20 bg-white rounded-[24px] p-6 sm:p-8 space-y-3">
+              <p className="font-display font-semibold text-2xl">You are unsubscribed.</p>
+              <p className="text-[17px] text-ink-muted">
+                Your email has been removed from GLOW VAI marketing emails. Order updates about any orders you place will still be sent.
               </p>
-            )}
+            </div>
+          ) : (
+            <form onSubmit={handleUnsubscribe} noValidate className="mt-10 space-y-5 border border-ink/15 bg-white rounded-[24px] p-6 sm:p-8">
+              <div>
+                <label htmlFor="unsub-email" className="block text-sm font-semibold">Email address</label>
+                <input
+                  id="unsub-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  aria-invalid={status === "error"}
+                  aria-describedby={status === "error" ? "unsub-error" : undefined}
+                  className={`${input} mt-2`}
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={status === "submitting"}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold text-sm rounded-xl transition-all shadow-lg active:scale-98"
-            >
-              {status === "submitting" ? "Processing..." : "Confirm Unsubscribe"}
-            </button>
-          </form>
-        )}
+              {status === "error" && (
+                <p id="unsub-error" role="alert" className="text-[15px] text-[#9B1C1C]">
+                  {errorMessage}
+                </p>
+              )}
 
-        <div className="mt-8 pt-6 border-t border-slate-800 flex justify-center gap-4 text-xs text-slate-400">
-          <Link href="/" className="hover:text-blue-400 transition-colors">
-            Return to Store
-          </Link>
-          <span>|</span>
-          <Link href="/privacy" className="hover:text-blue-400 transition-colors">
-            Privacy Policy
-          </Link>
+              <button
+                type="submit"
+                disabled={status === "submitting"}
+                className={`w-full min-h-[52px] rounded-[10px] bg-brand text-white font-semibold hover:bg-brand-dark disabled:opacity-50 ${focusRing}`}
+              >
+                {status === "submitting" ? "Processing…" : "Unsubscribe"}
+              </button>
+            </form>
+          )}
+
+          <p className="mt-8 text-ink-muted">
+            <Link href="/" className={`underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+              Back to the home page
+            </Link>
+            {" · "}
+            <Link href="/privacy" className={`underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+              Privacy policy
+            </Link>
+          </p>
         </div>
-      </div>
+      </Section>
     </div>
   );
 }
 
 export default function UnsubscribePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="bg-paper min-h-[50vh] p-10 text-ink-muted">Loading…</div>}>
       <UnsubscribeContent />
     </Suspense>
   );

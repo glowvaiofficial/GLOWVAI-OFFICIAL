@@ -2,9 +2,12 @@
 
 import React, { useState } from "react";
 import { dataRequestSchema } from "@/lib/schemas";
-import { Button } from "@/components/ui/Button";
-import { CheckCircle2 } from "lucide-react";
 import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
+import { focusRing } from "@/components/home/shared";
+import { Check } from "lucide-react";
+
+const input =
+  "w-full min-h-[52px] px-4 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20";
 
 export function DataRequestForm() {
   const [dataReq, setDataReq] = useState({
@@ -38,70 +41,63 @@ export function DataRequestForm() {
       setReqStatus("success");
     } catch {
       setReqStatus("error");
-      setReqError("Failed to submit request. Please try again or email us directly.");
+      setReqError("We could not send your request. Please try again, or email contact@glowvai.in.");
     }
   };
 
+  if (reqStatus === "success") {
+    return (
+      <div role="status" className="flex items-start gap-3 rounded-[10px] border border-ink/20 bg-white p-5 text-[17px]">
+        <Check className="w-5 h-5 text-brand shrink-0 mt-0.5" aria-hidden="true" />
+        <p>Request received. We will process it within the statutory timeframe of 7 days.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {reqStatus === "success" ? (
-        <div className="bg-mint text-ink p-4 rounded-2xl border border-mint text-xs font-semibold flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-ink shrink-0" />
-          <span>Request received. We will process it within statutory timeframes (7 days).</span>
-        </div>
-      ) : (
-        <form onSubmit={handleDataRequestSubmit} className="space-y-3 bg-white p-4 rounded-2xl border border-ink/10">
-          {/* Honeypot */}
-          <input
-            type="text"
-            name="website"
-            value={dataReq.website}
-            onChange={(e) => setDataReq({ ...dataReq, website: e.target.value })}
-            className="hidden"
-            tabIndex={-1}
-            autoComplete="off"
-          />
+    <form onSubmit={handleDataRequestSubmit} noValidate className="space-y-5 border border-ink/15 bg-white rounded-[24px] p-6 sm:p-8">
+      {/* Honeypot: hidden from people, filled by bots */}
+      <div className="hidden" aria-hidden="true">
+        <input type="text" name="website" tabIndex={-1} autoComplete="off" value={dataReq.website} onChange={(e) => setDataReq({ ...dataReq, website: e.target.value })} />
+      </div>
 
-          <div className="space-y-1">
-            <label className="block text-xs font-bold text-ink">Phone or Email *</label>
-            <input
-              type="text"
-              required
-              placeholder="Enter phone or email associated with your scan"
-              value={dataReq.contact}
-              onChange={(e) => setDataReq({ ...dataReq, contact: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 text-xs focus:outline-none focus:border-brand"
-            />
-          </div>
+      <div>
+        <label htmlFor="dr-contact" className="block text-sm font-semibold">Phone or email</label>
+        <input
+          id="dr-contact"
+          type="text"
+          required
+          placeholder="The phone or email you used for your scan"
+          value={dataReq.contact}
+          onChange={(e) => setDataReq({ ...dataReq, contact: e.target.value })}
+          aria-invalid={!!reqError}
+          aria-describedby={reqError ? "dr-error" : undefined}
+          className={`${input} mt-2`}
+        />
+      </div>
 
-          <div className="space-y-1">
-            <label className="block text-xs font-bold text-ink">Request Type *</label>
-            <select aria-label="Request type"
-              value={dataReq.type}
-              onChange={(e) => setDataReq({ ...dataReq, type: e.target.value as any })}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-ink/20 text-xs focus:outline-none focus:border-brand bg-white font-semibold"
-            >
-              <option value="delete">Erasure (Delete My Data & Photos)</option>
-              <option value="withdraw_consent">Withdraw Consent</option>
-              <option value="access">Access Data Summary</option>
-            </select>
-          </div>
+      <div>
+        <label htmlFor="dr-type" className="block text-sm font-semibold">What do you want to do?</label>
+        <select id="dr-type" value={dataReq.type} onChange={(e) => setDataReq({ ...dataReq, type: e.target.value as typeof dataReq.type })} className={`${input} mt-2`}>
+          <option value="delete">Delete my data and photos</option>
+          <option value="withdraw_consent">Withdraw my consent</option>
+          <option value="access">See a summary of my data</option>
+        </select>
+      </div>
 
-          {reqError && (
-            <p className="text-xs text-coral font-bold">{reqError}</p>
-          )}
-
-          <Button
-            variant="primary"
-            size="sm"
-            type="submit"
-            disabled={reqStatus === "loading"}
-            className="w-full "
-          >
-            {reqStatus === "loading" ? "Submitting..." : "Submit Data Request"}
-          </Button>
-        </form>
+      {reqError && (
+        <p id="dr-error" role="alert" className="text-[15px] text-[#9B1C1C]">
+          {reqError}
+        </p>
       )}
-    </div>
+
+      <button
+        type="submit"
+        disabled={reqStatus === "loading"}
+        className={`w-full min-h-[52px] rounded-[10px] bg-brand text-white font-semibold hover:bg-brand-dark disabled:opacity-50 ${focusRing}`}
+      >
+        {reqStatus === "loading" ? "Sending…" : "Send request"}
+      </button>
+    </form>
   );
 }

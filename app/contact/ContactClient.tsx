@@ -1,16 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Accent } from "@/components/ui/Accent";
-import { Button } from "@/components/ui/Button";
+import { submitPublicForm, normalizePhone } from "@/lib/forms/submit";
+import { Section, Eyebrow, focusRing } from "@/components/home/shared";
 import { siteConfig } from "@/config/site";
 import { complianceConfig } from "@/config/compliance";
 import { contactFormSchema } from "@/lib/schemas";
-import { Mail, Phone, MapPin, CheckCircle2, AlertCircle } from "lucide-react";
+import { Check, Mail, Phone } from "lucide-react";
+
+const input =
+  "w-full min-h-[52px] px-4 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20";
+
+const label = "block text-sm font-semibold text-ink";
+const err = "mt-1 text-sm text-[#9B1C1C]";
 
 export function ContactClient() {
   const [form, setForm] = useState({
@@ -55,215 +58,170 @@ export function ContactClient() {
       if (!ok) throw new Error("Submission failed");
       setSuccess(true);
     } catch {
-      setErrors({ form: "Could not send message. Please try again or email us directly." });
+      setErrors({ form: "Could not send your message. Please try again, or email us directly." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const hasGrievanceInfo = Boolean(
-    complianceConfig.grievanceOfficerName || complianceConfig.grievanceOfficerEmail
-  );
+  const hasGrievanceInfo = Boolean(complianceConfig.grievanceOfficerName || complianceConfig.grievanceOfficerEmail);
 
   return (
-    <div className="bg-white py-12 sm:py-20 text-ink min-h-screen">
-      <Container size="md">
-        
-        {/* Header */}
-        <div className="space-y-4 text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-          <Badge variant="brand" size="md">
-            Get in Touch
-          </Badge>
-          <h1 className="font-display font-semibold text-h1-page text-ink leading-tight">
-            We are here to <Accent>help</Accent> you.
-          </h1>
-          <p className="text-body-lg text-ink-muted leading-relaxed">
-            Have a question about your scan report, routine suggestions, or orders? Drop us a note.
-          </p>
-        </div>
+    <div className="bg-paper text-ink">
+      <Section pad="md" labelledBy="contact-title">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-12">
+          <div className="lg:col-span-5">
+            <Eyebrow>Get in touch</Eyebrow>
+            <h1 id="contact-title" className="mt-4 font-display font-semibold text-[clamp(2.5rem,1.6rem+4.5vw,5rem)] leading-[1] tracking-[-0.03em]">
+              We reply on working days.
+            </h1>
+            <p className="mt-6 text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] leading-[1.5] text-ink-muted max-w-[40ch]">
+              Ask about your scan report, a routine, or an order. Tell us what you need and we will reply.
+            </p>
 
-        {/* 2-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-          
-          {/* Form Left (7 cols desktop) */}
-          <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-ink/10 shadow-xl space-y-6">
-            <h2 className="font-display font-bold text-xl text-ink">Send a message</h2>
-
-            {success ? (
-              <div className="bg-mint text-ink p-6 rounded-2xl border border-mint text-center space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-ink mx-auto" />
-                <h3 className="font-bold text-lg">Thank you for reaching out!</h3>
-                <p className="text-xs">We have received your message and will respond shortly.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Honeypot */}
-                <input
-                  type="text"
-                  name="website"
-                  value={form.website}
-                  onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  className="hidden"
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink">Name *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ananya Roy"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
-                    />
-                    {errors.name && <p className="text-[11px] font-bold text-coral">{errors.name}</p>}
+            <ul className="mt-10 border-t border-ink/20">
+              {siteConfig.supportEmail && siteConfig.supportEmail.trim() !== "" && (
+                <li className="flex items-start gap-4 py-5 border-b border-ink/20">
+                  <Mail className="w-5 h-5 text-brand shrink-0 mt-1" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold">Email</p>
+                    <a href={`mailto:${siteConfig.supportEmail}`} className={`text-[17px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+                      {siteConfig.supportEmail}
+                    </a>
                   </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink">Email Address *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="ananya@example.com"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
-                    />
-                    {errors.email && <p className="text-[11px] font-bold text-coral">{errors.email}</p>}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink">Phone (optional)</label>
-                    <input
-                      type="tel"
-                      placeholder="98765 43210"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-ink">Topic *</label>
-                    <select aria-label="Topic"
-                      value={form.topic}
-                      onChange={(e) => setForm({ ...form, topic: e.target.value as any })}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none bg-white font-semibold"
+                </li>
+              )}
+              {siteConfig.phone && siteConfig.phone.trim() !== "" && (
+                <li className="flex items-start gap-4 py-5 border-b border-ink/20">
+                  <Phone className="w-5 h-5 text-brand shrink-0 mt-1" aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold">Phone and WhatsApp</p>
+                    <a
+                      href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`text-[17px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
                     >
-                      <option value="scan">Face Scan & Report</option>
-                      <option value="order">Orders & Delivery</option>
-                      <option value="product">Product Information</option>
-                      <option value="press">Press & Partnership</option>
-                      <option value="other">Other Inquiry</option>
-                    </select>
+                      {siteConfig.phone}
+                    </a>
                   </div>
-                </div>
+                </li>
+              )}
+            </ul>
 
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center text-xs font-bold text-ink">
-                    <span>Message *</span>
-                    <span className="text-ink-muted text-[10px]">{form.message.length}/1000</span>
-                  </div>
-                  <textarea
-                    required
-                    maxLength={1000}
-                    rows={4}
-                    placeholder="How can we help you?"
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
-                  />
-                  {errors.message && <p className="text-[11px] font-bold text-coral">{errors.message}</p>}
-                </div>
-
-                <label className="flex items-start gap-2 text-xs text-ink-muted cursor-pointer pt-1">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={form.consent}
-                    onChange={(e) => setForm({ ...form, consent: e.target.checked })}
-                    className="mt-0.5 rounded text-brand focus:ring-brand"
-                  />
-                  <span>
-                    I agree to GLOW VAI storing my details to reply to my message. Read our{" "}
-                    <Link href="/privacy" className="underline text-brand font-bold">
-                      Privacy Policy
-                    </Link>. *
-                  </span>
-                </label>
-                {errors.consent && <p className="text-[11px] font-bold text-coral">{errors.consent}</p>}
-
-                {errors.form && (
-                  <div className="bg-blush text-ink p-3 rounded-xl text-xs font-semibold flex items-center gap-2 border border-coral/30">
-                    <AlertCircle className="w-4 h-4 text-coral shrink-0" />
-                    <span>{errors.form}</span>
-                  </div>
-                )}
-
-                <Button
-                  variant="primary"
-                  size="md"
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full  gv-btn-label mt-2"
-                >
-                  {isSubmitting ? "Sending..." : "Send Message"}
-                </Button>
-              </form>
-            )}
-          </div>
-
-          {/* Details Right (5 cols desktop) */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-skymist/40 p-6 sm:p-8 rounded-3xl border border-ink/10 space-y-4">
-              <h2 className="font-display font-bold text-lg text-ink">Contact Details</h2>
-
-              <div className="space-y-3 text-xs text-ink">
-                {siteConfig.supportEmail && siteConfig.supportEmail.trim() !== "" && (
-                  <div className="flex items-start gap-3">
-                    <Mail className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold block">Email:</span>
-                      <a href={`mailto:${siteConfig.supportEmail}`} className="text-ink-muted hover:text-brand">
-                        {siteConfig.supportEmail}
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {siteConfig.phone && siteConfig.phone.trim() !== "" && (
-                  <div className="flex items-start gap-3">
-                    <Phone className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold block">Phone / WhatsApp:</span>
-                      <a href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}`} target="_blank" rel="noreferrer" className="text-ink-muted hover:text-brand">
-                        {siteConfig.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Grievance Officer Block (Rendered ONLY when filled) */}
             {hasGrievanceInfo && (
-              <div className="bg-skymist/40 p-6 rounded-3xl border border-ink/10 space-y-2 text-xs text-ink">
-                <h3 className="font-bold text-sm text-ink">Grievance Officer (India DPDP Act):</h3>
-                {complianceConfig.grievanceOfficerName && <p>Name: {complianceConfig.grievanceOfficerName}</p>}
-                {complianceConfig.grievanceOfficerEmail && <p>Email: {complianceConfig.grievanceOfficerEmail}</p>}
-                {complianceConfig.grievanceOfficerPhone && <p>Phone: {complianceConfig.grievanceOfficerPhone}</p>}
+              <div className="mt-8 border border-ink/15 bg-white rounded-[10px] p-5 space-y-1 text-[15px]">
+                <p className="font-semibold">Grievance officer (DPDP Act)</p>
+                {complianceConfig.grievanceOfficerName && <p className="text-ink-muted">Name: {complianceConfig.grievanceOfficerName}</p>}
+                {complianceConfig.grievanceOfficerEmail && <p className="text-ink-muted">Email: {complianceConfig.grievanceOfficerEmail}</p>}
+                {complianceConfig.grievanceOfficerPhone && <p className="text-ink-muted">Phone: {complianceConfig.grievanceOfficerPhone}</p>}
               </div>
             )}
           </div>
 
-        </div>
+          <div className="lg:col-span-7">
+            <div className="bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8">
+              {success ? (
+                <div role="status" className="space-y-3 py-6">
+                  <Check className="w-8 h-8 text-brand" aria-hidden="true" />
+                  <h2 className="font-display font-semibold text-2xl">Thanks. Your message is with us.</h2>
+                  <p className="text-ink-muted">We will reply to the email you gave. Working days only.</p>
+                  <Link href="/" className={`inline-block pt-2 font-semibold underline underline-offset-4 rounded ${focusRing}`}>
+                    Back to the home page
+                  </Link>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                  <h2 className="font-display font-semibold text-2xl">Send a message</h2>
 
-      </Container>
+                  {/* Honeypot: hidden from people, filled by bots */}
+                  <div className="hidden" aria-hidden="true">
+                    <input type="text" name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="c-name" className={label}>Name</label>
+                      <input id="c-name" type="text" required autoComplete="name" placeholder="Ananya Roy" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} aria-invalid={!!errors.name} className={`${input} mt-2`} />
+                      {errors.name && <p className={err} role="alert">{errors.name}</p>}
+                    </div>
+                    <div>
+                      <label htmlFor="c-email" className={label}>Email</label>
+                      <input id="c-email" type="email" required autoComplete="email" placeholder="ananya@example.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} aria-invalid={!!errors.email} className={`${input} mt-2`} />
+                      {errors.email && <p className={err} role="alert">{errors.email}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <label htmlFor="c-phone" className={label}>Phone <span className="font-normal text-ink-muted">(optional)</span></label>
+                      <input id="c-phone" type="tel" autoComplete="tel" placeholder="98765 43210" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={`${input} mt-2`} />
+                    </div>
+                    <div>
+                      <label htmlFor="c-topic" className={label}>Topic</label>
+                      <select id="c-topic" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value as typeof form.topic })} className={`${input} mt-2`}>
+                        <option value="scan">Face scan and report</option>
+                        <option value="order">Orders and delivery</option>
+                        <option value="product">Product information</option>
+                        <option value="press">Press and partnerships</option>
+                        <option value="other">Something else</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-baseline justify-between">
+                      <label htmlFor="c-message" className={label}>Message</label>
+                      <span className="text-[13px] text-ink-light">{form.message.length}/1000</span>
+                    </div>
+                    <textarea
+                      id="c-message"
+                      required
+                      maxLength={1000}
+                      rows={5}
+                      placeholder="How can we help?"
+                      value={form.message}
+                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      aria-invalid={!!errors.message}
+                      className="mt-2 w-full px-4 py-3 text-[17px] text-ink bg-white border-[1.5px] border-ink/30 rounded-[10px] placeholder:text-ink-light focus:outline-none focus:border-brand focus:ring-[3px] focus:ring-brand/20"
+                    />
+                    {errors.message && <p className={err} role="alert">{errors.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="flex items-start gap-3 text-[15px] text-ink-muted cursor-pointer min-h-11">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={form.consent}
+                        onChange={(e) => setForm({ ...form, consent: e.target.checked })}
+                        className="mt-1 w-[22px] h-[22px] shrink-0 accent-brand"
+                      />
+                      <span>
+                        I agree to GLOW VAI storing my details to reply to my message. Read our{" "}
+                        <Link href="/privacy" className="text-ink underline underline-offset-4 font-semibold rounded">Privacy policy</Link>.
+                      </span>
+                    </label>
+                    {errors.consent && <p className={err} role="alert">{errors.consent}</p>}
+                  </div>
+
+                  {errors.form && (
+                    <p role="alert" className="rounded-[10px] border border-[#9B1C1C]/40 bg-paper p-3 text-[15px] text-[#9B1C1C]">{errors.form}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full min-h-[52px] rounded-[10px] bg-brand text-white font-semibold text-[16px] hover:bg-brand-dark disabled:opacity-50 ${focusRing}`}
+                  >
+                    {isSubmitting ? "Sending…" : "Send message"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </Section>
     </div>
   );
 }
