@@ -1,0 +1,90 @@
+/* Routine guide, ingredient layering guide and patch test guide. Colors come from the :root tokens in index.css / glowvai.css. */
+
+.glowvai-root .rec-screen{ display:flex; flex-direction:column; min-height:100%; background:var(--bg); color:var(--text-primary); }
+
+.glowvai-root .rec-header{ position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:12px; min-height:60px; padding:12px 16px; border-bottom:1px solid var(--border-light); background:#fff; }
+.glowvai-root .rec-header-copy{ display:flex; flex:1; min-width:0; align-items:center; gap:6px; }
+.glowvai-root .rec-header-title{ overflow:hidden; font-family:var(--font-heading); font-size:17px; font-weight:750; letter-spacing:-.25px; text-overflow:ellipsis; white-space:nowrap; }
+.glowvai-root .rec-header-spacer{ width:38px; flex:none; }
+.glowvai-root .rec-icon-button{ display:inline-flex; width:38px; height:38px; flex:none; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:11px; background:#fff; color:var(--text-primary); transition:background-color .18s ease, border-color .18s ease; }
+.glowvai-root .rec-icon-button:hover{ border-color:var(--primary-border); background:var(--primary-light); }
+.glowvai-root .rec-icon-button:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+
+.glowvai-root .rec-body{ display:flex; flex-direction:column; gap:16px; width:100%; max-width:720px; margin:0 auto; padding:16px 16px 40px; box-sizing:border-box; }
+
+.glowvai-root .rec-label{ margin:8px 0 0; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+.glowvai-root .rec-note{ display:flex; align-items:flex-start; gap:10px; margin:0; padding:12px 14px; border:1px solid var(--border-light); border-radius:14px; background:#fff; color:var(--text-secondary); font-size:12px; line-height:1.5; }
+.glowvai-root .rec-note svg{ flex:none; margin-top:1px; color:var(--primary); }
+
+.glowvai-root .rec-hero{ display:flex; flex-direction:column; gap:8px; padding:18px; border:1px solid var(--primary-border); border-radius:20px; background:var(--primary-light); }
+.glowvai-root .rec-hero.is-success{ border-color:var(--success-border); background:var(--success-bg); }
+.glowvai-root .rec-hero.is-warning{ border-color:var(--warning-border); background:var(--warning-bg); }
+.glowvai-root .rec-hero.is-neutral{ border-color:var(--border-light); background:#fff; }
+.glowvai-root .rec-kicker{ display:inline-flex; align-self:flex-start; align-items:center; gap:6px; padding:4px 10px; border-radius:10px; background:#fff; color:var(--primary); font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; }
+.glowvai-root .rec-hero.is-success .rec-kicker{ color:var(--success); }
+.glowvai-root .rec-hero.is-warning .rec-kicker{ color:var(--warning); }
+.glowvai-root .rec-hero.is-neutral .rec-kicker{ color:var(--text-secondary); }
+.glowvai-root .rec-headline{ margin:0; font-family:var(--font-heading); font-size:22px; font-weight:800; line-height:1.25; letter-spacing:-.02em; }
+.glowvai-root .rec-subtext{ margin:0; color:var(--text-secondary); font-size:14px; line-height:1.5; }
+
+.glowvai-root .rec-card{ display:flex; gap:12px; padding:14px; border:1px solid var(--border-light); border-radius:16px; background:#fff; }
+.glowvai-root .rec-card-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+.glowvai-root .rec-card-title{ margin:0; font-size:15px; font-weight:800; letter-spacing:-.01em; }
+.glowvai-root .rec-card-desc{ margin:0; color:var(--text-secondary); font-size:13px; line-height:1.45; }
+.glowvai-root .rec-card-meta{ margin:0; color:var(--primary); font-size:12px; font-weight:700; line-height:1.4; }
+.glowvai-root .rec-card-meta.is-success{ color:var(--success); }
+.glowvai-root .rec-card-meta.is-warning{ color:var(--warning); }
+.glowvai-root .rec-card-meta.is-muted{ color:var(--text-muted); }
+.glowvai-root .rec-card.is-warning{ border-color:var(--warning-border); background:var(--warning-bg); }
+.glowvai-root .rec-card.is-warning .rec-card-desc{ color:var(--text-primary); }
+.glowvai-root .rec-card-icon{ display:grid; width:32px; height:32px; flex:none; place-items:center; border-radius:10px; background:var(--primary-light); color:var(--primary); }
+.glowvai-root .rec-card-icon.is-success{ background:var(--success-bg); color:var(--success); }
+.glowvai-root .rec-card-icon.is-warning{ background:#fff; color:var(--warning); }
+.glowvai-root .rec-card-icon.is-error{ background:var(--error-bg); color:var(--error); }
+.glowvai-root .rec-card-icon.is-muted{ background:var(--surface); color:var(--text-secondary); }
+
+.glowvai-root .rec-step-badge{ display:grid; width:32px; height:32px; flex:none; place-items:center; border-radius:50%; background:var(--primary-light); color:var(--primary); font-size:12px; font-weight:800; }
+.glowvai-root .rec-step-tag{ margin:0; color:var(--primary); font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; }
+
+.glowvai-root .rec-segment{ display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:4px; border:1px solid var(--border-light); border-radius:16px; background:#fff; }
+.glowvai-root .rec-segment-btn{ display:inline-flex; height:44px; align-items:center; justify-content:center; gap:6px; border:0; border-radius:12px; background:transparent; color:var(--text-primary); font-size:12px; font-weight:750; transition:background-color .18s ease, color .18s ease; }
+.glowvai-root .rec-segment-btn:hover{ background:var(--surface); }
+.glowvai-root .rec-segment-btn[aria-pressed="true"]{ background:var(--primary); color:var(--text-inverse); }
+.glowvai-root .rec-segment-btn:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+
+.glowvai-root .rec-timeline,
+.glowvai-root .rec-steps-list,
+.glowvai-root .rec-pair-list{ display:flex; flex-direction:column; gap:12px; margin:0; padding:0; list-style:none; }
+.glowvai-root .rec-timeline-item{ display:flex; gap:12px; padding:14px; border:1px solid var(--border-light); border-radius:18px; background:#fff; }
+.glowvai-root .rec-timeline-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+.glowvai-root .rec-timeline-title{ margin:0; font-size:15px; font-weight:800; }
+.glowvai-root .rec-timeline-desc{ margin:0; color:var(--text-secondary); font-size:13px; line-height:1.45; }
+.glowvai-root .rec-timeline-note{ display:inline-flex; align-items:center; gap:6px; margin:2px 0 0; color:var(--primary-dark); font-size:12px; font-weight:750; }
+
+.glowvai-root .rec-pair-status{ margin:0; font-size:12px; font-weight:750; color:var(--success); }
+.glowvai-root .rec-pair-status.is-warning{ color:var(--warning); }
+
+.glowvai-root .rec-ph-card{ display:flex; flex-direction:column; gap:12px; padding:16px; border:1px solid var(--border-light); border-radius:16px; background:#fff; }
+.glowvai-root .rec-ph-head{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px; }
+.glowvai-root .rec-ph-title{ margin:0; font-size:14px; font-weight:800; }
+.glowvai-root .rec-ph-value{ margin:0; color:var(--primary); font-size:13px; font-weight:750; }
+.glowvai-root .rec-ph-bar{ position:relative; height:10px; border-radius:999px; background:linear-gradient(90deg, #d9534f 0%, #f0ad4e 25%, #5cb85c 50%, #f0ad4e 75%, #d9534f 100%); }
+.glowvai-root .rec-ph-scale{ display:flex; justify-content:space-between; color:var(--text-muted); font-size:11px; font-weight:700; }
+
+.glowvai-root .rec-cta{ display:flex; flex-direction:column; gap:10px; padding:16px; border:1px solid var(--border-light); border-radius:16px; background:#fff; }
+.glowvai-root .rec-cta-text{ margin:0; color:var(--text-secondary); font-size:12px; line-height:1.5; }
+.glowvai-root .rec-cta-btn{ display:inline-flex; width:100%; min-height:48px; align-items:center; justify-content:center; gap:8px; border-radius:14px; }
+
+@media (min-width: 720px){
+  .glowvai-root .rec-body{ padding:24px 24px 48px; }
+  .glowvai-root .rec-headline{ font-size:26px; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .rec-body{ max-width:960px; padding:32px 32px 56px; }
+  .glowvai-root .rec-timeline{ display:grid; grid-template-columns:1fr 1fr; }
+  .glowvai-root .rec-pair-list{ display:grid; grid-template-columns:1fr 1fr; }
+  .glowvai-root .rec-steps-list{ display:grid; grid-template-columns:1fr 1fr; }
+  .glowvai-root .rec-cta{ flex-direction:row; align-items:center; justify-content:space-between; }
+  .glowvai-root .rec-cta-btn{ width:auto; min-width:260px; }
+}

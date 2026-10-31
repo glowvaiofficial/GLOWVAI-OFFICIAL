@@ -106,7 +106,9 @@
 
 /* Commerce action bar (cart, checkout, addresses, location): a floating card on desktop, not a full-width strip over the bill. */
 @media (min-width: 1024px){
-  .glowvai-root.glowvai-web .commerce-sticky-bar{ position: sticky !important; bottom: 20px; left: auto !important; right: auto !important; width: min(100%, 1200px); max-width: 1200px; margin: 24px auto 0; padding: 16px 20px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-elevated); box-shadow: var(--shadow-float); }
+  .glowvai-root.glowvai-web .commerce-sticky-bar{ position: sticky !important; bottom: 20px; left: auto !important; right: auto !important; width: min(100%, 1160px); max-width: 1160px; margin: 24px auto 0; padding: 16px 20px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-elevated); box-shadow: var(--shadow-float); }
+  /* The payment method page is a centred 560px column, so its bar matches that column. */
+  .glowvai-root.glowvai-web .commerce-payment > .commerce-sticky-bar{ width: min(100%, 560px); max-width: 560px; padding-inline: 20px; }
 }
 
 /* Edit profile: personal details on the left, demographics and skin profile on the right. */
@@ -144,3 +146,39 @@
 .glowvai-root.glowvai-web .scan-concern-guide{ margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 .glowvai-root.glowvai-web .scan-concern-guide p{ margin: 0 0 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
 .glowvai-root.glowvai-web .scan-concern-guide ul{ margin: 0; padding-left: 18px; list-style: disc; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+
+/* Onboarding and splash on desktop: the sheet fills the window with what each step offers, without scrolling. */
+.glowvai-root.glowvai-web .onb-web-highlights{ display: none; }
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .onboarding-screen{ height: calc(100dvh - 65px); min-height: 600px; overflow: hidden; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{ overflow: hidden; padding: 48px min(6vw, 96px) !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet h1{ margin: 0; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > p{ margin-top: 14px !important; }
+  .glowvai-root.glowvai-web .onb-web-highlights{ display: grid; gap: 12px; list-style: none; margin: 28px 0 0; padding: 0; max-width: 460px; }
+  .glowvai-root.glowvai-web .onb-web-highlights li{ display: grid; gap: 2px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: #f7f9fe; }
+  .glowvai-root.glowvai-web .onb-web-highlights b{ color: var(--text-primary); font-size: 15px; font-weight: 700; }
+  .glowvai-root.glowvai-web .onb-web-highlights span{ color: var(--text-secondary); font-size: 13.5px; line-height: 1.45; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > div[aria-label^="Step"]{ justify-content: flex-start !important; margin-top: 26px !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > button{ max-width: 460px; margin-top: 22px !important; }
+  .glowvai-root.glowvai-web .welcome-screen{ min-height: calc(100dvh - 65px) !important; height: auto; }
+}
+
+/* Shop home on desktop: full-width search, a six-column category strip and five-column product rails. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .shop-home-search{ max-width: none; width: 100%; }
+  .glowvai-root.glowvai-web .shop-home-category-rail .shop-home-rail{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; overflow: visible; }
+  .glowvai-root.glowvai-web .shop-home-category-card{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-category-media{ height: 150px; }
+  .glowvai-root.glowvai-web .shop-home-rail{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; overflow: visible; }
+  .glowvai-root.glowvai-web .shop-home-rail-item{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-arrow{ display: none; }
+}
+
+/* Desktop product rails: one tidy row of five, with the rest behind "See all". Cards share one image proportion. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) > .shop-home-rail-item:nth-child(n+6){ display: none; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) > .shop-home-rail-item{ display: flex; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card{ width: 100%; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card img,
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card [class*="media"]{ aspect-ratio: 1 / 1; object-fit: cover; }
+}

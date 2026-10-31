@@ -33,7 +33,7 @@
 .glowvai-root .shop-home-featured-media{ height: 116px; background: #f6f7f9; }
 .glowvai-root .shop-home-featured-media img{ width: 100%; height: 100%; object-fit: cover; }
 .glowvai-root .shop-home-featured-body{ display: flex; flex: 1; flex-direction: column; justify-content: space-between; gap: 6px; padding: 10px; }
-.glowvai-root .shop-home-featured-name{ font-size: 14px; font-weight: 800; line-height: 1.3; }
+.glowvai-root .shop-home-featured-name{ color: var(--text-primary); font-size: 14px; font-weight: 800; line-height: 1.3; }
 .glowvai-root .shop-home-featured-price{ display: flex; align-items: baseline; gap: 6px; }
 .glowvai-root .shop-home-featured-price b{ color: var(--primary); font-size: 16px; font-weight: 800; }
 .glowvai-root .shop-home-featured-price s{ color: var(--text-muted); font-size: 11px; }

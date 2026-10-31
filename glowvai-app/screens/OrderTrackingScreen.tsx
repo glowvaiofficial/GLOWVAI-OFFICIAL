@@ -1,14 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Check, Clock3, HelpCircle, MapPin, Navigation, PackageCheck, Phone, ShoppingBag, XCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { searchPlaces } from '../features/commerce/lib/geocode';
+import { LocationMap } from '../components/map/LocationMap';
 
-const VIJAYAWADA_MAP = 'https://www.openstreetmap.org/export/embed.html?bbox=80.6268%2C16.4940%2C80.6605%2C16.5215&layer=mapnik&marker=16.5062%2C80.6480';
+interface MapState {
+  status: 'loading' | 'ready' | 'unavailable';
+  point?: { latitude: number; longitude: number };
+}
 
 export const OrderTrackingScreen: React.FC = () => {
   const { goBack, navigate, activeOrder, orders, cancelOrder } = useApp();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [reason, setReason] = useState('Ordered by mistake');
   const order = activeOrder || orders[0];
+  const addressQuery = order ? `${order.address.street}, ${order.address.area}, ${order.address.city}, ${order.address.pincode}` : '';
+  const [map, setMap] = useState<MapState>({ status: 'loading' });
+
+  // Orders keep the address as text, so look up its position once per address for the map.
+  useEffect(() => {
+    if (!addressQuery) return;
+    let active = true;
+    setMap({ status: 'loading' });
+    searchPlaces(addressQuery, 1)
+      .then(([first]) => {
+        if (!active) return;
+        setMap(first ? { status: 'ready', point: { latitude: first.latitude, longitude: first.longitude } } : { status: 'unavailable' });
+      })
+      .catch(() => {
+        if (active) setMap({ status: 'unavailable' });
+      });
+    return () => {
+      active = false;
+    };
+  }, [addressQuery]);
   if (!order) return <main className="commerce-empty"><div><span><ShoppingBag size={34} /></span><h2>No active delivery</h2><p>Once you place an order, its route and status will appear here.</p><button onClick={() => navigate('home')}>Start shopping</button></div></main>;
   if (order.status === 'cancelled') return <main className="commerce-empty"><div><span><XCircle size={34} /></span><h2>This order was cancelled</h2><p>Open the cancellation summary for payment and refund details.</p><button onClick={() => navigate('order-cancelled')}>View cancellation</button></div></main>;
 
@@ -31,7 +56,7 @@ export const OrderTrackingScreen: React.FC = () => {
     <header className="commerce-flow-header"><button onClick={goBack} aria-label="Go back"><ArrowLeft size={21} /></button><div><h1>Track order</h1><p>#{order.id}</p></div><button className="tracking-help" onClick={() => navigate('support', { orderId: order.id })}><HelpCircle size={18} /> Help</button></header>
     <div className="tracking-body">
       <section className="tracking-eta"><div><span>{stageIndex >= 2 ? <Navigation size={22} /> : <PackageCheck size={22} />}</span><div><small>{stageIndex >= 2 ? 'ON THE WAY' : 'ORDER CONFIRMED'}</small><h1>{stageIndex >= 2 ? `Arriving in ${order.estimatedDeliveryMinutes} min` : 'We’re preparing your order'}</h1><p>Delivery to {order.address.area}</p></div></div><time><Clock3 size={15} /> {order.estimatedDeliveryMinutes} min</time></section>
-      <section className="tracking-map-card" aria-labelledby="estimated-route-title"><div className="tracking-map-head"><div><h2 id="estimated-route-title">Estimated route</h2><p>Map position updates when the rider is assigned.</p></div><span>{stageIndex >= 2 ? 'Rider moving' : 'Preparing'}</span></div><div className="tracking-map"><div className="tracking-map-fallback" aria-hidden="true"><i className="road road-one" /><i className="road road-two" /><i className="road road-three" /><span className="map-label benz">Benz Circle</span><span className="map-label mg">MG Road</span><span className="map-label labbipet">Labbipet</span></div><iframe title="Estimated delivery route around Benz Circle, Vijayawada" src={VIJAYAWADA_MAP} loading="lazy" referrerPolicy="no-referrer" /><span className="tracking-map-store"><ShoppingBag size={14} /></span><span className="tracking-map-home"><MapPin size={16} fill="currentColor" /></span><i className="tracking-map-route" aria-hidden="true" /></div><small className="tracking-map-note">Route shown is an estimate until live delivery-partner GPS is connected.</small></section>
+      <section className="tracking-map-card" aria-labelledby="estimated-route-title"><div className="tracking-map-head"><div><h2 id="estimated-route-title">Estimated route</h2><p>Your delivery address on the map.</p></div><span>{stageIndex >= 2 ? 'Rider moving' : 'Preparing'}</span></div><div className="tracking-map">{map.status === 'ready' && map.point ? <LocationMap latitude={map.point.latitude} longitude={map.point.longitude} label="Map of your delivery address" /> : <div className="tracking-map-fallback"><span>{map.status === 'loading' ? 'Finding your address on the map…' : 'Map unavailable for this address'}</span></div>}</div><small className="tracking-map-note">Shows your delivery address. Live rider position is not shown yet.</small></section>
       <section className="tracking-progress" aria-labelledby="delivery-progress-title"><h2 id="delivery-progress-title">Delivery progress</h2><div>{stages.map((stage, index) => <article key={stage.label} className={index < stageIndex ? 'is-done' : index === stageIndex ? 'is-current' : 'is-upcoming'}><span>{index <= stageIndex ? <Check size={15} /> : index + 1}</span><div><b>{stage.label}</b><p>{stage.note}</p></div></article>)}</div></section>
       {rider?.riderName && stageIndex >= 2 && <section className="tracking-rider"><span>{rider.riderName?.split(' ').map((part) => part[0]).join('').slice(0, 2)}</span><div><small>Delivery partner</small><b>{rider.riderName}</b><p>{rider.riderPhoneMasked}</p></div><button aria-label="Call delivery partner"><Phone size={18} /></button></section>}
       <section className="tracking-address"><MapPin size={19} /><div><small>Delivery address</small><b>{order.address.street}, {order.address.area}</b><p>{order.address.city} · {order.address.pincode}</p></div></section>

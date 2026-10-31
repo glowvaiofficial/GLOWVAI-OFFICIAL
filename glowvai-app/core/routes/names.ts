@@ -62,6 +62,13 @@ export type PortedScreenName =
   | 'profile-support'
   | 'profile-referrals'
   | 'profile-referral-code'
+  | 'profile-referral-transactions'
+  | 'profile-student-status'
+  // Routine and ingredient guidance (features/recommendations)
+  | 'recommend-overview'
+  | 'recommend-routine'
+  | 'recommend-ingredients'
+  | 'recommend-patch-test'
   // Admin & vendor (features/admin, features/vendor)
   | 'admin-portal'
   | 'admin-claims'

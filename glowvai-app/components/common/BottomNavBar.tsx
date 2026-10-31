@@ -13,7 +13,8 @@ export const BottomNavBar: React.FC = () => {
     return () => window.removeEventListener('glowvai:commerce-reveal', handleReveal);
   }, [currentScreen]);
 
-  const hidden: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp', 'face-prep', 'face-capture', 'face-loading', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking'];
+  const pillHiddenScreens: ScreenName[] = ['cart', 'shop-product', 'shop-search-filters', 'location-map-picker'];
+  const hidden: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp', 'face-prep', 'face-capture', 'face-loading', 'cart', 'checkout', 'checkout-payment-method', 'checkout-payment-success', 'checkout-payment-failed', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking'];
   if (hidden.includes(currentScreen) || (currentScreen === 'skin-report' && !reportCommerceVisible)) return null;
 
   const navItems = [
@@ -25,7 +26,8 @@ export const BottomNavBar: React.FC = () => {
 
   return (
     <div className="bottom-commerce-shell">
-      {cartItemCount > 0 && currentScreen !== 'cart' && (
+      {/* These screens have their own sticky bottom bar, which the pill would cover. */}
+      {cartItemCount > 0 && !pillHiddenScreens.includes(currentScreen) && (
         <button onClick={() => navigate('cart')} className="mini-cart-bar" aria-label={`View cart, ${cartItemCount} items, ₹${cartAuthoritative.finalPayable}`}>
           <span className="mini-cart-icon"><ShoppingCart size={20} /></span>
           <span className="mini-cart-copy"><b>View cart</b><small>{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'} · ₹{cartAuthoritative.finalPayable}</small></span>

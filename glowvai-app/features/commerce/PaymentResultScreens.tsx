@@ -116,7 +116,7 @@ export const PaymentFailedScreen: React.FC = () => {
           )}
           <div>
             <dt>Amount</dt>
-            <dd>₹{params.amount ?? 0}</dd>
+            <dd>{params.amount === undefined ? '—' : `₹${params.amount}`}</dd>
           </div>
         </dl>
       </div>

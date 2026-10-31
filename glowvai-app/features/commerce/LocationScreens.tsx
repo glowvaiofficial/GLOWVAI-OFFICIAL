@@ -5,6 +5,7 @@ import { getDeviceCurrentLocation } from '../../core/services/locationService';
 import { searchPlaces, type PlaceResult } from './lib/geocode';
 import { isServiceablePincode, useAddressStore } from './lib/addressStore';
 import { FlowHeader, useDeliveryAddress } from './components/shared';
+import { LocationMap } from '../../components/map/LocationMap';
 
 const FALLBACK = { latitude: 16.5417, longitude: 80.6425, pincode: '520015' };
 
@@ -195,6 +196,8 @@ export const LocationMapPickerScreen: React.FC = () => {
       <FlowHeader title="Confirm location" subtitle="Check the pin before adding details" onBack={goBack} />
 
       <div className="commerce-body">
+        <LocationMap latitude={latitude} longitude={longitude} label="Map of the selected pin" />
+
         <section className="commerce-pin-card" aria-label="Selected location">
           <span className="commerce-pin-icon">
             <Store size={20} />

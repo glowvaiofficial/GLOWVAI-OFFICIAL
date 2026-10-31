@@ -1,0 +1,24 @@
+.glowvai-root .location-map{
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-elevated);
+}
+.glowvai-root .location-map iframe{ display: block; width: 100%; height: 100%; border: 0; }
+
+.glowvai-root .orders-track-map{ margin-bottom: 16px; }
+.glowvai-root .orders-track-map .location-map{ height: 200px; }
+.glowvai-root .orders-track-map-fallback{
+  display: grid;
+  height: 200px;
+  place-items: center;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  background: var(--surface-elevated);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.glowvai-root .orders-rider-icon{ display: grid; width: 44px; height: 44px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--success-bg); color: var(--success); }
