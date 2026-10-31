@@ -99,8 +99,8 @@
 @media (min-width: 1024px){
   .glowvai-root.glowvai-web .orders-body{ max-width: 1200px; margin: 0 auto; padding: 24px 32px 48px; grid-template-columns: minmax(0, 1fr) !important; }
   .glowvai-root.glowvai-web .orders-body > *{ max-width: none; }
-  .glowvai-root.glowvai-web .orders-body div:has(> .orders-past-card){ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-  .glowvai-root.glowvai-web .orders-body div:has(> .orders-past-card) > *:not(.orders-past-card){ grid-column: 1 / -1; }
+  .glowvai-root.glowvai-web .orders-body:has(> .orders-past-card){ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 16px; align-items: start; }
+  .glowvai-root.glowvai-web .orders-body:has(> .orders-past-card) > *:not(.orders-past-card){ grid-column: 1 / -1; }
   .glowvai-root.glowvai-web .orders-active-card{ max-width: none !important; width: 100%; }
 }
 
@@ -120,3 +120,10 @@
 /* Product actions: label colour on the solid blue and black buttons (the shop reset set buttons to inherit). */
 .glowvai-root.glowvai-web .shop-screen .shop-btn-primary,
 .glowvai-root.glowvai-web .shop-screen .shop-product-buynow{ color: #fff; }
+
+/* Narrow form and tool screens: the header spans the page, so its back button lines up with the site header. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .commerce-head{ padding-inline: 24px !important; }
+  .glowvai-root.glowvai-web .orders-header{ width: 100%; max-width: none !important; margin: 0 !important; }
+  .glowvai-root.glowvai-web .scan-header{ padding-inline: 24px !important; }
+}

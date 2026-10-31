@@ -20,7 +20,9 @@ const METHOD_LABEL: Record<string, string> = {
 export const PaymentSuccessScreen: React.FC = () => {
   const { activeParams, navigate } = useApp();
   const params = (activeParams || {}) as PaymentResultParams;
-  const orderId = params.orderId || 'GV-PENDING';
+  // Opened without payment details, show a dash rather than a made-up order number or a zero amount.
+  const orderId = params.orderId || '—';
+  const amountLabel = params.amount === undefined ? '—' : `₹${params.amount}`;
 
   return (
     <main className="commerce-screen commerce-result is-success">
@@ -46,7 +48,7 @@ export const PaymentSuccessScreen: React.FC = () => {
           </div>
           <div>
             <dt>{params.method === 'cod' ? 'Amount to pay' : 'Amount paid'}</dt>
-            <dd>₹{params.amount ?? 0}</dd>
+            <dd>{amountLabel}</dd>
           </div>
           <div>
             <dt>Payment</dt>
@@ -74,7 +76,7 @@ export const PaymentSuccessScreen: React.FC = () => {
         <button className="commerce-ghost" onClick={() => navigate('home')}>
           Continue shopping
         </button>
-        <button className="commerce-primary" onClick={() => navigate('orders-tracking', { orderId })}>
+        <button className="commerce-primary" onClick={() => navigate('orders-tracking', { orderId: params.orderId })}>
           Track order live
         </button>
       </footer>
