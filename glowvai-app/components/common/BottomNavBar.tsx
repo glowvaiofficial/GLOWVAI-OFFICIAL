@@ -14,7 +14,7 @@ export const BottomNavBar: React.FC = () => {
   }, [currentScreen]);
 
   const pillHiddenScreens: ScreenName[] = ['cart', 'shop-product', 'shop-search-filters'];
-  const hidden: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp', 'face-prep', 'face-capture', 'face-loading', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking'];
+  const hidden: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp', 'face-prep', 'face-capture', 'face-loading', 'cart', 'checkout', 'checkout-payment-method', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking'];
   if (hidden.includes(currentScreen) || (currentScreen === 'skin-report' && !reportCommerceVisible)) return null;
 
   const navItems = [

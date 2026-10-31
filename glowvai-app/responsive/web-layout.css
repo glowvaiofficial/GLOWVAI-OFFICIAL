@@ -107,6 +107,8 @@
 /* Commerce action bar (cart, checkout, addresses, location): a floating card on desktop, not a full-width strip over the bill. */
 @media (min-width: 1024px){
   .glowvai-root.glowvai-web .commerce-sticky-bar{ position: sticky !important; bottom: 20px; left: auto !important; right: auto !important; width: min(100%, 1160px); max-width: 1160px; margin: 24px auto 0; padding: 16px 20px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-elevated); box-shadow: var(--shadow-float); }
+  /* The payment method page is a centred 560px column, so its bar matches that column. */
+  .glowvai-root.glowvai-web .commerce-payment > .commerce-sticky-bar{ width: min(100%, 560px); max-width: 560px; padding-inline: 20px; }
 }
 
 /* Edit profile: personal details on the left, demographics and skin profile on the right. */
