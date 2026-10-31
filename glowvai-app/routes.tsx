@@ -8,6 +8,19 @@ import { routes as scanRoutes } from './features/scan/routes';
 import { routes as profileRoutes } from './features/profile/routes';
 import { routes as recommendationRoutes } from './features/recommendations/routes';
 
+// The header and bottom nav still send some actions to the older screen names. Point those names at the
+// ported screens so every path shows the current design.
+const legacyAliases = {
+  home: shopRoutes['shop-home'],
+  categories: shopRoutes['shop-browse'],
+  search: shopRoutes['shop-search-filters'],
+  'product-detail': shopRoutes['shop-product'],
+  cart: commerceRoutes['cart-tab'],
+  'order-history': ordersRoutes['orders-list'],
+  'face-prep': scanRoutes['scan-tab'],
+  profile: profileRoutes['profile-tab'],
+} as Partial<Record<PortedScreenName, ComponentType>>;
+
 // Every customer-facing mobile-app screen, keyed by its PortedScreenName.
 // Admin and vendor screens (features/admin) are not mapped: they are not part of the public website.
 export const portedRoutes: Partial<Record<PortedScreenName, ComponentType>> = {
@@ -18,4 +31,5 @@ export const portedRoutes: Partial<Record<PortedScreenName, ComponentType>> = {
   ...scanRoutes,
   ...profileRoutes,
   ...recommendationRoutes,
+  ...legacyAliases,
 };
