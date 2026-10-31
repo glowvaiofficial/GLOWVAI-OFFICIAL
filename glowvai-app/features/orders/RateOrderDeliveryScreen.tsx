@@ -7,7 +7,7 @@ const RIDER_TAGS = ['Friendly', 'Fast', 'Careful', 'Professional'];
 const PRODUCT_TAGS = ['Fresh packaging', 'Loved the product', 'Great value'];
 const THUMBS = [
   'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1608248597263-00de46196f65?auto=format&fit=crop&w=150&q=80',
+  'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
   'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=150&q=80',
 ];
 

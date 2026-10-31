@@ -127,3 +127,15 @@
   .glowvai-root.glowvai-web .orders-header{ width: 100%; max-width: none !important; margin: 0 !important; }
   .glowvai-root.glowvai-web .scan-header{ padding-inline: 24px !important; }
 }
+
+/* Skin report: results on the left, actions in a sticky side column, concerns in two columns. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .scan-report-body .scan-split{ display: grid !important; grid-template-columns: minmax(0, 1fr) 320px !important; align-items: start; gap: 28px; max-width: 1160px; margin: 0 auto; padding-top: 24px; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-split-main{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-split-side{ position: sticky; top: 96px; width: auto; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-concern-list{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-routine-list{ max-width: none; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-disclaimer,
+  .glowvai-root.glowvai-web .scan-report-body .scan-privacy,
+  .glowvai-root.glowvai-web .scan-report-body .scan-model-note{ max-width: 1160px; margin-inline: auto; }
+}

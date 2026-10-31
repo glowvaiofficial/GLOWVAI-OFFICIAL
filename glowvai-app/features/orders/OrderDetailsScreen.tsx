@@ -23,7 +23,7 @@ const ORDER_ITEMS = [
     category: 'Moisturizer',
     qty: 1,
     price: 499,
-    image: 'https://images.unsplash.com/photo-1608248597263-00de46196f65?auto=format&fit=crop&w=300&q=80',
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=300&q=80',
   },
   {
     id: '3',
