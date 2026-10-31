@@ -70,3 +70,20 @@
     max-width: 440px;
   }
 }
+
+/* Scan tab: one centred column, with the launch actions under the scan target. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .scan-split{ display: flex !important; flex-direction: column; align-items: center; gap: 24px; max-width: 720px; margin: 0 auto; padding-top: 24px; grid-template-columns: none !important; }
+  .glowvai-root.glowvai-web .scan-split-main{ width: 100%; }
+  .glowvai-root.glowvai-web .scan-split-side{ display: flex; flex-direction: column; width: min(100%, 420px); gap: 12px; }
+  .glowvai-root.glowvai-web .scan-primary-button{ width: 100%; }
+}
+
+/* Orders: a 1200px page, with past orders in two columns. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .orders-body{ max-width: 1200px; margin: 0 auto; padding: 24px 32px 48px; grid-template-columns: minmax(0, 1fr) !important; }
+  .glowvai-root.glowvai-web .orders-body > *{ max-width: none; }
+  .glowvai-root.glowvai-web .orders-body div:has(> .orders-past-card){ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .glowvai-root.glowvai-web .orders-body div:has(> .orders-past-card) > *:not(.orders-past-card){ grid-column: 1 / -1; }
+  .glowvai-root.glowvai-web .orders-active-card{ max-width: none !important; width: 100%; }
+}
