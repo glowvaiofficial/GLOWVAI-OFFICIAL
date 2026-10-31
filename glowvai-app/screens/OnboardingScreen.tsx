@@ -13,6 +13,7 @@ const steps = [
     highlight: 'Know',
     tail: ' your skin.',
     body: 'AI-powered face analysis to understand your unique skin needs.',
+    highlights: [{title:'Scan in about a minute',text:'A guided camera check for lighting and angle.'},{title:'A clear skin report',text:'Skin type, concerns and confidence in one view.'},{title:'A routine that fits',text:'Products matched to what your scan found.'}],
     action: 'Next',
   },
   {
@@ -21,6 +22,7 @@ const steps = [
     highlight: ' glow,',
     tail: ' delivered.',
     body: 'Personalized skincare products and quick commerce, right to your door.',
+    highlights: [{title:'Delivery in about 10 minutes',text:'Orders are dispatched from a nearby darkstore.'},{title:'Pay your way',text:'UPI, cards, wallets or cash on delivery.'},{title:'Follow your rider',text:'Track packing, dispatch and arrival live.'}],
     action: 'Next',
   },
   {
@@ -29,6 +31,7 @@ const steps = [
     highlight: ' progress',
     tail: ' matters.',
     body: 'Track your journey, compare results, and get support when you need it.',
+    highlights: [{title:'Every order, in one timeline',text:'Confirmed, packed, on the way and delivered.'},{title:'Reorder in one tap',text:'Buy again from past orders without searching.'},{title:'Help when you need it',text:'Order support and FAQs from your account.'}],
     action: 'Start My Glow Journey',
   },
 ];
@@ -69,6 +72,15 @@ export const OnboardingScreen: React.FC = () => {
           {item.lead}<span style={{ color: '#0d62f8' }}>{item.highlight}</span>{item.tail}
         </h1>
         <p style={{ maxWidth: 360, marginTop: 15, color: '#6d7589', fontSize: 16, lineHeight: 1.55 }}>{item.body}</p>
+
+        <ul className="onb-web-highlights" aria-label="What you get">
+          {item.highlights.map((point) => (
+            <li key={point.title}>
+              <b>{point.title}</b>
+              <span>{point.text}</span>
+            </li>
+          ))}
+        </ul>
 
         <div aria-label={`Step ${step + 1} of ${steps.length}`} style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 23 : 30 }}>
           {steps.map((_, index) => <span key={index} aria-hidden="true" style={{ width: 11, height: 11, borderRadius: '50%', background: index === step ? '#0d62f8' : '#dce8fa', transition: 'background-color .2s ease' }} />)}

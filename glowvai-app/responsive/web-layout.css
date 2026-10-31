@@ -144,3 +144,19 @@
 .glowvai-root.glowvai-web .scan-concern-guide{ margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 .glowvai-root.glowvai-web .scan-concern-guide p{ margin: 0 0 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
 .glowvai-root.glowvai-web .scan-concern-guide ul{ margin: 0; padding-left: 18px; list-style: disc; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+
+/* Onboarding and splash on desktop: the sheet fills the window with what each step offers, without scrolling. */
+.glowvai-root.glowvai-web .onb-web-highlights{ display: none; }
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .onboarding-screen{ height: calc(100dvh - 65px); min-height: 600px; overflow: hidden; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{ overflow: hidden; padding: 48px min(6vw, 96px) !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet h1{ margin: 0; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > p{ margin-top: 14px !important; }
+  .glowvai-root.glowvai-web .onb-web-highlights{ display: grid; gap: 12px; list-style: none; margin: 28px 0 0; padding: 0; max-width: 460px; }
+  .glowvai-root.glowvai-web .onb-web-highlights li{ display: grid; gap: 2px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: #f7f9fe; }
+  .glowvai-root.glowvai-web .onb-web-highlights b{ color: var(--text-primary); font-size: 15px; font-weight: 700; }
+  .glowvai-root.glowvai-web .onb-web-highlights span{ color: var(--text-secondary); font-size: 13.5px; line-height: 1.45; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > div[aria-label^="Step"]{ justify-content: flex-start !important; margin-top: 26px !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > button{ max-width: 460px; margin-top: 22px !important; }
+  .glowvai-root.glowvai-web .welcome-screen{ min-height: calc(100dvh - 65px) !important; height: auto; }
+}
