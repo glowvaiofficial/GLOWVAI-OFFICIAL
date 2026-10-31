@@ -1,0 +1,72 @@
+/* Website layout for the shop at tablet and desktop widths.
+   The app was built phone-first, so on wide screens its entry screens used to float as phone-sized cards.
+   Here they become full-width website pages: a brand panel and a form column side by side.
+   Selectors carry .glowvai-web so these rules win over the per-screen responsive files, whatever the import order. */
+
+/* Entry flow (welcome, login, OTP, onboarding): one full-width split page per screen. */
+@media (min-width: 720px){
+  .glowvai-root.glowvai-web .welcome-screen,
+  .glowvai-root.glowvai-web .onboarding-screen,
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen,
+  .glowvai-root.glowvai-web .auth-welcome,
+  .glowvai-root.glowvai-web .auth-login,
+  .glowvai-root.glowvai-web .auth-screen{
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: calc(100dvh - 65px);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .glowvai-root.glowvai-web .screen-content:has(.welcome-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.onboarding-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.login-reference-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.otp-reference-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-welcome),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-login),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-screen){
+    padding: 0;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 1024px){
+  /* Onboarding positions its photo and sheet absolutely with inline styles; put them in the grid instead. */
+  .glowvai-root.glowvai-web .onboarding-screen{ min-height: calc(100dvh - 65px); }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{ position: relative !important; inset: auto !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media{ min-height: calc(100dvh - 65px); }
+
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen,
+  .glowvai-root.glowvai-web .onboarding-screen{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .glowvai-root.glowvai-web .login-reference-hero,
+  .glowvai-root.glowvai-web .otp-reference-hero,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media{
+    flex: none;
+    width: 100%;
+    min-height: calc(100dvh - 65px);
+    height: 100%;
+  }
+  .glowvai-root.glowvai-web .login-reference-sheet,
+  .glowvai-root.glowvai-web .otp-keypad-sheet,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: 80px min(8vw, 120px);
+  }
+  .glowvai-root.glowvai-web .login-reference-form,
+  .glowvai-root.glowvai-web .otp-keypad{
+    max-width: 440px;
+  }
+}

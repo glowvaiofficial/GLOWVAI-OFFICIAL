@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import './glowvai.css';
 import './responsive/shell.css';
+import './responsive/web-layout.css';
 
 // The NOV FINAL app is client-only: it relies on browser APIs and keeps all screen state in the browser.
 const GlowVaiApp = dynamic(() => import('./App').then((m) => m.App), {
@@ -12,7 +13,7 @@ const GlowVaiApp = dynamic(() => import('./App').then((m) => m.App), {
 
 export function GlowVaiShop() {
   return (
-    <div className="glowvai-root">
+    <div className="glowvai-root glowvai-web">
       <GlowVaiApp />
     </div>
   );
