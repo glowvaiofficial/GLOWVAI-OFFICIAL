@@ -132,10 +132,10 @@ export const RoutinePrescriberScreen = () => {
           <button
             type="button"
             className="commerce-primary rec-cta-btn"
-            onClick={() => navigate('shop-browse')}
+            onClick={() => navigate('recommend-checkout')}
           >
             <ShoppingBag size={18} />
-            Browse products
+            Shop this routine
           </button>
         </div>
       </div>

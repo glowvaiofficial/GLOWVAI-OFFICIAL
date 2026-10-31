@@ -75,7 +75,7 @@ export const StudentVerificationScreen: React.FC = () => {
       </div>
 
       <h1 className="auth-title auth-center">Unlock your student glow perks</h1>
-      <p className="auth-subtitle auth-center">Verify once to get extra Glow Coins and student-only offers.</p>
+      <p className="auth-subtitle auth-center">Verify once to unlock student-only offers.</p>
 
       <span className="auth-section-label">Verification Details</span>
 

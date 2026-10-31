@@ -195,13 +195,10 @@ export const ShopProductScreen: React.FC = () => {
             <h1 className="shop-product-title">{product.name}</h1>
             <p className="shop-product-desc">{product.description}</p>
 
+            {/* No review source is connected yet, so no rating or review count is shown. */}
             <div className="shop-product-rating-row">
-              <span className="shop-product-rating">
-                <Star size={12} fill="currentColor" />
-                {product.rating.toFixed(1)}
-              </span>
               <button type="button" className="shop-product-reviews-link" onClick={openReviews}>
-                {product.reviewCount.toLocaleString('en-IN')} verified reviews →
+                Reviews →
               </button>
             </div>
 
@@ -309,7 +306,7 @@ export const ShopProductScreen: React.FC = () => {
             <div className="shop-product-acc-divider" />
 
             <button type="button" className="shop-product-acc-btn" onClick={openReviews}>
-              <span>Customer Reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
+              <span>Customer reviews</span>
               <ChevronRight size={18} />
             </button>
           </div>

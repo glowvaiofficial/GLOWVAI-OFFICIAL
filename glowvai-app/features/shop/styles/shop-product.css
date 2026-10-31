@@ -93,3 +93,8 @@
   .glowvai-root .shop-product-title{ font-size: 26px; line-height: 1.25; }
   .glowvai-root .shop-product-desc{ font-size: 14px; }
 }
+
+.glowvai-root .shop-reviews-empty-body{ display: grid; justify-items: center; gap: 10px; padding: 48px 24px; text-align: center; }
+.glowvai-root .shop-reviews-empty-body h2{ margin: 0; font-size: 18px; font-weight: 800; }
+.glowvai-root .shop-reviews-empty-body p{ margin: 0; max-width: 360px; font-size: 13px; color: var(--text-muted); }
+.glowvai-root .shop-reviews-empty-body .shop-btn-primary{ margin-top: 8px; }

@@ -318,12 +318,6 @@ function DealCard({ item, rating }: { item: DealItem; rating?: boolean }) {
         </span>
         <small className="shop-home-deal-brand">{item.brand}</small>
         <span className="shop-home-deal-name">{item.name}</span>
-        {rating && item.rating !== undefined && (
-          <span className="shop-home-deal-rating">
-            <Star size={11} fill="currentColor" />
-            {item.rating}
-          </span>
-        )}
         <span className="shop-home-deal-price">
           <b>{formatRupee(item.price)}</b>
           <s>{formatRupee(item.mrp)}</s>
