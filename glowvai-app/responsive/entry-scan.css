@@ -1,0 +1,118 @@
+/* Entry and skin-scan screens for tablet and desktop. Phone layout comes from glowvai.css. */
+
+/* Welcome, onboarding, login and OTP: centred card; brand panel beside the form at 1024px+. */
+@media (min-width: 720px){
+  .glowvai-root .welcome-screen{ max-width: 440px; height: 640px; margin: 40px auto; border-radius: 28px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
+
+  .glowvai-root .onboarding-screen{ width: min(100%, 640px); height: 680px; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); --onb-hero-inset: 0 0 50% 0; --onb-sheet-min: 50%; --onb-sheet-pad: 40px 48px 40px; --onb-sheet-radius: 30px 30px 0 0; }
+  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 100%; }
+  .glowvai-root .onboarding-screen .onboarding-media{ width: 100%; }
+
+  .glowvai-root .login-reference-screen{ width: min(100%, 640px); height: auto; min-height: 0; flex: none; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
+  .glowvai-root .login-reference-hero{ flex: none; min-height: 460px; }
+  .glowvai-root .login-reference-sheet{ flex: none; min-height: 0; padding: 40px 48px 48px; }
+
+  .glowvai-root .screen-content:has(.otp-reference-screen){ overflow: visible; }
+  .glowvai-root .otp-reference-screen{ width: min(100%, 640px); height: auto; min-height: 0; flex: none; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
+  .glowvai-root .otp-reference-hero{ flex: none; min-height: 0; padding-bottom: 36px; }
+  .glowvai-root .otp-hero-content{ height: auto; padding-bottom: 8px; }
+  .glowvai-root .otp-keypad-sheet{ flex: none; min-height: 0; padding: 36px 48px 40px; }
+  .glowvai-root .otp-keypad{ height: auto; grid-template-rows: none; grid-auto-rows: 64px; max-width: 340px; margin: 0 auto; }
+  .glowvai-root .otp-keypad button, .glowvai-root .otp-key-spacer{ min-height: 64px; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .welcome-screen{ max-width: 480px; height: 680px; }
+
+  .glowvai-root .onboarding-screen{ width: min(100%, 960px); height: 620px; --onb-hero-inset: 0 auto 0 0; --onb-sheet-inset: 0 0 0 auto; --onb-sheet-min: 0px; --onb-sheet-pad: 56px 56px 48px; --onb-sheet-radius: 0; }
+  .glowvai-root .onboarding-screen .onboarding-media{ width: 50%; }
+  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 50%; display: flex; flex-direction: column; justify-content: center; }
+  .glowvai-root .onboarding-screen .onboarding-sheet h1{ max-width: 420px; font-size: 44px; }
+  .glowvai-root .onboarding-screen .onboarding-sheet p{ max-width: 420px; font-size: 17px; }
+
+  .glowvai-root .login-reference-screen{ width: min(100%, 960px); min-height: 620px; flex-direction: row; }
+  .glowvai-root .login-reference-hero{ flex: 0 0 46%; min-height: 0; }
+  .glowvai-root .login-reference-sheet{ flex: 1 1 auto; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 56px 64px; border-radius: 0; box-shadow: none; }
+  .glowvai-root .login-sheet-copy h1{ font-size: 32px; }
+  .glowvai-root .login-sheet-copy > p{ font-size: 14px; }
+  .glowvai-root .login-reference-form{ max-width: 420px; }
+  .glowvai-root .login-phone-field input{ font-size: 15px; }
+  .glowvai-root .login-continue-button{ height: 52px; font-size: 16px; }
+  .glowvai-root .login-legal-copy{ max-width: 420px; font-size: 11.5px; }
+  .glowvai-root .login-home-indicator{ display: none; }
+
+  .glowvai-root .otp-reference-screen{ width: min(100%, 960px); min-height: 620px; flex-direction: row; }
+  .glowvai-root .otp-reference-hero{ flex: 0 0 50%; }
+  .glowvai-root .otp-keypad-sheet{ flex: 1 1 0; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 56px 64px; border-radius: 0; box-shadow: none; }
+  .glowvai-root .otp-keypad-sheet .otp-keypad{ width: 100%; }
+  .glowvai-root .otp-sheet-handle{ display: none; }
+  .glowvai-root .otp-keypad{ grid-auto-rows: 72px; }
+  .glowvai-root .otp-keypad button, .glowvai-root .otp-key-spacer{ min-height: 72px; }
+  .glowvai-root .otp-copy h1{ font-size: 30px; }
+  .glowvai-root .otp-cells{ max-width: 380px; }
+}
+
+/* Face-scan preparation: checks on the left, consent and action on the right at 1024px+. */
+@media (min-width: 720px){
+  .glowvai-root .scan-prep{ padding: 28px 32px 110px; }
+  .glowvai-root .scan-prep-header h1{ max-width: 520px; font-size: 32px; }
+  .glowvai-root .scan-prep-header p{ max-width: 520px; font-size: 14px; }
+  .glowvai-root .prep-checks > h2{ font-size: 18px; }
+  .glowvai-root .prep-checks article b{ font-size: 14px; }
+  .glowvai-root .prep-checks article p{ font-size: 13px; }
+  .glowvai-root .photo-choice-title p, .glowvai-root .retention-options small, .glowvai-root .scan-consent{ font-size: 13px; }
+  .glowvai-root .retention-options b{ font-size: 14px; }
+  .glowvai-root .scan-start{ font-size: 15px; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .scan-prep{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 48px; align-items: start; max-width: 1040px; padding: 40px 40px 48px; }
+  .glowvai-root .scan-prep-header{ grid-column: 1 / -1; }
+  .glowvai-root .scan-prep-header h1{ max-width: none; font-size: 40px; }
+  .glowvai-root .scan-prep-header p{ max-width: 640px; }
+  .glowvai-root .prep-checks{ grid-column: 1; grid-row: 2 / span 2; margin-top: 8px; }
+  .glowvai-root .prep-checks article{ padding: 20px 0; }
+  .glowvai-root .photo-choice{ grid-column: 2; grid-row: 2; margin-top: 8px; padding: 24px; }
+  .glowvai-root .scan-prep-action{ position: sticky; bottom: 24px; grid-column: 2; grid-row: 3; margin: 16px 0 0; padding: 16px 0 0; border-top: 0; background: none; }
+  .glowvai-root .scan-prep-action p{ justify-content: flex-start; }
+}
+
+/* Camera capture: a centred viewfinder column so the controls stay on screen. */
+@media (min-width: 720px){
+  .glowvai-root .face-capture-screen{ max-width: 560px; height: min(780px, calc(100dvh - 120px)); min-height: 560px; max-height: 780px; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .3); }
+}
+
+/* Loading and failed states: a centred panel. */
+@media (min-width: 720px){
+  .glowvai-root .scan-loading, .glowvai-root .scan-failed{ min-height: 540px; max-width: 560px; margin: 40px auto; border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-float); }
+}
+
+/* Skin report: scores in a column, insights and routine beside them on desktop. */
+@media (min-width: 720px){
+  .glowvai-root .skin-dashboard-sheet:not(:has(.skin-gauge)){ max-width: 640px; margin: 40px auto; padding: 32px 36px; border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow-float); }
+  .glowvai-root .skin-dashboard{ min-height: calc(100dvh - 65px); }
+  .glowvai-root .skin-dashboard-title h1{ font-size: 36px; }
+  .glowvai-root .skin-dashboard-title p{ font-size: 13px; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge){ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px 24px; align-items: start; max-width: 1200px; padding: 32px 40px 48px; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-dashboard-title,
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-sample-notice{ grid-column: 1 / -1; margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-gauge{ grid-column: 1; grid-row: 3; margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-summary{ grid-column: 1; grid-row: 4; margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-insights{ grid-column: 2 / span 2; grid-row: 3; margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-routine{ grid-column: 2 / span 2; grid-row: 4; margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-shop-cta,
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-details-toggle,
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-details-panel,
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-scroll-hint{ grid-column: 1 / -1; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-shop-cta{ margin-top: 0; }
+  .glowvai-root .skin-dashboard-sheet:has(.skin-gauge) > .skin-details-toggle{ margin: 0 auto; }
+  .glowvai-root .skin-gauge{ min-height: 240px; }
+  .glowvai-root .skin-gauge svg{ width: min(100%, 360px); height: 190px; }
+  .glowvai-root .skin-gauge-score{ top: 74px; }
+  .glowvai-root .skin-gauge-score b{ font-size: 64px; }
+  .glowvai-root .skin-insights{ grid-template-columns: .9fr 1.1fr; }
+  .glowvai-root .skin-routine-grid{ grid-template-columns: 1fr 1fr; }
+}

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { captureUtmParameters } from "@/lib/analytics/utm";
 
 /**
@@ -22,6 +23,9 @@ export interface ConsentState {
 
 export function CookieNotice() {
   const [showBanner, setShowBanner] = useState(false);
+  const pathname = usePathname();
+  // On /shop the banner sits above the sticky action bar on desktop, so the total and checkout button stay visible.
+  const onShop = pathname?.startsWith("/shop") ?? false;
 
   useEffect(() => {
     // Capture UTM parameters into sessionStorage on load
@@ -73,7 +77,7 @@ export function CookieNotice() {
     <div
       role="dialog"
       aria-label="Privacy and analytics choice"
-      className="fixed bottom-24 md:bottom-4 left-4 right-4 sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[24px] p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]"
+      className={`fixed bottom-24 md:bottom-4 left-4 right-4 sm:right-auto z-[60] sm:w-[360px] ${onShop ? "md:bottom-[130px]" : ""} bg-white text-ink border border-ink/15 rounded-[24px] p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]`}
     >
       <h2 className="font-display font-semibold text-base text-ink">Analytics, your choice</h2>
       <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">

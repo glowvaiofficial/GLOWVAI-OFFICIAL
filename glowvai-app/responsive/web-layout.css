@@ -1,0 +1,146 @@
+/* Website layout for the shop at tablet and desktop widths.
+   The app was built phone-first, so on wide screens its entry screens used to float as phone-sized cards.
+   Here they become full-width website pages: a brand panel and a form column side by side.
+   Selectors carry .glowvai-web so these rules win over the per-screen responsive files, whatever the import order. */
+
+/* Entry flow (welcome, login, OTP, onboarding): one full-width split page per screen. */
+@media (min-width: 720px){
+  .glowvai-root.glowvai-web .welcome-screen,
+  .glowvai-root.glowvai-web .onboarding-screen,
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen,
+  .glowvai-root.glowvai-web .auth-welcome,
+  .glowvai-root.glowvai-web .auth-login,
+  .glowvai-root.glowvai-web .auth-screen{
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: calc(100dvh - 65px);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .glowvai-root.glowvai-web .screen-content:has(.welcome-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.onboarding-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.login-reference-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.otp-reference-screen),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-welcome),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-login),
+  .glowvai-root.glowvai-web .screen-content:has(.auth-screen){
+    padding: 0;
+    overflow: visible;
+  }
+}
+
+/* Login and OTP split into brand panel and form from tablet width up. */
+@media (min-width: 720px){
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .glowvai-root.glowvai-web .login-reference-hero,
+  .glowvai-root.glowvai-web .otp-reference-hero{ flex: none; width: 100%; min-height: calc(100dvh - 65px); height: 100%; }
+  .glowvai-root.glowvai-web .login-reference-sheet,
+  .glowvai-root.glowvai-web .otp-keypad-sheet{ display: flex; min-width: 0; flex-direction: column; justify-content: center; width: 100%; padding: 64px 40px; }
+  .glowvai-root.glowvai-web .login-reference-form,
+  .glowvai-root.glowvai-web .otp-keypad{ max-width: 400px; }
+
+  .glowvai-root.glowvai-web .auth-login{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .glowvai-root.glowvai-web .auth-login-hero{ flex: none; width: 100%; min-height: calc(100dvh - 65px); border-radius: 0; }
+  .glowvai-root.glowvai-web .auth-login-sheet{ display: flex; min-width: 0; flex-direction: column; justify-content: center; margin-top: 0; padding: 64px 40px; border-radius: 0; box-shadow: none; }
+}
+
+@media (min-width: 1024px){
+  /* Onboarding positions its photo and sheet absolutely with inline styles; put them in the grid instead. */
+  .glowvai-root.glowvai-web .onboarding-screen{ min-height: calc(100dvh - 65px); }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{ position: relative !important; inset: auto !important; }
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media{ min-height: calc(100dvh - 65px); }
+
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen,
+  .glowvai-root.glowvai-web .onboarding-screen{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .glowvai-root.glowvai-web .login-reference-hero,
+  .glowvai-root.glowvai-web .otp-reference-hero,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-media{
+    flex: none;
+    width: 100%;
+    min-height: calc(100dvh - 65px);
+    height: 100%;
+  }
+  .glowvai-root.glowvai-web .login-reference-sheet,
+  .glowvai-root.glowvai-web .otp-keypad-sheet,
+  .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet{
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    padding: 80px min(8vw, 120px);
+  }
+  .glowvai-root.glowvai-web .login-reference-form,
+  .glowvai-root.glowvai-web .otp-keypad{
+    max-width: 440px;
+  }
+}
+
+/* Scan tab: one centred column, with the launch actions under the scan target. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .scan-split{ display: flex !important; flex-direction: column; align-items: center; gap: 24px; max-width: 720px; margin: 0 auto; padding-top: 24px; grid-template-columns: none !important; }
+  .glowvai-root.glowvai-web .scan-split-main{ width: 100%; }
+  .glowvai-root.glowvai-web .scan-split-side{ display: flex; flex-direction: column; width: min(100%, 420px); gap: 12px; }
+  .glowvai-root.glowvai-web .scan-primary-button{ width: 100%; }
+}
+
+/* Orders: a 1200px page, with past orders in two columns. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .orders-body{ max-width: 1200px; margin: 0 auto; padding: 24px 32px 48px; grid-template-columns: minmax(0, 1fr) !important; }
+  .glowvai-root.glowvai-web .orders-body > *{ max-width: none; }
+  .glowvai-root.glowvai-web .orders-body:has(> .orders-past-card){ grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 16px; align-items: start; }
+  .glowvai-root.glowvai-web .orders-body:has(> .orders-past-card) > *:not(.orders-past-card){ grid-column: 1 / -1; }
+  .glowvai-root.glowvai-web .orders-active-card{ max-width: none !important; width: 100%; }
+}
+
+/* Commerce action bar (cart, checkout, addresses, location): a floating card on desktop, not a full-width strip over the bill. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .commerce-sticky-bar{ position: sticky !important; bottom: 20px; left: auto !important; right: auto !important; width: min(100%, 1200px); max-width: 1200px; margin: 24px auto 0; padding: 16px 20px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-elevated); box-shadow: var(--shadow-float); }
+}
+
+/* Edit profile: personal details on the left, demographics and skin profile on the right. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .profile-body{ display: block; columns: 2; column-gap: 28px; width: 100%; max-width: 1160px; margin: 0 auto; }
+  .glowvai-root.glowvai-web .profile-body > *{ break-inside: avoid; }
+  .glowvai-root.glowvai-web .profile-body > .profile-label{ break-after: avoid; }
+  .glowvai-root.glowvai-web .profile-body > .profile-card{ margin-bottom: 16px; }
+}
+
+/* Product actions: label colour on the solid blue and black buttons (the shop reset set buttons to inherit). */
+.glowvai-root.glowvai-web .shop-screen .shop-btn-primary,
+.glowvai-root.glowvai-web .shop-screen .shop-product-buynow{ color: #fff; }
+
+/* Narrow form and tool screens: the header spans the page, so its back button lines up with the site header. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .commerce-head{ padding-inline: 24px !important; }
+  .glowvai-root.glowvai-web .orders-header{ width: 100%; max-width: none !important; margin: 0 !important; }
+  .glowvai-root.glowvai-web .scan-header{ padding-inline: 24px !important; }
+}
+
+/* Skin report: results on the left, actions in a sticky side column, concerns in two columns. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .scan-report-body .scan-split{ display: grid !important; grid-template-columns: minmax(0, 1fr) 320px !important; align-items: start; gap: 28px; max-width: 1160px; margin: 0 auto; padding-top: 24px; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-split-main{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-split-side{ position: sticky; top: 96px; width: auto; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-concern-list{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-routine-list{ max-width: none; }
+  .glowvai-root.glowvai-web .scan-report-body .scan-disclaimer,
+  .glowvai-root.glowvai-web .scan-report-body .scan-privacy,
+  .glowvai-root.glowvai-web .scan-report-body .scan-model-note{ max-width: 1160px; margin-inline: auto; }
+}
+
+/* Scan report: what a detected concern means and what helps (cosmetic guidance). */
+.glowvai-root.glowvai-web .scan-concern-guide{ margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.glowvai-root.glowvai-web .scan-concern-guide p{ margin: 0 0 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.glowvai-root.glowvai-web .scan-concern-guide ul{ margin: 0; padding-left: 18px; list-style: disc; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }

@@ -1,0 +1,242 @@
+/* Auth & onboarding screens. Visual language follows the NOV login and OTP references. */
+
+/* ── Shared frame ───────────────────────────────────────── */
+.glowvai-root .auth-screen, .glowvai-root .auth-login, .glowvai-root .auth-welcome, .glowvai-root .auth-success{
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8f9fd;
+  color: #101c36;
+}
+.glowvai-root .auth-topbar{ display: flex; min-height: 56px; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px 0; }
+.glowvai-root .auth-body{ position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; min-height: 0; overflow-y: auto; padding: 16px 24px 16px; scrollbar-width: none; }
+.glowvai-root .auth-body::-webkit-scrollbar{ display: none; }
+.glowvai-root .auth-footer{ position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; padding: 12px 24px 24px; background: #f8f9fd; }
+.glowvai-root .auth-icon-button{ display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid #e2e8f3; border-radius: 50%; background: #fff; color: #101c36; }
+.glowvai-root .auth-icon-button svg{ width: 18px; height: 18px; stroke-width: 2.2; }
+.glowvai-root .auth-title{ font-size: 22px; font-weight: 800; letter-spacing: -.035em; line-height: 1.22; }
+.glowvai-root .auth-subtitle{ margin-top: 8px; color: #71809b; font-size: 13px; font-weight: 500; line-height: 1.5; }
+.glowvai-root .auth-strong{ color: #101c36; font-weight: 750; }
+.glowvai-root .auth-mono{ font-variant-numeric: tabular-nums; }
+.glowvai-root .auth-hint{ color: #8290aa; font-size: 12px; font-weight: 500; }
+.glowvai-root .auth-center{ text-align: center; }
+.glowvai-root .auth-label{ display: block; margin-bottom: 6px; color: #71809b; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-label-row{ display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.glowvai-root .auth-label-row .auth-label{ margin-bottom: 0; }
+.glowvai-root .auth-section-label{ display: block; margin: 20px 0 8px; color: #71809b; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-form-group{ margin-top: 16px; }
+.glowvai-root .auth-page-heading{ display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .auth-page-heading svg{ width: 18px; height: 18px; color: #1459e8; }
+.glowvai-root .auth-text-button{ display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; color: #1460df; font-size: 12px; font-weight: 700; }
+.glowvai-root .auth-text-button svg{ width: 14px; height: 14px; }
+.glowvai-root .auth-text-button:disabled{ color: #98a1b3; cursor: default; }
+.glowvai-root .auth-footer-link{ color: #7c89a1; font-size: 12px; font-weight: 600; text-align: center; }
+.glowvai-root .auth-skip-link{ align-self: center; margin-top: 12px; color: #7c89a1; font-size: 13px; font-weight: 600; }
+.glowvai-root .auth-resend{ font-size: 13px; }
+.glowvai-root .auth-link{ color: #1460df; font-weight: 700; }
+.glowvai-root .auth-status-row{ display: flex; min-height: 20px; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: #545b69; font-size: 13px; font-weight: 500; }
+.glowvai-root .auth-status-row-tight{ margin-top: 12px; justify-content: space-between; }
+.glowvai-root .auth-error{ display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 9px 12px; border: 1px solid #f1c5c9; border-radius: 10px; background: #fff0f1; color: #c13f4b; font-size: 12px; font-weight: 650; }
+.glowvai-root .auth-error svg{ width: 14px; height: 14px; flex: 0 0 auto; }
+.glowvai-root .auth-field-error{ display: flex; align-items: center; gap: 6px; margin-top: 6px; color: #c13f4b; font-size: 12px; font-weight: 600; }
+.glowvai-root .auth-field-error svg{ width: 12px; height: 12px; }
+.glowvai-root .auth-primary-button{
+  display: grid;
+  width: 100%;
+  height: 48px;
+  place-items: center;
+  grid-auto-flow: column;
+  gap: 8px;
+  border-radius: 12px;
+  background: #1f66ed;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(31,102,237,.15);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color .18s ease, opacity .18s ease, transform .15s ease;
+}
+.glowvai-root .auth-primary-button svg{ width: 18px; height: 18px; }
+.glowvai-root .auth-primary-button:hover:not(:disabled){ background: #155be0; }
+.glowvai-root .auth-primary-button:disabled{ background: #e6e9f0; color: #98a1b3; box-shadow: none; cursor: not-allowed; }
+.glowvai-root .auth-secondary-button{ display: grid; width: 100%; height: 46px; place-items: center; border: 1px solid #d8dfec; border-radius: 12px; background: #fff; color: #101c36; font-size: 13px; font-weight: 700; }
+.glowvai-root .auth-spinner{ display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: auth-spin .8s linear infinite; }
+.glowvai-root .auth-spinner-dark{ border-color: rgba(20,89,232,.2); border-top-color: #1459e8; }
+@keyframes auth-spin{ to{ transform: rotate(360deg); } }
+
+/* Inputs */
+.glowvai-root .auth-field{ display: flex; height: 50px; align-items: center; gap: 10px; padding: 0 14px; border: 1px solid #d8dfec; border-radius: 12px; background: #fbfcff; color: #8290aa; box-shadow: 0 1px 2px rgba(27,57,112,.03); transition: border-color .18s ease, box-shadow .18s ease; }
+.glowvai-root .auth-field svg{ width: 18px; height: 18px; flex: 0 0 auto; }
+.glowvai-root .auth-field:focus-within{ border-color: #8fb2fa; box-shadow: 0 0 0 3px rgba(20,89,232,.09); }
+.glowvai-root .auth-field.has-error{ border-color: #c13f4b; }
+.glowvai-root .auth-field input{ width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #101c36; font-size: 15px; font-weight: 600; }
+.glowvai-root .auth-field input::placeholder{ color: #8290aa; font-weight: 500; opacity: 1; }
+.glowvai-root .auth-field-plain{ padding: 0 14px; }
+.glowvai-root .auth-field strong{ color: #101c36; font-size: 14px; font-weight: 800; }
+
+/* ── Login ──────────────────────────────────────────────── */
+.glowvai-root .auth-login-hero{ position: relative; flex: 0 0 44%; min-height: 300px; overflow: hidden; background: #1459e8; color: #fff; }
+.glowvai-root .auth-login-hero::after{ position: absolute; inset: 0; background: radial-gradient(circle at 48% 38%, rgba(45,116,255,.28), transparent 42%); content: ''; pointer-events: none; }
+.glowvai-root .auth-orb{ position: absolute; z-index: 1; display: block; border-radius: 50%; background: rgba(102,164,255,.28); box-shadow: inset 0 0 38px rgba(255,255,255,.06); }
+.glowvai-root .auth-orb-right{ top: 10px; right: -97px; width: 176px; height: 245px; border-radius: 54% 0 0 55%; transform: rotate(8deg); }
+.glowvai-root .auth-orb-left{ bottom: -65px; left: -96px; width: 225px; height: 225px; border: 1px solid rgba(255,255,255,.12); }
+.glowvai-root .auth-login-topbar{ position: relative; z-index: 3; display: flex; justify-content: flex-end; padding: 14px 16px 0; }
+.glowvai-root .auth-skip-pill{ padding: 6px 16px; border-radius: 18px; background: rgba(0,20,80,.45); color: #fff; font-size: 13px; font-weight: 700; text-transform: lowercase; }
+.glowvai-root .auth-skip-pill-light{ background: #fff; color: #1459e8; border: 1px solid #d8dfec; }
+.glowvai-root .auth-brand-tap{ position: absolute; z-index: 2; top: 84px; left: 0; right: 0; display: flex; justify-content: center; }
+.glowvai-root .auth-brand-wordmark{ font-family: var(--font-brand); font-size: 50px; font-weight: 600; line-height: 1; letter-spacing: -.045em; color: #fff; text-transform: lowercase; }
+.glowvai-root .auth-mascot{ position: absolute; z-index: 2; bottom: -10px; width: 104px; height: auto; pointer-events: none; }
+.glowvai-root .auth-mascot-left{ left: 8px; }
+.glowvai-root .auth-mascot-right{ right: 8px; }
+.glowvai-root .auth-login-sheet{ position: relative; z-index: 3; display: flex; flex: 1; flex-direction: column; margin-top: -22px; padding: 28px 24px 22px; border-radius: 28px 28px 0 0; background: #f8f9fd; box-shadow: 0 -4px 14px rgba(20,40,90,.06); }
+.glowvai-root .auth-login-form{ margin-top: 20px; }
+.glowvai-root .auth-phone-field{ display: grid; height: 52px; grid-template-columns: auto auto 14px 1px minmax(0,1fr); align-items: center; gap: 9px; padding: 0 15px; border: 1px solid #d8dfec; border-radius: 12px; background: #fbfcff; transition: border-color .18s ease, box-shadow .18s ease; }
+.glowvai-root .auth-phone-field:focus-within{ border-color: #8fb2fa; box-shadow: 0 0 0 3px rgba(20,89,232,.09); }
+.glowvai-root .auth-phone-field.has-error{ border-color: #c13f4b; }
+.glowvai-root .auth-phone-field input{ width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #101c36; font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+.glowvai-root .auth-phone-field input::placeholder{ color: #8290aa; font-weight: 500; opacity: 1; }
+.glowvai-root .auth-phone-field strong{ color: #101c36; font-size: 14px; font-weight: 800; }
+.glowvai-root .auth-flag{ font-size: 15px; line-height: 1; }
+.glowvai-root .auth-chevron{ width: 14px; height: 14px; color: #1459e8; stroke-width: 2.4; }
+.glowvai-root .auth-divider{ width: 1px; height: 28px; background: #dbe1ec; }
+.glowvai-root .auth-login-continue{ margin-top: 20px; }
+.glowvai-root .auth-legal{ margin-top: auto; padding-top: 16px; color: #7c89a1; font-size: 12px; font-weight: 500; line-height: 1.55; text-align: center; }
+
+/* ── Welcome carousel ───────────────────────────────────── */
+.glowvai-root .auth-welcome-brand{ display: flex; justify-content: center; padding: 22px 0 6px; }
+.glowvai-root .auth-welcome-brand .auth-brand-wordmark{ color: #1459e8; font-size: 34px; }
+.glowvai-root .auth-slider{ position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: pan-y; }
+.glowvai-root .auth-slider-track{ display: flex; width: 100%; height: 100%; transition: transform .45s cubic-bezier(.16,1,.3,1); }
+.glowvai-root .auth-slide{ display: flex; flex: 0 0 100%; min-width: 0; flex-direction: column; padding: 8px 24px 0; }
+.glowvai-root .auth-slide-image{ position: relative; height: 300px; overflow: hidden; border-radius: 20px; background: #eaf0fb; }
+.glowvai-root .auth-slide-image img{ width: 100%; height: 100%; object-fit: cover; }
+.glowvai-root .auth-slide-badge{ position: absolute; left: 14px; bottom: 14px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.94); color: #1459e8; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; }
+.glowvai-root .auth-slide-title{ margin-top: 20px; font-size: 22px; font-weight: 800; letter-spacing: -.035em; line-height: 1.22; }
+.glowvai-root .auth-slide-body{ margin-top: 8px; color: #71809b; font-size: 13.5px; font-weight: 500; line-height: 1.5; }
+.glowvai-root .auth-dots{ display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+.glowvai-root .auth-dot{ width: 6px; height: 6px; padding: 0; border-radius: 999px; background: #cbd5e6; transition: width .25s ease, background-color .25s ease; }
+.glowvai-root .auth-dot.is-active{ width: 20px; background: #1459e8; }
+.glowvai-root .auth-welcome-footer{ display: flex; flex-direction: column; gap: 10px; padding: 18px 24px 24px; }
+
+/* ── Onboarding success ─────────────────────────────────── */
+.glowvai-root .auth-success{ align-items: center; justify-content: center; padding: 24px; text-align: center; }
+.glowvai-root .auth-success-icon{ width: 72px; height: 72px; margin-bottom: 20px; color: #19734f; stroke-width: 1.8; }
+.glowvai-root .auth-success-title{ font-size: 24px; }
+.glowvai-root .auth-success .auth-subtitle{ max-width: 320px; }
+.glowvai-root .auth-success-footer{ position: absolute; right: 24px; bottom: 24px; left: 24px; display: flex; flex-direction: column; gap: 14px; }
+.glowvai-root .auth-progress{ width: 100%; height: 4px; overflow: hidden; border-radius: 999px; background: #e2e8f3; }
+.glowvai-root .auth-progress > span{ display: block; width: 0; height: 100%; background: #1459e8; animation: auth-progress-fill 2s linear forwards; }
+@keyframes auth-progress-fill{ from{ width: 0; } to{ width: 100%; } }
+
+/* ── Permissions ────────────────────────────────────────── */
+.glowvai-root .auth-trust-badge{ display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; margin-bottom: 14px; padding: 5px 10px; border-radius: 999px; background: #edf2ff; color: #1459e8; font-size: 10.5px; font-weight: 800; letter-spacing: .05em; }
+.glowvai-root .auth-trust-badge svg{ width: 13px; height: 13px; }
+.glowvai-root .auth-card{ margin-top: 16px; padding: 16px; border: 1px solid #e2e8f3; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgba(27,57,112,.04); }
+.glowvai-root .auth-card-header{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.glowvai-root .auth-card-icon{ display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: #edf2ff; color: #1459e8; }
+.glowvai-root .auth-card-icon svg{ width: 20px; height: 20px; }
+.glowvai-root .auth-card-title{ font-size: 15px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .auth-card-subtitle{ margin-top: 2px; color: #8290aa; font-size: 12px; font-weight: 500; }
+.glowvai-root .auth-card .auth-card-title{ margin-bottom: 8px; }
+.glowvai-root .auth-card-copy{ margin-top: 0; }
+.glowvai-root .auth-permission-row{ display: grid; grid-template-columns: 38px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #eef1f7; }
+.glowvai-root .auth-permission-row:first-of-type{ border-top: 0; }
+.glowvai-root .auth-permission-icon{ display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; background: #edf2ff; color: #1459e8; }
+.glowvai-root .auth-permission-icon svg{ width: 18px; height: 18px; }
+.glowvai-root .auth-permission-text strong{ font-size: 13px; font-weight: 750; }
+.glowvai-root .auth-permission-text p{ margin-top: 3px; color: #8290aa; font-size: 11.5px; font-weight: 500; line-height: 1.4; }
+.glowvai-root .auth-switch{ position: relative; display: inline-block; width: 42px; height: 24px; }
+.glowvai-root .auth-switch input{ position: absolute; inset: 0; z-index: 1; margin: 0; opacity: 0; cursor: pointer; }
+.glowvai-root .auth-switch span{ position: absolute; inset: 0; border-radius: 999px; background: #d5dbe7; transition: background-color .2s ease; }
+.glowvai-root .auth-switch span::after{ position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.18); content: ''; transition: transform .2s ease; }
+.glowvai-root .auth-switch input:checked + span{ background: #1459e8; }
+.glowvai-root .auth-switch input:checked + span::after{ transform: translateX(18px); }
+.glowvai-root .auth-switch input:focus-visible + span{ outline: 3px solid rgba(40,84,197,.24); outline-offset: 2px; }
+.glowvai-root .auth-privacy-card{ display: flex; gap: 12px; margin-top: 14px; padding: 14px; border: 1px solid #cfe9da; border-radius: 16px; background: #f0faf5; color: #19734f; }
+.glowvai-root .auth-privacy-card svg{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; }
+.glowvai-root .auth-privacy-card strong{ font-size: 13px; font-weight: 800; color: #101c36; }
+.glowvai-root .auth-privacy-card p{ margin-top: 3px; color: #545b69; font-size: 11.5px; font-weight: 500; line-height: 1.45; }
+.glowvai-root .auth-privacy-card-compact{ align-items: center; margin-top: 16px; padding: 12px 14px; color: #545b69; font-size: 12px; font-weight: 500; line-height: 1.45; }
+.glowvai-root .auth-privacy-card-compact svg{ margin-top: 0; color: #19734f; }
+
+/* ── Profile setup & skin survey ────────────────────────── */
+.glowvai-root .auth-step-header{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.glowvai-root .auth-step-track{ height: 4px; overflow: hidden; border-radius: 999px; background: #e2e8f3; }
+.glowvai-root .auth-step-track > span{ display: block; height: 100%; border-radius: 999px; background: #1459e8; transition: width .3s ease; }
+.glowvai-root .auth-step-label{ color: #1459e8; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-avatar-section{ display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 22px 0 18px; }
+.glowvai-root .auth-avatar{ position: relative; display: grid; width: 72px; height: 72px; place-items: center; overflow: visible; border-radius: 50%; background: #edf2ff; color: #1459e8; font-size: 26px; font-weight: 800; }
+.glowvai-root .auth-avatar img{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.glowvai-root .auth-avatar-badge{ position: absolute; right: -2px; bottom: -2px; display: grid; width: 24px; height: 24px; place-items: center; border: 2px solid #f8f9fd; border-radius: 50%; background: #1459e8; color: #fff; }
+.glowvai-root .auth-avatar-badge svg{ width: 12px; height: 12px; }
+.glowvai-root .auth-chips{ display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 18px; }
+.glowvai-root .auth-chip{ padding: 8px 14px; border: 1px solid #d8dfec; border-radius: 999px; background: #fff; color: #545b69; font-size: 12.5px; font-weight: 650; transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+.glowvai-root .auth-chip.is-selected{ border-color: #1459e8; background: #1459e8; color: #fff; }
+.glowvai-root .auth-concern-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.glowvai-root .auth-concern{ display: flex; min-height: 104px; flex-direction: column; justify-content: space-between; gap: 10px; padding: 14px; border: 1px solid #e2e8f3; border-radius: 16px; background: #fff; text-align: left; transition: border-color .15s ease, background-color .15s ease; }
+.glowvai-root .auth-concern.is-selected{ border-color: #1459e8; background: #edf2ff; box-shadow: inset 0 0 0 1px #1459e8; }
+.glowvai-root .auth-concern-top{ display: flex; align-items: center; justify-content: space-between; }
+.glowvai-root .auth-concern-emoji{ font-size: 22px; line-height: 1; }
+.glowvai-root .auth-concern-check{ display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: #1459e8; color: #fff; }
+.glowvai-root .auth-concern-check svg{ width: 12px; height: 12px; stroke-width: 3; }
+.glowvai-root .auth-concern-label{ color: #101c36; font-size: 13px; font-weight: 750; line-height: 1.3; }
+
+/* ── Change phone ───────────────────────────────────────── */
+.glowvai-root .auth-info-banner{ display: flex; gap: 12px; margin-top: 16px; padding: 14px; border: 1px solid #d8e4fb; border-radius: 14px; background: #edf2ff; color: #1459e8; }
+.glowvai-root .auth-info-banner svg{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; }
+.glowvai-root .auth-info-banner strong{ color: #101c36; font-size: 13px; font-weight: 800; }
+.glowvai-root .auth-info-banner p{ margin-top: 3px; color: #545b69; font-size: 11.5px; font-weight: 500; line-height: 1.45; }
+.glowvai-root .auth-current-phone{ display: flex; align-items: center; gap: 12px; margin-top: 0; }
+.glowvai-root .auth-current-phone > div{ flex: 1; display: grid; gap: 2px; }
+.glowvai-root .auth-current-phone .auth-strong{ font-size: 15px; }
+.glowvai-root .auth-active-badge{ display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 999px; background: #e9f7ef; color: #19734f; font-size: 10.5px; font-weight: 800; }
+.glowvai-root .auth-active-badge svg{ width: 12px; height: 12px; }
+.glowvai-root .auth-card .auth-field{ margin-top: 6px; }
+
+/* ── OTP ────────────────────────────────────────────────── */
+.glowvai-root .auth-otp-cells{ display: grid; width: 100%; max-width: 354px; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 8px; margin: 24px auto 0; }
+.glowvai-root .auth-otp-cell{ width: 100%; aspect-ratio: 1 / 1.1; max-height: 58px; min-width: 0; border: 1px solid #d8dfec; border-radius: 12px; background: #fff; color: #101c36; font-size: 22px; font-weight: 800; text-align: center; outline: 0; box-shadow: 0 1px 2px rgba(27,57,112,.04); transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.glowvai-root .auth-otp-cell:focus{ border-color: #1459e8; box-shadow: 0 0 0 3px rgba(20,89,232,.14); }
+.glowvai-root .auth-otp-cell.is-filled{ border-color: #8fb2fa; background: #fff; }
+.glowvai-root .auth-otp-cell:disabled{ opacity: .6; }
+.glowvai-root .auth-otp-cells.has-error .auth-otp-cell{ border-color: #c13f4b; }
+.glowvai-root .auth-otp-cells.is-shaking{ animation: auth-shake .42s ease; }
+.glowvai-root .auth-otp-cells-compact{ margin-top: 14px; max-width: none; }
+.glowvai-root .auth-otp-cells-compact .auth-otp-cell{ font-size: 18px; max-height: 48px; }
+@keyframes auth-shake{ 20%, 60%{ transform: translateX(-6px); } 40%, 80%{ transform: translateX(6px); } }
+
+/* ── Student verification ───────────────────────────────── */
+.glowvai-root .auth-hero-icon{ position: relative; display: grid; width: 92px; height: 92px; margin: 4px auto 18px; place-items: center; border-radius: 50%; background: #edf2ff; color: #1459e8; }
+.glowvai-root .auth-hero-icon > svg{ width: 36px; height: 36px; }
+.glowvai-root .auth-hero-pill{ position: absolute; bottom: -10px; left: 50%; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: #fff; color: #101c36; font-size: 10.5px; font-weight: 750; white-space: nowrap; transform: translateX(-50%); box-shadow: 0 2px 6px rgba(20,40,90,.1); }
+.glowvai-root .auth-hero-pill svg{ width: 12px; height: 12px; color: #f27f78; }
+.glowvai-root .auth-upload{ display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 16px; border: 1.5px dashed #b9c8ea; border-radius: 14px; background: #f7f9ff; color: #1459e8; text-align: center; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
+.glowvai-root .auth-upload:hover{ border-color: #1459e8; background: #edf2ff; }
+.glowvai-root .auth-upload svg{ width: 26px; height: 26px; }
+.glowvai-root .auth-upload strong{ color: #101c36; font-size: 13px; font-weight: 750; }
+.glowvai-root .auth-upload span{ color: #8290aa; font-size: 11px; font-weight: 500; }
+.glowvai-root .auth-upload.has-error{ border-color: #c13f4b; }
+.glowvai-root .auth-uploaded{ display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #cfe9da; border-radius: 14px; background: #f0faf5; }
+.glowvai-root .auth-uploaded svg{ width: 24px; height: 24px; color: #19734f; flex: 0 0 auto; }
+.glowvai-root .auth-uploaded > div{ flex: 1; min-width: 0; }
+.glowvai-root .auth-uploaded strong{ display: block; overflow: hidden; color: #101c36; font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .auth-uploaded p{ color: #19734f; font-size: 11px; font-weight: 600; }
+.glowvai-root .auth-replace{ cursor: pointer; }
+.glowvai-root .auth-checkbox-row{ display: flex; align-items: center; gap: 10px; margin-top: 16px; color: #101c36; font-size: 13px; font-weight: 600; text-align: left; }
+.glowvai-root .auth-checkbox-row svg{ width: 20px; height: 20px; flex: 0 0 auto; color: #1459e8; }
+
+/* ── Focus & motion ─────────────────────────────────────── */
+.glowvai-root .auth-screen button:focus-visible, .glowvai-root .auth-screen input:focus-visible, .glowvai-root .auth-login button:focus-visible, .glowvai-root .auth-welcome button:focus-visible{ outline: 3px solid rgba(40,84,197,.24); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .auth-spinner, .glowvai-root .auth-progress > span, .glowvai-root .auth-otp-cells.is-shaking{ animation: none !important; }
+  .glowvai-root .auth-slider-track{ transition: none; }
+}
+@media (max-height: 760px){
+  .glowvai-root .auth-login-hero{ min-height: 260px; }
+  .glowvai-root .auth-brand-tap{ top: 64px; }
+  .glowvai-root .auth-slide-image{ height: 240px; }
+}

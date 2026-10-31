@@ -1,0 +1,164 @@
+/* Profile, settings, support, referrals and app doctor screens. Colors come from the :root tokens in index.css. */
+
+.glowvai-root .profile-screen{ display:flex; flex-direction:column; min-height:100%; background:var(--bg); color:var(--text-primary); }
+
+.glowvai-root .profile-header{ position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:12px; min-height:60px; padding:12px 16px; border-bottom:1px solid var(--border-light); background:#fff; }
+.glowvai-root .profile-header-copy{ flex:1; min-width:0; }
+.glowvai-root .profile-header-spacer{ width:38px; flex:none; }
+.glowvai-root .profile-eyebrow{ display:block; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; }
+.glowvai-root .profile-title{ overflow:hidden; font-family:var(--font-heading); font-size:17px; font-weight:750; letter-spacing:-.25px; text-overflow:ellipsis; white-space:nowrap; }
+.glowvai-root .profile-icon-button{ display:inline-flex; width:38px; height:38px; flex:none; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:11px; background:#fff; transition:background-color .18s ease, border-color .18s ease; }
+.glowvai-root .profile-icon-button:hover{ border-color:var(--primary-border); background:var(--primary-light); }
+
+.glowvai-root .profile-body{ display:flex; flex-direction:column; gap:16px; padding:16px 16px 32px; }
+.glowvai-root .profile-label{ color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; }
+.glowvai-root .profile-card{ overflow:hidden; border:1px solid var(--border-light); border-radius:16px; background:#fff; }
+.glowvai-root .profile-card-body{ display:flex; flex-direction:column; gap:12px; padding:16px; }
+.glowvai-root .profile-card-title{ font-size:15px; font-weight:800; letter-spacing:-.02em; }
+.glowvai-root .profile-card-sub{ color:var(--text-secondary); font-size:12px; line-height:1.45; }
+.glowvai-root .profile-divider{ height:1px; background:var(--border-light); }
+.glowvai-root .profile-text-link{ align-self:flex-start; color:var(--primary); font-size:13px; font-weight:800; }
+.glowvai-root .profile-chevron{ flex:none; color:var(--text-muted); }
+
+.glowvai-root .profile-user-button{ display:flex; width:100%; align-items:center; gap:12px; padding:16px; text-align:left; }
+.glowvai-root .profile-user-copy{ flex:1; min-width:0; }
+.glowvai-root .profile-user-name{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:16px; font-weight:800; }
+.glowvai-root .profile-user-phone{ margin-top:2px; color:var(--text-secondary); font-size:13px; }
+.glowvai-root .profile-hero-avatar{ display:grid; width:52px; height:52px; flex:none; place-items:center; overflow:hidden; border:2px solid var(--primary-border); border-radius:50%; background:var(--primary-light); color:var(--primary); font-size:18px; font-weight:800; }
+.glowvai-root .profile-hero-avatar img{ width:100%; height:100%; object-fit:cover; }
+
+.glowvai-root .profile-pill{ display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:999px; background:var(--primary-light); color:var(--primary); font-size:11px; font-weight:800; white-space:nowrap; }
+.glowvai-root .profile-pill.is-success{ background:var(--success-bg); color:var(--success); }
+.glowvai-root .profile-pill.is-warning{ background:var(--warning-bg); color:var(--warning); }
+.glowvai-root .profile-pill.is-error{ background:var(--error-bg); color:var(--error); }
+.glowvai-root .profile-pill.is-muted{ background:var(--surface); color:var(--text-secondary); }
+
+.glowvai-root .profile-glow-card{ display:flex; flex-direction:column; gap:12px; padding:16px; border:1px solid var(--primary-border); border-radius:16px; background:linear-gradient(135deg, #fff 0%, var(--primary-light) 100%); }
+.glowvai-root .profile-glow-top{ display:flex; align-items:center; gap:12px; }
+.glowvai-root .profile-glow-icon{ display:grid; width:40px; height:40px; flex:none; place-items:center; border-radius:12px; background:#fff; color:var(--primary); }
+.glowvai-root .profile-glow-copy{ flex:1; min-width:0; }
+
+.glowvai-root .profile-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.glowvai-root .profile-tile{ display:flex; flex-direction:column; gap:12px; padding:12px; border:1px solid var(--border-light); border-radius:14px; background:#fff; text-align:left; }
+.glowvai-root .profile-tile.is-blue{ background:var(--primary-light); border-color:var(--primary-border); }
+.glowvai-root .profile-tile-top{ display:flex; align-items:center; justify-content:space-between; color:var(--primary); }
+.glowvai-root .profile-tile-label{ font-size:13px; font-weight:800; }
+.glowvai-root .profile-tile-note{ margin-top:-8px; color:var(--text-secondary); font-size:11px; }
+
+.glowvai-root .profile-list-item{ display:flex; width:100%; align-items:center; gap:12px; padding:12px 16px; text-align:left; }
+.glowvai-root .profile-card > :is(.profile-list-item, .profile-list-row, .profile-privacy-note) + :is(.profile-list-item, .profile-list-row, .profile-privacy-note){ border-top:1px solid var(--border-light); }
+.glowvai-root .profile-list-row{ display:flex; align-items:center; gap:12px; padding:12px 16px; }
+.glowvai-root .profile-list-icon{ display:grid; width:32px; height:32px; flex:none; place-items:center; border-radius:10px; background:var(--primary-light); color:var(--primary); }
+.glowvai-root .profile-list-icon.is-danger{ background:var(--error-bg); color:var(--error); }
+.glowvai-root .profile-list-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
+.glowvai-root .profile-list-title{ font-size:14px; font-weight:750; }
+.glowvai-root .profile-list-title.is-danger{ color:var(--error); }
+.glowvai-root .profile-list-note{ color:var(--text-secondary); font-size:12px; line-height:1.4; }
+.glowvai-root .profile-list-value{ color:var(--text-secondary); font-size:13px; font-weight:600; white-space:nowrap; }
+.glowvai-root .profile-list-select{ max-width:150px; height:34px; padding:0 8px; border:1px solid var(--border); border-radius:10px; background:var(--surface); font-size:12px; font-weight:700; }
+.glowvai-root .profile-privacy-note{ display:flex; gap:10px; padding:0 16px 14px; color:var(--text-secondary); font-size:12px; line-height:1.5; }
+
+.glowvai-root .profile-switch{ position:relative; display:inline-flex; width:44px; height:26px; flex:none; }
+.glowvai-root .profile-switch input{ position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
+.glowvai-root .profile-switch span{ position:absolute; inset:0; border-radius:999px; background:var(--border); transition:background-color .18s ease; pointer-events:none; }
+.glowvai-root .profile-switch span::after{ content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(22,26,34,.2); transition:transform .18s ease; }
+.glowvai-root .profile-switch input:checked + span{ background:var(--primary); }
+.glowvai-root .profile-switch input:checked + span::after{ transform:translateX(18px); }
+.glowvai-root .profile-switch input:focus-visible + span{ outline:3px solid rgba(40,84,197,.24); outline-offset:2px; }
+
+.glowvai-root .profile-field{ display:flex; flex-direction:column; gap:6px; }
+.glowvai-root .profile-field-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.glowvai-root .profile-field-label{ color:var(--text-primary); font-size:12px; font-weight:750; }
+.glowvai-root .profile-input{ width:100%; height:46px; padding:0 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-primary); font-size:14px; font-weight:600; outline:none; }
+.glowvai-root .profile-input:focus{ border-color:var(--primary); background:#fff; }
+.glowvai-root .profile-input:disabled{ color:var(--text-muted); background:var(--surface-muted); }
+.glowvai-root .profile-input.is-textarea{ height:auto; min-height:96px; padding:12px 14px; font-weight:500; resize:vertical; }
+.glowvai-root .profile-input-wrap{ display:flex; height:48px; align-items:center; gap:10px; padding:0 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-secondary); }
+.glowvai-root .profile-input-wrap:focus-within{ border-color:var(--primary); background:#fff; }
+.glowvai-root .profile-input-wrap .profile-input{ flex:1; min-width:0; height:100%; padding:0; border:0; background:transparent; }
+.glowvai-root .profile-input-wrap .profile-input:focus{ background:transparent; }
+.glowvai-root .profile-input-wrap .profile-input:disabled{ background:transparent; }
+.glowvai-root .profile-avatar-block{ display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:8px; }
+.glowvai-root .profile-avatar-button{ position:relative; display:inline-flex; }
+.glowvai-root .profile-hero-avatar-lg{ width:96px; height:96px; font-size:28px; }
+.glowvai-root .profile-avatar-camera{ position:absolute; right:0; bottom:0; display:grid; width:32px; height:32px; place-items:center; border:2px solid #fff; border-radius:50%; background:var(--primary); color:#fff; }
+.glowvai-root .profile-field-error{ color:var(--error); font-size:12px; font-weight:600; }
+.glowvai-root .profile-field-hint{ color:var(--text-muted); font-size:11px; }
+.glowvai-root .profile-chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+.glowvai-root .profile-chip{ padding:8px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-primary); font-size:12px; font-weight:700; }
+.glowvai-root .profile-chip.is-active{ border-color:var(--primary); background:var(--primary); color:#fff; }
+
+.glowvai-root .profile-button{ display:inline-flex; min-height:48px; align-items:center; justify-content:center; gap:8px; padding:0 16px; border-radius:14px; font-size:14px; font-weight:800; }
+.glowvai-root .profile-button.is-block{ width:100%; }
+.glowvai-root .profile-button.is-primary{ background:var(--primary); color:#fff; }
+.glowvai-root .profile-button.is-secondary{ border:1px solid var(--primary-border); background:var(--primary-light); color:var(--primary); }
+.glowvai-root .profile-button.is-outline{ border:1px solid var(--border); background:#fff; color:var(--text-primary); }
+.glowvai-root .profile-button.is-danger{ background:var(--error); color:#fff; }
+.glowvai-root .profile-button.is-small{ min-height:36px; padding:0 12px; border-radius:10px; font-size:12px; }
+.glowvai-root .profile-button:disabled{ cursor:not-allowed; opacity:.55; }
+
+.glowvai-root .profile-notice{ display:flex; gap:10px; padding:12px; border:1px solid var(--primary-border); border-radius:14px; background:var(--primary-light); color:var(--text-secondary); font-size:12px; line-height:1.45; }
+.glowvai-root .profile-notice.is-error{ border-color:var(--error-border); background:var(--error-bg); color:var(--error); }
+.glowvai-root .profile-notice.is-warning{ border-color:var(--warning-border); background:var(--warning-bg); color:var(--warning); }
+.glowvai-root .profile-notice.is-success{ border-color:var(--success-border); background:var(--success-bg); color:var(--success); }
+.glowvai-root .profile-empty{ padding:20px 16px; color:var(--text-secondary); font-size:13px; line-height:1.5; text-align:center; }
+
+.glowvai-root .profile-hero{ display:flex; flex-direction:column; gap:8px; padding:20px; border-radius:16px; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color:#fff; }
+.glowvai-root .profile-hero-kicker{ align-self:flex-start; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.2); font-size:11px; font-weight:800; letter-spacing:.4px; }
+.glowvai-root .profile-hero-title{ margin-top:8px; font-size:26px; font-weight:800; letter-spacing:-.03em; }
+.glowvai-root .profile-hero-sub{ color:rgba(255,255,255,.85); font-size:13px; line-height:1.5; }
+.glowvai-root .profile-progress{ height:8px; overflow:hidden; border-radius:999px; background:var(--surface-muted); }
+.glowvai-root .profile-progress span{ display:block; height:100%; border-radius:inherit; background:var(--primary); }
+.glowvai-root .profile-stat-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.glowvai-root .profile-stat-value{ color:var(--primary); font-size:24px; font-weight:800; letter-spacing:-.02em; }
+
+.glowvai-root .profile-code-row{ display:flex; min-height:48px; align-items:center; gap:8px; padding:0 8px 0 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.glowvai-root .profile-code-text{ flex:1; min-width:0; overflow:hidden; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:14px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+.glowvai-root .profile-button-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+.glowvai-root .profile-upload{ display:flex; width:100%; min-height:120px; flex-direction:column; align-items:center; justify-content:center; gap:8px; overflow:hidden; border:1.5px dashed var(--primary-border); border-radius:14px; background:var(--primary-light); color:var(--primary); font-size:13px; font-weight:700; }
+.glowvai-root .profile-upload img{ width:100%; max-height:200px; object-fit:cover; }
+.glowvai-root .profile-file-input{ display:none; }
+
+.glowvai-root .profile-timeline{ display:flex; flex-direction:column; gap:12px; }
+.glowvai-root .profile-timeline-row{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:650; color:var(--text-primary); }
+.glowvai-root .profile-timeline-row.is-pending{ color:var(--text-muted); font-weight:600; }
+
+.glowvai-root .profile-faq-question{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; text-align:left; font-size:14px; font-weight:750; }
+.glowvai-root .profile-faq-answer{ padding:0 16px 14px; color:var(--text-secondary); font-size:13px; line-height:1.5; }
+.glowvai-root .profile-ticket-button{ display:flex; width:100%; flex-direction:column; gap:6px; padding:14px 16px; text-align:left; }
+.glowvai-root .profile-ticket-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.glowvai-root .profile-ticket-title{ font-size:14px; font-weight:750; }
+.glowvai-root .profile-ticket-meta{ color:var(--text-muted); font-size:11px; }
+.glowvai-root .profile-thread{ display:flex; flex-direction:column; gap:8px; padding:12px 16px 16px; border-top:1px solid var(--border-light); }
+.glowvai-root .profile-bubble{ max-width:85%; padding:8px 12px; border-radius:12px; background:var(--surface); font-size:12px; line-height:1.45; }
+.glowvai-root .profile-bubble.is-user{ align-self:flex-end; background:var(--primary); color:#fff; }
+.glowvai-root .profile-bubble small{ display:block; margin-bottom:2px; font-size:10px; opacity:.8; }
+.glowvai-root .profile-reply-row{ display:flex; gap:8px; }
+.glowvai-root .profile-reply-row .profile-input{ height:40px; font-size:12px; }
+
+.glowvai-root .profile-score{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px; }
+.glowvai-root .profile-score-value{ color:var(--primary); font-size:32px; font-weight:800; letter-spacing:-.03em; }
+.glowvai-root .profile-score-value small{ color:var(--text-muted); font-size:14px; font-weight:700; }
+.glowvai-root .profile-check-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; }
+.glowvai-root .profile-check-row + .profile-check-row{ border-top:1px solid var(--border-light); }
+.glowvai-root .profile-check-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
+.glowvai-root .profile-check-detail{ color:var(--text-secondary); font-size:12px; line-height:1.4; overflow-wrap:anywhere; }
+.glowvai-root .profile-meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; color:var(--text-secondary); font-size:12px; }
+.glowvai-root .profile-mono{ font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; overflow-wrap:anywhere; }
+
+.glowvai-root .profile-section-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.glowvai-root .profile-section-head .profile-label{ margin:0; }
+.glowvai-root .profile-whatsapp{ width:100%; text-align:left; }
+.glowvai-root .profile-whatsapp-icon{ display:grid; width:40px; height:40px; flex:none; place-items:center; border-radius:12px; background:#25d366; color:#fff; }
+.glowvai-root .profile-status-pill{ align-self:flex-start; padding:6px 10px; font-size:12px; }
+.glowvai-root .profile-or{ text-align:center; }
+.glowvai-root .profile-spin{ animation:profile-spin .9s linear infinite; }
+@keyframes profile-spin{ to{ transform:rotate(360deg); } }
+.glowvai-root .profile-modal-backdrop{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(22,26,34,.4); }
+.glowvai-root .profile-modal{ display:flex; width:100%; max-width:360px; flex-direction:column; gap:12px; padding:20px; border-radius:16px; background:#fff; box-shadow:var(--shadow-float); }
+.glowvai-root .profile-modal h2{ font-size:17px; font-weight:800; }
+.glowvai-root .profile-modal p{ color:var(--text-secondary); font-size:13px; line-height:1.5; }
+
+/* Wrapper columns only change layout on tablet and desktop (see responsive/profile-admin.css). */
+.glowvai-root .profile-side, .glowvai-root .profile-main{ display:contents; }
