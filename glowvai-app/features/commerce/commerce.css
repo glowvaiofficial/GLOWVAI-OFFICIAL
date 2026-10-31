@@ -141,8 +141,8 @@
   font-weight: 800;
   white-space: nowrap;
 }
-.glowvai-root .commerce-eta-card { display: flex; align-items: center; gap: 12px; border-color: var(--success-border); background: var(--success-bg); }
-.glowvai-root .commerce-eta-card b { display: block; font-size: 13px; }
+.glowvai-root .commerce-eta-card { display: flex; align-items: center; gap: 12px; border-color: var(--editorial-coral-soft); background: linear-gradient(120deg, var(--editorial-coral-soft) 0%, var(--editorial-ivory) 100%); color: var(--editorial-plum); }
+.glowvai-root .commerce-eta-card b { display: block; font-size: 13px; color: var(--editorial-plum); }
 .glowvai-root .commerce-eta-card p { color: var(--text-secondary); font-size: 12px; }
 .glowvai-root .commerce-eta-icon {
   display: grid;
@@ -560,3 +560,4 @@
 .glowvai-root .commerce-progress{ background: linear-gradient(120deg, var(--editorial-coral-soft) 0%, var(--editorial-ivory) 100%); border-color: var(--editorial-coral-soft); }
 .glowvai-root .commerce-progress-top{ color: var(--editorial-plum); }
 .glowvai-root .commerce-coupon{ background: var(--editorial-lavender); border-color: transparent; color: var(--editorial-plum); }
+.glowvai-root .commerce-eta-card .commerce-eta-icon { background: var(--editorial-plum); color: #fff; }
