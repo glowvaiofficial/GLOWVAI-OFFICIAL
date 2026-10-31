@@ -16,7 +16,7 @@
 .glowvai-root .rec-note{ display:flex; align-items:flex-start; gap:10px; margin:0; padding:12px 14px; border:1px solid var(--border-light); border-radius:14px; background:#fff; color:var(--text-secondary); font-size:12px; line-height:1.5; }
 .glowvai-root .rec-note svg{ flex:none; margin-top:1px; color:var(--primary); }
 
-.glowvai-root .rec-hero{ display:flex; flex-direction:column; gap:8px; padding:18px; border:1px solid var(--primary-border); border-radius:20px; background:var(--primary-light); }
+.glowvai-root .rec-hero{ display:flex; flex-direction:column; gap:8px; padding:18px; border:1px solid var(--editorial-coral-soft); border-radius:20px; background:linear-gradient(135deg, var(--editorial-ivory) 0%, var(--editorial-cream) 100%); color:var(--editorial-plum); }
 .glowvai-root .rec-hero.is-success{ border-color:var(--success-border); background:var(--success-bg); }
 .glowvai-root .rec-hero.is-warning{ border-color:var(--warning-border); background:var(--warning-bg); }
 .glowvai-root .rec-hero.is-neutral{ border-color:var(--border-light); background:#fff; }
