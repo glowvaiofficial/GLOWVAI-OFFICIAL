@@ -160,3 +160,23 @@
   .glowvai-root.glowvai-web .onboarding-screen .onboarding-sheet > button{ max-width: 460px; margin-top: 22px !important; }
   .glowvai-root.glowvai-web .welcome-screen{ min-height: calc(100dvh - 65px) !important; height: auto; }
 }
+
+/* Shop home on desktop: full-width search, a six-column category strip and five-column product rails. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .shop-home-search{ max-width: none; width: 100%; }
+  .glowvai-root.glowvai-web .shop-home-category-rail .shop-home-rail{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; overflow: visible; }
+  .glowvai-root.glowvai-web .shop-home-category-card{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-category-media{ height: 150px; }
+  .glowvai-root.glowvai-web .shop-home-rail{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; overflow: visible; }
+  .glowvai-root.glowvai-web .shop-home-rail-item{ width: auto; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-arrow{ display: none; }
+}
+
+/* Desktop product rails: one tidy row of five, with the rest behind "See all". Cards share one image proportion. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) > .shop-home-rail-item:nth-child(n+6){ display: none; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) > .shop-home-rail-item{ display: flex; min-width: 0; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card{ width: 100%; }
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card img,
+  .glowvai-root.glowvai-web .shop-home-rail:not(.shop-home-category-rail .shop-home-rail) .shop-product-card [class*="media"]{ aspect-ratio: 1 / 1; object-fit: cover; }
+}
