@@ -555,3 +555,8 @@
   .glowvai-root .commerce-orb-spin,
   .glowvai-root .commerce-spinner { animation: none; }
 }
+
+/* Offers on the cart and checkout use the editorial palette. Actions stay blue. */
+.glowvai-root .commerce-progress{ background: linear-gradient(120deg, var(--editorial-coral-soft) 0%, var(--editorial-ivory) 100%); border-color: var(--editorial-coral-soft); }
+.glowvai-root .commerce-progress-top{ color: var(--editorial-plum); }
+.glowvai-root .commerce-coupon{ background: var(--editorial-lavender); border-color: transparent; color: var(--editorial-plum); }
