@@ -17,10 +17,19 @@
 
 .glowvai-root{
   --commerce-blue: #075cff;
-  --primary: #2854c5;
-  --primary-dark: #1d3f9d;
-  --primary-light: #edf2ff;
-  --primary-border: #cdd9fb;
+  /* Brand blue (from the USER app) for actions and navigation. */
+  --primary: #0057fb;
+  --primary-dark: #1256b0;
+  --primary-light: #e9f1ff;
+  --primary-border: #c7dafd;
+  /* Editorial palette (from the USER app) for campaigns, offers and tips. Use it on
+     promotional surfaces only, never for routine controls. */
+  --editorial-ivory: #fffdf7;
+  --editorial-cream: #faf4ee;
+  --editorial-coral: #f27f78;
+  --editorial-coral-soft: #fbe0dc;
+  --editorial-plum: #5c2a91;
+  --editorial-lavender: #f2ecfa;
   --accent: #176b5b;
   --accent-light: #eaf6f2;
   --bg: #f7f8fb;
