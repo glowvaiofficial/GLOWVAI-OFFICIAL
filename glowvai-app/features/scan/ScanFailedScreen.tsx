@@ -94,7 +94,7 @@ export const ScanFailedScreen: React.FC = () => {
           Choose another photo
         </button>
         <button type="button" className="scan-text-button" onClick={() => navigate('home')}>
-          Continue with basic routine
+          Continue shopping
         </button>
       </div>
     </div>
