@@ -53,6 +53,7 @@ export type PortedScreenName =
   | 'scan-preview'
   | 'scan-analyzing'
   | 'scan-report'
+  | 'scan-concern'
   | 'scan-failed'
   // Profile, settings, support, referrals (features/profile, settings, support, referrals)
   | 'profile-tab'
