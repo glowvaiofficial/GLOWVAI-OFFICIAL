@@ -139,3 +139,8 @@
   .glowvai-root.glowvai-web .scan-report-body .scan-privacy,
   .glowvai-root.glowvai-web .scan-report-body .scan-model-note{ max-width: 1160px; margin-inline: auto; }
 }
+
+/* Scan report: what a detected concern means and what helps (cosmetic guidance). */
+.glowvai-root.glowvai-web .scan-concern-guide{ margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.glowvai-root.glowvai-web .scan-concern-guide p{ margin: 0 0 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.glowvai-root.glowvai-web .scan-concern-guide ul{ margin: 0; padding-left: 18px; list-style: disc; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }

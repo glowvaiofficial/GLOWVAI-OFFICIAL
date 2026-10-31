@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { CONCERN_GUIDANCE } from "./concernGuidance";
 import { AlertTriangle, Camera, RotateCcw, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import type { SkinAnalysisResult } from '../../core/services/skinModelService';
@@ -118,6 +119,16 @@ export const ScanReportScreen: React.FC = () => {
                     <div className="scan-meter" aria-hidden="true">
                       <span className="scan-meter-fill" style={{ width: `${Math.round(concern.score * 100)}%` }} />
                     </div>
+                    {concern.present && CONCERN_GUIDANCE[concern.key] && (
+                      <div className="scan-concern-guide">
+                        <p>{CONCERN_GUIDANCE[concern.key].meaning}</p>
+                        <ul>
+                          {CONCERN_GUIDANCE[concern.key].helps.map((tip) => (
+                            <li key={tip}>{tip}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
