@@ -5,7 +5,7 @@ import { ShopHomeScreen } from './screens/ShopHomeScreen';
 import { ShopBrowseScreen } from './screens/ShopBrowseScreen';
 import { ShopCategoryScreen } from './screens/ShopCategoryScreen';
 import { ShopProductScreen } from './screens/ShopProductScreen';
-import { ShopProductReviewsScreen } from './screens/ShopProductReviewsScreen';
+import { ShopReviewsEmptyScreen } from './screens/ShopReviewsEmptyScreen';
 import { ShopSearchFiltersScreen } from './screens/ShopSearchFiltersScreen';
 import { ShopWishlistScreen } from './screens/ShopWishlistScreen';
 import '../../responsive/shop-ported.css';
@@ -15,7 +15,7 @@ export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'shop-browse': ShopBrowseScreen,
   'shop-category': ShopCategoryScreen,
   'shop-product': ShopProductScreen,
-  'shop-product-reviews': ShopProductReviewsScreen,
+  'shop-product-reviews': ShopReviewsEmptyScreen,
   'shop-search-filters': ShopSearchFiltersScreen,
   'shop-wishlist': ShopWishlistScreen,
 };

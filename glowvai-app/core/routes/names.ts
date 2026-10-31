@@ -69,6 +69,7 @@ export type PortedScreenName =
   | 'recommend-routine'
   | 'recommend-ingredients'
   | 'recommend-patch-test'
+  | 'recommend-checkout'
   // Admin & vendor (features/admin, features/vendor)
   | 'admin-portal'
   | 'admin-claims'

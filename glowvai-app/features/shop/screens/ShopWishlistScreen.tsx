@@ -191,12 +191,6 @@ export const ShopWishlistScreen: React.FC = () => {
                 <p className="shop-wishlist-name">{item.name}</p>
                 <p className="shop-wishlist-benefit">{item.benefit}</p>
 
-                <div className="shop-wishlist-rating">
-                  <Star size={11} fill="#f59e0b" color="#f59e0b" />
-                  <b>{item.rating}</b>
-                  <span>({item.reviews})</span>
-                </div>
-
                 <div className="shop-wishlist-price">
                   <b>{formatRupee(item.price)}</b>
                   <s>{formatRupee(item.mrp)}</s>
