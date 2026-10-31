@@ -1,0 +1,57 @@
+/* Auth and onboarding on tablet and desktop. Phone keeps the rules in features/auth/auth.css. */
+
+@media (min-width: 720px){
+  /* Shared auth card (AuthShell) */
+  .glowvai-root .auth-screen{ height: auto; min-height: 0; max-width: 560px; margin: 32px auto; border-radius: 24px; background: #fff; box-shadow: 0 12px 32px rgba(20,40,90,.08); }
+  .glowvai-root .auth-screen .auth-topbar{ padding: 16px 20px 0; }
+  .glowvai-root .auth-screen .auth-body{ flex: 0 0 auto; overflow: visible; padding: 24px 32px 8px; }
+  .glowvai-root .auth-screen .auth-footer{ padding: 16px 32px 32px; background: #fff; }
+
+  /* Login */
+  .glowvai-root .auth-login{ height: auto; min-height: 0; max-width: 560px; margin: 32px auto; border-radius: 24px; background: #fff; box-shadow: 0 12px 32px rgba(20,40,90,.08); }
+  .glowvai-root .auth-login-hero{ flex: 0 0 300px; min-height: 300px; }
+  .glowvai-root .auth-login-sheet{ background: #fff; }
+
+  /* Welcome carousel */
+  .glowvai-root .auth-welcome{ height: auto; min-height: 0; max-width: 560px; margin: 32px auto; border-radius: 24px; background: #fff; box-shadow: 0 12px 32px rgba(20,40,90,.08); }
+  .glowvai-root .auth-welcome-brand{ padding: 28px 0 8px; }
+  .glowvai-root .auth-welcome-brand .auth-brand-wordmark{ font-size: 40px; }
+  .glowvai-root .auth-slider{ flex: 0 0 auto; }
+  .glowvai-root .auth-slide{ padding: 16px 32px 0; }
+  .glowvai-root .auth-slide-image{ height: 380px; }
+  .glowvai-root .auth-slide-title{ font-size: 24px; }
+  .glowvai-root .auth-welcome-footer{ padding: 20px 32px 32px; }
+  .glowvai-root .auth-dot{ position: relative; }
+  .glowvai-root .auth-dot::before{ position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); content: ''; }
+
+  /* Onboarding success */
+  .glowvai-root .auth-success{ height: auto; min-height: 560px; max-width: 560px; margin: 32px auto; padding: 48px 40px 40px; border-radius: 24px; background: #fff; box-shadow: 0 12px 32px rgba(20,40,90,.08); }
+  .glowvai-root .auth-success-footer{ right: 40px; bottom: 40px; left: 40px; }
+}
+
+@media (min-width: 1024px){
+  /* Auth card with brand panel: two columns */
+  .glowvai-root .auth-screen{ display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); max-width: 1040px; margin: 40px auto; }
+  .glowvai-root .auth-screen > .auth-brand-panel{ grid-column: 1; grid-row: 1 / span 3; }
+  .glowvai-root .auth-screen > .auth-topbar,
+  .glowvai-root .auth-screen > .auth-body,
+  .glowvai-root .auth-screen > .auth-footer{ grid-column: 2; }
+  .glowvai-root .auth-screen .auth-topbar{ padding: 20px 40px 0; }
+  .glowvai-root .auth-screen .auth-body{ padding: 32px 40px 16px; }
+  .glowvai-root .auth-screen .auth-footer{ padding: 16px 40px 40px; }
+  .glowvai-root .auth-brand-panel{ display: flex; position: relative; flex-direction: column; justify-content: space-between; gap: 24px; overflow: hidden; padding: 48px 40px 0; background: #1459e8; color: #fff; }
+  .glowvai-root .auth-brand-panel .auth-brand-wordmark{ font-size: 44px; }
+  .glowvai-root .auth-brand-copy{ max-width: 280px; color: rgba(255,255,255,.88); font-size: 15px; font-weight: 600; line-height: 1.5; }
+  .glowvai-root .auth-brand-mascot{ align-self: center; width: 200px; height: auto; margin-bottom: -4px; }
+
+  /* Login: brand hero beside the form */
+  .glowvai-root .auth-login{ display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); max-width: 1040px; margin: 40px auto; }
+  .glowvai-root .auth-login-hero{ flex: none; min-height: 560px; border-radius: 0; }
+  .glowvai-root .auth-brand-tap{ top: 42%; transform: translateY(-50%); }
+  .glowvai-root .auth-mascot{ width: 150px; }
+  .glowvai-root .auth-login-sheet{ margin-top: 0; padding: 56px 48px 40px; border-radius: 0; box-shadow: none; }
+  .glowvai-root .auth-login-form{ margin-top: 28px; }
+
+  /* Onboarding success */
+  .glowvai-root .auth-success{ max-width: 560px; }
+}

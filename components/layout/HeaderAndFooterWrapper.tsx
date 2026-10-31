@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -14,6 +15,18 @@ interface HeaderAndFooterWrapperProps {
 }
 
 export function HeaderAndFooterWrapper({ children, city }: HeaderAndFooterWrapperProps) {
+  const pathname = usePathname();
+
+  // The shop runs the glowvai app shell, which has its own navigation and bottom bar.
+  if (pathname?.startsWith("/shop")) {
+    return (
+      <>
+        <ReferralCapture />
+        <main id="main" className="flex-1">{children}</main>
+      </>
+    );
+  }
+
   return (
     <>
       <ReferralCapture />

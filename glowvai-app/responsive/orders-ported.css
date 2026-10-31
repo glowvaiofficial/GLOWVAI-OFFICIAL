@@ -1,0 +1,90 @@
+/* Orders responsive layouts (tablet 720px+, desktop 1024px+). Phone layout is unchanged.
+   The layout wrappers are display: contents on phone, so the phone DOM flow stays the same. */
+
+.glowvai-root .orders-detail-side,
+.glowvai-root .orders-detail-main,
+.glowvai-root .orders-track-panel,
+.glowvai-root .orders-track-details{ display: contents; }
+
+@media (min-width: 720px){
+  .glowvai-root .orders-screen .orders-header{ position: static; padding: 14px 20px; }
+  .glowvai-root .orders-screen .orders-icon-button{ width: 44px; height: 44px; }
+  .glowvai-root .orders-screen .orders-segment button,
+  .glowvai-root .orders-screen .orders-chip,
+  .glowvai-root .orders-screen .orders-tag{ min-height: 44px; }
+  .glowvai-root .orders-screen button:focus-visible,
+  .glowvai-root .orders-screen a:focus-visible,
+  .glowvai-root .orders-screen [role="button"]:focus-visible,
+  .glowvai-root .orders-screen [role="tab"]:focus-visible,
+  .glowvai-root .orders-screen textarea:focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
+
+  /* Orders list: card grid, active order spans two columns on desktop */
+  .glowvai-root .orders-screen.is-list .orders-body{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 20px 24px 96px;
+    align-items: start;
+  }
+  .glowvai-root .orders-screen.is-list .orders-body > .orders-segment,
+  .glowvai-root .orders-screen.is-list .orders-body > .orders-section-label,
+  .glowvai-root .orders-screen.is-list .orders-body > .orders-active-card{ grid-column: 1 / -1; }
+  .glowvai-root .orders-screen.is-list .orders-body > .orders-segment{ max-width: 360px; }
+
+  /* Order details: items and bill on the left, status timeline on the right */
+  .glowvai-root .orders-screen.is-detail .orders-body{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 24px 96px;
+    align-items: start;
+  }
+  .glowvai-root .orders-screen.is-detail .orders-detail-side,
+  .glowvai-root .orders-screen.is-detail .orders-detail-main,
+  .glowvai-root .orders-screen.is-tracking .orders-track-panel,
+  .glowvai-root .orders-screen.is-tracking .orders-track-details{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  /* Live tracking: tracker panel on the left, order details on the right */
+  .glowvai-root .orders-screen.is-tracking .orders-body{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 24px 96px;
+    align-items: start;
+  }
+
+  /* Rate: centred form */
+  .glowvai-root .orders-screen.is-rate .orders-header,
+  .glowvai-root .orders-screen.is-rate .orders-body{
+    width: 100%;
+    max-width: 600px;
+    margin-inline: auto;
+  }
+  .glowvai-root .orders-screen.is-rate .orders-body{ padding: 24px 16px 96px; }
+  .glowvai-root .orders-screen.is-rate .orders-stars button{ min-width: 44px; min-height: 44px; }
+  .glowvai-root .orders-screen.is-rate .orders-summary-card > .orders-thumbs{ flex-direction: row; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .orders-screen.is-list .orders-body{ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .glowvai-root .orders-screen.is-list .orders-body > .orders-active-card{ grid-column: span 2; }
+
+  .glowvai-root .orders-screen.is-detail .orders-body{
+    grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr);
+    column-gap: 24px;
+  }
+  .glowvai-root .orders-screen.is-detail .orders-detail-main{ grid-column: 1; grid-row: 1; }
+  .glowvai-root .orders-screen.is-detail .orders-detail-side{ grid-column: 2; grid-row: 1; position: sticky; top: 84px; }
+
+  .glowvai-root .orders-screen.is-tracking .orders-body{
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+  }
+  .glowvai-root .orders-screen.is-tracking .orders-track-panel{ grid-column: 1; grid-row: 1; position: sticky; top: 84px; }
+  .glowvai-root .orders-screen.is-tracking .orders-track-details{ grid-column: 2; grid-row: 1; }
+}
