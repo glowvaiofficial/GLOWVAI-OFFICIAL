@@ -25,7 +25,8 @@ export const BottomNavBar: React.FC = () => {
 
   return (
     <div className="bottom-commerce-shell">
-      {cartItemCount > 0 && currentScreen !== 'cart' && (
+      {/* The product page has its own add-to-cart bar, which the pill would cover. */}
+      {cartItemCount > 0 && currentScreen !== 'cart' && currentScreen !== 'shop-product' && (
         <button onClick={() => navigate('cart')} className="mini-cart-bar" aria-label={`View cart, ${cartItemCount} items, ₹${cartAuthoritative.finalPayable}`}>
           <span className="mini-cart-icon"><ShoppingCart size={20} /></span>
           <span className="mini-cart-copy"><b>View cart</b><small>{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'} · ₹{cartAuthoritative.finalPayable}</small></span>
