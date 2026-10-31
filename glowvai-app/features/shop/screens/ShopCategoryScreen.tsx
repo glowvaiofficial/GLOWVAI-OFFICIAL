@@ -17,7 +17,6 @@ const SORT_OPTIONS = [
   { id: 'popularity', label: 'Popularity' },
   { id: 'price_low', label: 'Price: Low to High' },
   { id: 'price_high', label: 'Price: High to Low' },
-  { id: 'rating', label: 'Rating' },
 ];
 
 export const ShopCategoryScreen: React.FC = () => {
@@ -42,8 +41,6 @@ export const ShopCategoryScreen: React.FC = () => {
         return a.price - b.price;
       case 'price_high':
         return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
       default:
         return b.matchScore - a.matchScore;
     }
