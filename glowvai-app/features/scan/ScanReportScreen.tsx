@@ -119,6 +119,11 @@ export const ScanReportScreen: React.FC = () => {
                     <div className="scan-meter" aria-hidden="true">
                       <span className="scan-meter-fill" style={{ width: `${Math.round(concern.score * 100)}%` }} />
                     </div>
+                    {concern.present && (
+                      <button type="button" className="scan-text-button" onClick={() => navigate('scan-concern', { concern: concern.key, result })}>
+                        View details
+                      </button>
+                    )}
                     {concern.present && CONCERN_GUIDANCE[concern.key] && (
                       <div className="scan-concern-guide">
                         <p>{CONCERN_GUIDANCE[concern.key].meaning}</p>

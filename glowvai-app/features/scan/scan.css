@@ -143,3 +143,16 @@
   .glowvai-root .scan-orb, .glowvai-root .scan-step-dot{ animation: none; }
   .glowvai-root .scan-meter-fill{ transition: none; }
 }
+
+/* Concern detail: one view per concern, built from the user's own scan result. */
+.glowvai-root .scan-concern-screen .scan-body{ display: grid; gap: 14px; padding: 16px; }
+.glowvai-root .scan-concern-screen .scan-card{ display: grid; gap: 10px; padding: 16px; border: 1px solid var(--border-light); border-radius: 16px; background: var(--surface-elevated); }
+.glowvai-root .scan-concern-summary > div:first-child{ display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.glowvai-root .scan-concern-summary b{ font-size: 18px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .scan-concern-kicker{ font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--text-muted); }
+.glowvai-root .scan-concern-note{ margin: 0; font-size: 12px; color: var(--text-muted); }
+.glowvai-root .scan-concern-screen .scan-section-title{ margin: 4px 0 0; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .scan-concern-screen .scan-card p{ margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-primary); }
+.glowvai-root .scan-concern-tips{ margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.6; color: var(--text-primary); }
+.glowvai-root .scan-concern-actions{ gap: 10px; }
+.glowvai-root .scan-disclaimer{ margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
