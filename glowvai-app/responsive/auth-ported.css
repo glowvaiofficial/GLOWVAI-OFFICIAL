@@ -55,3 +55,9 @@
   /* Onboarding success */
   .glowvai-root .auth-success{ max-width: 560px; }
 }
+
+/* Desktop sign-in: the terms sit under Continue instead of floating at the bottom of a tall empty panel. */
+@media (min-width: 720px){
+  .glowvai-root .auth-login .auth-legal{ margin-top: 24px; padding-top: 0; }
+}
+.glowvai-root .auth-login .auth-legal{ align-self: stretch; margin-inline: 0; padding-inline: 8px; }
