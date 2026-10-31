@@ -34,6 +34,22 @@
   }
 }
 
+/* Login and OTP split into brand panel and form from tablet width up. */
+@media (min-width: 720px){
+  .glowvai-root.glowvai-web .login-reference-screen,
+  .glowvai-root.glowvai-web .otp-reference-screen{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .glowvai-root.glowvai-web .login-reference-hero,
+  .glowvai-root.glowvai-web .otp-reference-hero{ flex: none; width: 100%; min-height: calc(100dvh - 65px); height: 100%; }
+  .glowvai-root.glowvai-web .login-reference-sheet,
+  .glowvai-root.glowvai-web .otp-keypad-sheet{ display: flex; min-width: 0; flex-direction: column; justify-content: center; width: 100%; padding: 64px 40px; }
+  .glowvai-root.glowvai-web .login-reference-form,
+  .glowvai-root.glowvai-web .otp-keypad{ max-width: 400px; }
+
+  .glowvai-root.glowvai-web .auth-login{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .glowvai-root.glowvai-web .auth-login-hero{ flex: none; width: 100%; min-height: calc(100dvh - 65px); border-radius: 0; }
+  .glowvai-root.glowvai-web .auth-login-sheet{ display: flex; min-width: 0; flex-direction: column; justify-content: center; margin-top: 0; padding: 64px 40px; border-radius: 0; box-shadow: none; }
+}
+
 @media (min-width: 1024px){
   /* Onboarding positions its photo and sheet absolutely with inline styles; put them in the grid instead. */
   .glowvai-root.glowvai-web .onboarding-screen{ min-height: calc(100dvh - 65px); }
@@ -92,3 +108,15 @@
 @media (min-width: 1024px){
   .glowvai-root.glowvai-web .commerce-sticky-bar{ position: sticky !important; bottom: 20px; left: auto !important; right: auto !important; width: min(100%, 1200px); max-width: 1200px; margin: 24px auto 0; padding: 16px 20px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-elevated); box-shadow: var(--shadow-float); }
 }
+
+/* Edit profile: personal details on the left, demographics and skin profile on the right. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-web .profile-body{ display: block; columns: 2; column-gap: 28px; width: 100%; max-width: 1160px; margin: 0 auto; }
+  .glowvai-root.glowvai-web .profile-body > *{ break-inside: avoid; }
+  .glowvai-root.glowvai-web .profile-body > .profile-label{ break-after: avoid; }
+  .glowvai-root.glowvai-web .profile-body > .profile-card{ margin-bottom: 16px; }
+}
+
+/* Product actions: label colour on the solid blue and black buttons (the shop reset set buttons to inherit). */
+.glowvai-root.glowvai-web .shop-screen .shop-btn-primary,
+.glowvai-root.glowvai-web .shop-screen .shop-product-buynow{ color: #fff; }
