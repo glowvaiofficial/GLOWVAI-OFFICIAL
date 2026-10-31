@@ -13,7 +13,7 @@ export const BottomNavBar: React.FC = () => {
     return () => window.removeEventListener('glowvai:commerce-reveal', handleReveal);
   }, [currentScreen]);
 
-  const pillHiddenScreens: ScreenName[] = ['cart', 'shop-product', 'shop-search-filters'];
+  const pillHiddenScreens: ScreenName[] = ['cart', 'shop-product', 'shop-search-filters', 'location-map-picker'];
   const hidden: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp', 'face-prep', 'face-capture', 'face-loading', 'cart', 'checkout', 'checkout-payment-method', 'checkout-payment-success', 'checkout-payment-failed', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking'];
   if (hidden.includes(currentScreen) || (currentScreen === 'skin-report' && !reportCommerceVisible)) return null;
 
