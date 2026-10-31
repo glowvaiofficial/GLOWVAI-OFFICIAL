@@ -155,4 +155,5 @@
 .glowvai-root .scan-concern-screen .scan-card p{ margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-primary); }
 .glowvai-root .scan-concern-tips{ margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.6; color: var(--text-primary); }
 .glowvai-root .scan-concern-actions{ gap: 10px; }
+.glowvai-root .scan-concern-screen .scan-card:has(.scan-concern-tips){ background: var(--editorial-lavender); border-color: transparent; }
 .glowvai-root .scan-disclaimer{ margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
