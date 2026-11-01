@@ -51,7 +51,7 @@ export const RoutineCheckoutScreen: React.FC = () => {
           {rows.map(({ product, step }, index) => (
             <li key={product.id} className="rec-checkout-item">
               <span className="rec-checkout-thumb">
-                {product.official_brand_image_url ? <img src={getProductImageUrl(product)} alt="" /> : <ShoppingBag size={20} />}
+                <img src={getProductImageUrl(product)} alt="" />
               </span>
               <div>
                 <small>Step {index + 1} · {step} · {product.brand}</small>
