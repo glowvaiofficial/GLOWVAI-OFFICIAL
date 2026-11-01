@@ -1,0 +1,36 @@
+/* Cart, checkout hand-off and order screens for tablet and desktop. Phone layout comes from glowvai.css. */
+
+/* Tablet and up: cart items left, sticky payable summary right; tracking timeline left, details right. */
+@media (min-width: 720px){
+  .glowvai-root .screen-content > .cart-screen{ display: grid; grid-template-columns: minmax(0,1fr) 300px; column-gap: 24px; align-items: start; padding-bottom: 0; }
+  .glowvai-root .screen-content > .cart-screen > .commerce-flow-header{ grid-column: 1 / -1; grid-row: 1; }
+  .glowvai-root .screen-content > .cart-screen > .commerce-flow-body{ grid-column: 1; grid-row: 2; padding: 20px 0 32px 24px; }
+  .glowvai-root .screen-content > .cart-screen > .commerce-sticky-action{ position: sticky; top: 84px; right: auto; bottom: auto; left: auto; grid-column: 2; grid-row: 2; flex-direction: column; align-items: stretch; gap: 14px; margin: 20px 24px 0 0; padding: 18px; border: 1px solid #e0e4ea; border-radius: 14px; box-shadow: none; }
+  .glowvai-root .screen-content > .cart-screen > .commerce-sticky-action > button{ width: 100%; min-width: 0; height: 52px; border-radius: 12px; }
+  .glowvai-root .screen-content > .cart-screen > .commerce-sticky-action > div b{ font-size: 22px; }
+
+  .glowvai-root .screen-content > .tracking-v2 > .commerce-flow-header{ top: 64px; padding-inline: 24px; }
+  .glowvai-root .screen-content > .tracking-v2 > .tracking-body{ display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: start; gap: 16px; padding: 20px 24px 40px; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-eta{ grid-column: 1 / -1; grid-row: 1; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-map-card{ grid-column: 1; grid-row: 2 / span 2; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-progress{ grid-column: 1; grid-row: 4; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-rider{ grid-column: 2; grid-row: 2; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-address{ grid-column: 2; grid-row: 3; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-items{ grid-column: 2; grid-row: 4; }
+  .glowvai-root .screen-content > .tracking-v2 .tracking-cancel-button{ grid-column: 1 / -1; grid-row: 5; justify-self: start; min-width: 240px; min-height: 44px; }
+
+  .glowvai-root .screen-content > .orders-v3 > .commerce-flow-header{ padding-inline: 24px; }
+  .glowvai-root .screen-content > .orders-v3 > .orders-list{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; gap: 16px; padding: 20px 24px 32px; }
+}
+
+/* Desktop: forms and receipts sit in one centred column (560px) under a full-width header. */
+@media (min-width: 1024px){
+  .glowvai-root .screen-content > .customer-details-screen,
+  .glowvai-root .screen-content > .payment-status-screen,
+  .glowvai-root .screen-content > .order-cancelled-screen,
+  .glowvai-root .screen-content > .order-confirmation{ padding-inline: max(16px, calc(50% - 280px)); }
+  .glowvai-root .screen-content > .customer-details-screen > .customer-details-form{ padding: 20px 0 40px; }
+  .glowvai-root .screen-content > .payment-status-screen > section{ padding-top: 56px; }
+  .glowvai-root .screen-content > .order-cancelled-screen{ padding-top: 56px; padding-bottom: 48px; }
+  .glowvai-root .screen-content > .order-confirmation{ padding-top: 36px; padding-bottom: 40px; }
+}

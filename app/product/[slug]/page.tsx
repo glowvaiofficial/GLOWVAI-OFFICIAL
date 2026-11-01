@@ -2,17 +2,12 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Accent } from "@/components/ui/Accent";
-import { Button } from "@/components/ui/Button";
-import { CartDrawer } from "@/components/cart/CartDrawer";
+import { Section, SectionTitle, focusRing } from "@/components/home/shared";
 import { ProductBuyBox } from "@/components/product/ProductBuyBox";
 import { getProducts, getProductBySlug, getRelatedProducts, computeDiscountPercent } from "@/lib/catalog";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { BRAND_NAME, siteConfig } from "@/config/site";
-import { testimonials } from "@/config/testimonials";
-import { Camera, Lock, ShieldCheck, MapPin, CheckCircle2, ChevronRight } from "lucide-react";
+import { CheckCircle2, ScanLine } from "lucide-react";
 
 import { SITE_URL, getAbsoluteUrl } from "@/lib/site-url";
 
@@ -32,7 +27,7 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
   const titleClean = (product.seo.title || product.name).replace(/\s*\|\s*GLOW VAI/gi, "");
   const canonicalUrl = getAbsoluteUrl(`/product/${product.slug}`);
-  const ogImageUrl = product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/og.jpg`;
+  const ogImageUrl = product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/opengraph-image`;
 
   return {
     title: titleClean,
@@ -63,6 +58,9 @@ export async function generateMetadata({ params }: ProductPageProps) {
   };
 }
 
+import { buildProductSchema, buildBreadcrumbSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/seo/JsonLd";
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
@@ -74,64 +72,45 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const related = getRelatedProducts(product.slug, 3);
   const discount = computeDiscountPercent(product.price, product.mrp);
 
-  const productSchema = {
+  const breadcrumbs = [
+    { name: "Home", urlPath: "/" },
+    { name: "Shop", urlPath: "/shop" },
+    { name: product.name },
+  ];
+
+  const productGraph = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    image: product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/og.jpg`,
-    description: product.description,
-    sku: product.id,
-    brand: {
-      "@type": "Brand",
-      name: product.marketerName || BRAND_NAME,
-    },
-    offers: {
-      "@type": "Offer",
-      url: getAbsoluteUrl(`/product/${product.slug}`),
-      priceCurrency: "INR",
-      price: product.price,
-      itemCondition: "https://schema.org/NewCondition",
-      availability: "https://schema.org/InStock",
-    },
+    "@graph": [
+      buildProductSchema(product, []),
+      buildBreadcrumbSchema(breadcrumbs, `/product/${product.slug}`),
+    ],
   };
 
   return (
-    <div className="bg-white py-10 sm:py-16 text-ink min-h-screen">
-      <CartDrawer />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
+    <div className="bg-paper text-ink">
+      <JsonLd data={productGraph} />
 
-      <Container>
-        
-        {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="mb-6 text-xs text-ink-muted">
-          <ol className="flex items-center gap-2">
+      <Section pad="tight" labelledBy="product-title">
+        <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
+          <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/" className="hover:text-brand transition-colors">
-                Home
-              </Link>
+              <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>Home</Link>
             </li>
-            <li>/</li>
+            <li aria-hidden="true">/</li>
             <li>
-              <Link href="/shop" className="hover:text-brand transition-colors">
-                Shop
-              </Link>
+              <Link href="/shop" className={`underline underline-offset-4 rounded ${focusRing}`}>Shop</Link>
             </li>
-            <li>/</li>
-            <li className="font-semibold text-ink truncate max-w-[180px]">{product.name}</li>
+            <li aria-hidden="true">/</li>
+            <li className="text-ink font-medium">{product.name}</li>
           </ol>
         </nav>
 
-        {/* Desktop 7/5 Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-          
-          {/* Left Gallery (7 cols desktop) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10 items-start">
+          {/* Gallery */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden bg-skymist border border-ink/10 shadow-lg">
+            <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden border border-ink/15 bg-paper-deep">
               <Image
-                src={getAssetPath(product.images[0] || "/images/hero/product.png")}
+                src={getAssetPath(product.images[0] || "/images/hero/product.webp")}
                 alt={product.name}
                 fill
                 priority
@@ -139,140 +118,127 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 className="object-cover"
               />
               {discount > 0 && (
-                <div className="absolute top-4 left-4 bg-coral text-ink font-bold text-xs px-3 py-1 rounded-full shadow-xs">
-                  {discount}% OFF
-                </div>
+                <span className="absolute top-4 left-4 bg-white text-ink font-mono text-[11px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-[6px]">
+                  {discount}% off
+                </span>
               )}
             </div>
-
-            {/* Thumbnails */}
             {product.images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2">
+              <ul className="grid grid-cols-4 gap-3">
                 {product.images.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="relative w-20 h-20 rounded-2xl overflow-hidden bg-skymist border-2 border-brand shrink-0 cursor-pointer"
-                  >
-                    <Image src={getAssetPath(img)} alt={`${product.name} view ${idx + 1}`} fill className="object-cover" />
-                  </div>
+                  <li key={idx} className="relative aspect-square rounded-[10px] overflow-hidden border border-ink/15 bg-paper-deep">
+                    <Image src={getAssetPath(img)} alt={`${product.name}, view ${idx + 1}`} fill sizes="(max-width: 1024px) 25vw, 120px" className="object-cover" />
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
+          </div>
 
-            {/* "Match with your scan" Strip */}
-            <div className="bg-skymist/50 rounded-3xl p-6 border border-brand/15 flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
-              <div className="space-y-1 text-center sm:text-left">
-                <span className="text-xs font-bold text-brand uppercase tracking-wider block">
-                  Custom Match
-                </span>
-                <h3 className="font-display font-bold text-base text-ink">
-                  Check if this formula suits your skin
-                </h3>
-                <p className="text-xs text-ink-muted">
-                  Take a 30-second camera scan to match hydration and barrier scores.
-                </p>
+          {/* Buy box */}
+          <div className="lg:col-span-5 lg:sticky lg:top-[96px] space-y-6">
+            <ProductBuyBox product={product} />
+            <div className="border border-ink/15 bg-white rounded-[24px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="font-display font-semibold text-lg">Not sure this suits you?</p>
+                <p className="text-[15px] text-ink-muted">A 30-second face scan checks your hydration and barrier scores.</p>
               </div>
-              <Link href="/face-analysis" className="shrink-0">
-                <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
-                  <Camera className="w-4 h-4 text-ink shrink-0" />
-                  <span>Start free scan</span>
-                </Button>
+              <Link
+                href="/face-analysis"
+                className={`inline-flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-[10px] border-[1.5px] border-ink/20 font-semibold hover:border-ink shrink-0 ${focusRing}`}
+              >
+                <ScanLine className="w-5 h-5 text-brand" aria-hidden="true" />
+                Scan my face
               </Link>
             </div>
           </div>
-
-          {/* Right Sticky Buy Box (5 cols desktop) */}
-          <div className="lg:col-span-5 lg:sticky lg:top-[96px] space-y-6">
-            <ProductBuyBox product={product} />
-          </div>
-
         </div>
+      </Section>
 
-        {/* Product Details Accordion & INCI Labeling */}
-        <div className="mt-16 sm:mt-24 border-t border-ink/10 pt-12 space-y-8 max-w-4xl mx-auto">
-          <h2 className="font-display font-bold text-2xl text-ink text-center sm:text-left">
-            Formula & Regulatory Details
-          </h2>
-
-          <div className="space-y-4">
-            {/* Description */}
-            <div className="p-6 rounded-3xl bg-skymist/30 border border-ink/10 space-y-2">
-              <h3 className="font-bold text-sm text-ink uppercase tracking-wider">Description</h3>
-              <p className="text-sm text-ink-muted leading-relaxed">{product.description}</p>
+      {/* Details */}
+      <Section tone="deep" pad="tight" labelledBy="details-title">
+        <SectionTitle id="details-title">Formula and details</SectionTitle>
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10">
+          <div className="lg:col-span-5 space-y-8">
+            <div>
+              <h3 className="font-display font-semibold text-xl">About this product</h3>
+              <p className="mt-2 text-[17px] leading-relaxed text-ink-muted">{product.description}</p>
             </div>
-
-            {/* Key Ingredients */}
-            <div className="p-6 rounded-3xl bg-skymist/30 border border-ink/10 space-y-2">
-              <h3 className="font-bold text-sm text-ink uppercase tracking-wider">Key Active Ingredients</h3>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {product.keyIngredients.map((ing, idx) => (
-                  <Badge key={idx} variant="brand" size="sm">
+            <div>
+              <h3 className="font-display font-semibold text-xl">Key actives</h3>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {product.keyIngredients.map((ing) => (
+                  <li key={ing} className="min-h-[36px] inline-flex items-center px-3 rounded-[10px] bg-white border border-ink/15 text-[15px]">
                     {ing}
-                  </Badge>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-
-            {/* Full INCI Ingredients */}
-            <div className="p-6 rounded-3xl bg-skymist/30 border border-ink/10 space-y-2">
-              <h3 className="font-bold text-sm text-ink uppercase tracking-wider">Full INCI Ingredient List</h3>
-              <p className="text-xs text-ink-muted font-mono leading-relaxed">{product.ingredients}</p>
-            </div>
-
-            {/* How to Use & Patch Test */}
-            <div className="p-6 rounded-3xl bg-skymist/30 border border-ink/10 space-y-2">
-              <h3 className="font-bold text-sm text-ink uppercase tracking-wider">How to Use & Patch Test</h3>
-              <ol className="list-decimal list-inside text-xs text-ink-muted space-y-1">
+            <div>
+              <h3 className="font-display font-semibold text-xl">How to use</h3>
+              <ol className="mt-3 space-y-3 text-ink-muted">
                 {product.howToUse.map((step, idx) => (
-                  <li key={idx}>{step}</li>
+                  <li key={idx} className="flex gap-3">
+                    <span className="font-mono text-sm text-brand pt-0.5">{String(idx + 1).padStart(2, "0")}</span>
+                    <span>{step}</span>
+                  </li>
                 ))}
               </ol>
-              <div className="pt-2 text-xs font-semibold text-coral flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Caution: {product.cautions}</span>
-              </div>
+              <p className="mt-4 inline-flex items-start gap-2 text-[15px] text-ink">
+                <CheckCircle2 className="w-5 h-5 text-brand shrink-0 mt-0.5" aria-hidden="true" />
+                <span>{product.cautions}</span>
+              </p>
             </div>
+          </div>
 
-            {/* Indian Cosmetic Regulatory Details */}
-            <div className="p-6 rounded-3xl bg-skymist/30 border border-ink/10 text-xs text-ink-muted space-y-1">
-              <h3 className="font-bold text-sm text-ink uppercase tracking-wider mb-2">Product Compliance Info</h3>
-              <p><strong className="text-ink">Net Quantity:</strong> {product.size}</p>
-              <p><strong className="text-ink">Shelf Life:</strong> {product.shelfLife}</p>
-              <p><strong className="text-ink">Country of Origin:</strong> {product.countryOfOrigin}</p>
-              <p><strong className="text-ink">Marketer:</strong> {product.marketerName}, {product.marketerAddress}</p>
+          <div className="lg:col-span-7 space-y-8">
+            <div className="bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8">
+              <h3 className="font-display font-semibold text-xl">Full ingredient list (INCI)</h3>
+              <p className="mt-3 font-mono text-[13px] leading-relaxed text-ink-muted">{product.ingredients}</p>
+            </div>
+            <div className="bg-white border border-ink/15 rounded-[24px] p-6 sm:p-8">
+              <h3 className="font-display font-semibold text-xl">Product information</h3>
+              <dl className="mt-4 border-t border-ink/15">
+                {[
+                  ["Net quantity", product.size],
+                  ["Shelf life", product.shelfLife],
+                  ["Country of origin", product.countryOfOrigin],
+                  ["Marketer", `${product.marketerName}, ${product.marketerAddress}`],
+                ].map(([k, v]) => (
+                  <div key={k} className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-x-6 border-b border-ink/15">
+                    <dt className="py-3 text-[15px] font-semibold">{k}</dt>
+                    <dd className="py-3 text-[15px] text-ink-muted">{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </div>
+      </Section>
 
-        {/* Pairs Well With */}
-        {related.length > 0 && (
-          <div className="mt-20 border-t border-ink/10 pt-12 space-y-8">
-            <h2 className="font-display font-bold text-2xl text-ink text-center sm:text-left">
-              Pairs well with
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {related.map((rel) => (
-                <div key={rel.id} className="p-4 rounded-3xl border border-ink/10 bg-white space-y-3 flex flex-col justify-between">
-                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-skymist border border-ink/10">
-                    <Image src={getAssetPath(rel.images[0] || "/images/hero/product.png")} alt={rel.name} fill className="object-cover" />
+      {related.length > 0 && (
+        <Section pad="tight" labelledBy="related-title">
+          <SectionTitle id="related-title">Pairs well with</SectionTitle>
+          <ul className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {related.map((rel) => (
+              <li key={rel.id} className="bg-white border border-ink/15 rounded-[10px] p-3 flex flex-col">
+                <Link href={`/product/${rel.slug}`} className={`group block rounded ${focusRing}`}>
+                  <div className="relative aspect-square rounded-[8px] overflow-hidden bg-paper">
+                    <Image src={getAssetPath(rel.images[0] || "/images/hero/product.webp")} alt={rel.name} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-ink line-clamp-1">{rel.name}</h3>
-                    <p className="text-xs text-ink-muted">{formatPrice(rel.price)}</p>
-                  </div>
-                  <Link href={`/product/${rel.slug}`}>
-                    <Button variant="outline" size="sm" className="w-full text-xs">
-                      View Details
-                    </Button>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-      </Container>
+                  <h3 className="mt-3 font-display font-semibold text-lg leading-snug group-hover:underline underline-offset-4">{rel.name}</h3>
+                </Link>
+                <p className="mt-1 font-semibold">{formatPrice(rel.price)}</p>
+                <Link
+                  href={`/product/${rel.slug}`}
+                  className={`mt-3 inline-flex items-center justify-center min-h-[44px] rounded-[10px] border-[1.5px] border-ink/20 font-semibold hover:border-ink ${focusRing}`}
+                >
+                  View product
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
     </div>
   );
 }

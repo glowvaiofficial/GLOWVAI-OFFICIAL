@@ -1,44 +1,27 @@
 import React from "react";
 import Link from "next/link";
-import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { BRAND_NAME } from "@/config/site";
-import { Camera, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Section, Eyebrow, focusRing } from "@/components/home/shared";
 
 export default function NotFound() {
   return (
-    <div className="bg-white py-20 sm:py-32 text-ink min-h-[70vh] flex items-center">
-      <Container size="md">
-        <div className="bg-skymist/40 rounded-3xl p-8 sm:p-14 border border-brand/15 text-center space-y-6 max-w-2xl mx-auto shadow-sm">
-          <Badge variant="brand" size="md">
-            404 Page Not Found
-          </Badge>
-
-          <h1 className="font-display font-semibold text-3xl sm:text-5xl text-ink leading-tight">
-            Looks like this page took a wrong turn.
-          </h1>
-
-          <p className="text-body-lg text-ink-muted max-w-lg mx-auto leading-relaxed">
-            The page you are looking for doesn&apos;t exist or has moved. Explore our shop or take a free skin scan instead.
-          </p>
-
-          <div className="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/shop">
-              <Button variant="primary" size="md" className="gap-2 shadow-coral-glow text-button-label">
-                <ShoppingBag className="w-4 h-4 text-ink shrink-0" />
-                <span>Explore Shop</span>
-              </Button>
-            </Link>
-            <Link href="/face-analysis">
-              <Button variant="outline" size="md" className="gap-2 text-button-label">
-                <Camera className="w-4 h-4 text-brand shrink-0" />
-                <span>Start Free Scan</span>
-              </Button>
-            </Link>
-          </div>
+    <div className="bg-paper text-ink">
+      <Section pad="md" labelledBy="nf-title">
+        <Eyebrow>Error 404</Eyebrow>
+        <h1 id="nf-title" className="mt-4 font-display font-semibold text-[clamp(2.5rem,1.6rem+4.5vw,5rem)] leading-[1] tracking-[-0.03em] max-w-[16ch]">
+          This page took a wrong turn.
+        </h1>
+        <p className="mt-6 text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] leading-[1.5] text-ink-muted max-w-[46ch]">
+          The page doesn&apos;t exist or has moved. Shop the routines, or take the free face scan.
+        </p>
+        <div className="mt-10 flex flex-col sm:flex-row gap-3">
+          <Link href="/shop" className={`inline-flex items-center justify-center min-h-[52px] px-7 rounded-[10px] bg-brand text-white font-semibold ${focusRing}`}>
+            Shop routines
+          </Link>
+          <Link href="/face-analysis" className={`inline-flex items-center justify-center min-h-[52px] px-7 rounded-[10px] border-[1.5px] border-ink/20 bg-white font-semibold hover:border-ink ${focusRing}`}>
+            Scan my face
+          </Link>
         </div>
-      </Container>
+      </Section>
     </div>
   );
 }

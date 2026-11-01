@@ -7,7 +7,7 @@ export const siteConfig = {
   legalName: "GLOW VAI Technologies Pvt. Ltd.",
   description: "Scan your face for free, get a plain-language skin report, and shop a routine that fits.",
   url: SITE_URL,
-  ogImage: `${SITE_URL}/og.jpg`,
+  ogImage: `${SITE_URL}/opengraph-image`,
   supportEmail: "contact@glowvai.in",
   phone: "+91 89778 55998",
   address: "Studio 4B, Design District, Hyderabad, Telangana 500081",

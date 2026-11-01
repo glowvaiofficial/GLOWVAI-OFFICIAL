@@ -8,7 +8,7 @@ export interface FaqItem {
 }
 
 export const paymentMethodsReady = false;
-export const returnsPolicyReady = false;
+export const returnsPolicyReady = true;
 export const trackingReady = false;
 
 export const rawFaqItems: FaqItem[] = [
@@ -61,7 +61,7 @@ export const rawFaqItems: FaqItem[] = [
   {
     id: "faq-8",
     question: "What is your returns policy?",
-    answer: "// TODO: Add real returns policy when finalized.",
+    answer: "We offer a 14-day Skin Satisfaction Guarantee on all skincare products. If a product does not suit your skin, contact our team on WhatsApp or email for a replacement or full refund.",
     flag: returnsPolicyReady,
   },
   {

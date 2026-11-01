@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { navLinks } from "@/config/nav";
 import { BRAND_NAME } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import { X, Sparkles, ShoppingBag, ArrowRight } from "lucide-react";
+import { X, ShoppingBag, ArrowRight } from "lucide-react";
+import { getAssetPath } from "@/lib/utils";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -20,19 +22,44 @@ export function MobileMenu({
   cartCount,
   onOpenCart,
 }: MobileMenuProps) {
-  // Lock body scroll and trap Escape key
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Lock scroll, trap focus, hide the page behind the sheet, restore focus on close
   useEffect(() => {
     if (!isOpen) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const behind = Array.from(document.querySelectorAll<HTMLElement>("header, #main, footer"));
+    behind.forEach((el) => el.setAttribute("inert", ""));
     document.body.style.overflow = "hidden";
+    document.querySelector<HTMLElement>("[data-menu-close]")?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.body.style.overflow = "auto";
+      behind.forEach((el) => el.removeAttribute("inert"));
+      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
+      opener?.focus();
     };
   }, [isOpen, onClose]);
 
@@ -40,10 +67,11 @@ export function MobileMenu({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Navigation Menu"
-      className="fixed inset-0 z-[100] bg-white flex flex-col justify-between p-6 animate-in fade-in duration-200"
+      aria-label="Navigation menu"
+      className="fixed inset-y-0 right-0 z-[100] w-[min(88vw,360px)] bg-white flex flex-col justify-between p-6"
     >
       {/* Top Header */}
       <div className="flex items-center justify-between border-b border-ink/10 pb-4">
@@ -52,12 +80,21 @@ export function MobileMenu({
           onClick={onClose}
           className="flex items-center gap-2 select-none"
         >
+          <div className="relative w-7 h-7 rounded-[7px] overflow-hidden shrink-0">
+            <Image
+              src={getAssetPath("/logo/glowvai-logo.svg")}
+              alt="GLOW VAI Logo"
+              fill
+              sizes="28px"
+              className="object-contain"
+            />
+          </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display font-extrabold text-2xl tracking-tight text-[#0050FF]">
+            <span className="font-display font-bold text-[24px] leading-none tracking-[-0.02em] text-brand">
               GLOW VAI
             </span>
-            <span className="text-[10px] font-extrabold tracking-widest text-amber-600 uppercase bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-              Quick Commerce
+            <span className="text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
+              Quick commerce
             </span>
           </div>
         </Link>
@@ -65,62 +102,33 @@ export function MobileMenu({
         <button
           onClick={onClose}
           aria-label="Close menu"
-          className="w-10 h-10 rounded-full bg-ink/5 hover:bg-ink/10 flex items-center justify-center text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="w-11 h-11 rounded-full hover:bg-paper-deep flex items-center justify-center text-ink transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          data-menu-close
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Main Links */}
-      <nav className="flex flex-col space-y-5 my-auto py-6">
-        {navLinks.map((link) => {
-          const isExternal = link.href.startsWith("http");
-          return isExternal ? (
-            <a
-              key={link.title}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onClose}
-              className="group flex items-center justify-between font-display text-2xl font-bold text-ink hover:text-brand transition-colors py-1"
-            >
-              <span>{link.title}</span>
-              <div className="flex items-center gap-2">
-                {link.badge && (
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full border border-emerald-300">
-                    {link.badge}
-                  </span>
-                )}
-                <ArrowRight className="w-5 h-5 text-ink/30 group-hover:text-brand group-hover:translate-x-1 transition-all" />
-              </div>
-            </a>
-          ) : (
-            <Link
-              key={link.title}
-              href={link.href}
-              onClick={onClose}
-              className="group flex items-center justify-between font-display text-2xl font-bold text-ink hover:text-brand transition-colors py-1"
-            >
-              <span>{link.title}</span>
-              <div className="flex items-center gap-2">
-                {link.badge && (
-                  <span className="text-xs bg-blush text-ink font-semibold px-2.5 py-0.5 rounded-full border border-coral/20">
-                    {link.badge}
-                  </span>
-                )}
-                <ArrowRight className="w-5 h-5 text-ink/30 group-hover:text-brand group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-          );
-        })}
+      <nav className="flex flex-col my-auto py-4" aria-label="Mobile">
+        {navLinks.map((link) => (
+          <Link
+            key={link.title}
+            href={link.href}
+            onClick={onClose}
+            className="flex items-center justify-between min-h-14 text-xl font-medium text-ink hover:text-brand transition-colors border-b border-ink/10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            <span>{link.title}</span>
+            <ArrowRight className="w-5 h-5 text-ink-light" aria-hidden="true" />
+          </Link>
+        ))}
       </nav>
 
       {/* Bottom Action Area & Contact Info */}
       <div className="space-y-3 pt-4 border-t border-ink/10">
         <Link href="/face-analysis" onClick={onClose} className="block w-full">
-          <Button variant="primary" size="lg" className="w-full flex items-center justify-center gap-2 shadow-coral-glow">
-            <Sparkles className="w-5 h-5" />
-            <span>Scan My Face (Free)</span>
+          <Button variant="primary" size="md" className="w-full">
+            <span>Scan my face</span>
           </Button>
         </Link>
 
@@ -129,10 +137,10 @@ export function MobileMenu({
             onClose();
             onOpenCart();
           }}
-          className="w-full flex items-center justify-center gap-2 bg-skymist text-brand font-bold py-3.5 px-4 rounded-2xl border border-brand/20"
+          className="w-full min-h-[52px] flex items-center justify-center gap-2 bg-white text-ink font-semibold px-4 rounded-[10px] border-[1.5px] border-ink/20 hover:border-ink transition-colors cursor-pointer"
         >
           <ShoppingBag className="w-5 h-5" />
-          <span>View Cart ({cartCount})</span>
+          <span>View cart ({cartCount})</span>
         </button>
 
         {/* Contact & Social Links in Mobile Drawer */}
@@ -152,7 +160,7 @@ export function MobileMenu({
               href="https://www.instagram.com/glowvai"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full bg-skymist flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
+              className="w-8 h-8 rounded-full bg-paper-deep flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -162,7 +170,7 @@ export function MobileMenu({
               href="https://x.com/Glowvai"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full bg-skymist flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
+              className="w-8 h-8 rounded-full bg-paper-deep flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -172,7 +180,7 @@ export function MobileMenu({
               href="https://www.linkedin.com/company/glowvai/"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full bg-skymist flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
+              className="w-8 h-8 rounded-full bg-paper-deep flex items-center justify-center text-ink hover:bg-brand hover:text-white transition-colors"
             >
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>

@@ -1,38 +1,33 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Serif, DM_Sans } from "next/font/google";
+import { Familjen_Grotesk, Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { HeaderAndFooterWrapper } from "@/components/layout/HeaderAndFooterWrapper";
 import { getLocationFromIP } from "@/lib/location";
 import { SITE_URL } from "@/lib/site-url";
+import { CookieNotice } from "@/components/consent/CookieNotice";
+import { GA4Script } from "@/components/analytics/GA4Script";
+import { RouteTracker } from "@/components/analytics/RouteTracker";
 
-const displayFont = Bricolage_Grotesque({
+const displayFont = Familjen_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
-  weight: ["500", "600", "700"],
+  weight: ["600", "700"],
   preload: true,
 });
 
-const accentFont = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-accent",
-  display: "swap",
-  weight: ["400"],
-  style: ["italic"],
-  preload: false,
-});
-
-const bodyFont = DM_Sans({
+const bodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["400", "600"],
   preload: true,
 });
 
 export const viewport: Viewport = {
-  themeColor: "#0050FF",
+  themeColor: "#1447E6",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -48,15 +43,15 @@ export const metadata: Metadata = {
     template: "%s | GLOW VAI",
   },
   description: "Scan your face for free, get a plain-language skin report, and shop a routine that fits.",
-  alternates: {
-    canonical: "./",
-  },
   authors: [{ name: siteConfig.name, url: SITE_URL }],
   creator: siteConfig.name,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   manifest: "/site.webmanifest",
   openGraph: {
@@ -68,7 +63,7 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: "/og.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "GLOW VAI skincare",
@@ -77,9 +72,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GLOW VAI | Skincare that starts with a face scan",
-    description: "Scan your face for free, get a plain-language skin report, and shop a routine that fits.",
-    images: ["/og.jpg"],
+    images: ["/opengraph-image"],
     creator: "@glowvai",
   },
   robots: {
@@ -104,19 +97,22 @@ export default async function RootLayout({
   const locationData = await getLocationFromIP();
 
   return (
-    <html lang="en-IN" className={`${displayFont.variable} ${accentFont.variable} ${bodyFont.variable}`}>
+    <html lang="en-IN" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="shortcut icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen bg-white text-ink flex flex-col font-sans selection:bg-brand selection:text-white">
+        <GA4Script />
+        <Suspense fallback={null}>
+          <RouteTracker />
+        </Suspense>
         <HeaderAndFooterWrapper city={locationData.city}>
           {children}
         </HeaderAndFooterWrapper>
+        <CookieNotice />
       </body>
     </html>
   );
 }
-
-

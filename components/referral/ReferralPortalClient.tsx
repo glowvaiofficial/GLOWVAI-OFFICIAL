@@ -3,40 +3,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Accent } from "@/components/ui/Accent";
 import { Button } from "@/components/ui/Button";
+import { ReferralLanding } from "./ReferralLanding";
+import { Section, focusRing } from "@/components/home/shared";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { SITE_URL } from "@/lib/site-url";
-import {
-  Gift,
-  Share2,
-  QrCode,
-  Sparkles,
-  CheckCircle2,
-  Copy,
-  Check,
-  TrendingUp,
-  Award,
-  Clock,
-  ArrowRight,
-  ShieldCheck,
-  UserCheck,
-  Car,
-  GraduationCap,
-  Upload,
-  ChevronRight,
-  RotateCcw,
-  MessageSquare,
-  DollarSign,
-  AlertCircle,
-} from "lucide-react";
+import { Gift, Share2, QrCode, ScanLine, CheckCircle2, Copy, Check, TrendingUp, Award, Clock, ArrowRight, ShieldCheck, UserCheck, Car, GraduationCap, Upload, ChevronRight, RotateCcw, MessageSquare, DollarSign, AlertCircle } from "lucide-react";
 
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbxMKXA3nFFIlX4mmbTjrOMwSa1Vu7JSgx6HIlKqmT6jLcZ0qz5ppqWFcLczaIR1RxkAuw/exec";
 
-type ActiveView = "WELCOME" | "DRIVER_WIZARD" | "STUDENT_WIZARD" | "DASHBOARD";
+type ActiveView = "WELCOME" | "DRIVER_WIZARD" | "STUDENT_WIZARD" | "DASHBOARD" | "LOGIN";
 type PartnerCategory = "DRIVER" | "STUDENT";
 
 interface MetricsState {
@@ -53,6 +32,10 @@ export function ReferralPortalClient() {
   const [partnerId, setPartnerId] = useState<string>("");
   const [partnerName, setPartnerName] = useState<string>("");
   const [partnerMeta, setPartnerMeta] = useState<string>("");
+  const [loginPartnerId, setLoginPartnerId] = useState("");
+  const [loginPhone, setLoginPhone] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginBusy, setLoginBusy] = useState(false);
   const [metrics, setMetrics] = useState<MetricsState>({ count: 0, earned: 0, declined: 0 });
 
   // Wizard Steps
@@ -342,6 +325,42 @@ export function ReferralPortalClient() {
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
   };
 
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginBusy(true);
+    setLoginError("");
+    try {
+      const res = await fetch(
+        `${APPS_SCRIPT_URL}?action=LOGIN_PARTNER&partnerId=${encodeURIComponent(loginPartnerId.trim())}&phone=${encodeURIComponent(loginPhone.trim())}&t=${Date.now()}`
+      );
+      const data = await res.json();
+      if (data && data.status === "SUCCESS" && data.partner) {
+        const p = data.partner;
+        const isStudent = p.partnerType === "STUDENT";
+        const name = p.fullName || (isStudent ? "Campus Ambassador" : "Auto Captain");
+        const meta = isStudent ? "Student Ambassador" : "Auto Partner";
+        setPartnerId(p.partnerId);
+        setCategory(isStudent ? "STUDENT" : "DRIVER");
+        setPartnerName(name);
+        setPartnerMeta(meta);
+        localStorage.setItem("v_partner_id", p.partnerId);
+        localStorage.setItem("v_partner_name", name);
+        localStorage.setItem("v_partner_meta", meta);
+        localStorage.setItem("v_partner_category", isStudent ? "STUDENT" : "DRIVER");
+        setLoginPhone("");
+        setView("DASHBOARD");
+      } else if (data && data.status === "RATE_LIMITED") {
+        setLoginError("Too many attempts. Please wait a minute and try again.");
+      } else {
+        setLoginError("Partner ID or phone number not found. Check both and try again.");
+      }
+    } catch {
+      setLoginError("Could not reach the server. Please try again.");
+    } finally {
+      setLoginBusy(false);
+    }
+  };
+
   const resetRegistration = () => {
     localStorage.removeItem("v_partner_id");
     localStorage.removeItem("v_partner_name");
@@ -352,263 +371,99 @@ export function ReferralPortalClient() {
     setView("WELCOME");
   };
 
+  if (view === "WELCOME") {
+    return (
+      <ReferralLanding
+        onDriver={() => {
+          setCategory("DRIVER");
+          setDriverStep(1);
+          setView("DRIVER_WIZARD");
+        }}
+        onStudent={() => {
+          setCategory("STUDENT");
+          setStudentStep(1);
+          setView("STUDENT_WIZARD");
+        }}
+        onLogin={() => {
+          setLoginError("");
+          setView("LOGIN");
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="bg-white min-h-screen text-slate-900 relative overflow-hidden bg-grid-subtle">
-      {/* Ambient Blue Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#0050FF]/10 blur-[120px] rounded-full pointer-events-none -z-10" />
-
-      <Container size="md" className="py-12 sm:py-20 relative z-10">
-        {/* Top Header Badge */}
-        <div className="text-center space-y-4 max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#0050FF]/10 text-[#0050FF] px-4 py-1.5 rounded-full text-xs font-bold border border-[#0050FF]/20 shadow-sm">
-            <Sparkles className="w-4 h-4 text-[#0050FF]" />
-            <span>GLOW VAI Partner Ecosystem</span>
-          </div>
-
-          <h1 className="font-display font-black text-4xl sm:text-5xl text-slate-900 tracking-tight leading-tight">
-            Partner <span className="bg-gradient-to-r from-[#0050FF] via-blue-600 to-indigo-600 bg-clip-text text-transparent">Referral</span> Network
+    <div className="bg-paper text-ink">
+      <Section pad="md" labelledBy="ref-portal-title">
+        <div className="max-w-2xl mx-auto mb-10">
+          <button type="button" onClick={() => setView("WELCOME")} className="text-sm font-medium underline underline-offset-4 rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand">
+            Back to the referral overview
+          </button>
+          <h1 id="ref-portal-title" className="mt-4 font-display font-semibold text-[clamp(2.25rem,1.6rem+3vw,3.75rem)] leading-[1] tracking-[-0.03em]">
+            Partner <span className="text-brand">referral</span> network
           </h1>
-
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium max-w-xl mx-auto">
-            Earn <strong className="text-[#0050FF] font-extrabold">₹10 per verified referral</strong> + <strong className="text-emerald-600 font-extrabold">₹1,000 milestone bonus</strong>. Instant UPI settlements directly to your bank account.
-          </p>
         </div>
 
-        {/* ----------------- SCREEN 1: WELCOME SELECTOR ----------------- */}
-        {view === "WELCOME" && (
-          <div className="space-y-8 max-w-2xl mx-auto">
-            {/* 6 AI Image Showcase Section FIRST */}
-            <div className="space-y-6">
-              <div className="text-center space-y-2">
-                <div className="inline-flex items-center gap-2 bg-[#0050FF]/10 text-[#0050FF] px-3.5 py-1 rounded-full text-xs font-bold border border-[#0050FF]/20">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Partner Program Visual Guidance</span>
-                </div>
-                <h3 className="font-display font-black text-2xl text-slate-900">
-                  How You Earn With GLOW VAI
-                </h3>
-                <p className="text-xs text-slate-600 max-w-md mx-auto font-medium">
-                  Review how Auto Rickshaw posters, campus ambassador badges, and instant UPI payouts work in Vijayawada before registering below.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* 1. Auto Poster */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/auto_poster.png"
-                      alt="Seatback QR Poster inside Autos"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-[#0050FF] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      1. Transit Poster
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">1. Auto Seatback QR Poster</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Mount our durable QR poster inside your auto. Passengers scan & scan skin for free.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2. Direct UPI Payout */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/upi_payout.png"
-                      alt="Instant Direct UPI Settlements"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      2. Instant Payout
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">2. ₹10 Per Scan Instant UPI</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Direct cash transfer to Google Pay or PhonePe as soon as referral is verified.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 3. Campus Ambassador */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/campus_ambassador.png"
-                      alt="Student Campus QR Badge Program"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      3. Campus Ambassador
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">3. College QR ID Badge</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Campus ambassadors share skin scan badges with classmates across colleges.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 4. WhatsApp Share */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/whatsapp_share.png"
-                      alt="Instant WhatsApp Share Link"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-teal-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      4. WhatsApp Share
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">4. 1-Click WhatsApp Invites</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Send personalized referral links directly to your WhatsApp groups and friends.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 5. Vijayawada Hubs */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/vijayawada_hubs.png"
-                      alt="Vijayawada Hub Transit Network"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-[#0050FF] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      5. Local Hubs
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">5. Vijayawada Transit Map</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Benz Circle, Bus Stand & Kanuru stands connected to neighborhood micro-hubs.
-                    </p>
-                  </div>
-                </div>
-
-                {/* 6. Milestone Bonus */}
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-[#0050FF]/40 shadow-sm transition-all space-y-3 group">
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
-                    <Image
-                      src="/images/referral/milestone_bonus.png"
-                      alt="₹1,000 Milestone Cash Bonus"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
-                      6. ₹1,000 Bonus
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-sm text-slate-900">6. ₹1,000 Milestone Bonus</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Hit 100 verified referrals in a month to unlock your extra ₹1,000 cash bonus.
-                    </p>
-                  </div>
-                </div>
-              </div>
+        {/* ----------------- SCREEN 2: AUTO DRIVER WIZARD ----------------- */}
+        {view === "LOGIN" && (
+          <div className="max-w-md mx-auto bg-white p-6 sm:p-8 rounded-[24px] border border-ink/10 space-y-5">
+            <div className="space-y-1 text-center">
+              <h3 className="font-display font-bold text-xl text-ink">Partner Log In</h3>
+              <p className="text-xs text-ink-muted font-medium">
+                Enter the Partner ID from your registration and the phone number you registered with.
+              </p>
             </div>
-
-            {/* Registration Selector Cards NEXT */}
-            <div className="pt-4 space-y-6 max-w-xl mx-auto">
-              <div className="text-center space-y-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0050FF] block">
-                  Select Campaign & Register Below
-                </span>
-                <h3 className="font-display font-black text-xl text-slate-900">
-                  Ready to Become a Partner?
-                </h3>
+            <form onSubmit={handleLogin} className="space-y-4 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-ink-muted block">Partner ID</label>
+                <input
+                  type="text"
+                  required
+                  value={loginPartnerId}
+                  onChange={(e) => setLoginPartnerId(e.target.value)}
+                  placeholder="e.g. GLV-AUTO-001-ABCD or GLV-STUDENT-001-ABCD"
+                  className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
+                />
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Option 1: Auto Driver */}
-                <div
-                  onClick={() => {
-                    setCategory("DRIVER");
-                    setDriverStep(1);
-                    setView("DRIVER_WIZARD");
-                  }}
-                  className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 hover:border-[#0050FF]/50 shadow-sm hover:shadow-xl hover:shadow-[#0050FF]/10 transition-all cursor-pointer space-y-5 flex flex-col justify-between group"
-                >
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#0050FF]/10 text-[#0050FF] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                      <Car className="w-6 h-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#0050FF] block">
-                        Transit Campaign
-                      </span>
-                      <h2 className="font-display font-black text-xl text-slate-900 group-hover:text-[#0050FF] transition-colors">
-                        Auto Driver Partner
-                      </h2>
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Mount our seatback QR poster inside your auto. Passengers scan & earn you ₹10 per referral + ₹1,000 milestone bonus.
-                    </p>
-                  </div>
-                  <div className="pt-2">
-                    <Button variant="primary" size="md" className="w-full text-xs font-bold gap-2 bg-[#0050FF] hover:bg-[#003CD6] text-white shadow-md shadow-[#0050FF]/20">
-                      <span>Register Auto Driver</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Option 2: Student Campus Ambassador */}
-                <div
-                  onClick={() => {
-                    setCategory("STUDENT");
-                    setStudentStep(1);
-                    setView("STUDENT_WIZARD");
-                  }}
-                  className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 hover:border-purple-500/50 shadow-sm hover:shadow-xl hover:shadow-purple-500/10 transition-all cursor-pointer space-y-5 flex flex-col justify-between group"
-                >
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                      <GraduationCap className="w-6 h-6" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 block">
-                        Campus Campaign
-                      </span>
-                      <h2 className="font-display font-black text-xl text-slate-900 group-hover:text-purple-700 transition-colors">
-                        Campus Ambassador
-                      </h2>
-                    </div>
-                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                      Refer classmates & friends across campus. Get a custom QR badge, earn instant pocket cash, and top performance perks.
-                    </p>
-                  </div>
-                  <div className="pt-2">
-                    <Button variant="outline" size="md" className="w-full text-xs font-bold border-slate-300 hover:border-purple-600 hover:bg-purple-50 text-slate-800 gap-2">
-                      <span>Register Ambassador</span>
-                      <ArrowRight className="w-4 h-4 text-purple-700" />
-                    </Button>
-                  </div>
-                </div>
+              <div className="space-y-1">
+                <label className="font-bold text-ink-muted block">Registered Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  value={loginPhone}
+                  onChange={(e) => setLoginPhone(e.target.value)}
+                  placeholder="10-digit mobile number"
+                  className="w-full px-3.5 py-2.5 rounded-[10px] bg-paper-deep border border-ink/20 text-ink font-semibold focus:outline-none focus:border-brand"
+                />
               </div>
+              {loginError && (
+                <div className="bg-paper-deep text-ink p-3 rounded-[10px] border border-ink/20 font-semibold">{loginError}</div>
+              )}
+              <button
+                type="submit"
+                disabled={loginBusy}
+                className="w-full py-3.5 px-4 rounded-[10px] bg-brand hover:bg-brand-dark text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                <span>{loginBusy ? "Checking..." : "Log In"}</span>
+              </button>
+            </form>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => { setLoginError(""); setView("WELCOME"); }}
+                className="text-xs font-semibold text-ink-muted hover:text-brand cursor-pointer"
+              >
+                New partner? Register instead
+              </button>
             </div>
           </div>
         )}
 
-        {/* ----------------- SCREEN 2: AUTO DRIVER WIZARD ----------------- */}
         {view === "DRIVER_WIZARD" && (
-          <div className="bg-white p-6 sm:p-10 rounded-3xl border border-ink/15 max-w-lg mx-auto shadow-md space-y-6">
+          <div className="bg-white p-6 sm:p-10 rounded-[24px] border border-ink/15 max-w-lg mx-auto space-y-6">
             <div className="flex items-center justify-between border-b border-ink/10 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-brand uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em] block">
                   Step {driverStep} of 3
                 </span>
                 <h2 className="font-display font-bold text-xl text-ink">Auto Driver Registration</h2>
@@ -622,7 +477,7 @@ export function ReferralPortalClient() {
             </div>
 
             {formError && (
-              <div className="bg-coral/10 border border-coral/30 p-3.5 rounded-2xl text-coral text-xs font-bold flex items-center gap-2">
+              <div className="bg-coral/10 border border-ink/20 p-3.5 rounded-[10px] text-coral text-xs font-bold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{formError}</span>
               </div>
@@ -639,7 +494,7 @@ export function ReferralPortalClient() {
                       placeholder="e.g. Rajesh Kumar"
                       value={dName}
                       onChange={(e) => setDName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -652,7 +507,7 @@ export function ReferralPortalClient() {
                       placeholder="10-digit mobile number"
                       value={dPhone}
                       onChange={(e) => setDPhone(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -685,16 +540,16 @@ export function ReferralPortalClient() {
                       placeholder="AP 16 XX 1234"
                       value={dVehicle}
                       onChange={(e) => setDVehicle(e.target.value.toUpperCase())}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none uppercase"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none uppercase"
                     />
                   </div>
 
                   <div className="space-y-1">
                     <label className="block text-xs font-bold text-ink">Primary Hub / Stand Location *</label>
-                    <select
+                    <select aria-label="Primary hub or stand location"
                       value={dHub}
                       onChange={(e) => setDHub(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none bg-white font-medium"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none bg-white font-medium"
                     >
                       <option value="Benz Circle">Benz Circle</option>
                       <option value="Bus Stand / Railway Station">Bus Stand / Railway Station</option>
@@ -711,7 +566,7 @@ export function ReferralPortalClient() {
                       placeholder="9876543210@ybl"
                       value={dUpi}
                       onChange={(e) => setDUpi(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -752,7 +607,7 @@ export function ReferralPortalClient() {
 
                     <div className="grid grid-cols-2 gap-3">
                       {/* Selfie Upload */}
-                      <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-sand/30 hover:bg-white transition-all">
+                      <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-[10px] p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-paper hover:bg-white transition-all">
                         <input
                           type="file"
                           accept="image/*"
@@ -761,12 +616,12 @@ export function ReferralPortalClient() {
                         />
                         <Upload className="w-5 h-5 text-brand mb-1" />
                         <span className="text-[11px] font-bold text-ink">
-                          {dSelfieFile ? "✓ Selfie Attached" : "Driver Selfie"}
+                          {dSelfieFile ? "Selfie Attached" : "Driver Selfie"}
                         </span>
                       </label>
 
                       {/* Driving License Upload */}
-                      <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-sand/30 hover:bg-white transition-all">
+                      <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-[10px] p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-paper hover:bg-white transition-all">
                         <input
                           type="file"
                           accept="image/*"
@@ -775,7 +630,7 @@ export function ReferralPortalClient() {
                         />
                         <Upload className="w-5 h-5 text-brand mb-1" />
                         <span className="text-[11px] font-bold text-ink">
-                          {dLicenseFile ? "✓ License Attached" : "License Photo"}
+                          {dLicenseFile ? "License Attached" : "License Photo"}
                         </span>
                       </label>
                     </div>
@@ -796,7 +651,7 @@ export function ReferralPortalClient() {
                       variant="primary"
                       size="md"
                       disabled={isSubmitting}
-                      className="w-1/2 shadow-coral-glow"
+                      className="w-1/2"
                     >
                       {isSubmitting ? "Generating QR..." : "Get QR Code"}
                     </Button>
@@ -809,10 +664,10 @@ export function ReferralPortalClient() {
 
         {/* ----------------- SCREEN 3: STUDENT WIZARD ----------------- */}
         {view === "STUDENT_WIZARD" && (
-          <div className="bg-white p-6 sm:p-10 rounded-3xl border border-ink/15 max-w-lg mx-auto shadow-md space-y-6">
+          <div className="bg-white p-6 sm:p-10 rounded-[24px] border border-ink/15 max-w-lg mx-auto space-y-6">
             <div className="flex items-center justify-between border-b border-ink/10 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em] block">
                   Step {studentStep} of 3
                 </span>
                 <h2 className="font-display font-bold text-xl text-ink">Campus Ambassador Registration</h2>
@@ -826,7 +681,7 @@ export function ReferralPortalClient() {
             </div>
 
             {formError && (
-              <div className="bg-coral/10 border border-coral/30 p-3.5 rounded-2xl text-coral text-xs font-bold flex items-center gap-2">
+              <div className="bg-coral/10 border border-ink/20 p-3.5 rounded-[10px] text-coral text-xs font-bold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{formError}</span>
               </div>
@@ -843,7 +698,7 @@ export function ReferralPortalClient() {
                       placeholder="e.g. Sai Teja"
                       value={sName}
                       onChange={(e) => setSName(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -857,7 +712,7 @@ export function ReferralPortalClient() {
                       placeholder="e.g. 20"
                       value={sAge}
                       onChange={(e) => setSAge(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -890,7 +745,7 @@ export function ReferralPortalClient() {
                       placeholder="e.g. VR Siddhartha Engineering College"
                       value={sCollege}
                       onChange={(e) => setSCollege(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -902,7 +757,7 @@ export function ReferralPortalClient() {
                       placeholder="student@gmail.com"
                       value={sEmail}
                       onChange={(e) => setSEmail(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -915,7 +770,7 @@ export function ReferralPortalClient() {
                       placeholder="10-digit mobile number"
                       value={sPhone}
                       onChange={(e) => setSPhone(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
@@ -959,23 +814,23 @@ export function ReferralPortalClient() {
                       placeholder="username@upi / mobile@ybl"
                       value={sUpi}
                       onChange={(e) => setSUpi(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-ink/20 text-xs focus:border-brand focus:outline-none"
+                      className="w-full px-4 py-3 rounded-[10px] border border-ink/20 text-xs focus:border-brand focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-xs font-bold text-ink">Upload Student ID Card *</label>
 
-                    <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-sand/30 hover:bg-white transition-all">
+                    <label className="border-2 border-dashed border-ink/20 hover:border-brand rounded-[10px] p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-paper hover:bg-white transition-all">
                       <input
                         type="file"
                         accept="image/*"
                         className="hidden"
                         onChange={(e) => handlePhotoSelect(e, setSIdFile, setSIdPreview)}
                       />
-                      <Upload className="w-5 h-5 text-purple-700 mb-1" />
+                      <Upload className="w-5 h-5 text-brand mb-1" />
                       <span className="text-[11px] font-bold text-ink">
-                        {sIdFile ? "✓ College ID Attached" : "Click to upload Student ID Card Photo"}
+                        {sIdFile ? "College ID Attached" : "Click to upload Student ID Card Photo"}
                       </span>
                     </label>
                   </div>
@@ -995,7 +850,7 @@ export function ReferralPortalClient() {
                       variant="primary"
                       size="md"
                       disabled={isSubmitting}
-                      className="w-1/2 shadow-coral-glow"
+                      className="w-1/2"
                     >
                       {isSubmitting ? "Generating QR..." : "Get Ambassador QR"}
                     </Button>
@@ -1010,10 +865,10 @@ export function ReferralPortalClient() {
         {view === "DASHBOARD" && (
           <div className="space-y-8 max-w-2xl mx-auto">
             {/* Header Badge & Partner ID */}
-            <div className="bg-white p-6 rounded-3xl border border-ink/15 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="bg-white p-6 rounded-[24px] border border-ink/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-brand/10 text-brand flex items-center justify-center text-2xl font-bold">
-                  {category === "STUDENT" ? <GraduationCap className="w-6 h-6 text-purple-700" /> : <Car className="w-6 h-6 text-brand" />}
+                <div className="w-12 h-12 rounded-[10px] bg-brand/10 text-brand flex items-center justify-center text-2xl font-bold">
+                  {category === "STUDENT" ? <GraduationCap className="w-6 h-6 text-brand" /> : <Car className="w-6 h-6 text-brand" />}
                 </div>
                 <div>
                   <h2 className="font-display font-bold text-xl text-ink">{partnerName}</h2>
@@ -1022,11 +877,11 @@ export function ReferralPortalClient() {
               </div>
 
               <div className="text-right flex flex-col items-start sm:items-end">
-                <span className="font-mono text-xs font-bold bg-ink text-white px-3 py-1 rounded-xl">
+                <span className="font-mono text-xs font-bold bg-ink text-white px-3 py-1 rounded-[10px]">
                   {partnerId}
                 </span>
-                <span className="text-[10px] font-extrabold text-emerald-600 flex items-center gap-1 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-semibold text-ink bg-paper-deep px-2 py-0.5 rounded-full flex items-center gap-1 mt-1">
+                  <span className="w-2 h-2 rounded-full bg-brand" />
                   <span>LIVE ACTIVE</span>
                 </span>
               </div>
@@ -1034,41 +889,41 @@ export function ReferralPortalClient() {
 
             {/* 4 Metric Cards Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-2xl border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-wider block">
+              <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
+                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Referrals
                 </span>
-                <span className="font-display font-black text-2xl text-ink block">
+                <span className="font-display font-bold text-2xl text-ink block">
                   {metrics.count}
                 </span>
                 <span className="text-[10px] text-ink/60 block">Verified scans</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-wider block">
+              <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
+                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Total Earned
                 </span>
-                <span className="font-display font-black text-2xl text-emerald-600 block">
+                <span className="font-display font-bold text-2xl text-brand block">
                   ₹{metrics.earned}
                 </span>
                 <span className="text-[10px] text-ink/60 block">₹10 / referral</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-wider block">
+              <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
+                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Declined
                 </span>
-                <span className="font-display font-black text-2xl text-coral block">
+                <span className="font-display font-bold text-2xl text-coral block">
                   {metrics.declined}
                 </span>
                 <span className="text-[10px] text-ink/60 block">Duplicates</span>
               </div>
 
-              <div className="bg-white p-4 rounded-2xl border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-wider block">
+              <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
+                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Payout Cycle
                 </span>
-                <span className="font-display font-black text-2xl text-brand block">
+                <span className="font-display font-bold text-2xl text-brand block">
                   {daysLeftInMonth()} days
                 </span>
                 <span className="text-[10px] text-ink/60 block">Settlement due</span>
@@ -1076,29 +931,29 @@ export function ReferralPortalClient() {
             </div>
 
             {/* Animated Milestone Track (Bright Royal Blue Gradient) */}
-            <div className="bg-gradient-to-r from-[#0050FF] via-blue-600 to-indigo-600 text-white p-6 rounded-3xl space-y-4 shadow-xl border border-blue-400/30">
+            <div className="bg-brand text-white p-6 rounded-[24px] space-y-4 border border-ink/20">
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-white">Target Milestone (₹1,000 Bonus)</span>
-                <span className="text-amber-300 font-extrabold px-2.5 py-0.5 rounded-full bg-white/10 border border-white/20">
+                <span className="text-ink font-semibold px-2.5 py-0.5 rounded-full bg-white/10 border border-white/20">
                   100 Referrals
                 </span>
               </div>
 
-              <div className="relative w-full h-4 bg-white/20 rounded-full overflow-hidden border border-white/30 flex items-center p-0.5 backdrop-blur-sm">
+              <div className="relative w-full h-4 bg-white/20 rounded-full overflow-hidden border border-white/30 flex items-center p-0.5">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-300 to-yellow rounded-full transition-all duration-700 shadow-md"
+                  className="h-full bg-brand rounded-full transition-all"
                   style={{ width: `${Math.min(100, Math.max(5, (metrics.count / 100) * 100))}%` }}
                 />
               </div>
 
-              <div className="flex justify-between text-[11px] text-blue-100 font-bold">
+              <div className="flex justify-between text-[11px] text-skymist font-bold">
                 <span>{metrics.count} Referrals Completed</span>
                 <span>{Math.max(0, 100 - metrics.count)} remaining for ₹1,000 bonus</span>
               </div>
             </div>
 
             {/* QR Code & Link Sharing Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-ink/15 shadow-sm space-y-6 text-center">
+            <div className="bg-white p-6 sm:p-8 rounded-[24px] border border-ink/15 space-y-6 text-center">
               <div className="space-y-1">
                 <h3 className="font-display font-bold text-lg text-ink">Your Unique Referral QR Code</h3>
                 <p className="text-xs text-ink/70">Show this QR code to customers or friends to scan directly.</p>
@@ -1106,12 +961,12 @@ export function ReferralPortalClient() {
 
               {/* Canvas QR rendering */}
               <div className="flex justify-center py-2">
-                <canvas ref={qrCanvasRef} className="rounded-2xl shadow-sm border border-ink/10" />
+                <canvas ref={qrCanvasRef} className="rounded-[10px] border border-ink/10" />
               </div>
 
               {/* Copy Referral URL Input */}
               <div className="space-y-2 max-w-md mx-auto text-left">
-                <label className="block text-[11px] font-bold text-ink/60 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-ink/60 uppercase tracking-[0.1em]">
                   Official Referral Link
                 </label>
                 <div className="flex items-center gap-2">
@@ -1119,7 +974,7 @@ export function ReferralPortalClient() {
                     type="text"
                     readOnly
                     value={`${SITE_URL}/?ref=${encodeURIComponent(partnerId)}`}
-                    className="flex-1 px-3 py-2.5 rounded-xl border border-ink/20 text-xs font-mono font-bold text-ink bg-sand/30 outline-none"
+                    className="flex-1 px-3 py-2.5 rounded-[10px] border border-ink/20 text-xs font-mono font-bold text-ink bg-paper outline-none"
                   />
                   <Button
                     type="button"
@@ -1141,7 +996,7 @@ export function ReferralPortalClient() {
                   variant="primary"
                   size="md"
                   onClick={shareWhatsApp}
-                  className="w-full gap-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="w-full gap-2 text-xs font-bold bg-paper-deep hover:bg-paper text-ink"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Share on WhatsApp</span>
@@ -1161,7 +1016,7 @@ export function ReferralPortalClient() {
             </div>
           </div>
         )}
-      </Container>
+      </Section>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  future: { hoverOnlyWhenSupported: true },
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,45 +10,50 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#0050FF',
-          dark: '#0040D6',
-          light: '#3373FF',
+          DEFAULT: "#1447E6",
+          dark: "#0F37B8",
+          light: "#3B6AF0",
         },
         coral: {
-          DEFAULT: '#FF6B57',
-          hover: '#E85541',
-          light: '#FF8A7A',
+          DEFAULT: "#1447E6",
+          hover: "#0F37B8",
+          light: "#3B6AF0",
         },
         yellow: {
-          DEFAULT: '#FFD84D',
-          hover: '#ECC333',
+          DEFAULT: '#E5DCC9',
+          hover: '#D8CDB6',
         },
-        skymist: '#E6EEFF',
-        blush: '#FFE6EA',
-        mint: '#DDF7EC',
+        skymist: "#ECE7DF",
+        blush: "#F6F3EE",
+        mint: "#D9F7EA",
+        "mint-scan": "#7CF5C8",
         ink: {
-          DEFAULT: '#0B1220',
-          muted: '#475569',
-          light: '#8E9BAE',
-          subtle: '#F1F5F9',
+          DEFAULT: "#12161F",
+          muted: "#3F4656",
+          light: "#4F5666",
+          subtle: "#F6F3EE",
+        },
+        paper: {
+          DEFAULT: "#F6F3EE",
+          deep: "#ECE7DF",
         },
       },
       fontFamily: {
         display: ['var(--font-display)', 'sans-serif'],
-        accent: ['var(--font-accent)', 'serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'Roboto Mono', 'monospace'],
         sans: ['var(--font-body)', 'sans-serif'],
       },
       borderRadius: {
-        '2xl': '1rem',
-        '3xl': '1.5rem',
-        '4xl': '2rem',
-        'blob': '40% 60% 70% 30% / 40% 50% 60% 50%',
+        '2xl': '10px',
+        '3xl': '24px',
+        '4xl': '24px',
       },
       boxShadow: {
-        'card': '0 10px 30px -10px rgba(11, 18, 32, 0.08), 0 4px 6px -2px rgba(11, 18, 32, 0.03)',
-        'card-hover': '0 20px 40px -15px rgba(0, 80, 255, 0.15), 0 10px 15px -5px rgba(11, 18, 32, 0.04)',
-        'glow': '0 0 40px rgba(0, 80, 255, 0.25)',
-        'coral-glow': '0 0 30px rgba(255, 107, 87, 0.3)',
+        card: "0 1px 2px rgba(10,27,77,.06)",
+        "card-hover": "0 8px 24px rgba(10,27,77,.10)",
+        glow: "0 8px 24px rgba(10,27,77,.10)",
+        "coral-glow": "0 8px 24px rgba(10,27,77,.10)",
+        phone: "0 24px 56px rgba(10,27,77,.18)",
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

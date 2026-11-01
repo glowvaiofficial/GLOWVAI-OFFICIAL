@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createConfirmToken, verifyConfirmToken } from "@/lib/email/tokens";
+import { queueEmail, sendEmail } from "@/lib/email/send";
+import { storage } from "@/lib/storage";
+import { SITE_URL } from "@/lib/site-url";
+
+export const dynamic = "force-static";
 
 const newsletterSchema = z.object({
   email: z.string().trim().email("Valid email address required"),
   consent: z.literal(true),
-  website: z.string().max(0).optional(), // Honeypot
+  website: z.string().max(0).optional(),
 });
 
 const hits = new Map<string, { n: number; t: number }>();
@@ -19,20 +25,40 @@ function limited(ip: string) {
   return h.n > 10;
 }
 
-async function callSheet(payload: object) {
-  const webappUrl = process.env.SHEETS_WEBAPP_URL || process.env.SHEET_WEB_APP_URL;
-  if (!webappUrl) {
-    return { ok: true };
+export async function GET(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token) {
+    return NextResponse.redirect(`${SITE_URL}/?newsletter=invalid`);
   }
 
-  const res = await fetch(webappUrl, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ secret: process.env.SHEETS_SECRET, ...payload }),
-    redirect: "follow",
-    cache: "no-store",
-  });
-  return res.json();
+  const verified = verifyConfirmToken(token);
+  if (!verified.valid || !verified.email) {
+    return NextResponse.redirect(`${SITE_URL}/?newsletter=expired`);
+  }
+
+  const cleanEmail = verified.email;
+
+  try {
+    // Update status to confirmed in Sheets
+    await storage.callSheet({
+      tab: "Newsletter",
+      action: "confirm",
+      data: { email: cleanEmail, status: "confirmed", confirmed_at: new Date().toISOString() },
+    });
+
+    // Send welcome email
+    await sendEmail({
+      template: "newsletter_welcome",
+      to: cleanEmail,
+      data: {},
+      relatedId: `NL-CONF-${Date.now()}`,
+      stream: "marketing",
+    });
+
+    return NextResponse.redirect(`${SITE_URL}/?newsletter=confirmed`);
+  } catch {
+    return NextResponse.redirect(`${SITE_URL}/?newsletter=confirmed`);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -49,28 +75,40 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
   if (d.website) {
-    return NextResponse.json({ success: true }); // Honeypot
+    return NextResponse.json({ success: true });
   }
 
   const now = new Date().toISOString();
+  const cleanEmail = d.email.trim().toLowerCase();
+  const confirmToken = createConfirmToken(cleanEmail);
 
   try {
-    await callSheet({
+    await storage.callSheet({
       tab: "Newsletter",
       data: {
         created_at: now,
-        email: d.email,
+        email: cleanEmail,
         source: "footer_banner",
         consent: "yes",
         consent_at: now,
+        status: "pending_confirmation",
       },
+    });
+
+    // Send double opt-in confirmation email
+    queueEmail({
+      template: "newsletter_confirm",
+      to: cleanEmail,
+      data: { token: confirmToken },
+      relatedId: `NL-REQ-${Date.now()}`,
+      stream: "marketing",
     });
 
     return NextResponse.json({
       success: true,
-      message: "You're in. Check your inbox.",
+      message: "Check your inbox to confirm your subscription.",
     });
-  } catch (err) {
-    return NextResponse.json({ success: true }); // Silent acceptance
+  } catch {
+    return NextResponse.json({ success: true });
   }
 }

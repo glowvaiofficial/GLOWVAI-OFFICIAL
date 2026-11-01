@@ -1,0 +1,178 @@
+/* Commerce flows (cart, checkout, payment, address, location) on tablet and desktop.
+   Every rule sits inside a min-width query, so the phone layout from commerce.css is unchanged. */
+
+/* Page chrome on tablet and desktop: header and steps sit on the canvas. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-screen > .commerce-head {
+    position: static;
+    padding-top: 24px;
+    padding-bottom: 12px;
+    border-bottom: 0;
+    background: transparent;
+  }
+  .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy h1 { font-size: 22px; }
+  .glowvai-root .commerce-screen > .commerce-steps {
+    padding: 0 20px 12px;
+    border-bottom: 0;
+    background: transparent;
+  }
+  .glowvai-root .commerce-screen > .commerce-body { padding: 16px 20px 32px; }
+  .glowvai-root .commerce-screen > .commerce-sticky-bar { padding-inline: 20px; }
+  .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-primary:not(.is-wide),
+  .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-ghost {
+    flex: 0 0 auto;
+    min-width: 220px;
+  }
+  .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-primary.is-wide { flex: 0 0 auto; }
+  .glowvai-root .commerce-screen .commerce-link { min-height: 44px; }
+  .glowvai-root .commerce-screen :is(button, a, input, textarea):focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+  }
+  .glowvai-root .commerce-screen .commerce-pay-option:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+}
+
+/* Cart: items on the left, order summary on the right. */
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-cart > .commerce-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+    gap: 16px 24px;
+  }
+  .glowvai-root .commerce-cart > .commerce-body > section:nth-child(-n + 2) { grid-column: 1; }
+  .glowvai-root .commerce-cart > .commerce-body > section:nth-child(n + 3) { grid-column: 2; }
+  .glowvai-root .commerce-cart .commerce-bill { position: sticky; top: 88px; }
+}
+
+/* Checkout review: address, delivery and items on the left; bill on a sticky right column. */
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-review > .commerce-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    gap: 16px 24px;
+  }
+  .glowvai-root .commerce-review > .commerce-body > section:nth-child(-n + 3) { grid-column: 1; }
+  .glowvai-root .commerce-review > .commerce-body > section:nth-child(4) {
+    grid-column: 2;
+    position: sticky;
+    top: 88px;
+  }
+}
+
+/* Express cart review: same two-column layout as checkout review. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-head,
+  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-body,
+  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-sticky-bar {
+    padding-inline: 20px;
+  }
+}
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    gap: 16px 24px;
+  }
+  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) > section:nth-child(-n + 4) { grid-column: 1; }
+  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) > section:nth-child(5) {
+    grid-column: 2;
+    position: sticky;
+    top: 88px;
+  }
+}
+
+/* Centred narrow column: payment method, express payment choice, forms, location, delivery check.
+   Content sits at 560px; padding is a share of the screen width. Declared after the chrome rules so it wins. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-payment > .commerce-head,
+  .glowvai-root .commerce-payment > .commerce-steps,
+  .glowvai-root .commerce-payment > .commerce-body,
+  .glowvai-root .commerce-payment > .commerce-sticky-bar,
+  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-head,
+  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-body,
+  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-sticky-bar,
+  .glowvai-root .commerce-addresses:has(> form.commerce-body) > .commerce-head,
+  .glowvai-root .commerce-addresses > form.commerce-body,
+  .glowvai-root .commerce-location > .commerce-head,
+  .glowvai-root .commerce-location > .commerce-body,
+  .glowvai-root .commerce-location > .commerce-sticky-bar {
+    padding-inline: max(20px, calc(50% - 280px));
+  }
+}
+
+/* Saved addresses: cards in a grid, add button at the end of the footer. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-addresses > div.commerce-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-items: start;
+    gap: 16px;
+  }
+  .glowvai-root .commerce-addresses > div.commerce-body > .commerce-empty-state { grid-column: 1 / -1; }
+  .glowvai-root .commerce-addresses > div.commerce-body > .commerce-address {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+  }
+  .glowvai-root .commerce-addresses > div.commerce-body > .commerce-address .commerce-address-pick { flex: 1; }
+  .glowvai-root .commerce-addresses > .commerce-sticky-bar { justify-content: flex-end; }
+  .glowvai-root .commerce-addresses > .commerce-sticky-bar .commerce-primary.is-wide {
+    width: auto;
+    min-width: 260px;
+  }
+}
+
+/* Map picker (no map on web): search and device location on the left, address form on the right. */
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-head,
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body,
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-sticky-bar {
+    padding-inline: 24px;
+  }
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px 24px;
+  }
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-pin-card,
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-search,
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-locate { grid-column: 1; }
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-form {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-sticky-bar .commerce-primary.is-wide {
+    width: auto;
+    min-width: 260px;
+    margin-left: auto;
+  }
+}
+
+/* Payment result and processing: a calm centred card on the canvas. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-screen.commerce-processing,
+  .glowvai-root .commerce-screen.commerce-result {
+    width: min(100%, 560px);
+    min-height: 0;
+    margin: 32px auto;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(22, 26, 34, .04);
+  }
+  .glowvai-root .commerce-screen.commerce-processing .commerce-processing-body { padding-bottom: 32px; }
+  .glowvai-root .commerce-screen.commerce-result .commerce-result-body { padding-bottom: 24px; }
+  .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar .commerce-primary,
+  .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar .commerce-ghost { flex: 1 1 0; min-width: 0; }
+  .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar { padding-inline: 16px; }
+}
+
+/* Loading and empty express states stay centred in the middle of the page. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-screen.commerce-express.is-center { min-height: 60dvh; }
+}

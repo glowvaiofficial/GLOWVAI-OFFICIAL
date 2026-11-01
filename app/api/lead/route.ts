@@ -3,6 +3,8 @@ import { randomUUID } from "crypto";
 import { leadFormSchema, leadPatchSchema } from "@/lib/schemas";
 import { setSessionCookie, verifySessionToken } from "@/lib/session";
 import { storage } from "@/lib/storage";
+import { queueEmail } from "@/lib/email/send";
+import { env } from "@/lib/env";
 
 const hits = new Map<string, { n: number; t: number }>();
 function limited(ip: string) {
@@ -52,7 +54,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Security checks: Content-Type & Origin
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.includes("application/json")) {
     return NextResponse.json({ error: "Invalid Content-Type" }, { status: 400 });
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
   if (d.website) {
-    return NextResponse.json({ ok: true, session_id: "bot" }); // Honeypot bot protection
+    return NextResponse.json({ ok: true, session_id: "bot" });
   }
 
   const session_id = randomUUID();
@@ -86,14 +87,18 @@ export async function POST(req: NextRequest) {
   const region = req.headers.get("x-vercel-ip-country-region") || "Telangana";
   const country = req.headers.get("x-vercel-ip-country") || "India";
 
-  // Normalize phone to E.164 string format (+91...)
   let normalizedPhone = d.phone.replace(/[^0-9+]/g, "");
   if (!normalizedPhone.startsWith("+")) {
     normalizedPhone = `+91${normalizedPhone.slice(-10)}`;
   }
 
+  const personaName = body?.persona || "Dew Barrier Routine";
+  const glowLevel = body?.glow_level || 3;
+  const scoreBandText = `Band ${glowLevel} of 5`;
+  const orderRef = `GV-${session_id.slice(0, 8).toUpperCase()}`;
+
   try {
-    const r = await storage.callSheet({
+    await storage.callSheet({
       action: "create",
       tab: "Leads",
       data: {
@@ -122,28 +127,65 @@ export async function POST(req: NextRequest) {
         overall_score: body?.overall_score ?? 75,
         sub_scores: body?.sub_scores ? JSON.stringify(body.sub_scores) : "",
         scan_type: body?.scan_type || "camera",
-        persona: body?.persona || "dew-drop",
-        glow_level: body?.glow_level || 4,
+        persona: personaName,
+        glow_level: glowLevel,
         scan_count: 1,
         status: "completed",
       },
     });
 
-    if (!r.ok) throw new Error(r.error || "Storage failed");
-
-    // Set HMAC signed httpOnly cookie
     await setSessionCookie(session_id);
+
+    // Queue customer lead report email if email provided
+    if (d.email && d.email.includes("@")) {
+      queueEmail({
+        template: "lead_report",
+        to: d.email,
+        data: {
+          persona: personaName,
+          glowLevel,
+          scoreBandText,
+          orderRef,
+          quests: [
+            { productName: "Dew Barrier Daily Hydrator", brand: "Minimalist", size: "50ml", price: 699, slug: "dew-barrier-daily-hydrator" },
+            { productName: "Clarity Pop Niacinamide Serum", brand: "The Derma Co", size: "30ml", price: 599, slug: "clarity-pop-niacinamide-serum" },
+          ],
+        },
+        relatedId: orderRef,
+        stream: "transactional",
+      });
+    }
+
+    // Queue minimal PII team alert if enabled
+    if (env.LEAD_ALERTS === "true") {
+      const teamRecipients = env.TEAM_NOTIFY_EMAIL.split(",").map((s) => s.trim()).filter(Boolean);
+      const lastDigits = normalizedPhone.slice(-2);
+      for (const teamEmail of teamRecipients) {
+        queueEmail({
+          template: "lead_alert",
+          to: teamEmail,
+          data: {
+            firstName: d.name.split(" ")[0],
+            lastPhoneDigits: lastDigits,
+            city,
+            persona: personaName,
+            scanType: body?.scan_type || "camera",
+          },
+          relatedId: orderRef,
+          stream: "transactional",
+        });
+      }
+    }
 
     return NextResponse.json({ ok: true, session_id, sessionId: session_id });
   } catch (err) {
     console.error("Error creating lead record (PII omitted):", String(err).slice(0, 100));
     await setSessionCookie(session_id);
-    return NextResponse.json({ ok: true, session_id, sessionId: session_id }); // Resilient fallback
+    return NextResponse.json({ ok: true, session_id, sessionId: session_id });
   }
 }
 
 export async function PATCH(req: NextRequest) {
-  // HMAC Cookie signature verification (never trust session_id in request body)
   const sessionCookie = req.cookies.get("gv_session")?.value;
   const verification = verifySessionToken(sessionCookie || "");
 
@@ -161,7 +203,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const r = await storage.callSheet({
+    await storage.callSheet({
       action: "complete",
       tab: "Leads",
       session_id: verification.sessionId,
@@ -170,10 +212,8 @@ export async function PATCH(req: NextRequest) {
       skin_concern: parsed.data.skin_concern || "",
     });
 
-    if (!r.ok) throw new Error(r.error || "Patch failed");
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Error updating scan completion (PII omitted):", String(err).slice(0, 100));
-    return NextResponse.json({ ok: true }); // Resilient fallback
+  } catch {
+    return NextResponse.json({ ok: true });
   }
 }

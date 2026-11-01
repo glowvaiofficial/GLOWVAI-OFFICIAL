@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 
 /**
- * ReferralCapture — intercepts ?ref= query param on ANY page load
+ * ReferralCapture: intercepts ?ref= query param on ANY page load
  * and stores it in localStorage so the referral portal can credit it
  * even if the user lands on the homepage (not /referral directly).
  */

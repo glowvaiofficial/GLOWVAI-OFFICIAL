@@ -1,0 +1,124 @@
+/* Shop screens on tablet (720px+) and desktop (1024px+). Phone rules stay in features/shop/styles and shop.css. */
+
+@media (min-width: 720px){
+  .glowvai-root .shop-screen{ padding-bottom: 0; }
+  .glowvai-root .shop-header{ position: static; padding: 10px 24px; }
+  .glowvai-root .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+}
+
+/* Home */
+@media (min-width: 720px){
+  .glowvai-root .shop-home-hero{ padding: 20px 24px 28px; }
+  .glowvai-root .shop-home-search{ max-width: 640px; }
+  .glowvai-root .shop-home-flash-grid{ grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .glowvai-root .shop-home-featured-media{ height: 180px; }
+  .glowvai-root .shop-home-flash-tile{ height: 110px; }
+  .glowvai-root .shop-home-cart-pill{ display: none; }
+
+  .glowvai-root .shop-home-section-head,
+  .glowvai-root .shop-home-under199 .shop-home-section-head,
+  .glowvai-root .shop-home-category-grid,
+  .glowvai-root .shop-home-concerns,
+  .glowvai-root .shop-home-trust,
+  .glowvai-root .shop-home-protect,
+  .glowvai-root .shop-home-refer,
+  .glowvai-root .shop-home-ai-cta,
+  .glowvai-root .shop-home-under199,
+  .glowvai-root .shop-home-end{ margin-inline: 24px; }
+  .glowvai-root .shop-home .shop-home-rail{ padding-inline: 24px; }
+  .glowvai-root .shop-home .shop-home-rail-item,
+  .glowvai-root .shop-home .shop-home-deal{ flex-basis: 180px; }
+
+  .glowvai-root .shop-home-banner-track{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; overflow: visible; padding: 0 24px; scroll-snap-type: none; }
+  .glowvai-root .shop-home-banner{ flex: none; height: 150px; }
+  .glowvai-root .shop-home-dots{ display: none; }
+  .glowvai-root .shop-home-trust-grid{ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .shop-home-flash h1{ font-size: 32px; }
+  .glowvai-root .shop-home-featured-media{ height: 220px; }
+  .glowvai-root .shop-home-flash-tile{ height: 128px; }
+
+  /* Product rails become grids on desktop */
+  .glowvai-root .shop-home .shop-home-rail{ display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; overflow: visible; }
+  .glowvai-root .shop-home .shop-home-rail-item,
+  .glowvai-root .shop-home .shop-home-deal,
+  .glowvai-root .shop-home .shop-home-category-card,
+  .glowvai-root .shop-home .shop-home-brand-card,
+  .glowvai-root .shop-home .shop-home-routine,
+  .glowvai-root .shop-home .shop-home-testimonial{ width: auto; flex: none; }
+  .glowvai-root .shop-home-section-actions .shop-home-arrow{ display: none; }
+
+  .glowvai-root .shop-home-banner{ height: 180px; }
+  .glowvai-root .shop-home-banner-track{ grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+  .glowvai-root .shop-home-category-grid{ grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 20px 12px; }
+  .glowvai-root .shop-home-category-circle{ width: 72px; height: 72px; }
+  .glowvai-root .shop-home-concerns{ grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .glowvai-root .shop-home-trust-grid{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+  .glowvai-root .shop-home-ai-cta{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 40px; align-items: center; padding: 32px; }
+  .glowvai-root .shop-home-ai-stats{ grid-column: 2; grid-row: 1 / span 4; grid-template-columns: 1fr; margin-top: 0; }
+
+  .glowvai-root .shop-home-protect,
+  .glowvai-root .shop-home-refer{ padding: 32px; }
+}
+
+/* Browse: sidebar filters and product grid */
+@media (min-width: 720px) and (max-width: 1023px){
+  .glowvai-root .shop-browse-category-grid{ grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-browse .shop-browse-products .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .glowvai-root .shop-browse-sidebar{ position: sticky; top: 88px; align-self: start; }
+}
+
+/* Category: product grid */
+@media (min-width: 1024px){
+  .glowvai-root .shop-category .shop-category-main .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+/* Product: gallery left, buy box right */
+@media (min-width: 720px){
+  .glowvai-root .shop-product-layout{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 24px; align-items: start; }
+  .glowvai-root .shop-product-hero{ height: 360px; }
+  .glowvai-root .shop-product-thumbs{ display: flex; }
+  .glowvai-root .shop-product-actions{ display: flex; }
+  .glowvai-root .shop-product-buybar{ display: none; }
+  .glowvai-root .shop-screen .shop-product-buynow{ color: var(--text-inverse); }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-product-layout{ max-width: 1120px; margin: 0 auto; padding: 32px; gap: 40px; }
+  .glowvai-root .shop-product-hero{ height: 460px; }
+  .glowvai-root .shop-product-gallery{ position: sticky; top: 88px; }
+  .glowvai-root .shop-product-title{ font-size: 28px; }
+}
+
+/* Reviews: summary and filters left, review list right */
+@media (min-width: 1024px){
+  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 360px) minmax(0, 1fr); column-gap: 24px; align-items: start; max-width: 1120px; padding: 32px; }
+  .glowvai-root .shop-reviews-body > section{ grid-column: 1; }
+  .glowvai-root .shop-reviews-body > .shop-reviews-card{ grid-column: 2; }
+  .glowvai-root .shop-reviews-buybar{ max-width: 1120px; }
+  .glowvai-root .shop-reviews-filters{ min-width: 0; }
+  .glowvai-root .shop-reviews-filters .shop-chip-row{ margin: 0; flex-wrap: wrap; overflow: visible; padding: 0; }
+}
+
+/* Search and filters */
+@media (min-width: 720px){
+  .glowvai-root .shop-search .shop-search-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+/* Wishlist */
+@media (min-width: 720px){
+  .glowvai-root .shop-wishlist{ padding-bottom: 0; }
+  .glowvai-root .shop-wishlist-nav,
+  .glowvai-root .shop-wishlist-cart-pill{ display: none; }
+  .glowvai-root .shop-wishlist-main{ padding: 24px; }
+  .glowvai-root .shop-screen .shop-wishlist-add{ color: var(--text-inverse); font-size: 13px; font-weight: 800; }
+  .glowvai-root .shop-screen .shop-wishlist-cart{ display: inline-flex; align-items: center; }
+  .glowvai-root .shop-wishlist-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-wishlist-media{ height: 160px; }
+}

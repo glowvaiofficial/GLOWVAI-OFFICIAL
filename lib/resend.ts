@@ -1,8 +1,10 @@
-export const RESEND_API_KEY = process.env.RESEND_API_KEY || [
-  "re_",
-  "KRn3Q9dT_",
-  "Mba4jEBog3SGvgjjnMrQiCgK"
-].join("");
+/**
+ * The Resend API key lives ONLY in the email-proxy Apps Script's Script
+ * Properties now - never in this bundle. See docs/google-apps-script-email-proxy.js.
+ * Set EMAIL_PROXY_URL below once that proxy is deployed.
+ */
+const EMAIL_PROXY_URL = process.env.NEXT_PUBLIC_EMAIL_PROXY_URL || "";
+const EMAIL_PROXY_SECRET = process.env.NEXT_PUBLIC_EMAIL_PROXY_SECRET || "";
 
 export interface SendEmailOptions {
   to: string;
@@ -97,7 +99,7 @@ export function generateGlowVaiEmailHTML(
                   <tr>
                     <td style="background-color: #F8FAFC; padding: 20px; text-align: center; border-top: 1px solid #E2E8F0; font-size: 11px; color: #94A3B8;">
                       © ${new Date().getFullYear()} GLOW VAI Quick-Commerce • Vijayawada, Andhra Pradesh, India<br>
-                      On-device computer vision scan. Cosmetic skin insights, not medical advice.
+                      Cosmetic skin insights, not medical advice.
                     </td>
                   </tr>
 
@@ -192,31 +194,37 @@ export function generateGlowVaiEmailHTML(
   `;
 }
 
+export function isEmailProxyConfigured(): boolean {
+  return EMAIL_PROXY_URL.length > 0;
+}
+
 export async function sendResendEmail(options: SendEmailOptions) {
+  if (!EMAIL_PROXY_URL) {
+    return { ok: false, error: "Email proxy not configured (NEXT_PUBLIC_EMAIL_PROXY_URL is empty)." };
+  }
+
   const html = generateGlowVaiEmailHTML(options.templateType, options.data);
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch(EMAIL_PROXY_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({
-        from: "GLOW VAI <onboarding@resend.dev>",
-        to: [options.to],
+        secret: EMAIL_PROXY_SECRET,
+        to: options.to,
         subject: options.subject,
-        html: html,
+        html,
       }),
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.message || "Resend API call failed");
+    const data = await res.json().catch(() => ({ ok: false, error: "Bad proxy response" }));
+    if (!data.ok) {
+      throw new Error(data.error || "Email proxy call failed");
     }
     return { ok: true, data };
-  } catch (err: any) {
-    console.error("Resend API Email error:", err);
-    return { ok: false, error: err.message || "Failed to send email" };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to send email";
+    console.error("Email proxy error:", message);
+    return { ok: false, error: message };
   }
 }

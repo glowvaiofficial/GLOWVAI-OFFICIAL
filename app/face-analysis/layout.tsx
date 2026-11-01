@@ -3,22 +3,22 @@ import { siteConfig } from "@/config/site";
 import { SITE_URL } from "@/lib/site-url";
 
 export const metadata: Metadata = {
-  title: "AI Face Scan & Instant Skin Diagnostic",
-  description: "Scan your face in 30 seconds for a free instant skin diagnostic, plain-language analysis, and personalized routine recommendation.",
+  title: "AI Face Scan & Instant Skin Check",
+  description: "Scan your face in 30 seconds for a free instant skin check, plain-language analysis, and personalized routine recommendation.",
   alternates: {
     canonical: `${SITE_URL}/face-analysis`,
   },
   openGraph: {
-    title: "AI Face Scan & Instant Skin Diagnostic | GLOW VAI",
-    description: "Scan your face in 30 seconds for a free instant skin diagnostic, plain-language analysis, and personalized routine recommendation.",
+    title: "AI Face Scan & Instant Skin Check | GLOW VAI",
+    description: "Scan your face in 30 seconds for a free instant skin check, plain-language analysis, and personalized routine recommendation.",
     url: `${SITE_URL}/face-analysis`,
-    images: [{ url: `${SITE_URL}/og.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/opengraph-image`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Face Scan & Instant Skin Diagnostic | GLOW VAI",
-    description: "Scan your face in 30 seconds for a free instant skin diagnostic, plain-language analysis, and personalized routine recommendation.",
-    images: [`${SITE_URL}/og.jpg`],
+    title: "AI Face Scan & Instant Skin Check | GLOW VAI",
+    description: "Scan your face in 30 seconds for a free instant skin check, plain-language analysis, and personalized routine recommendation.",
+    images: [`${SITE_URL}/opengraph-image`],
   },
 };
 

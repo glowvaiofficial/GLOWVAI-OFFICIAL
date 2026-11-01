@@ -1,0 +1,648 @@
+/* Orders and order tracking: white and soft-blue NOV look, 8pt spacing. */
+
+.glowvai-root .orders-screen{
+  min-height: 100%;
+  padding-bottom: 96px;
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.glowvai-root .orders-body{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.glowvai-root .orders-body h2{ font-size: 16px; font-weight: 800; color: var(--text-primary); }
+
+.glowvai-root .orders-section-label{
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.glowvai-root .orders-section-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.glowvai-root .orders-count{ font-size: 12px; font-weight: 700; color: var(--primary); }
+
+/* Header */
+.glowvai-root .orders-header{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 12px 16px;
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border);
+}
+.glowvai-root .orders-header-copy{ flex: 1; min-width: 0; }
+.glowvai-root .orders-header-copy h1{ font-size: 18px; font-weight: 800; line-height: 1.2; color: var(--text-primary); }
+.glowvai-root .orders-header-copy p{ margin-top: 2px; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--primary); }
+.glowvai-root .orders-header-right{ display: flex; align-items: center; }
+
+.glowvai-root .orders-icon-button{
+  position: relative;
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.glowvai-root .orders-icon-button:hover{ border-color: var(--primary-border); background: var(--primary-light); }
+
+.glowvai-root .orders-unread-dot{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--error);
+}
+
+.glowvai-root .orders-pill{
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Shared cards */
+.glowvai-root .orders-card,
+.glowvai-root .orders-active-card,
+.glowvai-root .orders-past-card,
+.glowvai-root .orders-status-card,
+.glowvai-root .orders-eta-card,
+.glowvai-root .orders-support-card,
+.glowvai-root .orders-summary-card,
+.glowvai-root .orders-rate-card,
+.glowvai-root .orders-comment-card,
+.glowvai-root .orders-thanks{
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-elevated);
+  box-shadow: 0 1px 2px rgba(31, 45, 78, .05);
+}
+
+.glowvai-root .orders-card-title{ font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
+
+.glowvai-root .orders-card-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.glowvai-root .orders-card-head > div:first-child{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.glowvai-root .orders-card-head > div:first-child strong{ font-size: 16px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-card-head > div:first-child strong.is-large{ font-size: 18px; }
+.glowvai-root .orders-card-head > div:first-child span{ font-size: 12px; color: var(--text-muted); }
+
+.glowvai-root .orders-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.glowvai-root .orders-badge.is-delivered,
+.glowvai-root .orders-badge.is-eta{ background: var(--success-bg); color: var(--success); }
+.glowvai-root .orders-badge.is-on-way{ background: var(--primary); color: #fff; }
+
+.glowvai-root .orders-badge-stack{ display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+.glowvai-root .orders-thumbs{ display: flex; align-items: center; gap: 8px; }
+.glowvai-root .orders-thumbs img{
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface);
+}
+.glowvai-root .orders-more-items{ margin-left: 4px; font-size: 12px; font-weight: 700; color: var(--text-muted); }
+
+.glowvai-root .orders-summary-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+}
+.glowvai-root .orders-summary-row strong{ font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-address-line{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Buttons */
+.glowvai-root .orders-primary-button,
+.glowvai-root .orders-secondary-button,
+.glowvai-root .orders-chip{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.glowvai-root .orders-primary-button{
+  height: 48px;
+  padding: 0 16px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+}
+.glowvai-root .orders-primary-button:hover{ background: var(--primary-dark); }
+.glowvai-root .orders-primary-button.is-compact{ height: 40px; flex: 1; font-size: 13px; gap: 6px; }
+.glowvai-root .orders-primary-button.is-block,
+.glowvai-root .orders-secondary-button.is-block{ width: 100%; }
+
+.glowvai-root .orders-secondary-button{
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+  font-size: 14px;
+}
+.glowvai-root .orders-secondary-button.is-block{ border-color: var(--border); color: var(--text-secondary); }
+
+.glowvai-root .orders-chip{
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  gap: 4px;
+}
+.glowvai-root .orders-chip.is-rate{ background: var(--primary-light); color: var(--primary); }
+.glowvai-root .orders-chip.is-buy{ border: 1px solid var(--primary); background: #fff; color: var(--primary); }
+
+/* Segmented control */
+.glowvai-root .orders-segment{
+  display: flex;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+}
+.glowvai-root .orders-segment button{
+  flex: 1;
+  height: 40px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.glowvai-root .orders-segment button.is-active{ background: var(--primary); color: #fff; }
+
+/* Orders list */
+.glowvai-root .orders-active-card{ cursor: pointer; display: flex; flex-direction: column; gap: 12px; }
+.glowvai-root .orders-past-card{ display: flex; flex-direction: column; gap: 12px; }
+
+.glowvai-root .orders-timeline{
+  display: flex;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+.glowvai-root .orders-timeline-step{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.glowvai-root .orders-timeline-step small{ font-size: 10px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+.glowvai-root .orders-timeline-step.is-done small{ color: var(--primary); }
+.glowvai-root .orders-timeline-step.is-current small{ color: var(--primary); font-weight: 800; }
+.glowvai-root .orders-timeline-line{
+  flex: 1;
+  height: 2px;
+  margin: 9px 4px 0;
+  background: var(--border);
+}
+.glowvai-root .orders-timeline-line.is-done{ background: var(--primary); }
+
+.glowvai-root .orders-dot{
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+}
+.glowvai-root .orders-timeline-step.is-current .orders-dot{ box-shadow: 0 0 0 4px var(--primary-light); }
+.glowvai-root .orders-dot.is-pending{ width: 18px; height: 18px; background: var(--border); }
+
+.glowvai-root .orders-past-footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.glowvai-root .orders-past-footer > strong{ font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-past-actions{ display: flex; gap: 8px; }
+
+/* Order details */
+.glowvai-root .orders-status-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.glowvai-root .orders-status-head strong{ font-size: 16px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-status-card{ display: flex; flex-direction: column; gap: 4px; }
+.glowvai-root .orders-meta-row{ display: flex; justify-content: space-between; gap: 12px; font-size: 12px; }
+.glowvai-root .orders-meta-row span{ color: var(--text-muted); }
+.glowvai-root .orders-meta-row b{ color: var(--text-primary); font-weight: 700; text-align: right; }
+
+.glowvai-root .orders-timeline-card{ display: flex; flex-direction: column; }
+.glowvai-root .orders-timeline-row{ display: flex; align-items: flex-start; gap: 12px; }
+.glowvai-root .orders-timeline-icon{ display: flex; flex-direction: column; align-items: center; }
+.glowvai-root .orders-check-dot{
+  display: flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+}
+.glowvai-root .orders-vline{ width: 2px; height: 28px; margin: 2px 0; background: var(--success); }
+.glowvai-root .orders-timeline-text{ display: flex; flex-direction: column; gap: 2px; padding-bottom: 14px; }
+.glowvai-root .orders-timeline-text b{ font-size: 13px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-timeline-text small{ font-size: 11px; color: var(--text-muted); }
+
+.glowvai-root .orders-items-card{ display: flex; flex-direction: column; }
+.glowvai-root .orders-item-row{ display: flex; align-items: center; gap: 12px; }
+.glowvai-root .orders-item-row img{
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface);
+}
+.glowvai-root .orders-item-copy{ display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.glowvai-root .orders-item-copy b{ font-size: 13px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-item-copy small{ font-size: 11px; color: var(--text-muted); }
+.glowvai-root .orders-item-copy small.is-qty{ font-weight: 600; color: var(--text-primary); }
+.glowvai-root .orders-category{
+  align-self: flex-start;
+  margin-bottom: 2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 9px;
+  font-weight: 800;
+}
+.glowvai-root .orders-item-price{ font-size: 14px; font-weight: 800; color: var(--primary); }
+.glowvai-root .orders-divider{ height: 1px; margin: 12px 0; background: var(--border); }
+
+.glowvai-root .orders-bill-card{ display: flex; flex-direction: column; gap: 8px; }
+.glowvai-root .orders-bill-row{ display: flex; justify-content: space-between; font-size: 13px; }
+.glowvai-root .orders-bill-row span{ color: var(--text-muted); }
+.glowvai-root .orders-bill-row b{ font-weight: 700; color: var(--text-primary); }
+.glowvai-root .orders-bill-row b.is-discount{ color: var(--success); }
+.glowvai-root .orders-grand-total{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--primary-light);
+}
+.glowvai-root .orders-grand-total span{ font-size: 15px; font-weight: 800; color: var(--primary); }
+.glowvai-root .orders-grand-total strong{ font-size: 18px; font-weight: 800; color: var(--primary); }
+
+.glowvai-root .orders-action-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.glowvai-root .orders-action-tile{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.glowvai-root .orders-action-tile svg{ flex-shrink: 0; color: var(--primary); }
+
+.glowvai-root .orders-support-card{ display: flex; flex-direction: column; gap: 12px; background: var(--surface); }
+.glowvai-root .orders-support-head{ display: flex; align-items: center; gap: 10px; }
+.glowvai-root .orders-support-head > div{ display: flex; flex-direction: column; gap: 2px; }
+.glowvai-root .orders-support-head b{ font-size: 14px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-support-head small{ font-size: 12px; color: var(--text-muted); }
+.glowvai-root .orders-support-icon{
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.glowvai-root .orders-support-actions{ display: flex; gap: 8px; }
+.glowvai-root .orders-support-actions > *{ flex: 1; }
+.glowvai-root .orders-support-actions .orders-secondary-button{ height: 40px; font-size: 13px; }
+
+/* Live tracking */
+.glowvai-root .orders-eta-card{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(40, 84, 197, .18);
+}
+.glowvai-root .orders-eta-card > div:first-child{ display: flex; flex-direction: column; gap: 4px; }
+.glowvai-root .orders-eta-card small{ font-size: 11px; font-weight: 800; letter-spacing: 1px; opacity: .85; }
+.glowvai-root .orders-eta-card strong{ font-size: 32px; font-weight: 800; line-height: 1.1; }
+.glowvai-root .orders-eta-card strong span{ font-size: 18px; font-weight: 700; opacity: .85; }
+.glowvai-root .orders-eta-card p{ font-size: 12px; opacity: .9; }
+.glowvai-root .orders-eta-side{ display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; }
+
+.glowvai-root .orders-route-card{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 48px;
+}
+.glowvai-root .orders-route-track{
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  left: 20px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--primary-light);
+}
+.glowvai-root .orders-route-fill{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-radius: 4px;
+  background: var(--primary);
+  transition: height .6s ease;
+}
+.glowvai-root .orders-route-rider{
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  line-height: 1;
+  transition: top .6s ease;
+}
+.glowvai-root .orders-route-stops{ display: flex; flex-direction: column; gap: 16px; }
+.glowvai-root .orders-route-stop{ display: flex; align-items: flex-start; gap: 12px; }
+.glowvai-root .orders-route-stop > div{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.glowvai-root .orders-route-stop small{ font-size: 10px; font-weight: 700; letter-spacing: .4px; color: var(--text-muted); }
+.glowvai-root .orders-route-stop b{ font-size: 13px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-route-stop p{ font-size: 12px; color: var(--text-muted); }
+.glowvai-root .orders-stop-icon{
+  display: flex;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.glowvai-root .orders-stop-icon.is-success{ background: var(--success-bg); color: var(--success); }
+.glowvai-root .orders-note{ font-size: 11px; color: var(--text-muted); }
+
+.glowvai-root .orders-stepper{ display: flex; align-items: flex-start; }
+.glowvai-root .orders-step{
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 56px;
+  text-align: center;
+}
+.glowvai-root .orders-step b{ font-size: 10px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+.glowvai-root .orders-step b.is-done{ color: var(--primary); }
+.glowvai-root .orders-step b.is-active{ color: var(--primary); font-weight: 800; }
+.glowvai-root .orders-step small{ font-size: 10px; color: var(--text-muted); }
+.glowvai-root .orders-step-dot{
+  display: flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--border);
+  color: #fff;
+}
+.glowvai-root .orders-step-dot.is-done{ background: var(--primary); }
+.glowvai-root .orders-step-dot.is-active{ background: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
+.glowvai-root .orders-step-line{
+  flex: 1;
+  height: 2px;
+  margin: 13px 4px 0;
+  background: var(--border);
+}
+.glowvai-root .orders-step-line.is-done{ background: var(--primary); }
+.glowvai-root .orders-step-line.is-active{ background: var(--primary-border); }
+
+.glowvai-root .orders-rider-card{ display: flex; align-items: center; gap: 12px; }
+.glowvai-root .orders-rider-card > img{
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--surface);
+}
+.glowvai-root .orders-rider-copy{ display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.glowvai-root .orders-rider-name{ display: flex; align-items: center; gap: 8px; min-width: 0; }
+.glowvai-root .orders-rider-name b{ font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-rating{
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 11px;
+  font-weight: 800;
+}
+.glowvai-root .orders-rider-copy > small{ font-size: 12px; color: var(--text-muted); }
+.glowvai-root .orders-verified{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success);
+}
+.glowvai-root .orders-rider-actions{ display: flex; flex-direction: column; gap: 8px; }
+.glowvai-root .orders-call-button{
+  display: inline-flex;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.glowvai-root .orders-chat-button{
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.glowvai-root .orders-mini-items{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.glowvai-root .orders-mini-item{ display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.glowvai-root .orders-mini-item img{
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  object-fit: contain;
+  background: var(--surface);
+}
+.glowvai-root .orders-mini-item b{ font-size: 11px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+.glowvai-root .orders-mini-item small{ font-size: 10px; color: var(--text-muted); }
+.glowvai-root .orders-paid{ margin-top: 8px; text-align: right; font-size: 11px; font-weight: 800; color: var(--success); }
+
+/* Rate delivery */
+.glowvai-root .orders-thanks{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+}
+.glowvai-root .orders-thanks-icon{
+  display: flex;
+  width: 72px;
+  height: 72px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  color: var(--success);
+}
+.glowvai-root .orders-thanks h2{ font-size: 20px; }
+.glowvai-root .orders-thanks p{ font-size: 13px; color: var(--text-secondary); }
+
+.glowvai-root .orders-summary-card{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.glowvai-root .orders-summary-card > div{ display: flex; flex-direction: column; gap: 2px; }
+.glowvai-root .orders-summary-card strong{ font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-summary-card span{ font-size: 12px; color: var(--text-muted); }
+
+.glowvai-root .orders-rate-card h2{ margin-bottom: 12px; }
+.glowvai-root .orders-rider-line{ display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.glowvai-root .orders-rider-line img{ width: 48px; height: 48px; border-radius: 16px; object-fit: cover; background: var(--surface); }
+.glowvai-root .orders-rider-line div{ display: flex; flex-direction: column; gap: 2px; }
+.glowvai-root .orders-rider-line b{ font-size: 14px; font-weight: 800; color: var(--text-primary); }
+.glowvai-root .orders-rider-line small{ font-size: 12px; color: var(--text-muted); }
+
+.glowvai-root .orders-stars{ display: flex; align-items: center; gap: 8px; margin: 8px 0 16px; }
+.glowvai-root .orders-stars button{
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.glowvai-root .orders-score{ margin-left: 8px; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+
+.glowvai-root .orders-tags{ display: flex; flex-wrap: wrap; gap: 8px; }
+.glowvai-root .orders-tag{
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.glowvai-root .orders-tag.is-selected{ border-color: var(--primary-border); background: var(--primary-light); color: var(--primary); }
+
+.glowvai-root .orders-comment-card{ display: flex; flex-direction: column; gap: 12px; }
+.glowvai-root .orders-comment-head{ display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+.glowvai-root .orders-comment-head b{ flex: 1; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.glowvai-root .orders-comment-head span{ font-size: 12px; color: var(--text-muted); }
+.glowvai-root .orders-comment-card textarea{
+  width: 100%;
+  min-height: 88px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  resize: none;
+}
+.glowvai-root .orders-comment-card textarea:focus{ outline: none; border-color: var(--primary-border); background: #fff; }

@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
-import { GlowVaiBot } from "@/components/chat/GlowVaiBot";
+import { StickyCtaBar } from "./StickyCtaBar";
+import { WhatsAppButton } from "./WhatsAppButton";
 import { ReferralCapture } from "./ReferralCapture";
 
 interface HeaderAndFooterWrapperProps {
@@ -13,15 +15,27 @@ interface HeaderAndFooterWrapperProps {
 }
 
 export function HeaderAndFooterWrapper({ children, city }: HeaderAndFooterWrapperProps) {
+  const pathname = usePathname();
+
+  // The shop runs the glowvai app shell, which has its own navigation and bottom bar.
+  if (pathname?.startsWith("/shop")) {
+    return (
+      <>
+        <ReferralCapture />
+        <main id="main" className="flex-1">{children}</main>
+      </>
+    );
+  }
+
   return (
     <>
-      {/* Capture ?ref= param on every page so QR referrals from autos/campus are credited */}
       <ReferralCapture />
       <AnnouncementBar city={city} />
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main id="main" className="flex-1">{children}</main>
       <Footer />
-      <GlowVaiBot />
+      <StickyCtaBar />
+      <WhatsAppButton />
     </>
   );
 }

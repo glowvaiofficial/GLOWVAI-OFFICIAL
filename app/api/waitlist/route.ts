@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { queueEmail } from "@/lib/email/send";
+import { storage } from "@/lib/storage";
 
 const waitlistSchema = z.object({
   email: z.string().trim().email("Valid email required"),
   pincode: z.string().trim().length(6, "Valid 6-digit pincode required"),
-  website: z.string().max(0).optional(), // Honeypot
+  website: z.string().max(0).optional(),
 });
 
 const hits = new Map<string, { n: number; t: number }>();
@@ -17,22 +19,6 @@ function limited(ip: string) {
   }
   h.n++;
   return h.n > 10;
-}
-
-async function callSheet(payload: object) {
-  const webappUrl = process.env.SHEETS_WEBAPP_URL || process.env.SHEET_WEB_APP_URL;
-  if (!webappUrl) {
-    return { ok: true };
-  }
-
-  const res = await fetch(webappUrl, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify({ secret: process.env.SHEETS_SECRET, ...payload }),
-    redirect: "follow",
-    cache: "no-store",
-  });
-  return res.json();
 }
 
 export async function POST(req: NextRequest) {
@@ -49,18 +35,20 @@ export async function POST(req: NextRequest) {
 
   const d = parsed.data;
   if (d.website) {
-    return NextResponse.json({ success: true }); // Honeypot bot protection
+    return NextResponse.json({ success: true });
   }
 
   const now = new Date().toISOString();
   const city = decodeURIComponent(req.headers.get("x-vercel-ip-city") || "");
+  const cleanEmail = d.email.trim().toLowerCase();
+  const ref = `WL-${Date.now()}`;
 
   try {
-    await callSheet({
+    await storage.callSheet({
       tab: "Waitlist",
       data: {
         created_at: now,
-        email: d.email,
+        email: cleanEmail,
         pincode: d.pincode,
         city,
         consent: "yes",
@@ -68,11 +56,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Queue waitlist confirmation email
+    queueEmail({
+      template: "waitlist_confirm",
+      to: cleanEmail,
+      data: {},
+      relatedId: ref,
+      stream: "transactional",
+    });
+
     return NextResponse.json({
       success: true,
       message: "Added to pincode waitlist! We will notify you when micro hubs launch in your area.",
     });
-  } catch (err) {
-    return NextResponse.json({ success: true }); // Fallback response so UX stays smooth
+  } catch {
+    return NextResponse.json({ success: true });
   }
 }

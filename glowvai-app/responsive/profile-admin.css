@@ -1,0 +1,61 @@
+/* Tablet and desktop layouts for the profile, settings, support and admin screens.
+   Phone layouts stay in features/profile/profile.css and features/admin/admin.css. */
+
+/* ---------- Profile ---------- */
+
+@media (min-width: 720px){
+  .glowvai-root .profile-screen{ padding-inline: 20px; }
+  .glowvai-root .profile-header{ position: static; margin-top: 20px; padding: 16px 20px; border: 1px solid var(--border-light); border-radius: 16px; }
+  .glowvai-root .profile-body{ padding: 20px 0 40px; }
+  .glowvai-root .profile-body:not(:has(> .profile-side)){ max-width: 560px; }
+  .glowvai-root .profile-side, .glowvai-root .profile-main{ display: flex; min-width: 0; flex-direction: column; gap: 16px; }
+  .glowvai-root .profile-body:has(> .profile-side){
+    display: grid;
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    align-items: start;
+    gap: 20px 28px;
+  }
+  .glowvai-root .profile-body:has(> .profile-side) > .profile-side{ grid-column: 1; }
+  .glowvai-root .profile-body:has(> .profile-side) > .profile-main{ grid-column: 2; grid-row: 1 / span 2; }
+  .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .glowvai-root .profile-main .profile-tile{ min-height: 110px; }
+  .glowvai-root .profile-screen :focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
+}
+
+@media (min-width: 720px) and (max-width: 1023px){
+  .glowvai-root .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px 20px; }
+  .glowvai-root .profile-hero-title{ font-size: 24px; }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .profile-header{ padding: 18px 24px; }
+  .glowvai-root .profile-body{ padding: 24px 0 48px; }
+  .glowvai-root .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px 32px; }
+  .glowvai-root .profile-title{ font-size: 20px; }
+  .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------- Admin ---------- */
+
+@media (min-width: 720px){
+  /* The shell caps screen children; the admin console needs the full width. */
+  .glowvai-root .screen-content > .admin-root{ max-width: none; }
+  .glowvai-root .admin-root{ min-height: 100dvh; }
+  .glowvai-root .admin-nav-item{ min-height: 44px; }
+  .glowvai-root .admin-table-wrap{ overflow-x: auto; }
+  .glowvai-root .admin-hub-grid{ grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+  .glowvai-root .admin-claim-grid{ grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .glowvai-root .admin-order-grid{ grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }}
+
+@media (min-width: 861px) and (max-width: 1023px){
+  .glowvai-root .admin-sidebar{ width: 216px; padding: var(--admin-s4) var(--admin-s3); top: 64px; height: calc(100dvh - 64px); }
+  .glowvai-root .admin-brand-sub{ display: none; }
+  .glowvai-root .admin-content{ padding: var(--admin-s5); }
+}
+
+@media (min-width: 1024px){
+  .glowvai-root .admin-sidebar{ top: 64px; height: calc(100dvh - 64px); }
+  .glowvai-root .admin-page-header{ padding: var(--admin-s6) var(--admin-s8) var(--admin-s5); }
+  .glowvai-root .admin-content{ padding: var(--admin-s6) var(--admin-s8) var(--admin-s8); }
+  .glowvai-root .admin-metrics{ grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+}

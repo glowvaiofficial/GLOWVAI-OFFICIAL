@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "brand" | "outline" | "ghost";
+  variant?: "primary" | "secondary" | "brand" | "outline" | "ghost" | "dark";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   children: React.ReactNode;
@@ -23,25 +23,21 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none rounded-2xl cursor-pointer";
+      "inline-flex items-center justify-center font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-brand active:translate-y-px disabled:opacity-50 disabled:pointer-events-none rounded-[10px] cursor-pointer border-[1.5px] border-transparent whitespace-nowrap";
 
     const variants = {
-      primary:
-        "bg-coral text-ink hover:bg-coral-hover shadow-md hover:shadow-coral-glow font-bold",
-      brand:
-        "bg-brand text-white hover:bg-brand-dark shadow-md hover:shadow-glow font-bold",
-      secondary:
-        "bg-skymist text-brand hover:bg-brand/10 border border-brand/20 font-semibold",
-      outline:
-        "border-2 border-ink/15 text-ink hover:bg-ink/5 hover:border-ink/30 font-semibold",
-      ghost:
-        "text-ink hover:bg-ink/5 font-medium",
+      primary: "bg-brand text-white hover:bg-brand-dark",
+      brand: "bg-brand text-white hover:bg-brand-dark",
+      dark: "bg-ink text-white hover:bg-brand",
+      secondary: "bg-white text-ink border-ink/20 hover:border-ink",
+      outline: "bg-white text-ink border-ink/20 hover:border-ink",
+      ghost: "text-brand hover:underline px-3",
     };
 
     const sizes = {
-      sm: "text-xs px-3.5 py-2 space-x-1.5 min-h-[36px]",
-      md: "text-sm px-5 py-3 space-x-2 min-h-[44px]",
-      lg: "text-base px-7 py-4 space-x-2.5 min-h-[52px] shadow-lg",
+      sm: "text-[0.9375rem] px-5 gap-2 min-h-[44px]",
+      md: "text-[1.0625rem] px-7 gap-2.5 min-h-[52px]",
+      lg: "text-lg px-9 gap-2.5 min-h-[60px]",
     };
 
     return (
