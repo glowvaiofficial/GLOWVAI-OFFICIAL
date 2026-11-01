@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, ShoppingBag } from 'lucide-react';
+import { ArrowRight, Camera, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { DISCLAIMER, type ConcernKey, type SkinAnalysisResult } from '../../core/services/skinModelService';
 import { CONCERN_GUIDANCE } from './concernGuidance';
 import { ScanHeader } from './components/ScanHeader';
+import { ConcernChip, ConcernLevel } from './components/ConcernLevel';
 import { loadLatestScanResult } from './services/scanHistory';
-
-const SEVERITY_LABEL: Record<SkinAnalysisResult['concerns'][number]['severity'], string> = {
-  mild: 'Mild',
-  moderate: 'Moderate',
-  pronounced: 'Pronounced',
-};
 
 // One detail view for any concern in the saved scan. It reads the same result as the report, so every
 // number and label comes from the user's own scan, not from fixed sample values.
@@ -49,18 +44,18 @@ export const ScanConcernDetailScreen: React.FC = () => {
   if (!result || !concern) {
     return (
       <div className="scan-screen">
-        <ScanHeader title="Skin detail" subtitle="No scan found for this concern" onBack={goBack} />
+        <ScanHeader title="Skin detail" onBack={goBack} />
         <div className="scan-body scan-empty">
-          <p className="scan-lead">Take a scan to see how this concern looks on your skin.</p>
-          <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
-            Start scan
+          <h2 className="scan-headline">No scan for this concern</h2>
+          <p className="scan-lead">Take a scan to see how this concern looks on your skin today.</p>
+          <button type="button" className="scan-primary-button" onClick={() => navigate('scan-intro')}>
+            <Camera size={18} />
+            Start a scan
           </button>
         </div>
       </div>
     );
   }
-
-  const percent = Math.round(concern.score * 100);
 
   return (
     <div className="scan-screen scan-concern-screen">
@@ -68,30 +63,36 @@ export const ScanConcernDetailScreen: React.FC = () => {
 
       <div className="scan-body">
         <section className="scan-card scan-concern-summary" aria-label="Result">
-          <div>
+          <div className="scan-concern-head">
             <span className="scan-concern-kicker">Result</span>
-            <b>{concern.present ? SEVERITY_LABEL[concern.severity] : 'Not detected'}</b>
+            <ConcernChip concern={concern} />
           </div>
-          <div className="scan-meter" aria-hidden="true">
-            <span className="scan-meter-fill" style={{ width: `${percent}%` }} />
-          </div>
+          <ConcernLevel concern={concern} />
           <p className="scan-concern-note">Cosmetic estimate from your photo. Lighting and angle can change it.</p>
         </section>
 
-        {guidance && concern.present && (
+        {guidance && concern.present ? (
+          <>
+            <section className="scan-card">
+              <h2 className="scan-section-title">What it means</h2>
+              <p>{guidance.meaning}</p>
+            </section>
+            <section className="scan-card scan-card-helps">
+              <h2 className="scan-section-title">What helps</h2>
+              <ul className="scan-concern-tips">
+                {guidance.helps.map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ul>
+            </section>
+          </>
+        ) : (
           <section className="scan-card">
-            <h2 className="scan-section-title">What it means</h2>
-            <p>{guidance.meaning}</p>
-            <h2 className="scan-section-title">What may help</h2>
-            <ul className="scan-concern-tips">
-              {guidance.helps.map((tip) => (
-                <li key={tip}>{tip}</li>
-              ))}
-            </ul>
+            <p>This concern was not clearly visible in your photo, so there is nothing specific to change for it right now.</p>
           </section>
         )}
 
-        <section className="scan-card scan-concern-actions">
+        <div className="scan-concern-actions">
           <button type="button" className="scan-primary-button" onClick={() => navigate('recommend-routine')}>
             View routine guide
             <ArrowRight size={16} />
@@ -100,7 +101,7 @@ export const ScanConcernDetailScreen: React.FC = () => {
             <ShoppingBag size={16} />
             Browse products
           </button>
-        </section>
+        </div>
 
         <p className="scan-disclaimer">{DISCLAIMER}</p>
       </div>

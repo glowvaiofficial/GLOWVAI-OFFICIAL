@@ -26,9 +26,9 @@ export const ScanIntroScreen: React.FC = () => {
 
   return (
     <div className="scan-screen">
-      <ScanHeader title="Glow AI skin scan" onBack={goBack} />
-      <div className="scan-body">
-        <div className="scan-progress" aria-label="Step 1 of 3">
+      <ScanHeader title="Before you scan" subtitle="Three quick checks" onBack={goBack} />
+      <div className="scan-body scan-intro-body">
+        <div className="scan-progress" role="progressbar" aria-label="Scan steps" aria-valuemin={1} aria-valuemax={3} aria-valuenow={1} aria-valuetext="Step 1 of 3">
           <span className="scan-progress-bar" style={{ width: '33%' }} />
         </div>
         <span className="scan-step-label">Step 1 of 3</span>

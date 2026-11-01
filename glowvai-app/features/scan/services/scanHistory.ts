@@ -24,3 +24,17 @@ export async function loadLatestScanResult(): Promise<SkinAnalysisResult | null>
     return null;
   }
 }
+
+/** Latest result plus when it was saved, for the scan tab summary. */
+export async function loadLatestScanEntry(): Promise<{ savedAt: number | null; result: SkinAnalysisResult } | null> {
+  const raw = await storage.getItem(HISTORY_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as { savedAt?: number; result?: SkinAnalysisResult };
+    const result = parsed.result;
+    if (!result || !result.skinProfile || !Array.isArray(result.concerns)) return null;
+    return { savedAt: typeof parsed.savedAt === 'number' ? parsed.savedAt : null, result };
+  } catch {
+    return null;
+  }
+}

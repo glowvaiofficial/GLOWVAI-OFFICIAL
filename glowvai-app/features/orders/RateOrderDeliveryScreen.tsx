@@ -1,124 +1,151 @@
 import React, { useState } from 'react';
-import { Check, CheckCircle2, MessageSquare, Star } from 'lucide-react';
+import { Check, CheckCircle2, MessageSquare, PackageOpen, Star, Truck } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { OrdersHeader } from './components/OrdersHeader';
+import { OrderThumbs, OrdersState } from './components/OrderParts';
+import { formatOrderDay, loadRatings, saveRating } from './lib/orderUtils';
 
-const RIDER_TAGS = ['Friendly', 'Fast', 'Careful', 'Professional'];
-const PRODUCT_TAGS = ['Fresh packaging', 'Loved the product', 'Great value'];
-const THUMBS = [
-  'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
-  'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=150&q=80',
-];
+const DELIVERY_TAGS = ['Friendly', 'On time', 'Careful with the bag', 'Easy to reach'];
+const PRODUCT_TAGS = ['Well packed', 'Matches the listing', 'Fresh stock', 'Good value'];
+const RATING_WORDS = ['', 'Poor', 'Could be better', 'Okay', 'Good', 'Great'];
 
 const toggle = (list: string[], tag: string) => (list.includes(tag) ? list.filter((t) => t !== tag) : [...list, tag]);
 
 interface StarRowProps {
+  label: string;
   value: number;
   onChange: (value: number) => void;
 }
 
-const StarRow: React.FC<StarRowProps> = ({ value, onChange }) => (
-  <div className="orders-stars" role="radiogroup">
-    {[1, 2, 3, 4, 5].map((star) => (
-      <button key={star} type="button" role="radio" aria-checked={star === value} aria-label={`${star} stars`} onClick={() => onChange(star)}>
-        <Star size={32} fill={star <= value ? '#FFD700' : 'transparent'} color="#FFD700" />
-      </button>
-    ))}
-    <span className="orders-score">{value}.0</span>
+const StarRow: React.FC<StarRowProps> = ({ label, value, onChange }) => (
+  <div className="orders-stars-wrap">
+    <div className="orders-stars" role="radiogroup" aria-label={label}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button key={star} type="button" role="radio" aria-checked={star === value} aria-label={`${star} star${star === 1 ? '' : 's'}`} className={star <= value ? 'is-on' : ''} onClick={() => onChange(star)}>
+          <Star size={30} fill={star <= value ? 'currentColor' : 'transparent'} />
+        </button>
+      ))}
+    </div>
+    <span className="orders-score">{value ? RATING_WORDS[value] : 'Tap a star'}</span>
+  </div>
+);
+
+interface TagRowProps {
+  tags: string[];
+  selected: string[];
+  onToggle: (tag: string) => void;
+}
+
+const TagRow: React.FC<TagRowProps> = ({ tags, selected, onToggle }) => (
+  <div className="orders-tags">
+    {tags.map((tag) => {
+      const on = selected.includes(tag);
+      return (
+        <button key={tag} type="button" className={`orders-tag${on ? ' is-selected' : ''}`} aria-pressed={on} onClick={() => onToggle(tag)}>
+          {on && <Check size={12} />}
+          {tag}
+        </button>
+      );
+    })}
   </div>
 );
 
 export const RateOrderDeliveryScreen: React.FC = () => {
-  const { goBack, navigate, activeParams } = useApp();
-  const orderId: string = activeParams?.orderId || activeParams?.id || 'GV28491';
-  const [riderRating, setRiderRating] = useState(5);
-  const [productRating, setProductRating] = useState(5);
-  const [riderTags, setRiderTags] = useState<string[]>(['Friendly', 'Fast']);
-  const [productTags, setProductTags] = useState<string[]>(['Fresh packaging']);
-  const [comment, setComment] = useState('');
+  const { goBack, navigate, activeParams, orders } = useApp();
+  const requestedId: string | undefined = activeParams?.orderId || activeParams?.id;
+  const order = requestedId ? orders.find((o) => o.id === requestedId) ?? null : orders.find((o) => o.status === 'delivered') ?? null;
+  const existing = order ? loadRatings()[order.id] : undefined;
+
+  const [deliveryRating, setDeliveryRating] = useState(existing?.delivery ?? 0);
+  const [productRating, setProductRating] = useState(existing?.products ?? 0);
+  const [deliveryTags, setDeliveryTags] = useState<string[]>(existing?.tags.filter((t) => DELIVERY_TAGS.includes(t)) ?? []);
+  const [productTags, setProductTags] = useState<string[]>(existing?.tags.filter((t) => PRODUCT_TAGS.includes(t)) ?? []);
+  const [comment, setComment] = useState(existing?.comment ?? '');
   const [submitted, setSubmitted] = useState(false);
 
+  if (!order) {
+    return (
+      <main className="orders-screen is-rate">
+        <OrdersHeader title="Rate your order" onBack={goBack} />
+        <div className="orders-content">
+          <OrdersState icon={<PackageOpen size={30} />} title="Nothing to rate yet" body="You can rate an order after it has been delivered.">
+            <button className="orders-primary-button" onClick={() => navigate('orders-list')}>Your orders</button>
+          </OrdersState>
+        </div>
+      </main>
+    );
+  }
+
+  if (order.status !== 'delivered') {
+    return (
+      <main className="orders-screen is-rate">
+        <OrdersHeader title="Rate your order" subtitle={`#${order.id}`} onBack={goBack} />
+        <div className="orders-content">
+          <OrdersState icon={<Truck size={30} />} title="Not delivered yet" body={`You can rate order #${order.id} once it has been delivered.`}>
+            <button className="orders-secondary-button" onClick={() => navigate('orders-detail', { orderId: order.id })}>Order details</button>
+          </OrdersState>
+        </div>
+      </main>
+    );
+  }
+
+  const riderName = order.fulfilmentTasks?.[0]?.riderName;
+  const canSubmit = deliveryRating > 0 || productRating > 0;
+
   const handleSubmit = () => {
+    if (!canSubmit) return;
+    saveRating(order.id, {
+      delivery: deliveryRating,
+      products: productRating,
+      tags: [...deliveryTags, ...productTags],
+      comment: comment.trim(),
+      ratedAt: new Date().toISOString(),
+    });
     setSubmitted(true);
-    setTimeout(() => navigate('orders-list'), 1200);
   };
 
   return (
     <main className="orders-screen is-rate">
-      <OrdersHeader title="Rate Delivery & Products" onBack={goBack} />
+      <OrdersHeader title="Rate your order" subtitle={`#${order.id}`} onBack={goBack} />
 
-      <div className="orders-body">
+      <div className="orders-content">
         {submitted ? (
-          <section className="orders-thanks">
-            <span className="orders-thanks-icon">
-              <CheckCircle2 size={40} />
-            </span>
-            <h2>Thank you!</h2>
-            <p>Your feedback helps us deliver a better GlowVAI experience, every time.</p>
-          </section>
+          <OrdersState icon={<CheckCircle2 size={34} />} title="Thanks for rating" body="Your rating for this order is saved on this device.">
+            <button className="orders-primary-button" onClick={() => navigate('orders-list')}>Back to your orders</button>
+          </OrdersState>
         ) : (
-          <>
-            <section className="orders-card orders-summary-card">
-              <div className="orders-thumbs">
-                {THUMBS.map((url, i) => (
-                  <img key={i} src={url} alt="" />
-                ))}
-              </div>
+          <div className="orders-rate-form">
+            <section className="orders-card orders-rate-summary">
+              <OrderThumbs order={order} max={3} />
               <div>
-                <strong>#{orderId}</strong>
-                <span>Delivered 4:32 PM · Apr 26, 2025</span>
+                <strong>{order.items.length === 1 ? order.items[0].productName : `${order.items.length} products`}</strong>
+                <span>Ordered {formatOrderDay(order.createdAt)} · {order.address.label}</span>
               </div>
             </section>
 
             <section className="orders-card orders-rate-card">
-              <h2>Rate your delivery partner</h2>
-              <div className="orders-rider-line">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="" />
-                <div>
-                  <b>Rahul</b>
-                  <small>GlowVAI Express Rider</small>
-                </div>
-              </div>
-              <StarRow value={riderRating} onChange={setRiderRating} />
-              <div className="orders-tags">
-                {RIDER_TAGS.map((tag) => {
-                  const selected = riderTags.includes(tag);
-                  return (
-                    <button key={tag} type="button" className={`orders-tag ${selected ? 'is-selected' : ''}`} aria-pressed={selected} onClick={() => setRiderTags(toggle(riderTags, tag))}>
-                      {selected && <Check size={12} />}
-                      {tag}
-                    </button>
-                  );
-                })}
-              </div>
+              <h2>How was the delivery?</h2>
+              <p className="orders-rate-sub">{riderName ? `Delivered by ${riderName}` : 'Rate the delivery experience'}</p>
+              <StarRow label="Delivery rating" value={deliveryRating} onChange={setDeliveryRating} />
+              <TagRow tags={DELIVERY_TAGS} selected={deliveryTags} onToggle={(tag) => setDeliveryTags(toggle(deliveryTags, tag))} />
             </section>
 
             <section className="orders-card orders-rate-card">
-              <h2>How do you like your products?</h2>
-              <StarRow value={productRating} onChange={setProductRating} />
-              <div className="orders-tags">
-                {PRODUCT_TAGS.map((tag) => {
-                  const selected = productTags.includes(tag);
-                  return (
-                    <button key={tag} type="button" className={`orders-tag is-plum ${selected ? 'is-selected' : ''}`} aria-pressed={selected} onClick={() => setProductTags(toggle(productTags, tag))}>
-                      {selected && <Check size={12} />}
-                      {tag}
-                    </button>
-                  );
-                })}
-              </div>
+              <h2>How are the products?</h2>
+              <p className="orders-rate-sub">Packaging, freshness and value</p>
+              <StarRow label="Product rating" value={productRating} onChange={setProductRating} />
+              <TagRow tags={PRODUCT_TAGS} selected={productTags} onToggle={(tag) => setProductTags(toggle(productTags, tag))} />
             </section>
 
             <section className="orders-card orders-comment-card">
-              <div className="orders-comment-head">
+              <label className="orders-comment-head" htmlFor="orders-rate-comment">
                 <MessageSquare size={16} />
-                <b>Tell us more (optional)</b>
+                <b>Anything else? (optional)</b>
                 <span>{comment.length}/250</span>
-              </div>
+              </label>
               <textarea
-                aria-label="Feedback"
-                placeholder="Share feedback on packaging, speed, or product quality..."
+                id="orders-rate-comment"
+                placeholder="Packaging, speed or product quality"
                 rows={3}
                 maxLength={250}
                 value={comment}
@@ -126,13 +153,15 @@ export const RateOrderDeliveryScreen: React.FC = () => {
               />
             </section>
 
-            <button className="orders-primary-button is-block" onClick={handleSubmit}>
-              Submit Rating
-            </button>
-            <button className="orders-secondary-button is-block" onClick={goBack}>
-              Skip for now
-            </button>
-          </>
+            <div className="orders-rate-actions">
+              <button className="orders-primary-button is-block" onClick={handleSubmit} disabled={!canSubmit}>
+                Submit rating
+              </button>
+              <button className="orders-secondary-button is-block is-quiet" onClick={goBack}>
+                Not now
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </main>

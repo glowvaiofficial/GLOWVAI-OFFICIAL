@@ -11,10 +11,10 @@ import { ScanError, analyzeFaceImage } from './services/scanApi';
 import { saveScanResult } from './services/scanHistory';
 
 const STEPS = [
-  'Analysing sebum & oiliness…',
-  'Checking skin tone & texture…',
-  'Detecting active concerns…',
-  'Building your skin profile…',
+  'Preparing your photo',
+  'Checking visible concerns',
+  'Reading your skin type',
+  'Building your report',
 ] as const;
 
 const STEP_INTERVAL_MS = 2200;
@@ -28,11 +28,13 @@ async function analyzeOnDevice(file: Blob, scanId: string): Promise<SkinAnalysis
   return runSkinAnalysis(prepared.maskedPixels, scanId);
 }
 
-export const ScanAnalyzingScreen: React.FC = () => {
+/** `file` lets the older face-capture flow hand over its photo; otherwise the photo comes from navigation params. */
+export const ScanAnalyzingScreen: React.FC<{ file?: Blob }> = ({ file: fileProp }) => {
   const { navigate, activeParams } = useApp();
-  const file: Blob | undefined = activeParams?.file;
+  const file: Blob | undefined = fileProp ?? activeParams?.file;
   const [stepIndex, setStepIndex] = useState(0);
-  const [statusNote, setStatusNote] = useState('This usually takes 5–8 seconds');
+  const [completed, setCompleted] = useState(false);
+  const [statusNote, setStatusNote] = useState('This can take a few seconds. Keep this page open.');
 
   useEffect(() => {
     if (!file) {
@@ -71,6 +73,7 @@ export const ScanAnalyzingScreen: React.FC = () => {
 
         clearTimers();
         setStepIndex(STEPS.length - 1);
+        setCompleted(true);
         await saveScanResult(result);
         completeTimer = window.setTimeout(() => navigate('scan-report', { result }), COMPLETE_DELAY_MS);
       } catch (err) {
@@ -94,17 +97,18 @@ export const ScanAnalyzingScreen: React.FC = () => {
   return (
     <div className="scan-screen scan-analyzing-screen">
       <div className="scan-body scan-analyzing-body">
-        <div className="scan-orb" aria-hidden="true">
-          <Sparkles size={40} />
-        </div>
-        <h1 className="scan-headline">Analysing your skin</h1>
-        <p className="scan-lead" role="status">
-          {statusNote}
-        </p>
+        <div className="scan-analyzing-card">
+          <div className="scan-orb" aria-hidden="true">
+            <Sparkles size={40} />
+          </div>
+          <h1 className="scan-headline">Analysing your skin</h1>
+          <p className="scan-lead" role="status">
+            {statusNote}
+          </p>
 
-        <ul className="scan-step-list">
+          <ul className="scan-step-list">
           {STEPS.map((label, index) => {
-            const done = index < stepIndex || (index === stepIndex && stepIndex === STEPS.length - 1);
+            const done = index < stepIndex || completed;
             const active = index === stepIndex && !done;
             return (
               <li
@@ -125,6 +129,7 @@ export const ScanAnalyzingScreen: React.FC = () => {
         <button type="button" className="scan-text-button" onClick={() => navigate('scan-intro')}>
           Cancel
         </button>
+        </div>
       </div>
     </div>
   );

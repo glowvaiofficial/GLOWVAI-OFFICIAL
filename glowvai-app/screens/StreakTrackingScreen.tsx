@@ -1,33 +1,39 @@
 import React, { useRef, useState } from 'react';
-import { ArrowLeft, ShieldCheck, Camera, CheckCircle2, AlertTriangle, Clock, Award, HelpCircle } from 'lucide-react';
+import { AlertTriangle, Award, Camera, Check, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { OrdersHeader } from '../features/orders/components/OrdersHeader';
+import { OrdersState } from '../features/orders/components/OrderParts';
 
+// Daily check-ins for a product bought with suitability cover. Every value comes from the streak in app state.
 export const StreakTrackingScreen: React.FC = () => {
   const { goBack, navigate, streaks, activeStreak, logStreakEvidence, reportAdverseReaction, submitClaim } = useApp();
-
   const streak = activeStreak || streaks[0];
 
   const [uploading, setUploading] = useState(false);
   const dailyPhotoInput = useRef<HTMLInputElement>(null);
-  const [adverseModalOpen, setAdverseModalOpen] = useState(false);
+  const [adverseOpen, setAdverseOpen] = useState(false);
   const [reactionDescription, setReactionDescription] = useState('');
   const [claimFeedback, setClaimFeedback] = useState('');
+  const [busy, setBusy] = useState(false);
 
   if (!streak) {
     return (
-      <div style={{ flex: 1, padding: '24px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
-        <button onClick={goBack} style={{ padding: '6px' }}><ArrowLeft size={20} /></button>
-        <p style={{ marginTop: '20px', color: '#687080' }}>No active Beauty Insurance streak found.</p>
-      </div>
+      <main className="orders-screen streak-screen">
+        <OrdersHeader title="Suitability cover" onBack={goBack} />
+        <div className="orders-content">
+          <OrdersState icon={<ShieldCheck size={30} />} title="No routine to check in yet" body="When you buy a product with suitability cover, its daily check-ins appear here.">
+            <button className="orders-primary-button" onClick={() => navigate('shop-home')}>Browse products</button>
+          </OrdersState>
+        </div>
+      </main>
     );
   }
 
-  const isCompleted = streak.completedDays >= streak.totalDaysRequired;
-  const progressPercent = Math.round((streak.completedDays / streak.totalDaysRequired) * 100);
+  const total = streak.totalDaysRequired;
+  const isCompleted = streak.completedDays >= total;
+  const progressPercent = Math.min(100, Math.round((streak.completedDays / total) * 100));
 
   // Evidence is the photo the customer takes or chooses. No placeholder image is ever recorded for a day.
-  const handleQuickDailyLog = () => dailyPhotoInput.current?.click();
-
   const handleDailyPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -42,450 +48,162 @@ export const StreakTrackingScreen: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleReportReaction = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleReportReaction = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!reactionDescription.trim()) return;
-    await reportAdverseReaction(streak.trackingId, reactionDescription);
-    setAdverseModalOpen(false);
+    setBusy(true);
+    await reportAdverseReaction(streak.trackingId, reactionDescription.trim());
+    setBusy(false);
+    setAdverseOpen(false);
     setReactionDescription('');
   };
 
-  const handleSubmitSuitabilityClaim = async () => {
-    await submitClaim(streak.trackingId, claimFeedback || 'Routine completed; unsuitable results.');
+  const handleSubmitClaim = async () => {
+    if (!claimFeedback.trim()) return;
+    setBusy(true);
+    await submitClaim(streak.trackingId, claimFeedback.trim());
+    setBusy(false);
   };
 
   return (
-    <div
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#F7F8FB',
-        overflowY: 'auto',
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: '12px 16px',
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #ECEEF2',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'sticky',
-          top: 0,
-          zIndex: 30,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button onClick={goBack} style={{ padding: '6px' }}>
-            <ArrowLeft size={20} />
+    <main className="orders-screen streak-screen">
+      <OrdersHeader
+        title="Suitability cover"
+        subtitle={`Policy ${streak.policyVersion}`}
+        onBack={goBack}
+        right={
+          <button className="streak-report-button" onClick={() => setAdverseOpen(true)}>
+            <AlertTriangle size={15} /> Report reaction
           </button>
-          <div>
-            <h1 style={{ fontSize: '15px', fontWeight: 700, color: '#161A22' }}>
-              Beauty Insurance Streak
-            </h1>
-            <span style={{ fontSize: '11px', color: '#2854C5', fontWeight: 600 }}>
-              Policy: {streak.policyVersion}
-            </span>
-          </div>
-        </div>
+        }
+      />
 
-        <button
-          onClick={() => setAdverseModalOpen(true)}
-          style={{
-            fontSize: '11px',
-            color: '#DC2626',
-            fontWeight: 700,
-            padding: '4px 8px',
-            backgroundColor: '#FEF2F2',
-            borderRadius: '6px',
-            border: '1px solid #FECACA',
-          }}
-        >
-          Report Reaction
-        </button>
-      </div>
-
-      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '32px' }}>
-        {/* Product & Policy Overview Card */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '16px',
-            border: '1px solid #E2E5EB',
-            display: 'flex',
-            gap: '12px',
-            alignItems: 'center',
-          }}
-        >
-          <img
-            src={streak.productImage}
-            alt={streak.productName}
-            style={{ width: '64px', height: '64px', borderRadius: '10px', objectFit: 'cover' }}
-          />
-          <div style={{ flex: 1 }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#2854C5', backgroundColor: '#EFF6FF', padding: '2px 6px', borderRadius: '4px' }}>
-              PROTECTED REGIMEN
-            </span>
-            <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#161A22', marginTop: '4px', lineHeight: '18px' }}>
-              {streak.productName}
-            </h2>
-            <div style={{ fontSize: '11px', color: '#687080', marginTop: '2px' }}>
-              Tracking: {streak.startDate} — {streak.endDate}
-            </div>
-          </div>
-        </div>
-
-        {/* Progress Metric Card */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '18px',
-            border: '1px solid #E2E5EB',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-            <div>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#687080' }}>
-                STREAK COMPLETION
-              </span>
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#161A22', marginTop: '2px' }}>
-                Day {streak.completedDays} of {streak.totalDaysRequired} Completed
-              </div>
-            </div>
-            <span style={{ fontSize: '16px', fontWeight: 800, color: '#2854C5' }}>
-              {progressPercent}%
-            </span>
-          </div>
-
-          {/* Progress Bar */}
-          <div
-            style={{
-              width: '100%',
-              height: '8px',
-              backgroundColor: '#F0F2F6',
-              borderRadius: '999px',
-              overflow: 'hidden',
-              marginBottom: '16px',
-            }}
-          >
-            <div
-              style={{
-                width: `${progressPercent}%`,
-                height: '100%',
-                backgroundColor: progressPercent === 100 ? '#19734F' : '#2854C5',
-                borderRadius: '999px',
-                transition: 'width 0.3s ease',
-              }}
-            />
-          </div>
-
-          {/* Daily Action Status */}
-          {isCompleted ? (
-            <div
-              style={{
-                padding: '12px 14px',
-                backgroundColor: '#F0FDF4',
-                borderRadius: '10px',
-                border: '1px solid #BBF7D0',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <Award size={20} color="#19734F" />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#166534' }}>
-                  14-Day Routine Completed!
-                </div>
-                <div style={{ fontSize: '11px', color: '#15803D' }}>
-                  You are now eligible to submit a suitability review or claim.
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px',
-                backgroundColor: '#EDF2FF',
-                borderRadius: '10px',
-                border: '1px solid #BAE6FD',
-              }}
-            >
+      <div className="orders-content">
+        <div className="orders-two-col">
+          <div className="orders-col-main">
+            <section className="orders-card streak-product">
+              {streak.productImage ? <img src={streak.productImage} alt="" /> : <span className="orders-thumb-empty is-large" aria-hidden="true"><ShieldCheck size={22} /></span>}
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0369A1' }}>
-                  Today's Daily Photo Log
-                </div>
-                <div style={{ fontSize: '11px', color: '#2854C5' }}>
-                  Capture face in natural light after applying product
-                </div>
+                <span className="streak-kicker">Covered routine</span>
+                <h2>{streak.productName}</h2>
+                <small>Check-in period {streak.startDate} to {streak.endDate} · Order #{streak.orderId}</small>
               </div>
+            </section>
 
-              <button
-                onClick={handleQuickDailyLog}
-                disabled={uploading}
-                style={{
-                  padding: '8px 14px',
-                  backgroundColor: '#2854C5',
-                  color: '#FFFFFF',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <Camera size={14} />
-                <span>{uploading ? 'Saving...' : 'Log Day'}</span>
-              </button>
-              <input ref={dailyPhotoInput} type="file" accept="image/*" capture="user" onChange={handleDailyPhoto} hidden aria-label="Daily check-in photo" />
-            </div>
-          )}
-        </div>
-
-        {/* 14-Day Calendar Grid */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '16px',
-            padding: '18px',
-            border: '1px solid #E2E5EB',
-          }}
-        >
-          <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#161A22', marginBottom: '12px' }}>
-            Daily Verification Log
-          </h3>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '6px',
-            }}
-          >
-            {streak.days.map((d) => (
-              <div
-                key={d.day}
-                style={{
-                  height: '48px',
-                  borderRadius: '8px',
-                  backgroundColor: d.completed ? '#F0FDF4' : '#F7F8FB',
-                  border: `1px solid ${d.completed ? '#BBF7D0' : '#E2E5EB'}`,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '2px',
-                }}
-              >
-                <span style={{ fontSize: '10px', color: '#687080' }}>D{d.day}</span>
-                {d.completed ? (
-                  <CheckCircle2 size={13} color="#19734F" />
-                ) : (
-                  <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#CBD5E1' }} />
-                )}
+            <section className="orders-card streak-progress-card">
+              <div className="streak-progress-head">
+                <div>
+                  <span className="streak-kicker">Days logged</span>
+                  <strong>{streak.completedDays} of {total} days</strong>
+                </div>
+                <b>{progressPercent}%</b>
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="streak-progress" role="progressbar" aria-label="Days logged" aria-valuemin={0} aria-valuemax={total} aria-valuenow={streak.completedDays} aria-valuetext={`${streak.completedDays} of ${total} days logged`}>
+                <span style={{ width: `${progressPercent}%` }} className={isCompleted ? 'is-complete' : ''} />
+              </div>
+              <div className="streak-progress-scale" aria-hidden="true"><span>Day 1</span><span>Day {total}</span></div>
 
-        {/* Outcome / Claim Section */}
-        {streak.claimOutcome ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '18px',
-              border: `1.5px solid ${streak.claimOutcome.approved ? '#BBF7D0' : '#FECACA'}`,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <CheckCircle2 size={20} color={streak.claimOutcome.approved ? '#19734F' : '#B91C1C'} />
-              <h3 style={{ fontSize: '15px', fontWeight: 800, color: streak.claimOutcome.approved ? '#166534' : '#991B1B' }}>
-                Suitability claim {streak.claimOutcome.approved ? 'approved' : 'declined'}
-              </h3>
-            </div>
-            <p style={{ fontSize: '12px', color: '#374151', lineHeight: '18px', marginBottom: '12px' }}>
-              {streak.claimOutcome.approved
-                ? <>Benefit: <strong>₹{streak.claimOutcome.amount}</strong>. Our team will confirm how it is paid.</>
-                : 'No benefit was approved for this claim.'}
-            </p>
-            <div style={{ fontSize: '11px', color: '#687080' }}>
-              Decision Date: {streak.claimOutcome.decisionDate} • Reason: {streak.claimOutcome.reason}
-            </div>
-          </div>
-        ) : streak.status === 'claim_submitted' ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '18px',
-              border: '1px solid #E2E5EB',
-            }}
-          >
-            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#161A22', marginBottom: '8px' }}>
-              Claim under review
-            </h3>
-            <p style={{ fontSize: '12px', color: '#687080', lineHeight: '18px' }}>
-              We have received your claim. No refund has been issued yet. We will update you once a decision is made.
-            </p>
-          </div>
-        ) : isCompleted ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '18px',
-              border: '1px solid #E2E5EB',
-            }}
-          >
-            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#161A22', marginBottom: '8px' }}>
-              Submit Suitability Claim
-            </h3>
-            <p style={{ fontSize: '12px', color: '#687080', lineHeight: '18px', marginBottom: '12px' }}>
-              Did this formulation cause breakouts, excessive dryness, or prove unsuitable for your skin?
-            </p>
-            <textarea
-              placeholder="Describe your skin experience (e.g., T-Zone became excessively dry)..."
-              value={claimFeedback}
-              onChange={(e) => setClaimFeedback(e.target.value)}
-              style={{
-                width: '100%',
-                height: '70px',
-                padding: '10px',
-                borderRadius: '8px',
-                border: '1px solid #CBD5E1',
-                fontSize: '12px',
-                marginBottom: '12px',
-                resize: 'none',
-              }}
-            />
-            <button
-              onClick={handleSubmitSuitabilityClaim}
-              style={{
-                width: '100%',
-                padding: '12px',
-                backgroundColor: '#2854C5',
-                color: '#FFFFFF',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 700,
-              }}
-            >
-              Submit claim for review
-            </button>
-          </div>
-        ) : null}
+              {isCompleted ? (
+                <div className="streak-callout is-success">
+                  <Award size={20} />
+                  <div>
+                    <b>{total}-day routine complete</b>
+                    <small>You can now ask for a suitability review.</small>
+                  </div>
+                </div>
+              ) : (
+                <div className="streak-callout">
+                  <Camera size={20} />
+                  <div>
+                    <b>Today’s check-in photo</b>
+                    <small>Take a photo in natural light after applying the product.</small>
+                  </div>
+                  <button className="orders-primary-button" onClick={() => dailyPhotoInput.current?.click()} disabled={uploading}>
+                    {uploading ? 'Saving…' : 'Log today'}
+                  </button>
+                  <input ref={dailyPhotoInput} type="file" accept="image/*" capture="user" onChange={handleDailyPhoto} hidden aria-label="Daily check-in photo" />
+                </div>
+              )}
+            </section>
 
-        {/* Safety Warning (PRD Section 20.10) */}
-        <div
-          style={{
-            padding: '12px 14px',
-            backgroundColor: '#FFFBEB',
-            borderRadius: '12px',
-            border: '1px solid #FDE68A',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'flex-start',
-          }}
-        >
-          <AlertTriangle size={16} color="#A76516" style={{ marginTop: '2px', flexShrink: 0 }} />
-          <p style={{ fontSize: '11px', color: '#92400E', lineHeight: '16px' }}>
-            <strong>Safety Warning:</strong> If you experience severe redness, burning, swelling, or allergic irritation, discontinue product use immediately and consult a certified medical dermatologist.
-          </p>
+            <section className="orders-card">
+              <div className="orders-card-title-row">
+                <h2 className="orders-card-title">Daily log</h2>
+                <span className="streak-legend"><i className="is-done" /> Logged <i /> Not yet</span>
+              </div>
+              <ol className="streak-days">
+                {streak.days.map((day) => (
+                  <li key={day.day} className={day.completed ? 'is-done' : day.missed ? 'is-missed' : ''} aria-label={`Day ${day.day}, ${day.date}: ${day.completed ? 'logged' : day.missed ? 'missed' : 'not logged yet'}`}>
+                    <small>Day {day.day}</small>
+                    {day.completed ? <Check size={15} strokeWidth={3} /> : <span className="streak-day-dot" />}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          </div>
+
+          <div className="orders-col-side">
+            {streak.claimOutcome ? (
+              <section className={`orders-card streak-claim ${streak.claimOutcome.approved ? 'is-approved' : 'is-declined'}`}>
+                <h2 className="orders-card-title">Review {streak.claimOutcome.approved ? 'approved' : 'declined'}</h2>
+                <p>
+                  {streak.claimOutcome.approved
+                    ? `Benefit: ₹${streak.claimOutcome.amount}. Our team will confirm how it is paid.`
+                    : 'No benefit was approved for this review.'}
+                </p>
+                <small>Decided {streak.claimOutcome.decisionDate} · {streak.claimOutcome.reason}</small>
+              </section>
+            ) : streak.status === 'claim_submitted' ? (
+              <section className="orders-card streak-claim">
+                <h2 className="orders-card-title">Review in progress</h2>
+                <p>We have your request. No refund has been issued yet; we will update you when a decision is made.</p>
+              </section>
+            ) : streak.status === 'adverse_reaction_reported' ? (
+              <section className="orders-card streak-claim is-declined">
+                <h2 className="orders-card-title">Reaction reported</h2>
+                <p>Please stop using this product. Our team will contact you about your report.</p>
+              </section>
+            ) : isCompleted ? (
+              <section className="orders-card streak-claim">
+                <h2 className="orders-card-title">Ask for a suitability review</h2>
+                <p>Did this product not suit your skin, for example breakouts or dryness? Tell us what you noticed.</p>
+                <textarea aria-label="What did you notice?" placeholder="What did you notice?" value={claimFeedback} onChange={(event) => setClaimFeedback(event.target.value)} />
+                <button className="orders-primary-button is-block" onClick={handleSubmitClaim} disabled={!claimFeedback.trim() || busy}>
+                  Send for review
+                </button>
+              </section>
+            ) : (
+              <section className="orders-card streak-claim">
+                <h2 className="orders-card-title">How the review works</h2>
+                <p>Log a photo each day for {total} days. After the last day you can ask for a suitability review of this product.</p>
+              </section>
+            )}
+
+            <section className="streak-safety" role="note">
+              <AlertTriangle size={16} />
+              <p>
+                <b>Stop using the product</b> if you notice strong redness, burning, swelling or irritation, and see a dermatologist.
+              </p>
+            </section>
+          </div>
         </div>
       </div>
 
-      {/* Adverse Reaction Modal */}
-      {adverseModalOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: '380px',
-              backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '20px',
-            }}
-          >
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#DC2626', marginBottom: '8px' }}>
-              Report Adverse Reaction
-            </h3>
-            <p style={{ fontSize: '12px', color: '#545B69', lineHeight: '18px', marginBottom: '14px' }}>
-              Please immediately pause using this product. Submit details below to initiate safety review with our clinical team.
-            </p>
-            <form onSubmit={handleReportReaction}>
-              <textarea
-                required
-                placeholder="Describe your symptoms (itching, rash, burning, etc.)..."
-                value={reactionDescription}
-                onChange={(e) => setReactionDescription(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '80px',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: '1px solid #CBD5E1',
-                  fontSize: '12px',
-                  marginBottom: '14px',
-                  resize: 'none',
-                }}
-              />
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => setAdverseModalOpen(false)}
-                  style={{
-                    flex: 1,
-                    padding: '10px',
-                    borderRadius: '8px',
-                    border: '1px solid #E2E5EB',
-                    color: '#687080',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{
-                    flex: 2,
-                    padding: '10px',
-                    borderRadius: '8px',
-                    backgroundColor: '#DC2626',
-                    color: '#FFFFFF',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                  }}
-                >
-                  Submit Safety Ticket
-                </button>
-              </div>
-            </form>
-          </div>
+      {adverseOpen && (
+        <div className="orders-dialog-backdrop">
+          <form className="orders-dialog" role="dialog" aria-modal="true" aria-labelledby="reaction-title" onSubmit={handleReportReaction}>
+            <span className="orders-dialog-icon" aria-hidden="true"><AlertTriangle size={22} /></span>
+            <h2 id="reaction-title">Report a reaction</h2>
+            <p>Please stop using this product. Tell us what happened and our team will follow up.</p>
+            <label className="orders-field">
+              <span>What happened?</span>
+              <textarea required value={reactionDescription} onChange={(event) => setReactionDescription(event.target.value)} placeholder="For example itching, rash or burning" />
+            </label>
+            <button type="submit" className="orders-danger-button is-block" disabled={!reactionDescription.trim() || busy}>Send report</button>
+            <button type="button" className="orders-secondary-button is-block is-quiet" onClick={() => setAdverseOpen(false)}>Cancel</button>
+          </form>
         </div>
       )}
-    </div>
+    </main>
   );
 };

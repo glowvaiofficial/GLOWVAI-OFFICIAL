@@ -36,8 +36,8 @@ export const ScanGalleryScreen: React.FC = () => {
     <div className="scan-screen">
       <ScanHeader title="Choose a clear photo" onBack={goBack} />
       <div className="scan-body">
-        <div className="scan-split">
-          <div className="scan-split-main">
+        <div className="scan-layout">
+          <div className="scan-layout-main">
             <h2 className="scan-headline">Already have a photo?</h2>
             <p className="scan-lead">
               Choose a front-facing image with clear lighting for an accurate cosmetic skin assessment.
@@ -79,7 +79,7 @@ export const ScanGalleryScreen: React.FC = () => {
             )}
           </div>
 
-          <div className="scan-split-side">
+          <div className="scan-layout-side">
             <h3 className="scan-section-label">Photo quality tips</h3>
             <ul className="scan-tip-list">
               {TIPS.map((tip) => (
