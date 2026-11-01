@@ -1,45 +1,43 @@
-import { GraduationCap } from 'lucide-react';
+import { ExternalLink, GraduationCap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { ProfileHeader } from './ProfileShared';
-import './referral-extra.css';
+import { openExternal, ProfileHeader, STUDENT_PORTAL_URL } from './ProfileShared';
 
-// The shop does not expose a student verification status on the user, so this screen does not claim
-// verified, pending or rejected. It points to the existing verification flow instead.
+// The shop does not store a student verification status, so this screen does not claim verified, pending or
+// rejected. Verification is handled on the earn portal, so it links there.
 export const StudentStatusScreen = () => {
   const { goBack, navigate } = useApp();
 
   return (
-    <main className="profile-screen">
-      <div className="referral-column">
-        <ProfileHeader title="Student verification" eyebrow="Student status" onBack={goBack} />
+    <main className="profile-screen is-narrow">
+      <ProfileHeader title="Student status" eyebrow="Glow rewards" onBack={goBack} />
 
-        <div className="referral-body">
-          <section className="profile-card profile-card-body">
-            <div className="referral-status-head">
-              <span className="referral-status-icon"><GraduationCap size={20} /></span>
-              <div>
-                <p className="profile-card-title">Status not shown here</p>
-                <p className="profile-card-sub">
-                  This app does not show your student verification status yet, so this page cannot confirm whether you are verified.
-                </p>
-              </div>
+      <div className="profile-body">
+        <section className="profile-card profile-card-body">
+          <div className="profile-status-head">
+            <span className="profile-status-icon"><GraduationCap size={20} /></span>
+            <div>
+              <h2 className="profile-card-title">Status not available here</h2>
+              <p className="profile-card-sub">
+                The web shop does not store your student verification status, so this page cannot confirm whether you are verified.
+              </p>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section className="profile-card profile-card-body">
-            <p className="profile-card-title">Verify your student status</p>
-            <p className="profile-card-sub">
-              Submit your college email and college name in the student verification flow.
-            </p>
-            <button type="button" className="profile-button is-primary is-block" onClick={() => navigate('auth-student-verify')}>
-              Verify student status →
-            </button>
-          </section>
-
-          <button type="button" className="profile-button is-outline is-block" onClick={() => navigate('profile-referrals')}>
-            Back to referral hub
+        <section className="profile-card profile-card-body">
+          <h2 className="profile-card-title">Check or start verification</h2>
+          <p className="profile-card-sub">
+            Student verification is handled on the glowvai earn portal. Open the portal to check your status or apply.
+          </p>
+          <button type="button" className="profile-button is-primary is-block" onClick={() => openExternal(STUDENT_PORTAL_URL)}>
+            Open earn portal
+            <ExternalLink size={16} />
           </button>
-        </div>
+        </section>
+
+        <button type="button" className="profile-button is-outline is-block" onClick={() => navigate('profile-referrals')}>
+          Back to Glow rewards
+        </button>
       </div>
     </main>
   );

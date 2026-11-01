@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ArrowLeft, Clock, Info, Moon, ShoppingBag, Sparkles, Sun } from 'lucide-react';
+import { Clock, Info, Moon, ShoppingBag, Sun } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import { RecHeader } from './RecHeader';
 
 type Period = 'AM' | 'PM';
 
@@ -14,41 +15,41 @@ interface TimelineStep {
 // General AM / PM sequence. It is not prescribed for an individual user.
 const ROUTINES: Record<Period, { heading: string; steps: TimelineStep[] }> = {
   AM: {
-    heading: 'MORNING ROUTINE TIMELINE',
+    heading: 'Morning steps',
     steps: [
       {
         title: 'Gentle cleanser',
-        desc: 'Massage 60s with lukewarm water. Rinse thoroughly.',
-        note: 'Wait 1 min before serum',
+        desc: 'Massage onto damp skin for about a minute, then rinse with lukewarm water.',
+        note: 'Pat dry before the next step',
         noteIcon: 'clock',
       },
       {
-        title: 'Niacinamide 10% serum',
-        desc: 'Pat 3–4 drops gently across T-zone and cheeks.',
-        note: 'Wait 2 min to absorb',
+        title: 'Niacinamide serum',
+        desc: 'Press 3–4 drops across the forehead, nose and cheeks.',
+        note: 'Let it absorb for a minute or two',
         noteIcon: 'clock',
       },
       {
-        title: 'SPF 50+ sunscreen gel',
-        desc: 'Apply 2 finger lengths generously as final step.',
-        note: 'Reapply every 3 hours',
+        title: 'Sunscreen, SPF 50',
+        desc: 'Apply a generous layer as the last step, including the neck.',
+        note: 'Reapply when you are outdoors for long',
         noteIcon: 'sun',
       },
     ],
   },
   PM: {
-    heading: 'EVENING REPAIR TIMELINE',
+    heading: 'Evening steps',
     steps: [
       {
-        title: 'Double cleanse balm',
-        desc: 'Remove sunscreen and urban pollutants completely.',
-        note: 'Rinse thoroughly',
+        title: 'Cleansing balm or micellar water',
+        desc: 'Take off sunscreen and make-up first, then follow with your gentle cleanser.',
+        note: 'Rinse well',
         noteIcon: 'clock',
       },
       {
-        title: 'Ceramide night repair cream',
-        desc: 'Seal moisture barrier for overnight cellular recovery.',
-        note: 'Overnight action',
+        title: 'Night moisturiser',
+        desc: 'A cream with ceramides helps keep skin moisturised overnight.',
+        note: 'Last step of the night',
         noteIcon: 'moon',
       },
     ],
@@ -62,27 +63,18 @@ const NOTE_ICONS = {
 };
 
 export const RoutinePrescriberScreen = () => {
-  const { goBack, navigate } = useApp();
+  const { navigate } = useApp();
   const [period, setPeriod] = useState<Period>('AM');
   const routine = ROUTINES[period];
 
   return (
     <main className="rec-screen">
-      <header className="rec-header">
-        <button type="button" className="rec-icon-button" onClick={goBack} aria-label="Go back">
-          <ArrowLeft size={20} strokeWidth={2.2} />
-        </button>
-        <div className="rec-header-copy">
-          <Sparkles size={16} color="var(--primary)" />
-          <h1 className="rec-header-title">AM / PM Routine Guide</h1>
-        </div>
-        <span className="rec-header-spacer" />
-      </header>
+      <RecHeader title="Morning and evening routine" eyebrow="Skincare guides" />
 
       <div className="rec-body">
         <p className="rec-note">
           <Info size={16} />
-          General morning and evening sequence for reference. It is not a personalised prescription.
+          General morning and evening order for reference. It is not a personalised prescription.
         </p>
 
         <div className="rec-segment" role="group" aria-label="Routine period">
@@ -93,7 +85,7 @@ export const RoutinePrescriberScreen = () => {
             onClick={() => setPeriod('AM')}
           >
             <Sun size={16} />
-            MORNING (AM)
+            Morning
           </button>
           <button
             type="button"
@@ -102,13 +94,13 @@ export const RoutinePrescriberScreen = () => {
             onClick={() => setPeriod('PM')}
           >
             <Moon size={16} />
-            EVENING (PM)
+            Evening
           </button>
         </div>
 
-        <h3 className="rec-label">{routine.heading}</h3>
+        <h3 className="rec-label">{routine.heading} · {routine.steps.length}</h3>
 
-        <ol className="rec-timeline">
+        <ol className={routine.steps.length === 3 ? 'rec-timeline is-three' : 'rec-timeline'}>
           {routine.steps.map((step, index) => {
             const NoteIcon = NOTE_ICONS[step.noteIcon];
             return (
@@ -128,14 +120,12 @@ export const RoutinePrescriberScreen = () => {
         </ol>
 
         <div className="rec-cta">
-          <p className="rec-cta-text">Ready to look at products? Browse the shop and choose what fits your routine.</p>
-          <button
-            type="button"
-            className="commerce-primary rec-cta-btn"
-            onClick={() => navigate('recommend-checkout')}
-          >
+          <p className="rec-cta-text">
+            See the morning steps as three products from the shop, with prices, and add them to your cart together.
+          </p>
+          <button type="button" className="rec-primary rec-cta-btn" onClick={() => navigate('recommend-checkout')}>
             <ShoppingBag size={18} />
-            Shop this routine
+            Shop the morning routine
           </button>
         </div>
       </div>

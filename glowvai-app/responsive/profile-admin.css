@@ -2,37 +2,65 @@
    Phone layouts stay in features/profile/profile.css and features/admin/admin.css. */
 
 /* ---------- Profile ---------- */
+/* Body selectors use main.profile-screen so they win over the generic two-column .profile-body rule in
+   responsive/web-layout.css, whatever the import order. */
 
 @media (min-width: 720px){
   .glowvai-root .profile-screen{ padding-inline: 20px; }
-  .glowvai-root .profile-header{ position: static; margin-top: 20px; padding: 16px 20px; border: 1px solid var(--border-light); border-radius: 16px; }
-  .glowvai-root .profile-body{ padding: 20px 0 40px; }
-  .glowvai-root .profile-body:not(:has(> .profile-side)){ max-width: 560px; }
-  .glowvai-root .profile-side, .glowvai-root .profile-main{ display: flex; min-width: 0; flex-direction: column; gap: 16px; }
-  .glowvai-root .profile-body:has(> .profile-side){
+  .glowvai-root .profile-header{ position: static; margin-top: 20px; padding: 14px 20px; border: 1px solid var(--border-light); border-radius: 16px; }
+  .glowvai-root .profile-header:not(:has(.profile-icon-button)){ padding-block: 18px; }
+  .glowvai-root .profile-title{ font-size: 20px; }
+  .glowvai-root main.profile-screen > .profile-body{ columns: auto; width: 100%; max-width: none; margin: 0; padding: 20px 0 48px; }
+  .glowvai-root main.profile-screen > .profile-body > .profile-card{ margin-bottom: 0; }
+  .glowvai-root .profile-side, .glowvai-root .profile-main{ display: flex; min-width: 0; flex-direction: column; gap: 12px; }
+
+  /* Two columns: summary and menus on the left, the main content on the right. The second row takes any
+     extra height so the left column never gets a gap between its blocks. */
+  .glowvai-root main.profile-screen > .profile-body:has(> .profile-side){
     display: grid;
-    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
     align-items: start;
-    gap: 20px 28px;
+    gap: 16px 20px;
   }
-  .glowvai-root .profile-body:has(> .profile-side) > .profile-side{ grid-column: 1; }
-  .glowvai-root .profile-body:has(> .profile-side) > .profile-main{ grid-column: 2; grid-row: 1 / span 2; }
-  .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-  .glowvai-root .profile-main .profile-tile{ min-height: 110px; }
+  .glowvai-root main.profile-screen > .profile-body:has(> .profile-side) > .profile-side{ grid-column: 1; }
+  .glowvai-root main.profile-screen > .profile-body:has(> .profile-side) > .profile-main{ grid-column: 2; grid-row: 1 / span 2; }
+  .glowvai-root main.profile-screen > .profile-body > .profile-side + .profile-main + .profile-side{ grid-row: 2; }
+  .glowvai-root .profile-body.is-edit > .profile-side{ position: sticky; top: 85px; }
+
+  /* Actions at the end of a column keep a natural width instead of stretching across it. */
+  .glowvai-root .profile-main > .profile-button.is-block{ width: auto; min-width: 220px; align-self: flex-start; }
+  .glowvai-root .profile-main > .profile-button.profile-save{ align-self: flex-end; min-width: 240px; }
+  .glowvai-root .profile-card-actions{ display: flex; flex-wrap: wrap; padding-left: 62px; }
+
+  /* Single-column pages: header and content share one centred reading width. */
+  .glowvai-root .profile-screen.is-narrow > .profile-header,
+  .glowvai-root main.profile-screen.is-narrow > .profile-body{ width: 100%; max-width: 640px; margin-inline: auto; }
+  .glowvai-root main.profile-screen.is-narrow > .profile-body{ display: flex; }
+
+  .glowvai-root .profile-section-head{ scroll-margin-top: 88px; }
+  .glowvai-root .profile-modal-backdrop{ align-items: center; padding: 24px; }
+  .glowvai-root .profile-modal{ max-width: 400px; padding: 24px; border-radius: 18px; }
   .glowvai-root .profile-screen :focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
 }
 
-@media (min-width: 720px) and (max-width: 1023px){
-  .glowvai-root .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 20px 20px; }
-  .glowvai-root .profile-hero-title{ font-size: 24px; }
+@media (min-width: 1024px){
+  .glowvai-root .profile-header{ padding: 16px 24px; }
+  .glowvai-root .profile-header:not(:has(.profile-icon-button)){ padding-block: 20px; }
+  .glowvai-root .profile-title{ font-size: 22px; }
+  .glowvai-root main.profile-screen > .profile-body{ padding: 24px 0 56px; }
+  .glowvai-root main.profile-screen > .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 16px 28px; }
+  .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .glowvai-root .profile-offer{ padding: 22px; }
+  .glowvai-root .profile-offer-title{ font-size: 24px; }
+  /* Edit profile: name and email side by side, phone below. */
+  .glowvai-root .profile-form-grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .glowvai-root .profile-form-grid > .profile-field-error{ grid-column: 1 / -1; }
 }
 
-@media (min-width: 1024px){
-  .glowvai-root .profile-header{ padding: 18px 24px; }
-  .glowvai-root .profile-body{ padding: 24px 0 48px; }
-  .glowvai-root .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px 32px; }
-  .glowvai-root .profile-title{ font-size: 20px; }
-  .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Tablet: the left column is narrow, so the user card drops its Edit / Add chip (the whole card is the button). */
+@media (min-width: 720px) and (max-width: 1023px){
+  .glowvai-root .profile-side .profile-user-action{ display: none; }
 }
 
 /* ---------- Admin ---------- */

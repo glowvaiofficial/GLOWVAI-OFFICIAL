@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, MessageSquare, PlusCircle, Send } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown, ChevronRight, ChevronUp, MessageSquare, PlusCircle, Send, X } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { openWhatsAppSupport, SUPPORT_HOTLINE } from '../../core/utils/whatsapp';
 import type { SupportTicket } from '../../types';
@@ -18,22 +18,23 @@ const TICKET_CATEGORIES: TicketCategory[] = [
   'Other',
 ];
 
+// Answers only describe what the shop shows today. Delivery times, cover and rewards are not promised here.
 const FAQS = [
   {
-    q: 'How fast is 10-Min Express Delivery in Vijayawada?',
-    a: 'Orders placed within our Payikapuram and Benz Circle dark store coverage areas are picked, packed, and delivered by our dedicated riders within 15–30 minutes max.',
+    q: 'How long does delivery take?',
+    a: 'It depends on your address and the nearest store. You see the delivery estimate for your address before you pay, and the live status on the order tracking page.',
   },
   {
-    q: 'What is GlowVAI 100% Beauty Protection Coverage?',
-    a: 'Every product purchase can opt-in for ₹29 Beauty Protection. If a product causes breakouts or redness within 14 days, upload photo proof for 100% wallet refund.',
+    q: 'What is Beauty Protection?',
+    a: 'Beauty Protection is an optional add-on offered on some products. What it covers and how to make a claim are shown with the product before you add it to your cart.',
   },
   {
-    q: 'How do I redeem GlowVAI Referral Coins?',
-    a: 'Referral coins earned from student invites can be redeemed directly on the checkout screen for up to 20% instant cart discount.',
+    q: 'Can I use Glow Coins at checkout?',
+    a: 'Not yet. Glow Coins are not connected to web shop accounts, so they cannot be earned or redeemed here.',
   },
   {
-    q: 'Can I cancel an active order before delivery?',
-    a: 'Yes! Orders can be cancelled free of charge from the Order Details screen before our dark store finishes packing.',
+    q: 'Can I cancel an order before delivery?',
+    a: 'You can request a cancellation from the order details page until the order is packed. After that, message us on WhatsApp and we will help.',
   },
 ];
 
@@ -49,6 +50,12 @@ export const HelpAndSupportScreen = () => {
   const [selectedId, setSelectedId] = useState<string | null>(supportTickets[0]?.id ?? null);
   const [reply, setReply] = useState('');
   const selectedTicket = supportTickets.find((ticket) => ticket.id === selectedId) ?? null;
+  const ticketsRef = useRef<HTMLDivElement>(null);
+
+  // Opened from an order: the pre-filled ticket form sits below the FAQ on phones, so bring it into view.
+  useEffect(() => {
+    if (orderId) ticketsRef.current?.scrollIntoView({ block: 'start' });
+  }, [orderId]);
 
   const handleCreateTicket = async () => {
     if (!subject.trim() || !message.trim()) {
@@ -76,16 +83,17 @@ export const HelpAndSupportScreen = () => {
 
   return (
     <main className="profile-screen">
-      <ProfileHeader title="Help & support" eyebrow="Vijayawada care team" onBack={goBack} />
+      <ProfileHeader title="Help & support" eyebrow="Customer care" onBack={goBack} />
 
-      <div className="profile-body">
+      <div className="profile-body is-support">
         <div className="profile-side">
         <button type="button" className="profile-card profile-list-row profile-whatsapp" onClick={() => openWhatsAppSupport()}>
           <span className="profile-whatsapp-icon"><MessageSquare size={20} /></span>
           <span className="profile-list-copy">
-            <span className="profile-list-title">Chat with our operations team</span>
-            <span className="profile-list-note">WhatsApp +91 {SUPPORT_HOTLINE}</span>
+            <span className="profile-list-title">Chat with us on WhatsApp</span>
+            <span className="profile-list-note">+91 {SUPPORT_HOTLINE}</span>
           </span>
+          <ChevronRight size={18} className="profile-chevron" />
         </button>
 
         <p className="profile-label">Frequently asked questions</p>
@@ -101,7 +109,7 @@ export const HelpAndSupportScreen = () => {
                   onClick={() => setExpandedFaq(isExpanded ? null : index)}
                 >
                   <span>{faq.q}</span>
-                  {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  {isExpanded ? <ChevronUp size={18} className="profile-chevron" /> : <ChevronDown size={18} className="profile-chevron" />}
                 </button>
                 {isExpanded && <p className="profile-faq-answer">{faq.a}</p>}
               </div>
@@ -112,7 +120,7 @@ export const HelpAndSupportScreen = () => {
         </div>
 
         <div className="profile-main">
-        <div className="profile-section-head">
+        <div className="profile-section-head" ref={ticketsRef}>
           <p className="profile-label">Your support tickets</p>
           <button
             type="button"
@@ -122,8 +130,8 @@ export const HelpAndSupportScreen = () => {
               setFormError(null);
             }}
           >
-            <PlusCircle size={14} />
-            {isCreating ? 'View tickets' : 'New ticket'}
+            {isCreating ? <X size={14} /> : <PlusCircle size={14} />}
+            {isCreating ? 'Cancel' : 'New ticket'}
           </button>
         </div>
 
@@ -148,7 +156,13 @@ export const HelpAndSupportScreen = () => {
           </section>
         ) : supportTickets.length === 0 ? (
           <section className="profile-card">
-            <p className="profile-empty">No tickets yet. Create one and our team will reply here.</p>
+            <div className="profile-empty-row">
+              <span className="profile-list-icon is-muted"><MessageSquare size={16} /></span>
+              <span className="profile-list-copy">
+                <span className="profile-list-title">No tickets yet</span>
+                <span className="profile-list-note">Raise a ticket and our replies will show up here.</span>
+              </span>
+            </div>
           </section>
         ) : (
           <section className="profile-card">
@@ -170,7 +184,7 @@ export const HelpAndSupportScreen = () => {
                     <div className="profile-thread">
                       {ticket.messages.map((item, index) => (
                         <p key={`${ticket.id}-${index}`} className={item.sender === 'user' ? 'profile-bubble is-user' : 'profile-bubble'}>
-                          <small>{item.sender === 'user' ? 'You' : 'Vijayawada support'} · {item.timestamp}</small>
+                          <small>{item.sender === 'user' ? 'You' : 'glowvai support'} · {item.timestamp}</small>
                           {item.text}
                         </p>
                       ))}

@@ -1,19 +1,26 @@
 import React from 'react';
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Info, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../core/state/cartStore';
 import { formatRupee, getProductImageUrl } from '../shop/shared/shopUtils';
+import { RecHeader } from './RecHeader';
 
 // The three routine steps, as real catalogue products. Prices and stock come from the catalogue, not from this file.
-const ROUTINE_PRODUCT_IDS = ['prod-17', 'prod-01', 'prod-12'];
+const ROUTINE_STEPS = [
+  { id: 'prod-17', step: 'Cleanse' },
+  { id: 'prod-01', step: 'Treat' },
+  { id: 'prod-12', step: 'Protect' },
+];
 
 export const RoutineCheckoutScreen: React.FC = () => {
-  const { goBack, navigate } = useApp();
+  const { navigate } = useApp();
   const addItem = useCartStore((state) => state.addItem);
-  const products = ROUTINE_PRODUCT_IDS.map((id) => INDIAN_SKINCARE_CATALOG.find((p) => p.id === id)).filter(
-    (p): p is (typeof INDIAN_SKINCARE_CATALOG)[number] => Boolean(p)
-  );
+  const rows = ROUTINE_STEPS.flatMap(({ id, step }) => {
+    const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === id);
+    return product ? [{ product, step }] : [];
+  });
+  const products = rows.map((row) => row.product);
   const total = products.reduce((sum, product) => sum + product.price, 0);
 
   const addRoutineToCart = () => {
@@ -32,46 +39,42 @@ export const RoutineCheckoutScreen: React.FC = () => {
 
   return (
     <main className="rec-screen rec-checkout">
-      <header className="rec-header">
-        <button className="rec-back" onClick={goBack} aria-label="Go back">
-          <ArrowLeft size={20} />
-        </button>
-        <div>
-          <h1>Shop this routine</h1>
-          <p>Three steps, added to your cart together</p>
-        </div>
-      </header>
+      <RecHeader title="Shop the morning routine" eyebrow="Routine guide" />
 
       <div className="rec-body">
-        <section className="rec-card rec-checkout-list" aria-label="Routine products">
-          {products.map((product) => (
-            <article key={product.id} className="rec-checkout-item">
-              {product.official_brand_image_url && <img src={getProductImageUrl(product)} alt="" />}
+        <p className="rec-note">
+          <Info size={16} />
+          Three products from the shop that match the general morning steps. They are not chosen for your skin.
+        </p>
+
+        <ol className="rec-card rec-checkout-list" aria-label="Routine products">
+          {rows.map(({ product, step }, index) => (
+            <li key={product.id} className="rec-checkout-item">
+              <span className="rec-checkout-thumb">
+                {product.official_brand_image_url ? <img src={getProductImageUrl(product)} alt="" /> : <ShoppingBag size={20} />}
+              </span>
               <div>
-                <small>{product.brand}</small>
+                <small>Step {index + 1} · {step} · {product.brand}</small>
                 <b>{product.name}</b>
-                <p>{product.volume}</p>
+                {product.volume && <p>{product.volume}</p>}
               </div>
               <strong>{formatRupee(product.price)}</strong>
-            </article>
+            </li>
           ))}
-        </section>
+        </ol>
 
         <section className="rec-card rec-checkout-total">
           <div>
             <span>Routine total</span>
             <b>{formatRupee(total)}</b>
           </div>
-          <p>Delivery and any offers are calculated in your cart before you pay.</p>
+          <p>Delivery and any offers are worked out in your cart before you pay.</p>
+          <button type="button" className="rec-primary" onClick={addRoutineToCart} disabled={products.length === 0}>
+            <ShoppingBag size={18} />
+            Add all three to cart
+          </button>
         </section>
       </div>
-
-      <footer className="rec-sticky-bar">
-        <button className="rec-primary" onClick={addRoutineToCart} disabled={products.length === 0}>
-          <ShoppingBag size={18} />
-          Add routine to cart
-        </button>
-      </footer>
     </main>
   );
 };
