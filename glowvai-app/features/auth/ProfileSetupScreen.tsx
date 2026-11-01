@@ -1,38 +1,47 @@
-import React, { useRef, useState } from 'react';
-import { Camera } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getCurrentUser } from '../../core/services/authService';
 import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
 
-const AGE_RANGES = ['Under 18', '18-24', '25-34', '35-44', '45+'];
-const GENDERS = ['Female', 'Male', 'Non-Binary', 'Prefer not to say'];
+// Same values and storage key as Edit profile, so the choices made here show up there.
+const DEMOGRAPHICS_KEY = 'glowvai:profile-demographics';
+const AGE_GROUPS = ['13-17', '18-24', '25-34', '35-44', '45+'];
+const GENDERS = ['Female', 'Male', 'Non-binary', 'Other'];
+
+// Only the choices made here are written; anything left blank keeps its saved value.
+const saveDemographics = async (choices: { gender: string | null; ageGroup: string | null }) => {
+  const patch = Object.fromEntries(Object.entries(choices).filter(([, value]) => value !== null));
+  if (Object.keys(patch).length === 0) return;
+  try {
+    const raw = await storage.getItem(DEMOGRAPHICS_KEY);
+    const saved = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+    await storage.setItem(DEMOGRAPHICS_KEY, JSON.stringify({ skinType: null, ...saved, ...patch }));
+  } catch {
+    // a corrupt or unavailable store should not block setup
+  }
+};
 
 export const ProfileSetupScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
   const currentUser = getCurrentUser();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(currentUser?.displayName || '');
-  const [selectedAge, setSelectedAge] = useState('18-24');
-  const [selectedGender, setSelectedGender] = useState('Female');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(currentUser?.photoURL || null);
+  const [ageGroup, setAgeGroup] = useState<string | null>(null);
+  const [gender, setGender] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = fullName.trim().length >= 2 && !!selectedAge && !!selectedGender;
-  const initial = fullName.trim() ? fullName.trim().charAt(0).toUpperCase() : 'P';
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) setAvatarUrl(URL.createObjectURL(file));
-  };
+  const isFormValid = fullName.trim().length >= 2;
 
   const handleContinue = async () => {
     if (!isFormValid || isLoading) return;
 
     safeHapticImpact();
     setIsLoading(true);
+    await saveDemographics({ gender, ageGroup });
     try {
       await syncUserOnboardingData({ name: fullName.trim() });
     } catch {
@@ -43,83 +52,67 @@ export const ProfileSetupScreen: React.FC = () => {
     navigate('auth-skin-survey');
   };
 
+  const chipGroup = (options: string[], value: string | null, onSelect: (next: string | null) => void, suffix = '') => (
+    <div className="auth-chips">
+      {options.map((option) => (
+        <button
+          key={option}
+          type="button"
+          className={`auth-chip${value === option ? ' is-selected' : ''}`}
+          aria-pressed={value === option}
+          onClick={() => {
+            safeHapticImpact();
+            onSelect(value === option ? null : option);
+          }}
+        >
+          {option}{suffix}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <AuthShell
       onBack={goBack}
       footer={
         <button type="button" className="auth-primary-button" onClick={handleContinue} disabled={!isFormValid || isLoading}>
-          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Continue to Skin Survey →'}
+          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : <>Continue <ArrowRight aria-hidden="true" /></>}
         </button>
       }
     >
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '50%' }} /></div>
-        <span className="auth-step-label">STEP 1 OF 2: PROFILE SETUP</span>
+        <span className="auth-step-label">Step 1 of 2 · About you</span>
       </div>
 
-      <h1 className="auth-title">Set Up Your Profile</h1>
-      <p className="auth-subtitle">Personalize your identity for express deliveries &amp; diagnostic tracking.</p>
+      <h1 className="auth-title">Set up your profile</h1>
+      <p className="auth-subtitle">Tell us your name. Age and gender are optional and you can change them later in Edit profile.</p>
 
-      <div className="auth-avatar-section">
-        <button type="button" className="auth-avatar" onClick={() => fileInputRef.current?.click()} aria-label="Add profile photo">
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initial}</span>}
-          <span className="auth-avatar-badge" aria-hidden="true"><Camera /></span>
-        </button>
-        <input
-          ref={fileInputRef}
-          className="sr-only"
-          type="file"
-          accept="image/*"
-          tabIndex={-1}
-          onChange={handleAvatarChange}
-        />
-        <p className="auth-hint">Tap to add profile photo (optional)</p>
+      <div className="auth-form-group">
+        <label className="auth-label" htmlFor="auth-profile-name">Full name</label>
+        <div className="auth-field auth-field-plain">
+          <input
+            id="auth-profile-name"
+            autoComplete="name"
+            placeholder="Your name"
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+          />
+        </div>
       </div>
 
-      <label className="auth-label" htmlFor="auth-profile-name">Full Name</label>
-      <div className="auth-field auth-field-plain">
-        <input
-          id="auth-profile-name"
-          placeholder="e.g. Priya Sharma"
-          value={fullName}
-          onChange={(event) => setFullName(event.target.value)}
-        />
+      <div className="auth-form-group">
+        <span className="auth-label" id="auth-profile-age">Age group <em>Optional</em></span>
+        <div role="group" aria-labelledby="auth-profile-age">
+          {chipGroup(AGE_GROUPS, ageGroup, setAgeGroup, ' yrs')}
+        </div>
       </div>
 
-      <span className="auth-label">Age Range</span>
-      <div className="auth-chips">
-        {AGE_RANGES.map((range) => (
-          <button
-            key={range}
-            type="button"
-            className={`auth-chip${selectedAge === range ? ' is-selected' : ''}`}
-            aria-pressed={selectedAge === range}
-            onClick={() => {
-              safeHapticImpact();
-              setSelectedAge(range);
-            }}
-          >
-            {range}
-          </button>
-        ))}
-      </div>
-
-      <span className="auth-label">Gender</span>
-      <div className="auth-chips">
-        {GENDERS.map((gender) => (
-          <button
-            key={gender}
-            type="button"
-            className={`auth-chip${selectedGender === gender ? ' is-selected' : ''}`}
-            aria-pressed={selectedGender === gender}
-            onClick={() => {
-              safeHapticImpact();
-              setSelectedGender(gender);
-            }}
-          >
-            {gender}
-          </button>
-        ))}
+      <div className="auth-form-group">
+        <span className="auth-label" id="auth-profile-gender">Gender <em>Optional</em></span>
+        <div role="group" aria-labelledby="auth-profile-gender">
+          {chipGroup(GENDERS, gender, setGender)}
+        </div>
       </div>
     </AuthShell>
   );

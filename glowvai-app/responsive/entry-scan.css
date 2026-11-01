@@ -1,55 +1,98 @@
-/* Entry and skin-scan screens for tablet and desktop. Phone layout comes from glowvai.css. */
+/* Entry and skin-scan screens. Phone layout comes from glowvai.css; tablet and desktop rules are in min-width queries. */
 
-/* Welcome, onboarding, login and OTP: centred card; brand panel beside the form at 1024px+. */
+/* Welcome, onboarding, login and OTP.
+   Phone: the reference layouts in glowvai.css, with readable type and real controls.
+   Tablet and desktop: web-layout.css turns them into full-width split pages; the rules here finish those pages. */
+
+/* Phone */
+.glowvai-root .onboarding-skip{ position: absolute; top: 16px; right: 16px; z-index: 2; display: inline-flex; min-height: 44px; align-items: center; padding: 0 18px; border: 1px solid rgba(255,255,255,.42); border-radius: 999px; background: rgba(0,30,110,.26); color: #fff; font-size: 13px; font-weight: 700; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.glowvai-root .onboarding-skip:hover{ background: rgba(0,30,110,.38); }
+
+.glowvai-root .login-reference-screen .login-sheet-copy > p{ font-size: 13px; }
+.glowvai-root .login-reference-screen .login-phone-field{ grid-template-columns: 22px auto 1px minmax(0,1fr); gap: 10px; border-radius: 12px; }
+.glowvai-root .login-reference-screen .login-phone-field strong{ font-size: 15px; }
+.glowvai-root .login-reference-screen .login-phone-field input{ font-size: 16px; font-weight: 600; }
+.glowvai-root .login-reference-screen .login-phone-error{ margin: 8px 2px 0; font-size: 12px; }
+.glowvai-root .login-reference-screen .login-continue-button{ height: 52px; font-size: 15px; }
+.glowvai-root .login-reference-screen .login-legal-copy{ font-size: 11.5px; }
+.glowvai-root .login-reference-screen .login-legal-copy a{ color: #1460df; font-weight: 700; text-decoration: none; }
+.glowvai-root .login-reference-screen .login-legal-copy a:hover{ text-decoration: underline; }
+.glowvai-root .login-reference-screen .login-benefit p{ font-size: 10.5px; }
+
+.glowvai-root .otp-reference-screen .otp-copy p{ font-size: 13px; }
+.glowvai-root .otp-reference-screen .otp-resend{ font-size: 12px; }
+.glowvai-root .otp-reference-screen .otp-resend button{ min-height: 32px; }
+.glowvai-root .otp-reference-screen .otp-resend button:disabled{ opacity: .6; }
+.glowvai-root .otp-reference-screen .otp-validity{ font-size: 11px; }
+.glowvai-root .otp-reference-screen .otp-error{ font-size: 12px; }
+
+/* Tablet and desktop */
 @media (min-width: 720px){
-  .glowvai-root .welcome-screen{ max-width: 440px; height: 640px; margin: 40px auto; border-radius: 28px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
+  /* Onboarding: photo on top, sheet below on tablets; web-layout.css puts them side by side at 1024px. */
+  .glowvai-root .onboarding-screen{ --onb-hero-inset: 0 0 40% 0; --onb-sheet-min: 40%; --onb-sheet-pad: 48px 64px 56px; }
+  .glowvai-root .onboarding-screen .onboarding-sheet{ text-align: center; }
+  .glowvai-root .onboarding-screen .onboarding-sheet > *{ max-width: 520px !important; margin-left: auto; margin-right: auto; }
+  .glowvai-root .onboarding-screen .onboarding-sheet h1{ font-size: 44px !important; }
+  .glowvai-root .onboarding-screen .onboarding-sheet > p{ font-size: 17px !important; }
 
-  .glowvai-root .onboarding-screen{ width: min(100%, 640px); height: 680px; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); --onb-hero-inset: 0 0 50% 0; --onb-sheet-min: 50%; --onb-sheet-pad: 40px 48px 40px; --onb-sheet-radius: 30px 30px 0 0; }
-  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 100%; }
-  .glowvai-root .onboarding-screen .onboarding-media{ width: 100%; }
+  /* The site header is hidden on these four screens, so they fill the whole window. */
+  .glowvai-root.glowvai-web .screen-content > .welcome-screen,
+  .glowvai-root.glowvai-web .screen-content > .onboarding-screen,
+  .glowvai-root.glowvai-web .screen-content > .login-reference-screen,
+  .glowvai-root.glowvai-web .screen-content > .otp-reference-screen{ min-height: 100dvh !important; }
+  .glowvai-root.glowvai-web .screen-content .login-reference-hero,
+  .glowvai-root.glowvai-web .screen-content .otp-reference-hero{ min-height: 100dvh; }
 
-  .glowvai-root .login-reference-screen{ width: min(100%, 640px); height: auto; min-height: 0; flex: none; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
-  .glowvai-root .login-reference-hero{ flex: none; min-height: 460px; }
-  .glowvai-root .login-reference-sheet{ flex: none; min-height: 0; padding: 40px 48px 48px; }
+  /* Login: brand lockup and benefits centred in the blue panel, terms aligned with the form. */
+  .glowvai-root .login-reference-screen .login-reference-hero{ display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 56px; padding: 64px 32px; }
+  .glowvai-root .login-reference-screen .login-brand-lockup{ position: relative; top: auto; left: auto; width: min(100%, 340px); transform: none; }
+  .glowvai-root .login-reference-screen .login-benefits{ position: relative; inset: auto; width: min(100%, 320px); grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 28px; }
+  .glowvai-root .login-reference-screen .login-benefit + .login-benefit::before{ display: none; }
+  .glowvai-root .login-reference-screen .login-benefit > span{ width: 46px; height: 46px; }
+  .glowvai-root .login-reference-screen .login-benefit svg{ width: 22px; height: 22px; }
+  .glowvai-root .login-reference-screen .login-benefit p{ margin-top: 10px; font-size: 12px; }
+  .glowvai-root .login-reference-screen .login-legal-copy{ max-width: 440px; margin-top: 20px; font-size: 12px; text-align: left; }
+  .glowvai-root .login-reference-screen .login-sheet-copy h1{ font-size: 28px; }
+  .glowvai-root .login-reference-screen .login-sheet-copy > p{ max-width: 440px; font-size: 14px; }
+  .glowvai-root .login-reference-screen .login-copy-break{ display: none; }
 
-  .glowvai-root .screen-content:has(.otp-reference-screen){ overflow: visible; }
-  .glowvai-root .otp-reference-screen{ width: min(100%, 640px); height: auto; min-height: 0; flex: none; margin: 32px auto; border-radius: 24px; overflow: hidden; box-shadow: 0 22px 65px rgba(28, 34, 51, .18); }
-  .glowvai-root .otp-reference-hero{ flex: none; min-height: 0; padding-bottom: 36px; }
-  .glowvai-root .otp-hero-content{ height: auto; padding-bottom: 8px; }
-  .glowvai-root .otp-keypad-sheet{ flex: none; min-height: 0; padding: 36px 48px 40px; }
-  .glowvai-root .otp-keypad{ height: auto; grid-template-rows: none; grid-auto-rows: 64px; max-width: 340px; margin: 0 auto; }
-  .glowvai-root .otp-keypad button, .glowvai-root .otp-key-spacer{ min-height: 64px; }
+  /* OTP: brand art in the blue panel, the code form in the white column (typed on the keyboard). */
+  .glowvai-root .otp-reference-screen.is-wide .otp-hero-content{ justify-content: center; height: 100%; padding: 72px 32px; }
+  .glowvai-root .otp-reference-screen.is-wide .otp-security-art{ transform: scale(1.25); }
+  .glowvai-root .otp-wide-brand{ margin-top: 36px; text-align: center; }
+  .glowvai-root .otp-wide-brand .brand-wordmark{ color: #fff; font-family: var(--font-brand); font-size: 52px; font-weight: 600; line-height: 1; letter-spacing: -.045em; }
+  .glowvai-root .otp-wide-brand p{ margin-top: 14px; color: rgba(255,255,255,.86); font-size: 15px; font-weight: 500; }
+  .glowvai-root .otp-reference-screen .otp-form-sheet{ border-radius: 0; background: #fff; box-shadow: none; color: #101c36; animation: none; }
+  .glowvai-root .otp-form-column{ width: 100%; max-width: 420px; margin: 0 auto; text-align: left; }
+  .glowvai-root .otp-form-sheet .otp-copy{ margin-top: 0; }
+  .glowvai-root .otp-form-sheet .otp-copy h1{ color: #101c36; font-size: 28px; }
+  .glowvai-root .otp-form-sheet .otp-copy p{ margin-top: 8px; color: #71809b; font-size: 14px; }
+  .glowvai-root .otp-form-sheet .otp-copy strong{ color: #101c36; }
+  .glowvai-root .otp-form-sheet .otp-copy-break{ display: none; }
+  .glowvai-root .otp-form-sheet .otp-cells{ max-width: none; gap: 10px; margin-top: 28px; }
+  .glowvai-root .otp-form-sheet .otp-cells input{ height: 60px; border: 1px solid #d8dfec; border-radius: 12px; background: #fbfcff; color: #101c36; box-shadow: 0 1px 2px rgba(27,57,112,.04); }
+  .glowvai-root .otp-form-sheet .otp-cells input:focus{ border-color: #1459e8; box-shadow: 0 0 0 3px rgba(20,89,232,.14); transform: none; }
+  .glowvai-root .otp-form-sheet .otp-cells input.is-filled{ border-color: #8fb2fa; background: #fff; }
+  .glowvai-root .otp-form-sheet .otp-resend{ justify-content: flex-start; margin-top: 20px; color: #545b69; font-size: 13px; }
+  .glowvai-root .otp-form-sheet .otp-resend strong{ color: #101c36; }
+  .glowvai-root .otp-form-sheet .otp-resend button{ color: #1460df; }
+  .glowvai-root .otp-form-sheet .otp-validity{ display: inline-flex; min-height: 36px; margin-top: 16px; padding: 0 14px; background: #edf2ff; color: #1459e8; font-size: 12px; }
+  .glowvai-root .otp-form-sheet .otp-error{ position: static; margin-top: 14px; color: #c13f4b; font-size: 13px; }
 }
 
 @media (min-width: 1024px){
-  .glowvai-root .welcome-screen{ max-width: 480px; height: 680px; }
-
-  .glowvai-root .onboarding-screen{ width: min(100%, 960px); height: 620px; --onb-hero-inset: 0 auto 0 0; --onb-sheet-inset: 0 0 0 auto; --onb-sheet-min: 0px; --onb-sheet-pad: 56px 56px 48px; --onb-sheet-radius: 0; }
-  .glowvai-root .onboarding-screen .onboarding-media{ width: 50%; }
-  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 50%; display: flex; flex-direction: column; justify-content: center; }
-  .glowvai-root .onboarding-screen .onboarding-sheet h1{ max-width: 420px; font-size: 44px; }
-  .glowvai-root .onboarding-screen .onboarding-sheet p{ max-width: 420px; font-size: 17px; }
-
-  .glowvai-root .login-reference-screen{ width: min(100%, 960px); min-height: 620px; flex-direction: row; }
-  .glowvai-root .login-reference-hero{ flex: 0 0 46%; min-height: 0; }
-  .glowvai-root .login-reference-sheet{ flex: 1 1 auto; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 56px 64px; border-radius: 0; box-shadow: none; }
-  .glowvai-root .login-sheet-copy h1{ font-size: 32px; }
-  .glowvai-root .login-sheet-copy > p{ font-size: 14px; }
-  .glowvai-root .login-reference-form{ max-width: 420px; }
-  .glowvai-root .login-phone-field input{ font-size: 15px; }
-  .glowvai-root .login-continue-button{ height: 52px; font-size: 16px; }
-  .glowvai-root .login-legal-copy{ max-width: 420px; font-size: 11.5px; }
-  .glowvai-root .login-home-indicator{ display: none; }
-
-  .glowvai-root .otp-reference-screen{ width: min(100%, 960px); min-height: 620px; flex-direction: row; }
-  .glowvai-root .otp-reference-hero{ flex: 0 0 50%; }
-  .glowvai-root .otp-keypad-sheet{ flex: 1 1 0; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 56px 64px; border-radius: 0; box-shadow: none; }
-  .glowvai-root .otp-keypad-sheet .otp-keypad{ width: 100%; }
-  .glowvai-root .otp-sheet-handle{ display: none; }
-  .glowvai-root .otp-keypad{ grid-auto-rows: 72px; }
-  .glowvai-root .otp-keypad button, .glowvai-root .otp-key-spacer{ min-height: 72px; }
-  .glowvai-root .otp-copy h1{ font-size: 30px; }
-  .glowvai-root .otp-cells{ max-width: 380px; }
+  .glowvai-root .onboarding-screen{ --onb-sheet-min: 0px; --onb-sheet-radius: 0; }
+  .glowvai-root .onboarding-screen .onboarding-sheet{ text-align: left; }
+  .glowvai-root .onboarding-screen .onboarding-sheet > *{ margin-left: 0; margin-right: 0; }
+  .glowvai-root .onboarding-screen .onboarding-sheet h1{ max-width: 460px; font-size: 44px !important; }
+  .glowvai-root .onboarding-screen .onboarding-sheet > p{ max-width: 460px; font-size: 17px !important; }
+  .glowvai-root .onboarding-skip{ top: 24px; right: 24px; }
+  .glowvai-root .welcome-screen .brand-wordmark{ font-size: 96px !important; }
+  .glowvai-root .welcome-screen strong{ font-size: 22px !important; }
+  .glowvai-root .login-reference-screen .login-sheet-copy h1{ font-size: 32px; }
+  .glowvai-root .login-reference-screen .login-benefits{ width: min(100%, 500px); grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .glowvai-root .login-reference-screen .login-benefit + .login-benefit::before{ display: block; }
+  .glowvai-root .otp-form-sheet .otp-copy h1{ font-size: 32px; }
 }
 
 /* Face-scan preparation: checks on the left, consent and action on the right at 1024px+. */

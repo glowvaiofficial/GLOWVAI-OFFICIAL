@@ -3,49 +3,42 @@ import { useApp } from '../../context/useApp';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { storage } from '../../core/utils/storage';
 import { logScreenMount, logTouch } from '../../core/utils/touchDoctor';
-const slideAiScan = '/glowvai/features/auth/assets/slide-ai-face-scan.png';
-const slideSkincare = '/glowvai/features/auth/assets/slide-skincare-ordering.png';
-const slideExpress = '/glowvai/features/auth/assets/slide-express-delivery.png';
-const slideFifteenMin = '/glowvai/features/auth/assets/slide-fifteen-min-guarantee.png';
 
+// Same artwork as the main onboarding flow (see DESIGN.md: decorative hero media only).
 const SLIDES = [
   {
-    id: 'slide-1',
-    image: slideAiScan,
-    badge: 'AI FACE SCAN',
-    title: 'AI Skin Scan in Seconds',
-    body: 'Scan your face using smartphone AI computer vision to uncover acne, hydration & 8-point skin metrics.',
+    id: 'slide-scan',
+    image: '/glowvai/assets/onboarding/hero-skin-v2.png',
+    badge: 'SKIN SCAN',
+    title: 'Know your skin',
+    body: 'A guided camera scan checks your skin and explains what it finds in plain language.',
   },
   {
-    id: 'slide-2',
-    image: slideSkincare,
-    badge: 'COSMETICS CATALOG',
-    title: 'Custom Skincare & Cosmetics',
-    body: 'Zero guesswork. Browse and order targeted serums, creams & derm-backed cosmetics tailored to your skin.',
+    id: 'slide-shop',
+    image: '/glowvai/assets/onboarding/hero-delivery-v2.png',
+    badge: 'SHOP AND DELIVERY',
+    title: 'Your glow, delivered',
+    body: 'Shop skincare and cosmetics matched to your skin, packed at a store near you.',
   },
   {
-    id: 'slide-3',
-    image: slideExpress,
-    badge: 'DOORSTEP DELIVERY',
-    title: 'Hyperlocal Express Parcel',
-    body: 'Verified Glow VAI rider hands over your tamper-proof skincare parcel right at your doorstep.',
-  },
-  {
-    id: 'slide-4',
-    image: slideFifteenMin,
-    badge: '15-MIN EXPRESS',
-    title: '15-Minute Delivery Guarantee',
-    body: 'Ultra-fast hyper-commerce delivery guarantee — get your skincare products delivered in 15 minutes flat.',
+    id: 'slide-progress',
+    image: '/glowvai/assets/onboarding/hero-progress-v2.png',
+    badge: 'ORDERS AND ROUTINE',
+    title: 'Keep track in one place',
+    body: 'Follow every order, reorder favourites and get help from your account.',
   },
 ];
 
 const AUTO_ADVANCE_MS = 4000;
 const SWIPE_THRESHOLD_PX = 40;
 
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export const WelcomeScreen: React.FC = () => {
   const { navigate } = useApp();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
+  const [autoPlay, setAutoPlay] = useState(() => !prefersReducedMotion());
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -95,20 +88,31 @@ export const WelcomeScreen: React.FC = () => {
     navigate('shop-home');
   };
 
+  const trackStyle = { transform: `translateX(-${activeIndex * 100}%)` };
+
   return (
-    <section className="auth-welcome">
+    <section className="auth-welcome" aria-roledescription="carousel" aria-label="Welcome to glowvai">
       <div className="auth-welcome-brand">
         <span className="auth-brand-wordmark">glowvai</span>
       </div>
 
-      <div className="auth-slider" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <div className="auth-slider-track" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
-          {SLIDES.map((slide) => (
-            <article className="auth-slide" key={slide.id}>
+      <div className="auth-slider auth-slider-media" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="auth-slider-track" style={trackStyle}>
+          {SLIDES.map((slide, index) => (
+            <div className="auth-slide" key={slide.id} aria-hidden={index !== activeIndex}>
               <div className="auth-slide-image">
                 <img src={slide.image} alt="" />
                 <span className="auth-slide-badge">{slide.badge}</span>
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="auth-slider auth-slider-copy" aria-live={autoPlay ? 'off' : 'polite'} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="auth-slider-track" style={trackStyle}>
+          {SLIDES.map((slide, index) => (
+            <article className="auth-slide" key={slide.id} aria-hidden={index !== activeIndex}>
               <h2 className="auth-slide-title">{slide.title}</h2>
               <p className="auth-slide-body">{slide.body}</p>
             </article>
@@ -123,17 +127,18 @@ export const WelcomeScreen: React.FC = () => {
             type="button"
             className={`auth-dot${index === activeIndex ? ' is-active' : ''}`}
             onClick={() => goToSlide(index)}
-            aria-label={`Show slide ${index + 1}`}
+            aria-label={`Show slide ${index + 1} of ${SLIDES.length}`}
+            aria-current={index === activeIndex ? 'true' : undefined}
           />
         ))}
       </div>
 
       <div className="auth-welcome-footer">
         <button type="button" className="auth-primary-button" onClick={handleGetStarted}>
-          Get Started
+          Get started
         </button>
         <button type="button" className="auth-secondary-button" onClick={handleExploreProducts}>
-          Explore Products
+          Explore products
         </button>
       </div>
     </section>

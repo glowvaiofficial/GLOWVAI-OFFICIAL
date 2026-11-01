@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, CircleDot, Droplet, Droplets, Flame, Hourglass, SunMedium } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
 
+// Concerns are kept on this device; the sync below only records the consent timestamp, as in the mobile app.
+const SKIN_CONCERNS_KEY = 'glowvai:skin-concerns';
+
 const SKIN_CONCERNS = [
-  { id: 'ACNE', label: 'Acne & Blemishes', emoji: '🔴' },
-  { id: 'HYPERPIGMENTATION', label: 'Hyperpigmentation', emoji: '🟤' },
-  { id: 'DRYNESS', label: 'Dryness & Dehydration', emoji: '💧' },
-  { id: 'OILINESS', label: 'Excess Oiliness', emoji: '✨' },
-  { id: 'SENSITIVITY', label: 'Sensitivity & Redness', emoji: '⚡' },
-  { id: 'FINE_LINES', label: 'Fine Lines & Aging', emoji: '🕰️' },
+  { id: 'ACNE', label: 'Acne and blemishes', icon: <CircleDot /> },
+  { id: 'HYPERPIGMENTATION', label: 'Dark spots and pigmentation', icon: <SunMedium /> },
+  { id: 'DRYNESS', label: 'Dryness', icon: <Droplet /> },
+  { id: 'OILINESS', label: 'Excess oil', icon: <Droplets /> },
+  { id: 'SENSITIVITY', label: 'Sensitivity and redness', icon: <Flame /> },
+  { id: 'FINE_LINES', label: 'Fine lines', icon: <Hourglass /> },
 ];
 
 export const SkinSurveyScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
-  const [selectedConcerns, setSelectedConcerns] = useState<string[]>(['ACNE']);
+  const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleConcern = (id: string) => {
@@ -26,11 +30,13 @@ export const SkinSurveyScreen: React.FC = () => {
     );
   };
 
-  // Mirrors the mobile app: concerns are shown but only the consent timestamp is synced
-  const handleSaveAndContinue = async () => {
+  const handleFinish = async () => {
     if (isLoading) return;
     safeHapticImpact();
     setIsLoading(true);
+    if (selectedConcerns.length > 0) {
+      await storage.setItem(SKIN_CONCERNS_KEY, JSON.stringify(selectedConcerns));
+    }
     try {
       await syncUserOnboardingData({ consentTimestamp: Date.now() });
     } catch {
@@ -41,26 +47,26 @@ export const SkinSurveyScreen: React.FC = () => {
     navigate('auth-onboarding-success');
   };
 
+  const hasSelection = selectedConcerns.length > 0;
+
   return (
     <AuthShell
       onBack={goBack}
       footer={
-        <button type="button" className="auth-primary-button" onClick={handleSaveAndContinue} disabled={isLoading}>
-          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Save & Finish Setup'}
+        <button type="button" className="auth-primary-button" onClick={handleFinish} disabled={isLoading}>
+          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : hasSelection ? 'Save and finish' : 'Skip for now'}
         </button>
       }
     >
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '100%' }} /></div>
-        <span className="auth-step-label">Step 2 of 2: Skin Survey</span>
+        <span className="auth-step-label">Step 2 of 2 · Your skin</span>
       </div>
 
-      <h1 className="auth-title">What are your main skin concerns?</h1>
-      <p className="auth-subtitle">
-        Select all that apply. This helps us personalize your initial routine and diagnostic report.
-      </p>
+      <h1 className="auth-title">What would you like help with?</h1>
+      <p className="auth-subtitle">Pick any that apply, or skip. A skin scan gives you a full report later.</p>
 
-      <div className="auth-concern-grid">
+      <div className="auth-concern-grid" role="group" aria-label="Skin concerns">
         {SKIN_CONCERNS.map((item) => {
           const isSelected = selectedConcerns.includes(item.id);
           return (
@@ -72,20 +78,14 @@ export const SkinSurveyScreen: React.FC = () => {
               onClick={() => toggleConcern(item.id)}
             >
               <span className="auth-concern-top">
-                <span className="auth-concern-emoji" aria-hidden="true">{item.emoji}</span>
-                {isSelected && (
-                  <span className="auth-concern-check" aria-hidden="true"><Check /></span>
-                )}
+                <span className="auth-concern-icon" aria-hidden="true">{item.icon}</span>
+                <span className="auth-concern-check" aria-hidden="true">{isSelected && <Check />}</span>
               </span>
               <span className="auth-concern-label">{item.label}</span>
             </button>
           );
         })}
       </div>
-
-      <button type="button" className="auth-text-button auth-skip-link" onClick={handleSaveAndContinue}>
-        Skip for now
-      </button>
     </AuthShell>
   );
 };
