@@ -172,3 +172,11 @@
 @media (min-width: 1024px){
   .glowvai-root .shop-home .shop-home-festival .zq-festival-grid{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
+
+/* Desktop: the home uses the full width of the window (up to 1600px) instead of a 1200px column, and the search, chips and mode switch fill the row. */
+@media (min-width: 1024px){
+  .glowvai-root .screen-content > .shop-home{ max-width: 1600px; }
+  .glowvai-root .shop-home .shop-home-search,
+  .glowvai-root .shop-home .shop-home-chips,
+  .glowvai-root .shop-home .shop-home-mode{ max-width: none; }
+}
