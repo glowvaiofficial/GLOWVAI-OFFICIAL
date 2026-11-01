@@ -2,25 +2,26 @@ import React, { useRef } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Moon, ScanFace, Search, Sun, User, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog, useCatalogStore } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import {
-  BIGGEST_DISCOUNTS,
-  SHOP_BRANDS,
   SHOP_CATEGORIES,
   SHOP_CONCERNS,
   TRIAL_PRODUCT,
   categoryCount,
   categoryFromPrice,
   concernCount,
+  getBiggestDiscounts,
+  getShopBrands,
   productsInCategory,
 } from '../shared/shopCatalog';
-import { formatRupee, getProductImageUrl } from '../shared/shopUtils';
+import { cartLineFor, formatRupee, getProductImageUrl } from '../shared/shopUtils';
 import '../styles/shop-home.css';
 
-// Every number on this page (counts, prices, discounts, delivery time) comes from the local
-// catalogue or the app's delivery address. Nothing is personalised, so nothing says "for you".
+// Every number on this page (counts, prices, discounts, delivery time) comes from the shop catalogue
+// (built-in and published vendor products) or the app's delivery address. Nothing is personalised,
+// so nothing says "for you".
 
 const plural = (n: number) => `${n} ${n === 1 ? 'product' : 'products'}`;
 
@@ -29,7 +30,7 @@ const firstImage = (categoryId: string) => {
   return product ? getProductImageUrl(product) : '';
 };
 
-const UNDER_500 = INDIAN_SKINCARE_CATALOG.filter((p) => p.price > 1 && p.price < 500).sort((a, b) => a.price - b.price);
+const under500 = (products: SkincareProduct[]) => products.filter((p) => p.price > 1 && p.price < 500).sort((a, b) => a.price - b.price);
 
 interface GlowDrop {
   id: string;
@@ -161,16 +162,7 @@ function TrialCard() {
             <button
               type="button"
               className="shop-home-trial-add"
-              onClick={() =>
-                addItem({
-                  productId: product.id,
-                  name: product.name,
-                  brand: product.brand,
-                  image: getProductImageUrl(product),
-                  price: product.price,
-                  mrp: product.originalPrice,
-                })
-              }
+              onClick={() => addItem(cartLineFor(product))}
             >
               ADD
             </button>
@@ -183,6 +175,8 @@ function TrialCard() {
 
 export const ShopHomeScreen: React.FC = () => {
   const { navigate, currentAddress } = useApp();
+  const catalog = useCatalog();
+  const sellerProducts = useCatalogStore((s) => s.vendorProducts);
   const cartCount = useCartStore((s) => s.totalCount);
   const openCategory = (categoryId: string) => navigate('shop-category', { categoryId });
 
@@ -308,9 +302,18 @@ export const ShopHomeScreen: React.FC = () => {
       <ProductRail
         title="Biggest discounts"
         subtitle="Sorted by % off the MRP"
-        products={BIGGEST_DISCOUNTS.slice(0, 8)}
+        products={getBiggestDiscounts().slice(0, 8)}
         onSeeAll={() => navigate('shop-search-filters', { sort: 'discount' })}
       />
+
+      {sellerProducts.length > 0 && (
+        <ProductRail
+          title="From our sellers"
+          subtitle="Listed by shops selling on glowvai"
+          products={sellerProducts}
+          onSeeAll={() => navigate('shop-browse')}
+        />
+      )}
 
       <ProductRail title="Serums & actives" products={productsInCategory('Serums')} onSeeAll={() => openCategory('Serums')} />
 
@@ -378,7 +381,7 @@ export const ShopHomeScreen: React.FC = () => {
           </div>
         </div>
         <div className="shop-home-scroller shop-home-brands">
-          {SHOP_BRANDS.map((b) => (
+          {getShopBrands().map((b) => (
             <button key={b.brand} type="button" className="shop-home-brand" onClick={() => navigate('shop-browse', { brand: b.brand })}>
               <span className="shop-home-brand-media">
                 <img src={getProductImageUrl(b.image)} alt="" loading="lazy" />
@@ -429,7 +432,7 @@ export const ShopHomeScreen: React.FC = () => {
         </div>
       </section>
 
-      <ProductRail title="Under ₹500" subtitle="Lowest price first" products={UNDER_500} onSeeAll={() => navigate('shop-search-filters', { sort: 'price_low' })} />
+      <ProductRail title="Under ₹500" subtitle="Lowest price first" products={under500(catalog)} onSeeAll={() => navigate('shop-search-filters', { sort: 'price_low' })} />
 
       <section className="shop-home-end">
         <span className="shop-home-end-mark brand-wordmark" aria-hidden="true">
@@ -437,7 +440,7 @@ export const ShopHomeScreen: React.FC = () => {
         </span>
         <h2>You have reached the end of the shelf</h2>
         <p>
-          {INDIAN_SKINCARE_CATALOG.length} products across {SHOP_CATEGORIES.length} categories
+          {catalog.length} products across {SHOP_CATEGORIES.length} categories
           {cartCount > 0 ? ` · ${cartCount} in your bag` : ''}
         </p>
         <div className="shop-home-end-actions">

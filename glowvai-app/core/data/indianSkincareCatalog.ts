@@ -23,6 +23,11 @@ export interface SkincareProduct {
     barrier: string;
   };
   deliveryMinutes: number;
+  /** Set only for marketplace products published by a vendor (see core/services/storefrontCatalog.ts). */
+  vendorId?: string;
+  storeId?: string;
+  /** The seller's display name, when the storefront document carries one. */
+  storeName?: string;
 }
 
 export const ALL_SKINCARE_BRANDS = [

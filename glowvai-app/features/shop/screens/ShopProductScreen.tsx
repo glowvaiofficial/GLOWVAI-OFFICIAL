@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Check, ChevronRight, Clock, Heart, Info, MapPin, Minus, Plus, Share2, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog, useCatalogLoading } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getCategoryMeta, productsInCategory, useScrollTopOn } from '../shared/shopCatalog';
-import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
+import { cartLineFor, formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import '../styles/shop-product.css';
 
 // General, category-level directions. Product-specific directions are on the pack, and the page says so.
@@ -21,7 +21,9 @@ export const ShopProductScreen: React.FC = () => {
   const { navigate, goBack, activeParams, currentAddress, wishlist, toggleWishlist, showToast } = useApp();
   const rawId = activeParams?.productId ?? activeParams?.id;
   const productId = typeof rawId === 'string' ? rawId : undefined;
-  const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === productId);
+  const catalog = useCatalog();
+  const catalogLoading = useCatalogLoading();
+  const product = catalog.find((p) => p.id === productId);
   const topRef = useScrollTopOn(productId);
 
   const cartCount = useCartStore((state) => state.totalCount);
@@ -32,6 +34,8 @@ export const ShopProductScreen: React.FC = () => {
   const [imageFailed, setImageFailed] = useState(false);
 
   if (!product) {
+    // A vendor product opened by link is not in the list until vendor products load.
+    const waiting = catalogLoading && Boolean(productId);
     return (
       <div ref={topRef} className="shop-screen shop-product">
         <header className="shop-header">
@@ -40,16 +44,22 @@ export const ShopProductScreen: React.FC = () => {
           </button>
           <h1>Product</h1>
         </header>
-        <div className="shop-empty">
-          <span className="shop-empty-icon">
-            <Info size={26} />
-          </span>
-          <h3>Product not found</h3>
-          <p>This product is not in the shop right now.</p>
-          <button type="button" className="shop-btn-primary" onClick={() => navigate('shop-browse')}>
-            Browse products
-          </button>
-        </div>
+        {waiting ? (
+          <div className="shop-empty" aria-busy="true">
+            <p>Loading product…</p>
+          </div>
+        ) : (
+          <div className="shop-empty">
+            <span className="shop-empty-icon">
+              <Info size={26} />
+            </span>
+            <h3>Product not found</h3>
+            <p>This product is not in the shop right now.</p>
+            <button type="button" className="shop-btn-primary" onClick={() => navigate('shop-browse')}>
+              Browse products
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -77,16 +87,8 @@ export const ShopProductScreen: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        productId: product.id,
-        name: product.name,
-        brand: product.brand,
-        price: product.price,
-        mrp: product.originalPrice,
-        image,
-      });
-    }
+    const line = cartLineFor(product);
+    for (let i = 0; i < quantity; i++) addItem(line);
     setQuantity(1);
   };
 
@@ -151,7 +153,8 @@ export const ShopProductScreen: React.FC = () => {
               <ChevronRight size={14} />
             </button>
             <h1 className="shop-product-title">{product.name}</h1>
-            <p className="shop-product-size">{product.volume}</p>
+            {product.volume && <p className="shop-product-size">{product.volume}</p>}
+            {product.storeName && <p className="shop-product-seller">Sold by {product.storeName}</p>}
 
             <div className="shop-product-pricebar">
               <span className="shop-product-price-now">{formatRupee(product.price)}</span>
@@ -208,10 +211,12 @@ export const ShopProductScreen: React.FC = () => {
             )}
           </div>
 
-          <div className="shop-product-panel">
-            <h2 className="shop-product-section-title">About this product</h2>
-            <p className="shop-product-desc">{product.description}</p>
-          </div>
+          {product.description && (
+            <div className="shop-product-panel">
+              <h2 className="shop-product-section-title">About this product</h2>
+              <p className="shop-product-desc">{product.description}</p>
+            </div>
+          )}
 
           {product.keyActives.length > 0 && (
             <div className="shop-product-panel">

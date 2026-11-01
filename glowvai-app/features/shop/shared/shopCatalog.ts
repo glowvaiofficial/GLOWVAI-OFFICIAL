@@ -3,9 +3,26 @@ import { Activity, Droplet, Droplets, Leaf, ShieldCheck, Sparkles, Sun } from 'l
 import type { LucideIcon } from 'lucide-react';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { getCatalog } from '../../../core/state/catalogStore';
 import { getDiscountPercent } from './shopUtils';
 
-// Everything here is derived from the local catalogue, so counts, prices and discounts are real.
+// Everything here is derived from the shop catalogue (built-in products plus published vendor products, see
+// core/state/catalogStore.ts), so counts, prices and discounts are real. Screens call useCatalog() so they re-render
+// when vendor products arrive; these helpers read the current list and cache results until it changes.
+
+/** Caches a value derived from the product list until the list changes. */
+const fromCatalog = <T>(derive: (products: SkincareProduct[]) => T) => {
+  let source: SkincareProduct[] | null = null;
+  let value: T;
+  return (): T => {
+    const products = getCatalog();
+    if (products !== source) {
+      source = products;
+      value = derive(products);
+    }
+    return value;
+  };
+};
 
 export type CategoryId = SkincareProduct['category'];
 
@@ -27,8 +44,13 @@ export const SHOP_CATEGORIES: CategoryMeta[] = [
 export const getCategoryMeta = (id: string | undefined): CategoryMeta | undefined =>
   SHOP_CATEGORIES.find((c) => c.id === id);
 
-export const productsInCategory = (id: string): SkincareProduct[] =>
-  INDIAN_SKINCARE_CATALOG.filter((p) => p.category === id);
+const byCategory = fromCatalog((products) => {
+  const map = new Map<string, SkincareProduct[]>();
+  for (const p of products) map.set(p.category, [...(map.get(p.category) ?? []), p]);
+  return map;
+});
+
+export const productsInCategory = (id: string): SkincareProduct[] => byCategory().get(id) ?? [];
 
 export const categoryCount = (id: string): number => productsInCategory(id).length;
 
@@ -40,8 +62,9 @@ export const categoryFromPrice = (id: string): number | null => {
 
 /** The trial sample sits in the catalogue at ₹1; keep it out of "regular" shelves so rails stay comparable. */
 export const isTrialProduct = (p: SkincareProduct) => p.price <= 1;
+/** The trial is a GLOW VAI product, so it only ever comes from the built-in catalogue. */
 export const TRIAL_PRODUCT = INDIAN_SKINCARE_CATALOG.find(isTrialProduct);
-export const REGULAR_PRODUCTS = INDIAN_SKINCARE_CATALOG.filter((p) => !isTrialProduct(p));
+export const getRegularProducts = fromCatalog((products) => products.filter((p) => !isTrialProduct(p)));
 
 /** Concerns are matched with keywords against the product name, description and key actives. */
 export interface ConcernMeta {
@@ -67,7 +90,7 @@ export const matchesConcern = (product: SkincareProduct, concernId: string): boo
 };
 
 export const concernCount = (concernId: string): number =>
-  REGULAR_PRODUCTS.filter((p) => matchesConcern(p, concernId)).length;
+  getRegularProducts().filter((p) => matchesConcern(p, concernId)).length;
 
 export interface BrandSummary {
   brand: string;
@@ -78,9 +101,9 @@ export interface BrandSummary {
 }
 
 /** Brands that actually have products in the catalogue, most products first. */
-export const SHOP_BRANDS: BrandSummary[] = (() => {
+export const getShopBrands = fromCatalog((products): BrandSummary[] => {
   const map = new Map<string, SkincareProduct[]>();
-  for (const p of REGULAR_PRODUCTS) map.set(p.brand, [...(map.get(p.brand) ?? []), p]);
+  for (const p of products) if (!isTrialProduct(p)) map.set(p.brand, [...(map.get(p.brand) ?? []), p]);
   return [...map.entries()]
     .map(([brand, items]) => ({
       brand,
@@ -90,12 +113,12 @@ export const SHOP_BRANDS: BrandSummary[] = (() => {
       image: items[0],
     }))
     .sort((a, b) => b.count - a.count || a.brand.localeCompare(b.brand));
-})();
+});
 
 export const brandKey = (brand: string) => brand.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 /** Products sorted by their real catalogue discount, biggest first. */
-export const BIGGEST_DISCOUNTS = [...REGULAR_PRODUCTS].sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a));
+export const getBiggestDiscounts = fromCatalog(() => [...getRegularProducts()].sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a)));
 
 /** Scroll the app's scroll container back to the top whenever `key` changes (screens opened from a scrolled list). */
 export function useScrollTopOn(key: unknown) {

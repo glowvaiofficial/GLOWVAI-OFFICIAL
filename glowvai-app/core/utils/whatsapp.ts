@@ -17,7 +17,7 @@ export interface DispatchOrderPayload {
   customerPhone: string;
   deliveryAddress: string;
   darkStoreName: string;
-  items: Array<{ name: string; qty: number; price: number }>;
+  items: Array<{ name: string; qty: number; price: number; productId?: string; vendorId?: string }>;
   totalAmount: number;
   paymentMethod: string;
   deliveryOtp: string;

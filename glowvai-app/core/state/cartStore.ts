@@ -9,6 +9,8 @@ export interface CartItem {
   image: string;
   price: number;
   mrp?: number;
+  /** Set for marketplace products: the vendor that sells this line. Undefined for built-in products. */
+  vendorId?: string;
   quantity: number;
 }
 

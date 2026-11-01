@@ -24,7 +24,10 @@ export type PaymentMethod = 'COD' | 'UPI' | 'CARD' | 'NET_BANKING' | 'WALLET' | 
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED' | 'COMPLETED';
 
 export interface OrderItem {
+  /** For marketplace products this is the storefront document id, products/{productId}. */
   productId: string;
+  /** The vendor selling a marketplace product. Undefined for built-in products. */
+  vendorId?: string;
   sku: string;
   title: string;
   productName?: string;

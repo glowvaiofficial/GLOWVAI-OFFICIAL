@@ -20,13 +20,24 @@ const csp = [
 // The glowvai app shell under /shop talks to Firebase, Razorpay and the scan backend, so it gets its own policy.
 const devEval = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'";
 
+// Marketplace product photos live in Firebase Storage (allowed below). When NEXT_PUBLIC_VENDOR_API_URL is set, the shop
+// may also read products and photos from that vendor API (NEXT_PUBLIC_CATALOG_SOURCE=vendor-api), so allow its origin.
+const shopVendorOrigin = (() => {
+  try {
+    return process.env.NEXT_PUBLIC_VENDOR_API_URL ? new URL(process.env.NEXT_PUBLIC_VENDOR_API_URL).origin : '';
+  } catch {
+    return '';
+  }
+})();
+const shopVendorSrc = shopVendorOrigin ? ` ${shopVendorOrigin}` : '';
+
 const shopCsp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${devEval} 'wasm-unsafe-eval' https://www.googletagmanager.com https://checkout.razorpay.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://*.gstatic.com",
+  `img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://*.gstatic.com${shopVendorSrc}`,
   "font-src 'self' data:",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://glowvai-backend-r7u2.onrender.com https://api.razorpay.com https://lumberjack.razorpay.com https://script.google.com https://script.googleusercontent.com https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com http://localhost:4000 http://localhost:10000",
+  `connect-src 'self'${shopVendorSrc} https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://glowvai-backend-r7u2.onrender.com https://api.razorpay.com https://lumberjack.razorpay.com https://script.google.com https://script.googleusercontent.com https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com http://localhost:4000 http://localhost:10000`,
   "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.firebaseapp.com https://www.openstreetmap.org",
   "worker-src 'self' blob:",
   "media-src 'self' blob:",

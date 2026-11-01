@@ -3,7 +3,7 @@ import { Clock, Heart, Minus, Plus } from 'lucide-react';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useApp } from '../../../context/useApp';
 import { useCartStore } from '../../../core/state/cartStore';
-import { formatRupee, getDiscountPercent, getProductImageUrl } from './shopUtils';
+import { cartLineFor, formatRupee, getDiscountPercent, getProductImageUrl } from './shopUtils';
 
 interface ShopProductCardProps {
   product: SkincareProduct;
@@ -22,15 +22,7 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
   const saved = wishlist.includes(product.id);
   const imageUrl = getProductImageUrl(product);
 
-  const addToCart = () =>
-    addItem({
-      productId: product.id,
-      name: product.name,
-      brand: product.brand,
-      image: imageUrl,
-      price: product.price,
-      mrp: product.originalPrice,
-    });
+  const addToCart = () => addItem(cartLineFor(product));
 
   return (
     <article className="shop-product-card">
