@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Crosshair, MapPin, Search, Store } from 'lucide-react';
+import { ArrowRight, Crosshair, MapPin, MapPinOff, Search } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getDeviceCurrentLocation } from '../../core/services/locationService';
 import { searchPlaces, type PlaceResult } from './lib/geocode';
 import { isServiceablePincode, useAddressStore } from './lib/addressStore';
-import { FlowHeader, useDeliveryAddress } from './components/shared';
+import { useCartStore } from '../../core/state/cartStore';
+import { FlowHeader, useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 import { LocationMap } from '../../components/map/LocationMap';
-
-const FALLBACK = { latitude: 16.5417, longitude: 80.6425, pincode: '520015' };
 
 const DEFAULT_SUGGESTIONS: PlaceResult[] = [
   { id: 'd1', name: 'Payakapuram, Vijayawada', locality: 'Near Water Tank Road, Sector 4', latitude: 16.532, longitude: 80.648 },
@@ -110,11 +109,20 @@ export const LocationSetupScreen: React.FC = () => {
           <ArrowRight size={16} />
         </button>
 
-        {searching && <p className="commerce-muted">Searching…</p>}
-        {error && <p className="commerce-error">{error}</p>}
+        {searching && (
+          <p className="commerce-muted" role="status">
+            Searching…
+          </p>
+        )}
+        {error && (
+          <p className="commerce-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <section className="commerce-card commerce-suggest" aria-label="Suggested locations">
           <h2>{showingSearch ? 'Search results' : 'Popular areas'}</h2>
+          {visible.length === 0 && !searching && <p className="commerce-muted">No places to show yet.</p>}
           {visible.map((place) => (
             <button className="commerce-suggest-row" key={place.id} onClick={() => pick(place)}>
               <span className="commerce-suggest-icon">
@@ -129,7 +137,7 @@ export const LocationSetupScreen: React.FC = () => {
           ))}
         </section>
 
-        <button className="commerce-link-block" onClick={() => navigate('location-map-picker', { address: '', ...FALLBACK })}>
+        <button className="commerce-link-block" onClick={() => navigate('location-map-picker', { address: '' })}>
           Enter address manually
         </button>
       </div>
@@ -137,26 +145,30 @@ export const LocationSetupScreen: React.FC = () => {
   );
 };
 
-// Step 2: confirm the pin. Web has no native map view, so this is a form with the device location button.
+// Step 2: confirm the pin and the area. Manual entry starts without a pin until the user searches or shares a location.
 export const LocationMapPickerScreen: React.FC = () => {
   const { activeParams, goBack, navigate, showToast } = useApp();
   const params = (activeParams || {}) as { address?: string; latitude?: number; longitude?: number; pincode?: string };
+  const hasParamPin = params.latitude !== undefined && params.longitude !== undefined && Number.isFinite(Number(params.latitude)) && Number.isFinite(Number(params.longitude));
 
   const [address, setAddress] = useState(params.address || '');
-  const [latitude, setLatitude] = useState<number>(Number(params.latitude ?? FALLBACK.latitude));
-  const [longitude, setLongitude] = useState<number>(Number(params.longitude ?? FALLBACK.longitude));
+  const [pin, setPin] = useState<{ latitude: number; longitude: number } | null>(
+    hasParamPin ? { latitude: Number(params.latitude), longitude: Number(params.longitude) } : null
+  );
   const [pincode, setPincode] = useState(params.pincode || '');
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
 
   const useCurrent = async () => {
     setBusy(true);
     try {
       const loc = await getDeviceCurrentLocation();
-      setLatitude(loc.latitude);
-      setLongitude(loc.longitude);
+      setPin({ latitude: loc.latitude, longitude: loc.longitude });
       setAddress(loc.formattedAddress || address);
       setPincode(loc.postalCode || pincode);
+    } catch {
+      showToast('Could not read your location. Search for the area instead.');
     } finally {
       setBusy(false);
     }
@@ -164,7 +176,10 @@ export const LocationMapPickerScreen: React.FC = () => {
 
   const search = async () => {
     const q = query.trim();
-    if (q.length < 3) return;
+    if (q.length < 3) {
+      showToast('Type at least 3 letters to search');
+      return;
+    }
     setBusy(true);
     try {
       const [first] = await searchPlaces(q, 1);
@@ -172,8 +187,7 @@ export const LocationMapPickerScreen: React.FC = () => {
         showToast('No place found for that search');
         return;
       }
-      setLatitude(first.latitude);
-      setLongitude(first.longitude);
+      setPin({ latitude: first.latitude, longitude: first.longitude });
       setAddress(first.locality);
       setPincode(first.pincode || pincode);
     } catch {
@@ -185,72 +199,101 @@ export const LocationMapPickerScreen: React.FC = () => {
 
   const confirm = () => {
     if (!address.trim()) {
-      showToast('Add the area or street to continue');
+      setAddressError('Add the area or street to continue');
       return;
     }
-    navigate('address-add', { address: address.trim(), latitude, longitude, pincode });
+    setAddressError(null);
+    navigate('address-add', { address: address.trim(), latitude: pin?.latitude, longitude: pin?.longitude, pincode });
   };
 
+  const outOfArea = pincode.length === 6 && !isServiceablePincode(pincode);
+
   return (
-    <main className="commerce-screen commerce-location">
-      <FlowHeader title="Confirm location" subtitle="Check the pin before adding details" onBack={goBack} />
+    <main className="commerce-screen commerce-location commerce-picker">
+      <FlowHeader title="Confirm location" subtitle={pin ? 'Check the pin before adding details' : 'Search for your area or share your location'} onBack={goBack} />
 
-      <div className="commerce-body">
-        <LocationMap latitude={latitude} longitude={longitude} label="Map of the selected pin" />
+      <div className="commerce-body commerce-split">
+        <div className="commerce-col">
+          {pin ? (
+            <LocationMap latitude={pin.latitude} longitude={pin.longitude} label="Map of the selected pin" />
+          ) : (
+            <div className="commerce-map-empty">
+              <MapPinOff size={24} />
+              <b>No pin yet</b>
+              <span>Search for your area or use your current location to drop a pin.</span>
+            </div>
+          )}
 
-        <section className="commerce-pin-card" aria-label="Selected location">
-          <span className="commerce-pin-icon">
-            <Store size={20} />
-          </span>
-          <div>
-            <b>Selected pin</b>
-            <small>
-              {latitude.toFixed(4)}, {longitude.toFixed(4)}
-            </small>
-          </div>
-        </section>
+          <section className="commerce-pin-card" aria-label="Selected location">
+            <span className="commerce-pin-icon">
+              <MapPin size={20} />
+            </span>
+            <div>
+              <b>{address.trim() || 'Area not set'}</b>
+              <small>{pin ? `Pin at ${pin.latitude.toFixed(4)}, ${pin.longitude.toFixed(4)}` : 'No map pin. The rider will use the written address.'}</small>
+            </div>
+          </section>
+        </div>
 
-        <label className="commerce-search">
-          <Search size={18} />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') search();
+        <div className="commerce-col">
+          <form
+            className="commerce-search"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              search();
             }}
-            placeholder="Search to move the pin"
-            aria-label="Search to move the pin"
-          />
-        </label>
+          >
+            <Search size={18} />
+            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search to move the pin" aria-label="Search to move the pin" />
+            <button type="submit" className="commerce-search-go" disabled={busy || query.trim().length < 3}>
+              Search
+            </button>
+          </form>
 
-        <button className="commerce-locate" onClick={useCurrent} disabled={busy}>
-          <span>
-            <Crosshair size={18} />
-          </span>
-          <div>
-            <b>{busy ? 'Working…' : 'Use my current location'}</b>
-            <small>Uses your browser location permission</small>
-          </div>
-          <ArrowRight size={16} />
-        </button>
+          <button className="commerce-locate" onClick={useCurrent} disabled={busy}>
+            <span>
+              <Crosshair size={18} />
+            </span>
+            <div>
+              <b>{busy ? 'Working…' : 'Use my current location'}</b>
+              <small>Uses your browser location permission</small>
+            </div>
+            <ArrowRight size={16} />
+          </button>
 
-        <section className="commerce-card commerce-form">
-          <label>
-            <span>Area and street</span>
-            <textarea rows={3} value={address} onChange={(e) => setAddress(e.target.value)} />
-          </label>
-          <label>
-            <span>Pincode</span>
-            <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} />
-          </label>
-          {pincode && !isServiceablePincode(pincode) && <p className="commerce-error">We deliver to Vijayawada pincodes (520xxx) right now.</p>}
-        </section>
+          <section className="commerce-card commerce-form" aria-labelledby="picker-form-title">
+            <h2 id="picker-form-title">Area details</h2>
+            <label className={addressError ? 'commerce-field has-error' : 'commerce-field'}>
+              <span>Area and street</span>
+              <textarea
+                rows={3}
+                value={address}
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                  if (addressError) setAddressError(null);
+                }}
+                placeholder="Street, area or colony"
+                aria-invalid={addressError ? true : undefined}
+              />
+              {addressError && (
+                <em className="commerce-error" role="alert">
+                  {addressError}
+                </em>
+              )}
+            </label>
+            <label className="commerce-field">
+              <span>Pincode</span>
+              <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} placeholder="6 digits" />
+              {outOfArea && <em className="commerce-field-hint">We deliver to Vijayawada pincodes (520xxx) right now.</em>}
+            </label>
+          </section>
+        </div>
       </div>
 
       <footer className="commerce-sticky-bar">
         <button className="commerce-primary is-wide" onClick={confirm}>
-          Confirm location
+          Confirm and add details
         </button>
       </footer>
     </main>
@@ -262,6 +305,8 @@ export const ServiceabilityScreen: React.FC = () => {
   const { goBack, navigate } = useApp();
   const address = useDeliveryAddress();
   const hasSaved = useAddressStore((s) => s.addresses.length > 0);
+  const hasCart = useCartStore((s) => Object.keys(s.items).length > 0);
+  const minutes = useDeliveryMinutes();
   const serviceable = address.serviceable;
 
   return (
@@ -274,14 +319,22 @@ export const ServiceabilityScreen: React.FC = () => {
             <MapPin size={24} />
           </span>
           <h1>{serviceable ? 'We deliver here' : 'Not serviceable yet'}</h1>
-          <p>{serviceable ? 'Express delivery in about 10 to 12 minutes from the nearest darkstore.' : 'We currently deliver only within Vijayawada (520xxx pincodes).'}</p>
+          <p>
+            {serviceable
+              ? minutes
+                ? `Express delivery in about ${minutes} minutes.`
+                : 'This address is inside our delivery area.'
+              : 'We currently deliver only within Vijayawada (520xxx pincodes).'}
+          </p>
         </section>
 
         <section className="commerce-card">
           <div className="commerce-card-head">
             <h2>Delivering to</h2>
           </div>
-          <p className="commerce-muted">{address.fullAddress}</p>
+          <p className="commerce-muted">
+            <MapPin size={14} /> {address.fullAddress || '—'}
+          </p>
         </section>
       </div>
 
@@ -289,8 +342,8 @@ export const ServiceabilityScreen: React.FC = () => {
         <button className="commerce-ghost" onClick={() => navigate(hasSaved ? 'address-list' : 'location-setup')}>
           Change address
         </button>
-        <button className="commerce-primary" disabled={!serviceable} onClick={() => navigate('home')}>
-          Start shopping
+        <button className="commerce-primary" disabled={!serviceable} onClick={() => navigate(hasCart ? 'checkout-review' : 'home')}>
+          {hasCart ? 'Continue to checkout' : 'Start shopping'}
         </button>
       </footer>
     </main>

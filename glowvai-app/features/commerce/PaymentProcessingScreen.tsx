@@ -64,7 +64,9 @@ export const PaymentProcessingScreen: React.FC = () => {
           paymentMethod: meta.method as InitiatePaymentParams['paymentMethod'],
         });
 
-        ok = session.success && (isCod || (await verifyOrderPayment(orderId, totals.grandTotal)));
+        // An online payment only counts when the gateway returned a real order. paymentService falls back to a
+        // simulated success when the backend is unreachable, and that must not show as a paid order.
+        ok = session.success && (isCod || (Boolean(session.razorpayOrderId) && (await verifyOrderPayment(orderId, totals.grandTotal))));
         setStep(2);
       } catch {
         ok = false;
@@ -130,7 +132,7 @@ export const PaymentProcessingScreen: React.FC = () => {
           ))}
         </ol>
 
-        <p className="commerce-processing-foot">Secured by Razorpay</p>
+        <p className="commerce-processing-foot">{payChoice === 'cod' ? 'Cash on delivery: pay the rider at handover' : 'Online payments are processed by Razorpay'}</p>
       </div>
     </main>
   );

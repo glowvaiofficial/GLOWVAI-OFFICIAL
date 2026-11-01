@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Briefcase, Home, MapPin, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
+import { Briefcase, CheckCircle2, Home, MapPin, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { safeHapticSelection } from '../../core/utils/haptics';
 import { useAddressStore, toNovAddress, isServiceablePincode, type SavedAddress } from './lib/addressStore';
@@ -24,7 +24,7 @@ export const AddressListScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-addresses">
-      <FlowHeader title="Saved addresses" subtitle={`${addresses.length} saved`} onBack={goBack} />
+      <FlowHeader title="Saved addresses" subtitle={addresses.length ? 'Pick where this order should go' : 'No addresses yet'} onBack={goBack} />
 
       <div className="commerce-body">
         {addresses.length === 0 && (
@@ -50,8 +50,8 @@ export const AddressListScreen: React.FC = () => {
                 <span>
                   <span className="commerce-tag-row">
                     <b>{address.label}</b>
-                    {address.isDefault && <i className="commerce-tag">Default</i>}
-                    {!serviceable && <i className="commerce-tag is-warn">Not serviceable</i>}
+                    {address.isDefault && <span className="commerce-tag">Default</span>}
+                    {!serviceable && <span className="commerce-tag is-warn">Not serviceable</span>}
                   </span>
                   <span className="commerce-muted">{address.recipientName} · {address.phoneNumber}</span>
                   <small>
@@ -62,6 +62,11 @@ export const AddressListScreen: React.FC = () => {
               </button>
 
               <div className="commerce-address-actions">
+                {isSelected && confirmId !== address.id && (
+                  <span className="commerce-address-current">
+                    <CheckCircle2 size={14} /> Delivering here
+                  </span>
+                )}
                 {confirmId === address.id ? (
                   <>
                     <span>Remove this address?</span>
@@ -87,9 +92,16 @@ export const AddressListScreen: React.FC = () => {
             </article>
           );
         })}
+
+        <button className="commerce-address-add-tile" onClick={() => navigate('location-setup')}>
+          <span className="commerce-suggest-icon">
+            <Plus size={18} />
+          </span>
+          Add new address
+        </button>
       </div>
 
-      <footer className="commerce-sticky-bar">
+      <footer className="commerce-sticky-bar commerce-address-list-bar">
         <button className="commerce-primary is-wide" onClick={() => navigate('location-setup')}>
           <Plus size={16} /> Add new address
         </button>
@@ -156,47 +168,71 @@ export const AddAddressScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-addresses">
-      <FlowHeader title="Add address" subtitle="Complete the details for your rider" onBack={goBack} />
+      <FlowHeader title="Add address" subtitle="Details the rider needs to reach you" onBack={goBack} />
 
       <form className="commerce-body" onSubmit={save} noValidate>
-        <section className="commerce-card commerce-form">
-          <Field label="House / flat number" error={errors.houseNo}>
-            <input value={houseNo} onChange={(e) => setHouseNo(e.target.value)} placeholder="Flat 402" />
-          </Field>
-          <Field label="Building or society (optional)">
-            <input value={buildingName} onChange={(e) => setBuildingName(e.target.value)} placeholder="Sri Krishna Apartments" />
-          </Field>
+        {Object.keys(errors).length > 0 && (
+          <p className="commerce-form-alert" role="alert">
+            Check the highlighted fields.
+          </p>
+        )}
+        <section className="commerce-card commerce-form" aria-labelledby="address-section-title">
+          <h2 id="address-section-title">Address</h2>
+          <div className="commerce-form-row">
+            <Field label="House / flat number" error={errors.houseNo}>
+              <input value={houseNo} onChange={(e) => setHouseNo(e.target.value)} placeholder="e.g. Flat 402" autoComplete="address-line1" />
+            </Field>
+            <Field label="Building or society" optional>
+              <input value={buildingName} onChange={(e) => setBuildingName(e.target.value)} placeholder="e.g. Sri Krishna Apartments" />
+            </Field>
+          </div>
           <Field label="Area and street" error={errors.areaAddress}>
-            <textarea rows={2} value={areaAddress} onChange={(e) => setAreaAddress(e.target.value)} />
+            <textarea rows={2} value={areaAddress} onChange={(e) => setAreaAddress(e.target.value)} placeholder="Street, area or colony" autoComplete="address-line2" />
           </Field>
-          <Field label="Landmark (optional)">
-            <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="Near water tank" />
-          </Field>
-          <Field label="Pincode" error={errors.pincode}>
-            <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} />
-          </Field>
+          <div className="commerce-form-row">
+            <Field label="Landmark" optional>
+              <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="e.g. Near water tank" />
+            </Field>
+            <Field
+              label="Pincode"
+              error={errors.pincode}
+              hint={pincode.length === 6 && !isServiceablePincode(pincode) ? 'We deliver to Vijayawada pincodes (520xxx) right now.' : undefined}
+            >
+              <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} placeholder="6 digits" autoComplete="postal-code" />
+            </Field>
+          </div>
+          <p className="commerce-field-static">
+            <span>City</span>
+            <b>Vijayawada</b>
+          </p>
         </section>
 
-        <section className="commerce-card commerce-form">
-          <Field label="Receiver name" error={errors.recipientName}>
-            <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} autoComplete="name" />
-          </Field>
-          <Field label="Mobile number" error={errors.phoneNumber}>
-            <input
-              inputMode="tel"
-              maxLength={10}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-              autoComplete="tel-national"
-            />
-          </Field>
-          <Field label="Delivery instructions (optional)">
-            <input value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Ring the bell twice" />
+        <section className="commerce-card commerce-form" aria-labelledby="receiver-section-title">
+          <h2 id="receiver-section-title">Receiver</h2>
+          <div className="commerce-form-row">
+            <Field label="Receiver name" error={errors.recipientName}>
+              <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} autoComplete="name" placeholder="Full name" />
+            </Field>
+            <Field label="Mobile number" error={errors.phoneNumber} prefix="+91">
+              <input
+                inputMode="tel"
+                maxLength={10}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                autoComplete="tel-national"
+                placeholder="10-digit number"
+              />
+            </Field>
+          </div>
+          <Field label="Delivery instructions" optional>
+            <input value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="e.g. Ring the bell twice" />
           </Field>
         </section>
 
         <section className="commerce-card">
-          <h2>Save as</h2>
+          <div className="commerce-card-head">
+            <h2>Save as</h2>
+          </div>
           <div className="commerce-segment" role="radiogroup" aria-label="Address type">
             {LABELS.map((item) => (
               <button type="button" key={item} role="radio" aria-checked={label === item} className={label === item ? 'is-on' : ''} onClick={() => setLabel(item)}>
@@ -220,10 +256,42 @@ export const AddAddressScreen: React.FC = () => {
   );
 };
 
-const Field: React.FC<{ label: string; error?: string; children: React.ReactElement }> = ({ label, error, children }) => (
-  <label className="commerce-field">
-    <span>{label}</span>
-    {children}
-    {error && <em className="commerce-error">{error}</em>}
-  </label>
-);
+type FieldControl = React.ReactElement<React.InputHTMLAttributes<HTMLInputElement> & React.TextareaHTMLAttributes<HTMLTextAreaElement>>;
+
+const Field: React.FC<{ label: string; error?: string; hint?: string; optional?: boolean; prefix?: string; children: FieldControl }> = ({
+  label,
+  error,
+  hint,
+  optional,
+  prefix,
+  children,
+}) => {
+  const id = React.useId();
+  const message = error || hint;
+  const control = React.cloneElement(children, {
+    id,
+    'aria-invalid': error ? true : undefined,
+    'aria-describedby': message ? `${id}-msg` : undefined,
+  });
+  return (
+    <div className={error ? 'commerce-field has-error' : 'commerce-field'}>
+      <label htmlFor={id}>
+        {label}
+        {optional && <i>optional</i>}
+      </label>
+      {prefix ? (
+        <span className="commerce-field-prefix">
+          <b>{prefix}</b>
+          {control}
+        </span>
+      ) : (
+        control
+      )}
+      {message && (
+        <em className={error ? 'commerce-error' : 'commerce-field-hint'} id={`${id}-msg`}>
+          {message}
+        </em>
+      )}
+    </div>
+  );
+};

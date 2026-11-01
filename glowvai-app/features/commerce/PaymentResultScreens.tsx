@@ -1,6 +1,7 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, HelpCircle, MapPin, Sparkles } from 'lucide-react';
+import { AlertTriangle, Check, CheckCircle2, HelpCircle, MapPin, Receipt, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import { useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 
 interface PaymentResultParams {
   orderId?: string;
@@ -20,9 +21,38 @@ const METHOD_LABEL: Record<string, string> = {
 export const PaymentSuccessScreen: React.FC = () => {
   const { activeParams, navigate } = useApp();
   const params = (activeParams || {}) as PaymentResultParams;
-  // Opened without payment details, show a dash rather than a made-up order number or a zero amount.
-  const orderId = params.orderId || '—';
+  const address = useDeliveryAddress();
+  const minutes = useDeliveryMinutes();
   const amountLabel = params.amount === undefined ? '—' : `₹${params.amount}`;
+
+  // Opened without an order (for example a refresh), so there is nothing to confirm.
+  if (!params.orderId) {
+    return (
+      <main className="commerce-screen commerce-result">
+        <header className="commerce-result-head">
+          <span className="commerce-brand">
+            <Sparkles size={16} />
+            glowvai
+          </span>
+        </header>
+        <div className="commerce-body commerce-result-body">
+          <span className="commerce-result-icon is-neutral">
+            <Receipt size={32} />
+          </span>
+          <h1>No order to show</h1>
+          <p>We couldn’t find a recent order on this screen. Your orders list has every order you placed.</p>
+        </div>
+        <footer className="commerce-sticky-bar">
+          <button className="commerce-ghost" onClick={() => navigate('home')}>
+            Continue shopping
+          </button>
+          <button className="commerce-primary" onClick={() => navigate('orders-list')}>
+            View orders
+          </button>
+        </footer>
+      </main>
+    );
+  }
 
   return (
     <main className="commerce-screen commerce-result is-success">
@@ -31,20 +61,19 @@ export const PaymentSuccessScreen: React.FC = () => {
           <Sparkles size={16} />
           glowvai
         </span>
-        <span className="commerce-chip-static">Order confirmed</span>
       </header>
 
       <div className="commerce-body commerce-result-body">
         <span className="commerce-result-icon is-success">
           <CheckCircle2 size={34} />
         </span>
-        <h1>Order confirmed!</h1>
-        <p>Your glow is on its way.</p>
+        <h1>Order placed</h1>
+        <p>{params.method === 'cod' ? 'Keep the amount ready for the rider.' : 'Your payment is confirmed.'}</p>
 
         <dl className="commerce-result-meta">
           <div>
             <dt>Order no.</dt>
-            <dd>{orderId}</dd>
+            <dd>{params.orderId}</dd>
           </div>
           <div>
             <dt>{params.method === 'cod' ? 'Amount to pay' : 'Amount paid'}</dt>
@@ -52,20 +81,30 @@ export const PaymentSuccessScreen: React.FC = () => {
           </div>
           <div>
             <dt>Payment</dt>
-            <dd>{METHOD_LABEL[params.method || ''] || 'Online payment'}</dd>
+            <dd>{METHOD_LABEL[params.method || ''] || '—'}</dd>
           </div>
         </dl>
 
         <section className="commerce-card commerce-arrival">
-          <b>Arriving in about 10 minutes</b>
-          <p>
-            <MapPin size={13} /> Dispatched from the nearest Glowway darkstore
-          </p>
+          <b>{minutes ? `Expected in about ${minutes} minutes` : 'Delivery time will show in order tracking'}</b>
+          {address.fullAddress && (
+            <p>
+              <MapPin size={13} /> {address.fullAddress}
+            </p>
+          )}
           <ol>
-            <li className="is-done">Order placed</li>
-            <li className="is-active">Packing your order</li>
-            <li>Out for delivery</li>
-            <li>Arrived</li>
+            <li className="is-done">
+              <Check size={14} /> Order placed
+            </li>
+            <li>
+              <span className="commerce-step-dot" /> Packing
+            </li>
+            <li>
+              <span className="commerce-step-dot" /> Out for delivery
+            </li>
+            <li>
+              <span className="commerce-step-dot" /> Delivered
+            </li>
           </ol>
         </section>
 
@@ -77,7 +116,7 @@ export const PaymentSuccessScreen: React.FC = () => {
           Continue shopping
         </button>
         <button className="commerce-primary" onClick={() => navigate('orders-tracking', { orderId: params.orderId })}>
-          Track order live
+          Track order
         </button>
       </footer>
     </main>
@@ -105,9 +144,15 @@ export const PaymentFailedScreen: React.FC = () => {
           <AlertTriangle size={34} />
         </span>
         <h1>Payment didn’t go through</h1>
-        <p>No amount has been confirmed for this order. You can try again with the same cart.</p>
+        <p>No payment was confirmed for this order. Your cart is unchanged, so you can try again or pick another method.</p>
 
         <dl className="commerce-result-meta">
+          {params.method && (
+            <div>
+              <dt>Method tried</dt>
+              <dd>{METHOD_LABEL[params.method] || '—'}</dd>
+            </div>
+          )}
           {params.orderId && (
             <div>
               <dt>Order ID</dt>
@@ -119,6 +164,8 @@ export const PaymentFailedScreen: React.FC = () => {
             <dd>{params.amount === undefined ? '—' : `₹${params.amount}`}</dd>
           </div>
         </dl>
+
+        <p className="commerce-notice">If money left your account, your bank or Razorpay returns it within their usual refund time.</p>
       </div>
 
       <footer className="commerce-sticky-bar">

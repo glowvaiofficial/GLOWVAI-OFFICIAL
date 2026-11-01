@@ -1,4 +1,4 @@
-/* Commerce flows (cart, checkout, payment, address, location) on tablet and desktop.
+/* Commerce flows (cart, checkout, payment, address, location, receipts) on tablet and desktop.
    Every rule sits inside a min-width query, so the phone layout from commerce.css is unchanged. */
 
 /* Page chrome on tablet and desktop: header and steps sit on the canvas. */
@@ -11,6 +11,7 @@
     background: transparent;
   }
   .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy h1 { font-size: 22px; }
+  .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy p { font-size: 13px; }
   .glowvai-root .commerce-screen > .commerce-steps {
     padding: 0 20px 12px;
     border-bottom: 0;
@@ -30,134 +31,113 @@
     outline-offset: 2px;
   }
   .glowvai-root .commerce-screen .commerce-pay-option:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+  .glowvai-root .commerce-screen .commerce-form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .glowvai-root .commerce-screen .commerce-pay-option:hover:not(.is-selected) { border-color: var(--primary-border); }
 }
 
-/* Cart: items on the left, order summary on the right. */
+/* Two-column pages (cart, checkout review, express review, map picker): main content left, summary right. */
 @media (min-width: 1024px) {
-  .glowvai-root .commerce-cart > .commerce-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    align-items: start;
-    gap: 16px 24px;
-  }
-  .glowvai-root .commerce-cart > .commerce-body > section:nth-child(-n + 2) { grid-column: 1; }
-  .glowvai-root .commerce-cart > .commerce-body > section:nth-child(n + 3) { grid-column: 2; }
-  .glowvai-root .commerce-cart .commerce-bill { position: sticky; top: 88px; }
-}
-
-/* Checkout review: address, delivery and items on the left; bill on a sticky right column. */
-@media (min-width: 1024px) {
-  .glowvai-root .commerce-review > .commerce-body {
+  .glowvai-root .commerce-screen > .commerce-body.commerce-split {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 380px;
     align-items: start;
     gap: 16px 24px;
   }
-  .glowvai-root .commerce-review > .commerce-body > section:nth-child(-n + 3) { grid-column: 1; }
-  .glowvai-root .commerce-review > .commerce-body > section:nth-child(4) {
-    grid-column: 2;
-    position: sticky;
-    top: 88px;
-  }
+  .glowvai-root .commerce-split > .commerce-side { position: sticky; top: 88px; }
+  .glowvai-root .commerce-split > .commerce-col > .commerce-card { scroll-margin-top: 88px; }
 }
 
-/* Express cart review: same two-column layout as checkout review. */
+/* Express cart review: same chrome as the cart. */
 @media (min-width: 720px) {
-  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-head,
-  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-body,
-  .glowvai-root .commerce-express:has(> .commerce-body > .commerce-savings) > .commerce-sticky-bar {
+  .glowvai-root .commerce-express:has(> .commerce-split) > .commerce-head,
+  .glowvai-root .commerce-express:has(> .commerce-split) > .commerce-body,
+  .glowvai-root .commerce-express:has(> .commerce-split) > .commerce-sticky-bar {
     padding-inline: 20px;
   }
 }
-@media (min-width: 1024px) {
-  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
-    align-items: start;
-    gap: 16px 24px;
-  }
-  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) > section:nth-child(-n + 4) { grid-column: 1; }
-  .glowvai-root .commerce-express > .commerce-body:has(> .commerce-savings) > section:nth-child(5) {
-    grid-column: 2;
-    position: sticky;
-    top: 88px;
-  }
-}
 
-/* Centred narrow column: payment method, express payment choice, forms, location, delivery check.
+/* Centred narrow column: payment method, express payment choice, forms, location, delivery check, contact details.
    Content sits at 560px; padding is a share of the screen width. Declared after the chrome rules so it wins. */
 @media (min-width: 720px) {
-  .glowvai-root .commerce-payment > .commerce-head,
   .glowvai-root .commerce-payment > .commerce-steps,
   .glowvai-root .commerce-payment > .commerce-body,
-  .glowvai-root .commerce-payment > .commerce-sticky-bar,
-  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-head,
-  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-body,
-  .glowvai-root .commerce-express:not(:has(> .commerce-body > .commerce-savings)) > .commerce-sticky-bar,
-  .glowvai-root .commerce-addresses:has(> form.commerce-body) > .commerce-head,
+  .glowvai-root .commerce-express:not(:has(> .commerce-split)) > .commerce-body,
   .glowvai-root .commerce-addresses > form.commerce-body,
-  .glowvai-root .commerce-location > .commerce-head,
-  .glowvai-root .commerce-location > .commerce-body,
-  .glowvai-root .commerce-location > .commerce-sticky-bar {
+  .glowvai-root .commerce-details > form.commerce-body,
+  .glowvai-root .commerce-location:not(.commerce-picker) > .commerce-body {
     padding-inline: max(20px, calc(50% - 280px));
+  }
+  /* The form submit sits under the form, so it lines up with the fields. */
+  .glowvai-root .commerce-addresses > form.commerce-body .commerce-form-footer,
+  .glowvai-root .commerce-details > form.commerce-body .commerce-form-footer { display: flex; justify-content: flex-end; }
+  .glowvai-root .commerce-addresses > form.commerce-body .commerce-form-footer .commerce-primary,
+  .glowvai-root .commerce-details > form.commerce-body .commerce-form-footer .commerce-primary { width: auto; min-width: 240px; flex: 0 0 auto; }
+}
+
+/* Desktop: narrow pages get a 560px action bar that matches their column (the shared rule makes it 1160px). */
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-screen.commerce-location:not(.commerce-picker) > .commerce-sticky-bar,
+  .glowvai-root .commerce-screen.commerce-express:not(:has(> .commerce-split)) > .commerce-sticky-bar {
+    width: min(100%, 560px);
+    max-width: 560px;
+    padding-inline: 20px;
   }
 }
 
-/* Saved addresses: cards in a grid, add button at the end of the footer. */
+/* Saved addresses: cards in a grid, with an "add" tile in place of the bottom bar. */
 @media (min-width: 720px) {
   .glowvai-root .commerce-addresses > div.commerce-body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    align-items: start;
+    align-content: start;
+    align-items: stretch;
     gap: 16px;
   }
   .glowvai-root .commerce-addresses > div.commerce-body > .commerce-empty-state { grid-column: 1 / -1; }
   .glowvai-root .commerce-addresses > div.commerce-body > .commerce-address {
     display: flex;
-    height: 100%;
     flex-direction: column;
   }
   .glowvai-root .commerce-addresses > div.commerce-body > .commerce-address .commerce-address-pick { flex: 1; }
-  .glowvai-root .commerce-addresses > .commerce-sticky-bar { justify-content: flex-end; }
-  .glowvai-root .commerce-addresses > .commerce-sticky-bar .commerce-primary.is-wide {
-    width: auto;
-    min-width: 260px;
+  .glowvai-root .commerce-addresses .commerce-address-pick:hover { background: var(--bg); }
+  .glowvai-root .commerce-addresses .commerce-address-add-tile {
+    display: flex;
+    min-height: 152px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1.5px dashed var(--primary-border);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 800;
   }
+  .glowvai-root .commerce-addresses .commerce-address-add-tile:hover { background: var(--primary-light); }
+  .glowvai-root .commerce-addresses > .commerce-address-list-bar { display: none; }
 }
 
-/* Map picker (no map on web): search and device location on the left, address form on the right. */
+/* Map picker: map and pin on the left, search and the area form on the right. */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root .commerce-picker > .commerce-body { padding-inline: max(20px, calc(50% - 280px)); }
+}
 @media (min-width: 1024px) {
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-head,
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body,
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-sticky-bar {
-    padding-inline: 24px;
-  }
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 16px 24px;
-  }
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-pin-card,
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-search,
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-locate { grid-column: 1; }
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-body > .commerce-form {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-  }
-  .glowvai-root .commerce-location:has(.commerce-pin-card) > .commerce-sticky-bar .commerce-primary.is-wide {
-    width: auto;
-    min-width: 260px;
-    margin-left: auto;
-  }
+  .glowvai-root .commerce-picker > .commerce-body.commerce-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .glowvai-root .commerce-picker .commerce-split > .commerce-col:first-child { position: sticky; top: 88px; }
+  .glowvai-root .commerce-picker .location-map,
+  .glowvai-root .commerce-picker .commerce-map-empty { height: 320px; }
+  .glowvai-root .commerce-picker > .commerce-sticky-bar { justify-content: flex-end; }
+  .glowvai-root .commerce-picker > .commerce-sticky-bar .commerce-primary.is-wide { width: auto; min-width: 260px; }
 }
 
-/* Payment result and processing: a calm centred card on the canvas. */
+/* Payment result, processing and receipts: a calm centred card on the canvas. */
 @media (min-width: 720px) {
   .glowvai-root .commerce-screen.commerce-processing,
   .glowvai-root .commerce-screen.commerce-result {
-    width: min(100%, 560px);
+    width: min(100% - 40px, 560px);
     min-height: 0;
+    flex: 0 0 auto;
     margin: 32px auto;
     overflow: hidden;
     border: 1px solid var(--border-light);
@@ -166,13 +146,49 @@
     box-shadow: 0 1px 2px rgba(22, 26, 34, .04);
   }
   .glowvai-root .commerce-screen.commerce-processing .commerce-processing-body { padding-bottom: 32px; }
-  .glowvai-root .commerce-screen.commerce-result .commerce-result-body { padding-bottom: 24px; }
+  .glowvai-root .commerce-screen.commerce-result > .commerce-result-head { padding: 20px 24px 0; }
+  .glowvai-root .commerce-screen.commerce-result > .commerce-result-body { flex: 0 0 auto; padding: 16px 24px 24px; }
   .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar .commerce-primary,
   .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar .commerce-ghost { flex: 1 1 0; min-width: 0; }
-  .glowvai-root .commerce-screen.commerce-result .commerce-sticky-bar { padding-inline: 16px; }
+  .glowvai-root .commerce-screen.commerce-result > .commerce-sticky-bar {
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 16px 24px 24px !important;
+    border: 0 !important;
+    border-top: 1px solid var(--border-light) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
 }
 
 /* Loading and empty express states stay centred in the middle of the page. */
 @media (min-width: 720px) {
   .glowvai-root .commerce-screen.commerce-express.is-center { min-height: 60dvh; }
+}
+
+/* Tablet: the action bar is a floating card that lines up with the content, like the desktop bar.
+   Narrow pages get a 560px bar to match their column. Placed last so it wins over the column padding above. */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root .commerce-screen.commerce-screen > .commerce-sticky-bar {
+    bottom: 16px;
+    width: calc(100% - 40px);
+    margin: 8px auto 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-float);
+  }
+  .glowvai-root .commerce-screen:is(.commerce-payment, .commerce-location, .commerce-express:not(:has(> .commerce-split))) > .commerce-sticky-bar {
+    width: min(calc(100% - 40px), 560px);
+  }
+}
+
+/* Two buttons in a 560px bar (delivery check, express states) share the width instead of hugging the left edge. */
+@media (min-width: 720px) {
+  .glowvai-root .commerce-screen:is(.commerce-location:not(.commerce-picker), .commerce-express:not(:has(> .commerce-split))) > .commerce-sticky-bar :is(.commerce-primary, .commerce-ghost) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
