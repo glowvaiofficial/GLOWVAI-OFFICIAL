@@ -8,21 +8,21 @@ import { logScreenMount, logTouch } from '../../core/utils/touchDoctor';
 const SLIDES = [
   {
     id: 'slide-scan',
-    image: '/glowvai/assets/onboarding/hero-skin-v2.png',
+    image: '/glowvai/assets/onboarding/hero-skin-v2.webp',
     badge: 'SKIN SCAN',
     title: 'Know your skin',
     body: 'A guided camera scan checks your skin and explains what it finds in plain language.',
   },
   {
     id: 'slide-shop',
-    image: '/glowvai/assets/onboarding/hero-delivery-v2.png',
+    image: '/glowvai/assets/onboarding/hero-delivery-v2.webp',
     badge: 'SHOP AND DELIVERY',
     title: 'Your glow, delivered',
     body: 'Shop skincare and cosmetics matched to your skin, packed at a store near you.',
   },
   {
     id: 'slide-progress',
-    image: '/glowvai/assets/onboarding/hero-progress-v2.png',
+    image: '/glowvai/assets/onboarding/hero-progress-v2.webp',
     badge: 'ORDERS AND ROUTINE',
     title: 'Keep track in one place',
     body: 'Follow every order, reorder favourites and get help from your account.',

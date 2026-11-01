@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import '../responsive/entry-scan.css';
-const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.png';
-const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.png';
-const progressHero = '/glowvai/assets/onboarding/hero-progress-v2.png';
+const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.webp';
+const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.webp';
+const progressHero = '/glowvai/assets/onboarding/hero-progress-v2.webp';
 
 const steps = [
   {
