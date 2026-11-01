@@ -1,33 +1,53 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Boxes, CircleUserRound, Home, Menu, RotateCcw, ScanLine, ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import { navLinks } from "@/config/nav";
+import { BRAND_NAME } from "@/config/site";
+import { Button } from "@/components/ui/Button";
+import { ShoppingBag, Menu } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { cn, getAssetPath } from "@/lib/utils";
 import { useCartStore } from "@/lib/store/cart";
 
-const focusRing = "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand";
+function GlowVaiLogo() {
+  return (
+    <div className="flex items-center gap-2.5 select-none group">
+      <div className="relative w-8 h-8 rounded-[8px] overflow-hidden shrink-0">
+        <Image
+          src={getAssetPath("/logo/glowvai-logo.svg")}
+          alt="GLOW VAI Logo"
+          fill
+          sizes="32px"
+          priority
+          className="object-contain"
+        />
+      </div>
+      <span className="font-display font-bold text-[26px] leading-none tracking-[-0.02em] text-brand group-hover:text-brand-dark transition-colors">
+        GLOW VAI
+      </span>
+      <span className="hidden min-[480px]:inline text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
+        Quick commerce
+      </span>
+    </div>
+  );
+}
 
-const shoppingNav = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Categories", href: "/shop", icon: Boxes },
-  { label: "Skin scan", href: "/face-analysis", icon: ScanLine },
-  { label: "Orders", href: "/track-order", icon: RotateCcw },
-  { label: "Account", href: "/contact", icon: CircleUserRound },
-];
+const focusRing =
+  "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const openCart = useCartStore((state) => state.openCart);
-  const cartItems = useCartStore((state) => state.items);
-  const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const openCart = useCartStore((s) => s.openCart);
+
+  const cartItems = useCartStore((s) => s.items);
+  const cartItemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 30);
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("gv:open-cart", openCart);
@@ -35,45 +55,93 @@ export function Navbar() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("gv:open-cart", openCart);
     };
-  }, [openCart]);
+  }, []);
 
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[300] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-ink">Skip to main content</a>
-      <header className={cn("sticky top-0 z-40 flex w-full items-center border-b border-[#e3e7f0] bg-white/95 backdrop-blur-xl transition-[min-height,box-shadow]", isScrolled ? "min-h-16 shadow-[0_8px_28px_rgba(28,47,90,.07)]" : "min-h-[72px]")}>
-        <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-4 sm:px-8 lg:px-10">
-          <Link href="/" className={cn("flex items-center gap-2 rounded-lg", focusRing)} aria-label="Glowvai home">
-            <span className="relative h-9 w-9 overflow-hidden rounded-[10px]">
-              <Image src={getAssetPath("/logo/glowvai-logo.svg")} alt="" fill priority sizes="36px" className="object-contain" />
-            </span>
-            <span className="font-display text-[26px] font-bold leading-none tracking-[-.04em] text-brand">glowvai</span>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[300] focus:bg-white focus:text-ink focus:px-4 focus:py-3 focus:rounded-[10px] focus:border-2 focus:border-brand"
+      >
+        Skip to main content
+      </a>
+
+      <header
+        className={cn(
+          "sticky top-0 z-40 w-full bg-white border-b border-ink/10 flex items-center transition-[min-height]",
+          isScrolled ? "min-h-16" : "min-h-16 lg:min-h-[76px]"
+        )}
+      >
+        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            className={cn("-ml-1 p-1 rounded-lg", focusRing)}
+            aria-label={`${BRAND_NAME} home`}
+          >
+            <GlowVaiLogo />
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
-            {shoppingNav.map(({ label, href, icon: Icon }, index) => (
-              <Link key={label} href={href} className={cn("inline-flex min-h-11 items-center gap-2 rounded-[14px] px-3.5 text-[14px] font-medium text-[#2f3a52] transition hover:bg-[#f1f5ff] hover:text-brand", index === 0 && "bg-[#eaf1ff] text-brand", focusRing)}>
-                <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
-                {label}
+          <nav className="hidden md:flex items-center gap-1 lg:gap-3" aria-label="Primary">
+            {navLinks.map((link) => (
+              <Link
+                key={link.title}
+                href={link.href}
+                className={cn(
+                  "px-3.5 py-2 text-[15px] font-medium text-ink hover:text-brand transition-colors rounded-lg",
+                  focusRing
+                )}
+              >
+                {link.title}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => openCart()} aria-label={"Cart, " + cartItemCount + " items"} className={cn("relative hidden min-h-12 items-center gap-2 rounded-[16px] bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-dark sm:inline-flex", focusRing)}>
-              <ShoppingCart className="h-5 w-5" aria-hidden="true" /> Cart
-              {cartItemCount > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[10px] font-bold text-brand">{cartItemCount}</span>}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => openCart()}
+              aria-label={`Cart, ${cartItemCount} ${cartItemCount === 1 ? "item" : "items"}`}
+              className={cn(
+                "relative w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] border-[1.5px] border-ink/20 text-ink hover:border-ink transition-colors cursor-pointer",
+                focusRing
+              )}
+            >
+              <ShoppingBag className="w-5 h-5" aria-hidden="true" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-brand text-white font-semibold text-[11px] flex items-center justify-center ring-2 ring-white">
+                  {cartItemCount}
+                </span>
+              )}
             </button>
-            <button type="button" onClick={() => openCart()} aria-label={"Cart, " + cartItemCount + " items"} className={cn("relative grid h-11 w-11 place-items-center rounded-xl bg-brand text-white sm:hidden", focusRing)}>
-              <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-              {cartItemCount > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#ff4d61] px-1 text-[10px] font-bold text-white ring-2 ring-white">{cartItemCount}</span>}
-            </button>
-            <button type="button" onClick={() => setIsMobileMenuOpen(true)} aria-label="Open navigation menu" className={cn("grid h-11 w-11 place-items-center rounded-xl text-[#17233c] hover:bg-[#f1f5ff] lg:hidden", focusRing)}>
-              <Menu className="h-6 w-6" aria-hidden="true" />
+
+            <div className="hidden sm:block">
+              <Link href="/face-analysis" data-track="scan_cta_click" data-track-location="nav">
+                <Button variant="dark" size="sm">
+                  <span>Scan my face</span>
+                </Button>
+              </Link>
+            </div>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+              className={cn(
+                "md:hidden w-[46px] h-[46px] inline-flex items-center justify-center rounded-[10px] text-ink hover:bg-paper-deep transition-colors cursor-pointer",
+                focusRing
+              )}
+            >
+              <Menu className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
       </header>
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} cartCount={cartItemCount} onOpenCart={() => openCart()} />
+
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        cartCount={cartItemCount}
+        onOpenCart={() => openCart()}
+      />
+
       <CartDrawer />
     </>
   );
