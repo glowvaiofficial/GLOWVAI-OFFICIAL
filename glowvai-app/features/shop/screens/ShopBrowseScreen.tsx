@@ -14,7 +14,7 @@ import {
   productsInCategory,
   useScrollTopOn,
 } from '../shared/shopCatalog';
-import { getProductImageUrl } from '../shared/shopUtils';
+import { getProductImageUrl, getCategoryArtUrl } from '../shared/shopUtils';
 import '../styles/shop-browse.css';
 
 const VALID_CONCERN_IDS = new Set(SHOP_CONCERNS.map((c) => c.id));
@@ -23,7 +23,7 @@ const VALID_CATEGORY_IDS = new Set<string>(SHOP_CATEGORIES.map((c) => c.id));
 const categoryImage = (id: string) => {
   const items = productsInCategory(id);
   const product = items.find((p) => p.price > 1) ?? items[0];
-  return product ? getProductImageUrl(product) : '';
+  return product ? getCategoryArtUrl(product) : '';
 };
 
 export const ShopBrowseScreen: React.FC = () => {
