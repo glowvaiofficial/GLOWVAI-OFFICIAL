@@ -192,7 +192,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSkinReports([]);
     setCustomerDetails(null);
     navigate('welcome');
-    showToast('Your account and personal data have been scheduled for deletion.');
+    showToast('Your account data was removed from this device.');
   };
 
   const saveCustomerDetails = (details: CustomerDetails) => {

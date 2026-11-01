@@ -1,7 +1,6 @@
 import React from 'react';
 import { AppProvider } from './context/AppContext';
 import { useApp } from './context/useApp';
-import { AndroidStatusBar } from './components/common/AndroidStatusBar';
 import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
@@ -95,7 +94,6 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app-viewport">
-      <AndroidStatusBar tone={['welcome', 'onboarding', 'login', 'otp'].includes(currentScreen) ? 'brand' : 'light'} />
       <WebHeader />
       <div className="screen-content">{renderScreen()}</div>
       <BottomNavBar />
