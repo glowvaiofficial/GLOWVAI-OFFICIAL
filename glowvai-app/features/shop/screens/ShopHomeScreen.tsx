@@ -16,7 +16,7 @@ import {
   concernCount,
   productsInCategory,
 } from '../shared/shopCatalog';
-import { formatRupee, getProductImageUrl } from '../shared/shopUtils';
+import { formatRupee, getProductImageUrl, getCategoryArtUrl } from '../shared/shopUtils';
 import '../styles/shop-home.css';
 
 // Every number on this page (counts, prices, discounts, delivery time) comes from the local
@@ -26,7 +26,7 @@ const plural = (n: number) => `${n} ${n === 1 ? 'product' : 'products'}`;
 
 const firstImage = (categoryId: string) => {
   const product = productsInCategory(categoryId).find((p) => p.price > 1) ?? productsInCategory(categoryId)[0];
-  return product ? getProductImageUrl(product) : '';
+  return product ? getCategoryArtUrl(product) : '';
 };
 
 const UNDER_500 = INDIAN_SKINCARE_CATALOG.filter((p) => p.price > 1 && p.price < 500).sort((a, b) => a.price - b.price);

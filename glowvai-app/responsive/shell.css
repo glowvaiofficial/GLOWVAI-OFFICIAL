@@ -27,25 +27,53 @@
   .glowvai-root .cart-screen{ overflow-y: visible !important; }
 }
 
-.glowvai-root .web-header-inner{ display: flex; align-items: center; gap: 16px; max-width: 1200px; margin: 0 auto; padding: 10px 20px; }
+/* Store header: logo, delivery address, search, shortcuts, cart. One row, 72px tall on desktop. */
+.glowvai-root .web-header-inner{ display: flex; align-items: center; gap: 14px; max-width: 1200px; min-height: 72px; margin: 0 auto; padding: 10px 20px; }
 
-.glowvai-root .web-header-back{ flex: 0 0 auto; color: var(--text-secondary); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; border-radius: 8px; }
-.glowvai-root .web-header-back:hover{ color: var(--text-primary); }
+.glowvai-root .web-header-brandbox{ display: grid; flex: 0 0 auto; justify-items: start; line-height: 1; }
+.glowvai-root .web-header-brand{ padding: 0; border: 0; background: none; color: var(--commerce-blue); font-family: var(--font-brand); font-size: 28px; font-weight: 600; letter-spacing: -.055em; line-height: 1; cursor: pointer; }
+.glowvai-root .web-header-back{ margin-top: 3px; color: var(--text-muted); font-size: 11px; font-weight: 600; text-decoration: none; }
+.glowvai-root .web-header-back:hover{ color: var(--primary); text-decoration: underline; }
 
-.glowvai-root .web-header-brand{ flex: 0 0 auto; padding: 4px 6px; border: 0; background: none; color: var(--commerce-blue); font-family: var(--font-brand); font-size: 24px; font-weight: 600; letter-spacing: -.055em; line-height: 1; cursor: pointer; border-radius: 8px; }
+.glowvai-root .web-header-location{ display: flex; flex: 0 1 220px; min-width: 0; min-height: 48px; align-items: center; gap: 8px; padding: 6px 10px; border: 0; border-radius: 12px; background: none; color: var(--text-primary); text-align: left; cursor: pointer; }
+.glowvai-root .web-header-location:hover{ background: var(--surface); }
+.glowvai-root .web-header-location > svg:first-child{ flex-shrink: 0; color: var(--primary); }
+.glowvai-root .web-header-location > span{ display: grid; min-width: 0; gap: 1px; }
+.glowvai-root .web-header-location b{ font-size: 14px; font-weight: 800; white-space: nowrap; }
+.glowvai-root .web-header-location small{ overflow: hidden; color: var(--text-secondary); font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .web-header-location > svg:last-child{ flex-shrink: 0; color: var(--text-muted); }
 
-.glowvai-root .web-header-nav{ display: flex; flex: 1; align-items: center; justify-content: center; gap: 4px; }
-.glowvai-root .web-header-nav button{ display: inline-flex; min-height: 40px; align-items: center; gap: 6px; padding: 8px 12px; border: 0; border-radius: 10px; background: none; color: var(--text-secondary); font: 600 13px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
+.glowvai-root .web-header-search{ display: flex; flex: 1 1 auto; min-width: 0; min-height: 46px; align-items: center; gap: 10px; padding: 0 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text-muted); font: 500 14px var(--font-body); text-align: left; cursor: text; }
+.glowvai-root .web-header-search:hover{ border-color: var(--primary-border); background: var(--surface-elevated); }
+.glowvai-root .web-header-search > svg{ flex-shrink: 0; color: var(--text-secondary); }
+.glowvai-root .web-header-search > span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.glowvai-root .web-header-nav{ display: flex; flex: 0 0 auto; align-items: center; gap: 2px; }
+.glowvai-root .web-header-nav button{ display: inline-flex; min-height: 44px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 4px 10px; border: 0; border-radius: 10px; background: none; color: var(--text-secondary); font: 600 11px var(--font-body); cursor: pointer; }
 .glowvai-root .web-header-nav button:hover{ background: var(--surface); color: var(--text-primary); }
 .glowvai-root .web-header-nav button.is-active{ background: var(--primary-light); color: var(--primary); }
 
-.glowvai-root .web-header-cart{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 8px; padding: 9px 14px; border: 0; border-radius: 12px; background: var(--commerce-blue); color: #fff; font: 700 13px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
-.glowvai-root .web-header-cart small{ font-size: 12px; font-weight: 600; opacity: .92; }
+.glowvai-root .web-header-cart{ display: inline-flex; flex: 0 0 auto; min-width: 112px; min-height: 48px; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border: 0; border-radius: 12px; background: var(--commerce-blue); color: #fff; font: 700 14px var(--font-body); cursor: pointer; }
+.glowvai-root .web-header-cart:hover{ background: var(--primary-dark); }
+.glowvai-root .web-header-cart-copy{ display: grid; gap: 1px; text-align: left; line-height: 1.15; }
+.glowvai-root .web-header-cart-copy b{ font-size: 13px; font-weight: 800; }
+.glowvai-root .web-header-cart-copy small{ font-size: 12px; font-weight: 600; opacity: .9; }
 
 .glowvai-root .web-header button:focus-visible,
 .glowvai-root .web-header a:focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
 
+/* Tablet: no address block, icon-only shortcuts. */
 @media (min-width: 720px) and (max-width: 1023px){
+  .glowvai-root .web-header-inner{ gap: 10px; min-height: 64px; }
+  .glowvai-root .web-header-location{ display: none; }
   .glowvai-root .web-header-nav span{ display: none; }
-  .glowvai-root .web-header-back span:last-child{ display: none; }
+  .glowvai-root .web-header-nav button{ min-width: 44px; padding: 4px 8px; }
+  .glowvai-root .web-header-cart{ min-width: 0; }
 }
+
+/* Desktop home: the header carries the address and search, so the hero doesn't repeat them. */
+@media (min-width: 1024px){
+  .glowvai-root .shop-home .shop-home-topbar,
+  .glowvai-root .shop-home .shop-home-search{ display: none; }
+}
+

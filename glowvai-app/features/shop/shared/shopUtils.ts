@@ -55,13 +55,14 @@ const wrapWords = (text: string, maxChars: number, maxLines: number): string[] =
 
 const tileCache = new Map<string, string>();
 
-const productTile = (product: SkincareProduct): string => {
-  const cached = tileCache.get(product.id);
+const productTile = (product: SkincareProduct, withBrand = true): string => {
+  const cacheKey = `${product.id}:${withBrand ? 'brand' : 'plain'}`;
+  const cached = tileCache.get(cacheKey);
   if (cached) return cached;
   const colours = TILE_COLOURS[product.category] ?? TILE_COLOURS.Serums;
   const shape = PACK_SHAPES[product.category] ?? PACK_SHAPES.Serums;
   // The card already prints the product name, so the tile only carries the pack outline and the brand.
-  const brandLines = wrapWords(product.brand.toUpperCase(), 18, 2)
+  const brandLines = (withBrand ? wrapWords(product.brand.toUpperCase(), 18, 2) : [])
     .map(
       (line, i) =>
         `<text x="300" y="${500 + i * 34}" font-size="26" font-weight="700" letter-spacing="4" fill="${colours.ink}" opacity="0.75">${escapeXml(line)}</text>`
@@ -74,12 +75,15 @@ const productTile = (product: SkincareProduct): string => {
     brandLines +
     '</svg>';
   const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  tileCache.set(product.id, url);
+  tileCache.set(cacheKey, url);
   return url;
 };
 
 // Cart items store a plain URL string, so this always returns one.
 export const getProductImageUrl = (product: SkincareProduct): string => PRODUCT_PHOTOS[product.id] ?? productTile(product);
+
+// Category tiles print their own label over the image, so their tile leaves out the brand name.
+export const getCategoryArtUrl = (product: SkincareProduct): string => PRODUCT_PHOTOS[product.id] ?? productTile(product, false);
 
 export const getDiscountPercent = (product: SkincareProduct): number => {
   if (product.discountPercent) return product.discountPercent;
