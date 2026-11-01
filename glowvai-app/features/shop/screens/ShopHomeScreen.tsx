@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, RotateCcw, ScanFace, Search, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
+import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { ScreenName } from '../../../context/contextDefinition';
@@ -163,25 +163,65 @@ function DealCard({ product }: { product: SkincareProduct }) {
   );
 }
 
-export const ShopHomeScreen: React.FC = () => {
-  const { navigate } = useApp();
+// For Her / For Him drives the shared shoppingPreference state (same as the legacy home).
+type Mode = 'women' | 'men';
+type ShopHomeScreenProps = { embedded?: boolean };
+type FestivalContent = {
+  heroCopy: string;
+  heroImage: string;
+  categoryAtlas: string;
+  categories: string[];
+  promoTitle: string;
+  promoCopy: string;
+};
+
+// Navratri copy and images carried over from the legacy home.
+const FESTIVAL: Record<Mode, FestivalContent> = {
+  women: {
+    heroCopy: 'Beauty · Gifting · Festive Picks',
+    heroImage: '/glowvai/assets/home/navratri-her-hero.png',
+    categoryAtlas: '/glowvai/assets/home/navratri-her-categories.png',
+    categories: ['Pooja Essentials', 'Skincare & Haircare', 'Makeup Essentials', 'Fragrances', 'Personal Care', 'Festive Gifts'],
+    promoTitle: 'Navratri Specials · Shop the edit',
+    promoCopy: 'Beauty · Skincare · Makeup · More',
+  },
+  men: {
+    heroCopy: 'Style · Grooming · Festive Picks',
+    heroImage: '/glowvai/assets/home/navratri-him-hero.png',
+    categoryAtlas: '/glowvai/assets/home/navratri-him-categories.png',
+    categories: ['Grooming & Skincare', 'Haircare', 'Fragrances', 'Shaving & Beard', 'Men’s Essentials', 'Festive Gifts'],
+    promoTitle: 'Navratri Specials · Shop the edit',
+    promoCopy: 'Grooming · Fragrances · More',
+  },
+};
+
+export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
+  const { navigate, setShoppingPreference, shoppingPreference } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
   const [userLocation, setUserLocation] = useState('Payikapuram, Vijayawada');
+  const mode: Mode = shoppingPreference === 'men' ? 'men' : 'women';
+  const festival = FESTIVAL[mode];
 
   useEffect(() => {
     let active = true;
-    getDeviceCurrentLocation()
-      .then((loc) => {
-        if (active && loc?.formattedAddress) setUserLocation(loc.formattedAddress);
-      })
-      .catch(() => {});
+    if (!embedded) {
+      getDeviceCurrentLocation()
+        .then((loc) => {
+          if (active && loc?.formattedAddress) setUserLocation(loc.formattedAddress);
+        })
+        .catch(() => {});
+    }
     return () => {
       active = false;
     };
-  }, []);
+  }, [embedded]);
+
+  const switchMode = (next: Mode) => {
+    if (next !== mode) setShoppingPreference(next);
+  };
 
   return (
-    <div className="shop-screen shop-home">
+    <div className={`shop-screen shop-home zq-mode-${mode}`}>
       <header className="shop-home-top">
         <div className="shop-home-topbar">
           <div className="shop-home-location">
@@ -189,10 +229,16 @@ export const ShopHomeScreen: React.FC = () => {
               <Zap size={16} fill="currentColor" />
               {DELIVERY_ETA} MINS
             </span>
-            <button type="button" className="shop-home-location-btn" onClick={() => navigate('location-setup')}>
-              <span>{userLocation}</span>
-              <ChevronRight size={14} />
-            </button>
+            {embedded ? (
+              <span className="shop-home-location-btn is-static">
+                <span>{userLocation}</span>
+              </span>
+            ) : (
+              <button type="button" className="shop-home-location-btn" onClick={() => navigate('location-setup')}>
+                <span>{userLocation}</span>
+                <ChevronRight size={14} />
+              </button>
+            )}
           </div>
           <button type="button" className="shop-home-profile" onClick={() => navigate('profile-tab')} aria-label="Profile">
             <User size={18} />
@@ -218,6 +264,20 @@ export const ShopHomeScreen: React.FC = () => {
             </button>
           ))}
         </div>
+
+        <div className="shop-home-mode">
+          <div className="zq-mode-toggle" data-mode={mode} role="group" aria-label="Shopping mode">
+            <span className="zq-mode-thumb" aria-hidden="true" />
+            <button type="button" aria-pressed={mode === 'women'} onClick={() => switchMode('women')}>
+              <Venus size={17} />
+              <span>For Her</span>
+            </button>
+            <button type="button" aria-pressed={mode === 'men'} onClick={() => switchMode('men')}>
+              <Mars size={17} />
+              <span>For Him</span>
+            </button>
+          </div>
+        </div>
       </header>
 
       <section className="shop-home-showcase">
@@ -238,6 +298,36 @@ export const ShopHomeScreen: React.FC = () => {
           </div>
         </div>
       </section>
+
+      <div key={mode} className="shop-home-festival">
+        <section className="zq-festival" aria-label={`Navratri ${festival.heroCopy}`}>
+          <button type="button" className="zq-festival-hero" onClick={() => navigate('shop-browse')}>
+            <img src={festival.heroImage} alt="" />
+            <span className="zq-festival-copy">
+              <small>Celebrate</small>
+              <strong>NAVRATRI</strong>
+              <em>{festival.heroCopy}</em>
+            </span>
+          </button>
+          <div className="zq-festival-grid">
+            {festival.categories.map((title, index) => (
+              <button key={title} type="button" onClick={() => navigate('shop-browse')}>
+                <span className="zq-category-photo" style={{ backgroundImage: `url(${festival.categoryAtlas})`, '--category-index': index } as React.CSSProperties} />
+                <b>{title}</b>
+                <ChevronRight size={14} />
+              </button>
+            ))}
+          </div>
+          <button type="button" className="zq-festival-promo" onClick={() => navigate('shop-browse')}>
+            <img src={festival.heroImage} alt="" />
+            <span>
+              <b>{festival.promoTitle}</b>
+              <small>{festival.promoCopy}</small>
+            </span>
+            <ChevronRight size={19} />
+          </button>
+        </section>
+      </div>
 
       <section className="shop-home-categories" aria-label="Shop by category">
         {CATEGORY_TILES.map((cat) => {

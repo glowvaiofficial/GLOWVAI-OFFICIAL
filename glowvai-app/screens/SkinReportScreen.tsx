@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowLeft, ChevronDown, CircleDot, Droplets, ShoppingBag, Sparkles, SunMedium } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { HomeScreen } from './HomeScreen';
+import { ShopHomeScreen } from '../features/shop/screens/ShopHomeScreen';
 import '../responsive/entry-scan.css';
 
 export const SkinReportScreen: React.FC = () => {
@@ -122,7 +122,7 @@ export const SkinReportScreen: React.FC = () => {
       <div ref={commerceRef} className={`commerce-reveal ${commerceVisible ? 'is-revealed' : 'is-awaiting'}`}>
         <div className="commerce-color-wash" aria-hidden="true" />
         <div className="commerce-reveal-handle" aria-hidden="true" />
-        <HomeScreen embedded />
+        <ShopHomeScreen embedded />
       </div>
     </main>
   );

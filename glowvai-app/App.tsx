@@ -15,7 +15,7 @@ import { FaceAnalysisPrepScreen } from './screens/FaceAnalysisPrepScreen';
 import { FaceAnalysisCameraScreen } from './screens/FaceAnalysisCameraScreen';
 import { FaceAnalysisLoadingScreen } from './screens/FaceAnalysisLoadingScreen';
 import { SkinReportScreen } from './screens/SkinReportScreen';
-import { HomeScreen } from './screens/HomeScreen';
+import { ShopHomeScreen } from './features/shop/screens/ShopHomeScreen';
 import { CategoryScreen } from './screens/CategoryScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ProductDetailScreen } from './screens/ProductDetailScreen';
@@ -57,7 +57,7 @@ const AppContent: React.FC = () => {
       case 'skin-report':
         return <SkinReportScreen />;
       case 'home':
-        return <HomeScreen />;
+        return <ShopHomeScreen />;
       case 'categories':
         return <CategoryScreen />;
       case 'search':
@@ -89,7 +89,7 @@ const AppContent: React.FC = () => {
       case 'student-referral':
         return <StudentReferralScreen />;
       default:
-        return <HomeScreen />;
+        return <ShopHomeScreen />;
     }
   };
 
