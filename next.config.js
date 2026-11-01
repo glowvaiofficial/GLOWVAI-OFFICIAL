@@ -36,8 +36,35 @@ const shopCsp = [
   "form-action 'self' https://api.razorpay.com",
 ].join('; ');
 
-// Static files that load their own third-party scripts keep their own rules. The shop has its own policy above.
-const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop).*';
+// The seller portal under /sellers is the vendor app built for the web (Expo, public/sellers). It calls the vendor
+// API set at build time; NEXT_PUBLIC_VENDOR_API_URL must hold the same URL so this policy allows it.
+const vendorApi = process.env.NEXT_PUBLIC_VENDOR_API_URL || 'http://localhost:4000';
+const vendorWs = vendorApi.replace(/^http/, 'ws');
+const sellerCsp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://unpkg.com https://*.tile.openstreetmap.org",
+  "font-src 'self' data:",
+  `connect-src 'self' ${vendorApi} ${vendorWs} https://nominatim.openstreetmap.org`,
+  "media-src 'self' blob:",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+
+const sellerHeaders = [
+  { key: 'Content-Security-Policy', value: sellerCsp },
+  { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=()' },
+];
+
+// Static files that load their own third-party scripts keep their own rules. The shop and sellers have their own policies.
+const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop|sellers).*';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -68,8 +95,17 @@ const nextConfig = {
             },
           ];
         },
+        // The seller portal is a single-page app: any /sellers path that isn't a file serves its index.html.
+        async rewrites() {
+          return [
+            { source: '/sellers', destination: '/sellers/index.html' },
+            { source: '/sellers/:path*', destination: '/sellers/index.html' },
+          ];
+        },
         async headers() {
           return [
+            { source: '/sellers', headers: sellerHeaders },
+            { source: '/sellers/:path*', headers: sellerHeaders },
             {
               source: `/(${exceptStaticPortals})`,
               headers: [
@@ -103,7 +139,7 @@ const nextConfig = {
               ],
             },
             {
-              source: '/((?!face-analysis|shop).*)',
+              source: '/((?!face-analysis|shop|sellers).*)',
               headers: [{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' }],
             },
             {
