@@ -116,3 +116,9 @@
   .glowvai-root .skin-insights{ grid-template-columns: .9fr 1.1fr; }
   .glowvai-root .skin-routine-grid{ grid-template-columns: 1fr 1fr; }
 }
+
+/* Desktop: the splash and the first onboarding screen fill the window below the header, instead of a phone-sized card. */
+@media (min-width: 1024px){
+  .glowvai-root .welcome-screen,
+  .glowvai-root .onboarding-screen{ width: 100%; max-width: none; height: calc(100vh - 66px); min-height: 560px; margin: 0; border-radius: 0; box-shadow: none; }
+}
