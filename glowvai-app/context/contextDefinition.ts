@@ -96,6 +96,8 @@ export interface AppContextType {
   orders: Order[];
   activeOrder: Order | null;
   setActiveOrder: (order: Order | null) => void;
+  /** Adds or replaces an order in the local order history and makes it the active order. */
+  recordOrder: (order: Order) => void;
   placeOrder: (paymentMethod: PaymentMethodType, checkoutDiscount?: number, verification?: PaymentVerification) => Promise<Order>;
   cancelOrder: (orderId: string, reason: string) => Order | null;
 

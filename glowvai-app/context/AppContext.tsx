@@ -350,6 +350,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Place Order. One key per checkout attempt, so a retry after a network failure cannot create a second order.
   const pendingCheckoutKey = useRef<string | null>(null);
+  const recordOrder = (order: Order) => {
+    setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+    setActiveOrder(order);
+  };
+
   const placeOrder = async (paymentMethod: PaymentMethodType, checkoutDiscount = 0, verification?: PaymentVerification): Promise<Order> => {
     pendingCheckoutKey.current ??= `idemp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const newOrder = await ApiService.createOrder(pendingCheckoutKey.current, cart, currentAddress, paymentMethod, checkoutDiscount, verification);
@@ -509,6 +514,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         orders,
         activeOrder,
         setActiveOrder,
+        recordOrder,
         placeOrder,
         cancelOrder,
         capturedFaceImage,

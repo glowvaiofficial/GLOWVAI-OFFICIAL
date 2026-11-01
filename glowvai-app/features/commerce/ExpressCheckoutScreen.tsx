@@ -7,7 +7,7 @@ import { verifyOrderPayment } from '../../core/services/orderService';
 import type { CartItem } from '../../core/state/cartStore';
 import { computeCartTotals, type CartTotals } from './lib/pricing';
 import { newOrderId, payChoiceMeta, PAY_CHOICES, type PayChoice } from './lib/checkoutSession';
-import { placeCartOrder, sendDispatchAlert } from './lib/orderPlacement';
+import { placeCartOrder, sendDispatchAlert, toLocalOrder } from './lib/orderPlacement';
 import { BillRows, useCustomer, useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 
 type Stage = 'cart_review' | 'payment_selection' | 'order_processing' | 'live_tracking';
@@ -31,7 +31,7 @@ const expressTotals = (items: CartItem[]): CartTotals => {
 };
 
 export const ExpressCheckoutScreen: React.FC = () => {
-  const { goBack, navigate, showToast } = useApp();
+  const { goBack, navigate, showToast, recordOrder } = useApp();
   const items = useCartStore((s) => s.items);
   const incrementItem = useCartStore((s) => s.incrementItem);
   const decrementItem = useCartStore((s) => s.decrementItem);
@@ -86,6 +86,7 @@ export const ExpressCheckoutScreen: React.FC = () => {
       });
       // Online payments need a real gateway order; the service's offline fallback is not a payment.
       const ok = session.success && (choice === 'cod' || (Boolean(session.razorpayOrderId) && (await verifyOrderPayment(id, payable))));
+      recordOrder(toLocalOrder(input, ok && choice !== 'cod', minutes));
       if (!ok) throw new Error('payment not confirmed');
 
       clearCart();

@@ -6,15 +6,16 @@ import { initiateRazorpayOrder, type InitiatePaymentParams } from '../../core/se
 import { verifyOrderPayment } from '../../core/services/orderService';
 import { computeCartTotals } from './lib/pricing';
 import { newOrderId, payChoiceMeta, useCheckoutSession } from './lib/checkoutSession';
-import { placeCartOrder } from './lib/orderPlacement';
-import { useCustomer, useDeliveryAddress } from './components/shared';
+import { placeCartOrder, toLocalOrder } from './lib/orderPlacement';
+import { useCustomer, useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 
 const MIN_DISPLAY_MS = 2800;
 
 const STEPS = ['Creating order session', 'Verifying bank payment status', 'Confirming order and reserving stock'];
 
 export const PaymentProcessingScreen: React.FC = () => {
-  const { navigate, showToast } = useApp();
+  const { navigate, showToast, recordOrder } = useApp();
+  const etaMinutes = useDeliveryMinutes();
   const couponApplied = useCheckoutSession((s) => s.couponApplied);
   const payChoice = useCheckoutSession((s) => s.payChoice);
   const address = useDeliveryAddress();
@@ -41,9 +42,10 @@ export const PaymentProcessingScreen: React.FC = () => {
       const isCod = payChoice === 'cod';
 
       let ok = false;
+      let orderInput: Parameters<typeof placeCartOrder>[0] | null = null;
       try {
         // Order is written first so a UPI handoff (which leaves the page) cannot lose it.
-        await placeCartOrder({
+        orderInput = {
           orderId,
           items: cartItems,
           totals,
@@ -52,7 +54,8 @@ export const PaymentProcessingScreen: React.FC = () => {
           deliveryType: 'STANDARD_ECOMMERCE',
           address,
           customer: { userId: customer.userId, name: customer.name, phone: customer.phone },
-        });
+        };
+        await placeCartOrder(orderInput);
         setStep(1);
 
         const session = await initiateRazorpayOrder({
@@ -75,6 +78,7 @@ export const PaymentProcessingScreen: React.FC = () => {
       const remaining = MIN_DISPLAY_MS - (Date.now() - startedAt);
       if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 
+      if (orderInput) recordOrder(toLocalOrder(orderInput, ok && !isCod, etaMinutes));
       if (ok) {
         useCartStore.getState().clearCart();
         navigate('checkout-payment-success', { orderId, amount: totals.grandTotal, method: payChoice });
