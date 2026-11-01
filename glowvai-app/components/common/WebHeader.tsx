@@ -2,12 +2,14 @@ import React from 'react';
 import { Home, LayoutGrid, RotateCcw, ScanFace, ShoppingCart, User } from 'lucide-react';
 import { useApp, ScreenName } from '../../context/AppContext';
 import { activeNavKey, NavKey } from './navGroups';
+import { useCartSummary } from '../../features/commerce/lib/useCartSummary';
 
 // Top navigation for tablet and desktop widths. Phones keep the bottom bar, so this is hidden there by CSS.
 const HIDDEN_ON: ScreenName[] = ['welcome', 'onboarding', 'login', 'otp'];
 
 export const WebHeader: React.FC = () => {
-  const { currentScreen, navigate, cartItemCount, cartAuthoritative } = useApp();
+  const { currentScreen, navigate } = useApp();
+  const { itemCount: cartItemCount, grandTotal } = useCartSummary();
 
   if (HIDDEN_ON.includes(currentScreen)) return null;
 
@@ -43,7 +45,7 @@ export const WebHeader: React.FC = () => {
           <ShoppingCart size={18} />
           <span>Cart</span>
           {cartItemCount > 0 && (
-            <small>{cartItemCount} · ₹{cartAuthoritative.finalPayable}</small>
+            <small>{cartItemCount} · ₹{grandTotal}</small>
           )}
         </button>
       </div>

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Camera, ChevronRight, Home, LayoutGrid, RotateCcw, ScanFace, ShoppingCart } from 'lucide-react';
 import { useApp, ScreenName } from '../../context/AppContext';
 import { activeNavKey, NavKey } from './navGroups';
+import { useCartSummary } from '../../features/commerce/lib/useCartSummary';
 
 export const BottomNavBar: React.FC = () => {
-  const { currentScreen, navigate, cartItemCount, cartAuthoritative } = useApp();
+  const { currentScreen, navigate } = useApp();
+  const { itemCount: cartItemCount, grandTotal } = useCartSummary();
   const [reportCommerceVisible, setReportCommerceVisible] = useState(false);
 
   useEffect(() => {
@@ -30,9 +32,9 @@ export const BottomNavBar: React.FC = () => {
     <div className="bottom-commerce-shell">
       {/* These screens have their own sticky bottom bar, which the pill would cover. */}
       {cartItemCount > 0 && !pillHiddenScreens.includes(currentScreen) && (
-        <button onClick={() => navigate('cart-tab')} className="mini-cart-bar" aria-label={`View cart, ${cartItemCount} items, ₹${cartAuthoritative.finalPayable}`}>
+        <button onClick={() => navigate('cart-tab')} className="mini-cart-bar" aria-label={`View cart, ${cartItemCount} items, ₹${grandTotal}`}>
           <span className="mini-cart-icon"><ShoppingCart size={20} /></span>
-          <span className="mini-cart-copy"><b>View cart</b><small>{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'} · ₹{cartAuthoritative.finalPayable}</small></span>
+          <span className="mini-cart-copy"><b>View cart</b><small>{cartItemCount} {cartItemCount === 1 ? 'item' : 'items'} · ₹{grandTotal}</small></span>
           <span className="mini-cart-action"><ChevronRight size={17} /></span>
         </button>
       )}
