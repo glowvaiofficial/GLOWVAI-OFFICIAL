@@ -1,4 +1,4 @@
-import { createOrder } from '../../../core/services/orderService';
+import { createOrder, newDeliveryOtp } from '../../../core/services/orderService';
 import { triggerWhatsAppDispatchAlert } from '../../../core/utils/whatsapp';
 import type { CartItem } from '../../../core/state/cartStore';
 import type { OrderDeliveryType, OrderItem, OrderPricing, PaymentStatus, UserAddress } from '../../../core/types';
@@ -103,6 +103,6 @@ export const sendDispatchAlert = (input: PlaceOrderInput) => {
     items: input.items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
     totalAmount: input.totals.grandTotal + (input.tipAmount ?? 0),
     paymentMethod: meta.group === 'cod' ? 'CASH ON DELIVERY' : `ONLINE (${meta.method})`,
-    deliveryOtp: '4892',
+    deliveryOtp: newDeliveryOtp(),
   }).catch(() => null);
 };
