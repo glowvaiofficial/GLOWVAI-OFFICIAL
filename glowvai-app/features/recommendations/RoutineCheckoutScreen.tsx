@@ -1,9 +1,9 @@
 import React from 'react';
 import { Info, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../core/state/catalogStore';
 import { useCartStore } from '../../core/state/cartStore';
-import { formatRupee, getProductImageUrl } from '../shop/shared/shopUtils';
+import { cartLineFor, formatRupee, getProductImageUrl } from '../shop/shared/shopUtils';
 import { RecHeader } from './RecHeader';
 
 // The three routine steps, as real catalogue products. Prices and stock come from the catalogue, not from this file.
@@ -16,24 +16,16 @@ const ROUTINE_STEPS = [
 export const RoutineCheckoutScreen: React.FC = () => {
   const { navigate } = useApp();
   const addItem = useCartStore((state) => state.addItem);
+  const catalog = useCatalog();
   const rows = ROUTINE_STEPS.flatMap(({ id, step }) => {
-    const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === id);
+    const product = catalog.find((p) => p.id === id);
     return product ? [{ product, step }] : [];
   });
   const products = rows.map((row) => row.product);
   const total = products.reduce((sum, product) => sum + product.price, 0);
 
   const addRoutineToCart = () => {
-    products.forEach((product) =>
-      addItem({
-        productId: product.id,
-        name: product.name,
-        brand: product.brand,
-        image: getProductImageUrl(product),
-        price: product.price,
-        mrp: product.originalPrice,
-      })
-    );
+    products.forEach((product) => addItem(cartLineFor(product)));
     navigate('cart-tab');
   };
 

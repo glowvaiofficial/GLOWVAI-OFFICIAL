@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowUpDown, Search, ShoppingBag, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SHOP_CATEGORIES, categoryCount, getCategoryMeta, productsInCategory, useScrollTopOn } from '../shared/shopCatalog';
@@ -21,6 +22,7 @@ export const ShopCategoryScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
   const paramId: string = activeParams?.categoryId ?? activeParams?.id ?? '';
   const cartCount = useCartStore((s) => s.totalCount);
+  useCatalog(); // re-render when vendor products load
 
   const [categoryId, setCategoryId] = useState(paramId);
   const [searchQuery, setSearchQuery] = useState('');

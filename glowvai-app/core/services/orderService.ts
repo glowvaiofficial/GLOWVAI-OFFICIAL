@@ -111,6 +111,8 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     customerPhone: params.customerPhone,
     deliveryAddress: params.shippingAddress.fullAddress || params.shippingAddress.streetAddress || 'Vijayawada',
     items: params.items.map(it => ({
+      productId: it.productId,
+      vendorId: it.vendorId,
       name: it.productName || it.title,
       qty: it.quantity,
       price: it.unitPrice,
@@ -136,10 +138,11 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
   }
 
   // 2. Firestore sync in the background. setDoc only resolves once the server acknowledges the write, so
-  // awaiting it froze checkout whenever Firestore was unreachable.
+  // awaiting it froze checkout whenever Firestore was unreachable. The backend may already have written this
+  // order from /api/orders/create, so merge instead of replacing its fields.
   try {
     const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-    void setDoc(orderRef, JSON.parse(JSON.stringify(newOrder))).catch((dbErr: any) => {
+    void setDoc(orderRef, JSON.parse(JSON.stringify(newOrder)), { merge: true }).catch((dbErr: any) => {
       console.warn('[Firestore Sync Note]:', dbErr?.message);
     });
   } catch (dbErr: any) {

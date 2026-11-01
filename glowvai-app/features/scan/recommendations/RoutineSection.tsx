@@ -2,39 +2,34 @@ import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { getRecommendedRoutine } from '../../../core/services/recommendationService';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
-import { getProductImageUrl } from '../../shop/shared/shopUtils';
+import { cartLineFor, getProductImageUrl } from '../../shop/shared/shopUtils';
 
 const formatPrice = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
 
 // The routine names products as "Name (size)". Match them to the shop catalogue by brand and the start of the name,
 // so the price shown and the item added to the bag are the ones the shop actually sells.
 const normalise = (name: string) => name.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
-const findInShop = (brand: string, name: string) => {
+const findInShop = (catalog: SkincareProduct[], brand: string, name: string) => {
   const wanted = normalise(name);
   const prefix = wanted.split(' ').slice(0, 3).join(' ');
-  return INDIAN_SKINCARE_CATALOG.find((p) => p.brand === brand && normalise(p.name).startsWith(prefix));
+  return catalog.find((p) => p.brand === brand && normalise(p.name).startsWith(prefix));
 };
 
 /** Routine steps from the shared catalogue, shown with the scan result. */
 export const RoutineSection: React.FC = () => {
   const { navigate, showToast } = useApp();
   const addItem = useCartStore((state) => state.addItem);
-  const steps = getRecommendedRoutine().map((step) => ({ step, product: findInShop(step.brand, step.name) }));
+  const catalog = useCatalog();
+  const steps = getRecommendedRoutine().map((step) => ({ step, product: findInShop(catalog, step.brand, step.name) }));
   const available = steps.filter((row) => row.product);
 
   const handleShop = () => {
     available.forEach(({ product }) => {
       if (!product) return;
-      addItem({
-        productId: product.id,
-        name: product.name,
-        brand: product.brand,
-        image: getProductImageUrl(product),
-        price: product.price,
-        mrp: product.originalPrice,
-      });
+      addItem(cartLineFor(product));
     });
     const missing = steps.length - available.length;
     showToast(

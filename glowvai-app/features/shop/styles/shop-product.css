@@ -25,6 +25,7 @@
 .glowvai-root .shop-product-maker{ display: inline-flex; align-items: center; justify-self: start; gap: 2px; min-height: 28px; padding: 0; border: 0; background: none; color: var(--primary); font-size: 13px; font-weight: 800; }
 .glowvai-root .shop-product-title{ font-size: 21px; font-weight: 800; line-height: 1.25; letter-spacing: -.015em; }
 .glowvai-root .shop-product-size{ color: var(--text-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-product-seller{ color: var(--text-muted); font-size: 12px; font-weight: 600; }
 .glowvai-root .shop-product-pricebar{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 6px; }
 .glowvai-root .shop-product-price-now{ font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
 .glowvai-root .shop-product-price-mrp{ color: var(--text-muted); font-size: 13px; }

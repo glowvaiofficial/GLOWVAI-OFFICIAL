@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, MessageSquareText } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { useScrollTopOn } from '../shared/shopCatalog';
 import { formatRupee, getProductImageUrl } from '../shared/shopUtils';
 import '../styles/shop-reviews.css';
@@ -11,7 +11,7 @@ import '../styles/shop-reviews.css';
 export const ShopReviewsEmptyScreen: React.FC = () => {
   const { goBack, navigate, activeParams } = useApp();
   const productId = typeof activeParams?.productId === 'string' ? activeParams.productId : undefined;
-  const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === productId);
+  const product = useCatalog().find((p) => p.id === productId);
   const topRef = useScrollTopOn(productId);
 
   return (

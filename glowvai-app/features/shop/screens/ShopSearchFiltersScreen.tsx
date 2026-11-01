@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
-import { SHOP_BRANDS, SHOP_CATEGORIES, useScrollTopOn } from '../shared/shopCatalog';
+import { SHOP_CATEGORIES, getShopBrands, useScrollTopOn } from '../shared/shopCatalog';
 import { getDiscountPercent } from '../shared/shopUtils';
 import '../styles/shop-search-filters.css';
 
@@ -22,9 +22,12 @@ type SortId = 'relevance' | 'price_low' | 'price_high' | 'discount';
 
 const EMPTY_FILTERS: ActiveFilters = { category: 'all', brand: 'all', price: 'all' };
 
-const FILTER_GROUPS: { title: string; key: FilterKey; options: { id: string; label: string }[] }[] = [
+type FilterGroup = { title: string; key: FilterKey; options: { id: string; label: string }[] };
+
+// The brand list follows the catalogue, which grows when vendor products load.
+const filterGroupsFor = (brands: ReturnType<typeof getShopBrands>): FilterGroup[] => [
   { title: 'Category', key: 'category', options: SHOP_CATEGORIES.map((c) => ({ id: c.id, label: c.short })) },
-  { title: 'Brand', key: 'brand', options: SHOP_BRANDS.map((b) => ({ id: b.brand, label: b.brand })) },
+  { title: 'Brand', key: 'brand', options: brands.map((b) => ({ id: b.brand, label: b.brand })) },
   { title: 'Price', key: 'price', options: PRICE_BUCKETS.map((b) => ({ id: b.id, label: b.label })) },
 ];
 
@@ -35,11 +38,15 @@ const SORTS: { id: SortId; label: string }[] = [
   { id: 'discount', label: 'Biggest discount' },
 ];
 
-const labelFor = (key: FilterKey, id: string) => FILTER_GROUPS.find((g) => g.key === key)?.options.find((o) => o.id === id)?.label ?? id;
+const labelFor = (groups: FilterGroup[], key: FilterKey, id: string) =>
+  groups.find((g) => g.key === key)?.options.find((o) => o.id === id)?.label ?? id;
 
 export const ShopSearchFiltersScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
   const topRef = useScrollTopOn('search');
+  const catalog = useCatalog();
+  const shopBrands = getShopBrands();
+  const filterGroups = useMemo(() => filterGroupsFor(shopBrands), [shopBrands]);
   // Opened from a "See all" link, the search can start with a query or a sort order (for example lowest price first).
   const initialSort = SORTS.find((s) => s.id === activeParams?.sort)?.id ?? 'relevance';
 
@@ -54,7 +61,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const matched = INDIAN_SKINCARE_CATALOG.filter((p) => {
+    const matched = catalog.filter((p) => {
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -74,11 +81,11 @@ export const ShopSearchFiltersScreen: React.FC = () => {
     if (sortBy === 'price_high') sorted.sort((a, b) => b.price - a.price);
     if (sortBy === 'discount') sorted.sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a));
     return sorted;
-  }, [query, activeFilters, sortBy]);
+  }, [catalog, query, activeFilters, sortBy]);
 
   const activeChips = (Object.keys(activeFilters) as FilterKey[])
     .filter((key) => activeFilters[key] !== 'all')
-    .map((key) => ({ key, label: labelFor(key, activeFilters[key]) }));
+    .map((key) => ({ key, label: labelFor(filterGroups, key, activeFilters[key]) }));
 
   const toggleOption = (key: FilterKey, option: string) =>
     setActiveFilters((prev) => ({ ...prev, [key]: prev[key] === option ? 'all' : option }));
@@ -182,7 +189,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
               </button>
             )}
           </div>
-          {FILTER_GROUPS.map((group) => (
+          {filterGroups.map((group) => (
             <section key={group.key} className="shop-search-group">
               <h3>{group.title}</h3>
               <div className="shop-search-options" role="group" aria-label={group.title}>

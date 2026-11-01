@@ -1,4 +1,5 @@
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import type { CartItem } from '../../../core/state/cartStore';
 
 export const formatRupee = (amount: number) => `₹${Math.round(amount).toLocaleString('en-IN')}`;
 
@@ -78,8 +79,21 @@ const productTile = (product: SkincareProduct): string => {
   return url;
 };
 
-// Cart items store a plain URL string, so this always returns one.
-export const getProductImageUrl = (product: SkincareProduct): string => PRODUCT_PHOTOS[product.id] ?? productTile(product);
+// Cart items store a plain URL string, so this always returns one. Vendor products use the first photo the vendor
+// uploaded; the built-in catalogue's image URLs are stock photos, so only vendor products use that field.
+export const getProductImageUrl = (product: SkincareProduct): string =>
+  PRODUCT_PHOTOS[product.id] ?? (product.vendorId ? product.official_brand_image_url : undefined) ?? productTile(product);
+
+/** The bag line for a product. Vendor products carry their vendor id through to the order. */
+export const cartLineFor = (product: SkincareProduct): Omit<CartItem, 'quantity'> => ({
+  productId: product.id,
+  name: product.name,
+  brand: product.brand,
+  image: getProductImageUrl(product),
+  price: product.price,
+  mrp: product.originalPrice,
+  ...(product.vendorId ? { vendorId: product.vendorId } : {}),
+});
 
 export const getDiscountPercent = (product: SkincareProduct): number => {
   if (product.discountPercent) return product.discountPercent;

@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, Search, ShoppingBag, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import {
-  SHOP_BRANDS,
   SHOP_CATEGORIES,
   SHOP_CONCERNS,
   brandKey,
   categoryCount,
+  getShopBrands,
   matchesConcern,
   productsInCategory,
   useScrollTopOn,
@@ -29,6 +29,8 @@ const categoryImage = (id: string) => {
 export const ShopBrowseScreen: React.FC = () => {
   const { navigate, activeParams } = useApp();
   const params: Record<string, string | undefined> = activeParams ?? {};
+  const catalog = useCatalog();
+  const shopBrands = getShopBrands();
   const cartCount = useCartStore((s) => s.totalCount);
   const topRef = useScrollTopOn(`${params.concern ?? ''}|${params.brand ?? ''}`);
 
@@ -51,11 +53,11 @@ export const ShopBrowseScreen: React.FC = () => {
 
   const brandLabel = useMemo(() => {
     if (!selectedBrand) return null;
-    return SHOP_BRANDS.find((b) => brandKey(b.brand) === brandKey(selectedBrand))?.brand ?? selectedBrand;
-  }, [selectedBrand]);
+    return shopBrands.find((b) => brandKey(b.brand) === brandKey(selectedBrand))?.brand ?? selectedBrand;
+  }, [selectedBrand, shopBrands]);
 
   const q = searchQuery.trim().toLowerCase();
-  const filteredProducts = INDIAN_SKINCARE_CATALOG.filter((product) => {
+  const filteredProducts = catalog.filter((product) => {
     const matchesSearch =
       !q ||
       product.name.toLowerCase().includes(q) ||
@@ -139,7 +141,7 @@ export const ShopBrowseScreen: React.FC = () => {
           })}
 
           <h3>Brand</h3>
-          {[{ brand: 'All brands', count: INDIAN_SKINCARE_CATALOG.length }, ...SHOP_BRANDS].map((b) => {
+          {[{ brand: 'All brands', count: catalog.length }, ...shopBrands].map((b) => {
             const isAll = b.brand === 'All brands';
             const isSelected = isAll ? !selectedBrand : Boolean(selectedBrand) && brandKey(b.brand) === brandKey(selectedBrand ?? '');
             return (

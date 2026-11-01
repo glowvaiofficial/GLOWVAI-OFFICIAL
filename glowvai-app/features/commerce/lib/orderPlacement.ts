@@ -1,6 +1,7 @@
 import { createOrder, newDeliveryOtp } from '../../../core/services/orderService';
 import { triggerWhatsAppDispatchAlert } from '../../../core/utils/whatsapp';
 import type { CartItem } from '../../../core/state/cartStore';
+import { toStorefrontId } from '../../../core/services/storefrontCatalog';
 import type { OrderDeliveryType, OrderItem, OrderPricing, PaymentStatus, UserAddress } from '../../../core/types';
 import type { CartTotals } from './pricing';
 import type { DeliveryAddress } from './addressStore';
@@ -32,9 +33,11 @@ export interface PlaceOrderInput {
   pricing?: Partial<OrderPricing>;
 }
 
+// Marketplace lines go out under their storefront id (products/{id}) with their vendor, so the backend can route them.
 const toOrderItems = (items: CartItem[]): OrderItem[] =>
   items.map((item) => ({
-    productId: item.productId,
+    productId: item.vendorId ? toStorefrontId(item.productId) : item.productId,
+    ...(item.vendorId ? { vendorId: item.vendorId } : {}),
     sku: item.productId,
     title: item.name,
     productName: item.name,
@@ -114,7 +117,14 @@ export const sendDispatchAlert = (input: PlaceOrderInput) => {
     customerPhone: input.customer.phone,
     deliveryAddress: input.address.fullAddress,
     darkStoreName: 'Glowway Darkstore Payikapuram (DS-VIJ-01)',
-    items: input.items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
+    // Same ids as the order record, since this alert also posts to /api/orders/create.
+    items: toOrderItems(input.items).map((item) => ({
+      productId: item.productId,
+      vendorId: item.vendorId,
+      name: item.title,
+      qty: item.quantity,
+      price: item.unitPrice,
+    })),
     totalAmount: input.totals.grandTotal + (input.tipAmount ?? 0),
     paymentMethod: meta.group === 'cod' ? 'CASH ON DELIVERY' : `ONLINE (${meta.method})`,
     deliveryOtp: deliveryOtpFor(input.orderId),

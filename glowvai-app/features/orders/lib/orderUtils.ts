@@ -1,8 +1,8 @@
 import type { Order } from '../../../types';
 import { PRODUCTS } from '../../../data/products';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { findCatalogProduct } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
-import { getProductImageUrl } from '../../shop/shared/shopUtils';
+import { cartLineFor } from '../../shop/shared/shopUtils';
 
 /** The four stages a delivery passes through, in order. */
 export const ORDER_STAGES = ['Placed', 'Packed', 'On the way', 'Delivered'] as const;
@@ -78,9 +78,9 @@ export const reorderItems = (order: Order): number => {
   let added = 0;
   order.items.forEach((item) => {
     const quantity = Math.max(1, item.quantity || 1);
-    const current = INDIAN_SKINCARE_CATALOG.find((entry) => entry.id === item.productId);
+    const current = findCatalogProduct(item.productId);
     if (current) {
-      const line = { productId: current.id, name: current.name, brand: current.brand, image: getProductImageUrl(current), price: current.price, mrp: current.originalPrice };
+      const line = cartLineFor(current);
       for (let i = 0; i < quantity; i += 1) addItem(line);
       added += 1;
       return;

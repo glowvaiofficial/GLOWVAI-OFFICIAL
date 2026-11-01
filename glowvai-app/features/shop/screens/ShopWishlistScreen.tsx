@@ -1,11 +1,12 @@
 import React from 'react';
 import { ArrowLeft, Heart, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { useCatalog } from '../../../core/state/catalogStore';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { useScrollTopOn } from '../shared/shopCatalog';
-import { formatRupee, getProductImageUrl } from '../shared/shopUtils';
+import { cartLineFor, formatRupee } from '../shared/shopUtils';
 import '../styles/shop-wishlist.css';
 
 // Saved products come from the app wishlist (the heart on every product card and product page).
@@ -16,16 +17,17 @@ export const ShopWishlistScreen: React.FC = () => {
   const cartCount = useCartStore((s) => s.totalCount);
   const cartItems = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
+  const catalog = useCatalog();
 
   const saved = wishlist
-    .map((id) => INDIAN_SKINCARE_CATALOG.find((p) => p.id === id))
-    .filter((p): p is (typeof INDIAN_SKINCARE_CATALOG)[number] => Boolean(p));
+    .map((id) => catalog.find((p) => p.id === id))
+    .filter((p): p is SkincareProduct => Boolean(p));
   const notInBag = saved.filter((p) => !cartItems[p.id]);
   const notInBagTotal = notInBag.reduce((sum, p) => sum + p.price, 0);
 
   const addAllToBag = () => {
     for (const p of notInBag) {
-      addItem({ productId: p.id, name: p.name, brand: p.brand, image: getProductImageUrl(p), price: p.price, mrp: p.originalPrice });
+      addItem(cartLineFor(p));
     }
   };
 
