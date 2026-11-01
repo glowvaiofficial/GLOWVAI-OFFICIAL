@@ -214,6 +214,36 @@ export function Footer() {
           <div className="lg:col-span-2"><FooterColumn title="Partners" links={footerLinks.partners} /></div>
         </div>
 
+        {/* The seller portal is a separate app served from /sellers, so these are plain links, not Next routes. */}
+        <section
+          aria-labelledby="footer-sellers-title"
+          className="mb-12 rounded-[16px] border border-ink/10 bg-paper-deep px-6 py-6 sm:px-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between"
+        >
+          <div className="max-w-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-brand mb-2">GlowVai Sellers</p>
+            <h2 id="footer-sellers-title" className="font-display font-semibold text-lg text-ink">
+              Sell your beauty products on glowvai
+            </h2>
+            <p className="mt-1 text-[15px] text-ink-muted">
+              Stores and brands in Vijayawada can list products, take orders and track payouts from the seller portal.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="/sellers"
+              className={`inline-flex items-center justify-center min-h-11 px-5 rounded-full bg-brand text-white font-semibold text-[15px] hover:opacity-90 ${focusRing}`}
+            >
+              Start selling
+            </a>
+            <a
+              href="/sellers/login"
+              className={`inline-flex items-center justify-center min-h-11 px-5 rounded-full border border-ink/20 text-ink font-semibold text-[15px] hover:border-ink ${focusRing}`}
+            >
+              Seller login
+            </a>
+          </div>
+        </section>
+
         {/* Department emails */}
         <div className="border-t border-ink/15 py-10 grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-8">
           <div className="lg:col-span-8">
