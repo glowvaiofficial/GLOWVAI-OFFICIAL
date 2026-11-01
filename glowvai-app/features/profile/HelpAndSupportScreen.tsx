@@ -39,7 +39,7 @@ const FAQS = [
 ];
 
 export const HelpAndSupportScreen = () => {
-  const { supportTickets, createTicket, replyToTicket, activeParams, goBack, showToast } = useApp();
+  const { activeParams, goBack, showToast } = useApp();
   const orderId: string | undefined = activeParams?.orderId;
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [isCreating, setIsCreating] = useState(Boolean(orderId));
@@ -47,38 +47,26 @@ export const HelpAndSupportScreen = () => {
   const [subject, setSubject] = useState(orderId ? `Query regarding Order #${orderId}` : '');
   const [message, setMessage] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(supportTickets[0]?.id ?? null);
-  const [reply, setReply] = useState('');
-  const selectedTicket = supportTickets.find((ticket) => ticket.id === selectedId) ?? null;
   const ticketsRef = useRef<HTMLDivElement>(null);
 
-  // Opened from an order: the pre-filled ticket form sits below the FAQ on phones, so bring it into view.
+  // Opened from an order: the pre-filled form sits below the FAQ on phones, so bring it into view.
   useEffect(() => {
     if (orderId) ticketsRef.current?.scrollIntoView({ block: 'start' });
   }, [orderId]);
 
-  const handleCreateTicket = async () => {
+  // There is no ticket service behind the web shop, so the message goes to the support team on WhatsApp,
+  // where they reply. Nothing is shown as a ticket here, because nobody would answer it in this screen.
+  const handleSendMessage = () => {
     if (!subject.trim() || !message.trim()) {
       setFormError('Add a subject and some details so we can help.');
       return;
     }
-    try {
-      const ticket = await createTicket(category, subject.trim(), message.trim(), orderId);
-      setSelectedId(ticket.id);
-      setIsCreating(false);
-      setSubject('');
-      setMessage('');
-      setFormError(null);
-      showToast('Support ticket created');
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Could not create the ticket. Try again.');
-    }
-  };
-
-  const handleReply = () => {
-    if (!reply.trim() || !selectedTicket) return;
-    replyToTicket(selectedTicket.id, reply.trim());
-    setReply('');
+    const text = [`Hi glowvai support, ${category.toLowerCase()}.`, orderId ? `Order: #${orderId}` : '', `Subject: ${subject.trim()}`, message.trim()]
+      .filter(Boolean)
+      .join('\n');
+    openWhatsAppSupport(text);
+    setFormError(null);
+    showToast('Opening WhatsApp with your message. Send it there to reach our team.');
   };
 
   return (
@@ -121,7 +109,7 @@ export const HelpAndSupportScreen = () => {
 
         <div className="profile-main">
         <div className="profile-section-head" ref={ticketsRef}>
-          <p className="profile-label">Your support tickets</p>
+          <p className="profile-label">Message our team</p>
           <button
             type="button"
             className="profile-button is-secondary is-small"
@@ -131,7 +119,7 @@ export const HelpAndSupportScreen = () => {
             }}
           >
             {isCreating ? <X size={14} /> : <PlusCircle size={14} />}
-            {isCreating ? 'Cancel' : 'New ticket'}
+            {isCreating ? 'Cancel' : 'Write to us'}
           </button>
         </div>
 
@@ -152,59 +140,21 @@ export const HelpAndSupportScreen = () => {
               <textarea className="profile-input is-textarea" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Share full details so we can resolve this quickly" />
             </label>
             {formError && <p className="profile-field-error" role="alert">{formError}</p>}
-            <button type="button" className="profile-button is-primary is-block" onClick={handleCreateTicket}>Submit ticket</button>
+            <button type="button" className="profile-button is-primary is-block" onClick={handleSendMessage}>
+              <Send size={16} />
+              Send on WhatsApp
+            </button>
+            <p className="profile-list-note">This opens WhatsApp with your message filled in. Our team replies to you there.</p>
           </section>
-        ) : supportTickets.length === 0 ? (
+        ) : (
           <section className="profile-card">
             <div className="profile-empty-row">
               <span className="profile-list-icon is-muted"><MessageSquare size={16} /></span>
               <span className="profile-list-copy">
-                <span className="profile-list-title">No tickets yet</span>
-                <span className="profile-list-note">Raise a ticket and our replies will show up here.</span>
+                <span className="profile-list-title">Need help with something else?</span>
+                <span className="profile-list-note">Write to us and we will open WhatsApp with your message, so our team can reply there.</span>
               </span>
             </div>
-          </section>
-        ) : (
-          <section className="profile-card">
-            {supportTickets.map((ticket) => {
-              const isSelected = selectedTicket?.id === ticket.id;
-              const resolved = ticket.status === 'Resolved' || ticket.status === 'Closed';
-              return (
-                <div key={ticket.id}>
-                  <button type="button" className="profile-ticket-button" aria-expanded={isSelected} onClick={() => setSelectedId(isSelected ? null : ticket.id)}>
-                    <span className="profile-ticket-top">
-                      <span className="profile-ticket-meta">#{ticket.id}</span>
-                      <span className={resolved ? 'profile-pill is-success' : 'profile-pill is-warning'}>{ticket.status}</span>
-                    </span>
-                    <span className="profile-ticket-title">{ticket.subject}</span>
-                    <span className="profile-ticket-meta">{ticket.category} · {ticket.createdAt}</span>
-                  </button>
-
-                  {isSelected && (
-                    <div className="profile-thread">
-                      {ticket.messages.map((item, index) => (
-                        <p key={`${ticket.id}-${index}`} className={item.sender === 'user' ? 'profile-bubble is-user' : 'profile-bubble'}>
-                          <small>{item.sender === 'user' ? 'You' : 'glowvai support'} · {item.timestamp}</small>
-                          {item.text}
-                        </p>
-                      ))}
-                      <form
-                        className="profile-reply-row"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          handleReply();
-                        }}
-                      >
-                        <input className="profile-input" value={reply} onChange={(e) => setReply(e.target.value)} placeholder="Type your reply" aria-label="Reply to ticket" />
-                        <button type="submit" className="profile-button is-primary is-small" aria-label="Send reply">
-                          <Send size={14} />
-                        </button>
-                      </form>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </section>
         )}
         </div>

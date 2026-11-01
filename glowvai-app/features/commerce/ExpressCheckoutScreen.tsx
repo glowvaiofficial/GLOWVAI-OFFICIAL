@@ -263,7 +263,7 @@ export const ExpressCheckoutScreen: React.FC = () => {
           <section className="commerce-card">
             <div className="commerce-card-head">
               <h2>Delivery address</h2>
-              <button className="commerce-link" onClick={() => navigate('address-saved')}>
+              <button className="commerce-link" onClick={() => navigate('address-list')}>
                 Change <ChevronRight size={13} />
               </button>
             </div>

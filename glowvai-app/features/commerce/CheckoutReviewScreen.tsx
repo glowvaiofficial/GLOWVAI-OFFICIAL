@@ -62,7 +62,7 @@ export const CheckoutReviewScreen: React.FC = () => {
             </section>
           ) : null}
 
-          <DeliveryAddressCard address={address} onChange={() => navigate('address-saved')} />
+          <DeliveryAddressCard address={address} onChange={() => navigate('address-list')} />
 
           <section className="commerce-card" aria-label="Items">
             <div className="commerce-card-head">

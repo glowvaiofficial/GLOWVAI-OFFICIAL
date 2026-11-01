@@ -1,5 +1,6 @@
 import { AlertCircle, Clock, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import { useCartStore } from '../../core/state/cartStore';
 import { RecHeader } from './RecHeader';
 
 const STEPS = [
@@ -22,8 +23,9 @@ const STEPS = [
 ];
 
 export const PatchTestGuideScreen = () => {
-  const { navigate, cartItemCount } = useApp();
-  const hasCart = cartItemCount > 0;
+  const { navigate } = useApp();
+  // The bag the cart screen shows.
+  const hasCart = useCartStore((state) => state.totalCount > 0);
 
   return (
     <main className="rec-screen">

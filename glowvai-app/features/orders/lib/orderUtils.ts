@@ -1,6 +1,8 @@
 import type { Order } from '../../../types';
 import { PRODUCTS } from '../../../data/products';
-import type { AppContextType } from '../../../context/contextDefinition';
+import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useCartStore } from '../../../core/state/cartStore';
+import { getProductImageUrl } from '../../shop/shared/shopUtils';
 
 /** The four stages a delivery passes through, in order. */
 export const ORDER_STAGES = ['Placed', 'Packed', 'On the way', 'Delivered'] as const;
@@ -69,16 +71,28 @@ export const paymentLabel = (order: Order): string => {
 };
 
 /** Adds the same products and sizes from an order back to the cart. Returns how many lines were added. */
-export const reorderItems = (order: Order, addToCart: AppContextType['addToCart']): number => {
+// Adds a past order's items back to the bag the cart screen reads (the cart store), at today's price.
+// Items no longer in the catalogue or out of stock are skipped. Returns how many order lines were added.
+export const reorderItems = (order: Order): number => {
+  const { addItem } = useCartStore.getState();
   let added = 0;
   order.items.forEach((item) => {
+    const quantity = Math.max(1, item.quantity || 1);
+    const current = INDIAN_SKINCARE_CATALOG.find((entry) => entry.id === item.productId);
+    if (current) {
+      const line = { productId: current.id, name: current.name, brand: current.brand, image: getProductImageUrl(current), price: current.price, mrp: current.originalPrice };
+      for (let i = 0; i < quantity; i += 1) addItem(line);
+      added += 1;
+      return;
+    }
     const product = PRODUCTS.find((entry) => entry.id === item.productId);
     if (!product) return;
     const variant =
       product.variants.find((entry) => entry.size === item.variantSize) ??
       product.variants.find((entry) => entry.id === product.currentVariantId);
     if (!variant || !variant.inStock) return;
-    addToCart(product, variant.id, item.insuranceSelected);
+    const line = { productId: product.id, name: product.name, brand: product.brand, image: product.images[0] ?? '', price: variant.price, mrp: variant.mrp };
+    for (let i = 0; i < quantity; i += 1) addItem(line);
     added += 1;
   });
   return added;

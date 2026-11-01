@@ -134,7 +134,7 @@ export const PaymentFailedScreen: React.FC = () => {
           <Sparkles size={16} />
           glowvai
         </span>
-        <button className="commerce-icon-btn" onClick={() => navigate('profile-support')} aria-label="Get help">
+        <button className="commerce-icon-btn" onClick={() => navigate('profile-support', params.orderId ? { orderId: params.orderId } : undefined)} aria-label="Get help">
           <HelpCircle size={18} />
         </button>
       </header>

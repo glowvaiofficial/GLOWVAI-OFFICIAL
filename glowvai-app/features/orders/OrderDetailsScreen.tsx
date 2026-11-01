@@ -7,7 +7,7 @@ import { OrderTimeline, OrdersState, StatusBadge } from './components/OrderParts
 import { formatOrderDate, formatRupees, isActiveOrder, itemCount, loadRatings, paymentLabel, reorderItems } from './lib/orderUtils';
 
 export const OrderDetailsScreen: React.FC = () => {
-  const { goBack, navigate, activeParams, orders, activeOrder, addToCart, showToast, setActiveOrder } = useApp();
+  const { goBack, navigate, activeParams, orders, activeOrder, showToast, setActiveOrder } = useApp();
   const requestedId: string | undefined = activeParams?.orderId || activeParams?.id;
   const order = requestedId ? orders.find((o) => o.id === requestedId) ?? null : activeOrder ?? orders[0] ?? null;
 
@@ -28,7 +28,7 @@ export const OrderDetailsScreen: React.FC = () => {
   const rated = Boolean(loadRatings()[order.id]);
   const openSupport = () => navigate('support', { orderId: order.id });
   const buyAgain = () => {
-    const added = reorderItems(order, addToCart);
+    const added = reorderItems(order);
     if (!added) {
       showToast('These items are not available right now');
       return;

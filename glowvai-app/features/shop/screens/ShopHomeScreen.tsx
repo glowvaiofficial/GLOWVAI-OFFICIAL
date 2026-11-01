@@ -309,7 +309,7 @@ export const ShopHomeScreen: React.FC = () => {
         title="Biggest discounts"
         subtitle="Sorted by % off the MRP"
         products={BIGGEST_DISCOUNTS.slice(0, 8)}
-        onSeeAll={() => navigate('shop-browse')}
+        onSeeAll={() => navigate('shop-search-filters', { sort: 'discount' })}
       />
 
       <ProductRail title="Serums & actives" products={productsInCategory('Serums')} onSeeAll={() => openCategory('Serums')} />
@@ -429,7 +429,7 @@ export const ShopHomeScreen: React.FC = () => {
         </div>
       </section>
 
-      <ProductRail title="Under ₹500" subtitle="Lowest price first" products={UNDER_500} onSeeAll={() => navigate('shop-search-filters')} />
+      <ProductRail title="Under ₹500" subtitle="Lowest price first" products={UNDER_500} onSeeAll={() => navigate('shop-search-filters', { sort: 'price_low' })} />
 
       <section className="shop-home-end">
         <span className="shop-home-end-mark brand-wordmark" aria-hidden="true">

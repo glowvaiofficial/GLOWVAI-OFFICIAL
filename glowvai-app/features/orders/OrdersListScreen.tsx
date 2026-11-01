@@ -13,7 +13,7 @@ const itemsLine = (order: Order) => {
 };
 
 export const OrdersListScreen: React.FC = () => {
-  const { goBack, navigate, orders, addToCart, showToast, setActiveOrder } = useApp();
+  const { goBack, navigate, orders, showToast, setActiveOrder } = useApp();
   const activeOrders = useMemo(() => orders.filter(isActiveOrder), [orders]);
   const pastOrders = useMemo(() => orders.filter((order) => !isActiveOrder(order)), [orders]);
   const [tab, setTab] = useState<'active' | 'past'>(activeOrders.length ? 'active' : 'past');
@@ -25,7 +25,7 @@ export const OrdersListScreen: React.FC = () => {
   };
   const openDetails = (order: Order) => navigate('orders-detail', { orderId: order.id });
   const buyAgain = (order: Order) => {
-    const added = reorderItems(order, addToCart);
+    const added = reorderItems(order);
     if (!added) {
       showToast('These items are not available right now');
       return;

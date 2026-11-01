@@ -47,6 +47,8 @@ export interface AppContextType {
   screenHistory: ScreenName[];
   navigate: (screen: ScreenName, params?: any) => void;
   goBack: () => void;
+  /** Return to an earlier screen in the history, or open it when it is not in the history. */
+  goBackTo: (screen: ScreenName) => void;
   activeParams: any;
 
   // User state
