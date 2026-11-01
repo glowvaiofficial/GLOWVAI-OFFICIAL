@@ -38,14 +38,16 @@ const SORTS: { id: SortId; label: string }[] = [
 const labelFor = (key: FilterKey, id: string) => FILTER_GROUPS.find((g) => g.key === key)?.options.find((o) => o.id === id)?.label ?? id;
 
 export const ShopSearchFiltersScreen: React.FC = () => {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack, activeParams } = useApp();
   const topRef = useScrollTopOn('search');
+  // Opened from a "See all" link, the search can start with a query or a sort order (for example lowest price first).
+  const initialSort = SORTS.find((s) => s.id === activeParams?.sort)?.id ?? 'relevance';
 
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(typeof activeParams?.query === 'string' ? activeParams.query : '');
   const [isListening, setIsListening] = useState(false);
   const [voiceNote, setVoiceNote] = useState<string | null>(null);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS);
-  const [sortBy, setSortBy] = useState<SortId>('relevance');
+  const [sortBy, setSortBy] = useState<SortId>(initialSort);
 
   const w = typeof window !== 'undefined' ? (window as any) : undefined;
   const Recognition = w?.SpeechRecognition || w?.webkitSpeechRecognition;

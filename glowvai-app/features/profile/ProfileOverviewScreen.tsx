@@ -1,5 +1,8 @@
 import { ChevronRight, Gift, Heart, HelpCircle, ListChecks, MapPin, Package, Settings, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../../context/useApp';
+import { loadLatestScanEntry } from '../scan/services/scanHistory';
+import type { SkinAnalysisResult } from '../../core/services/skinModelService';
 import { getInitials, ProfileHeader, ProfileListItem } from './ProfileShared';
 
 const statusLabel = (status: string): string => {
@@ -16,6 +19,15 @@ export const ProfileOverviewScreen = () => {
   const phone = customerDetails?.phoneNumber || user?.phoneNumber || '';
   const report = activeReport ?? skinReports[0] ?? null;
   const recentOrder = orders[0] ?? null;
+  // The skin scan saves its latest result on this device; show that here so a finished scan is not reported as missing.
+  const [latestScan, setLatestScan] = useState<SkinAnalysisResult | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void loadLatestScanEntry().then((entry) => { if (alive) setLatestScan(entry?.result ?? null); });
+    return () => { alive = false; };
+  }, []);
+  const scanSkinType = latestScan && latestScan.skinProfile.skinType !== 'uncertain' ? latestScan.skinProfile.skinType : null;
+  const scanConcerns = latestScan ? latestScan.concerns.filter((c) => c.present).map((c) => c.label) : [];
 
   return (
     <main className="profile-screen">
@@ -41,25 +53,29 @@ export const ProfileOverviewScreen = () => {
               <span className="profile-glow-icon"><Sparkles size={20} /></span>
               <div className="profile-glow-copy">
                 <span className="profile-label">My glow profile</span>
-                <h2 className="profile-card-title">{report ? `${report.skinType} skin` : 'No skin scan yet'}</h2>
+                <h2 className="profile-card-title">
+                  {latestScan ? (scanSkinType ? `${scanSkinType.charAt(0).toUpperCase()}${scanSkinType.slice(1)} skin` : 'Skin scan saved') : report ? `${report.skinType} skin` : 'No skin scan yet'}
+                </h2>
               </div>
-              {report && (
+              {!latestScan && report && (
                 <span className={report.isSample ? 'profile-pill is-muted' : 'profile-pill'}>
                   {report.isSample ? 'Sample' : `${report.skinScore}/100`}
                 </span>
               )}
             </div>
             <p className="profile-card-sub">
-              {report
+              {latestScan
+                ? scanConcerns.length ? `Noticed: ${scanConcerns.slice(0, 3).join(', ')}` : 'Open your report for routine suggestions.'
+                : report
                 ? report.recommendedIngredients.slice(0, 3).join(', ') || 'Open your report for routine suggestions.'
                 : 'Scan your skin to build a profile and get product suggestions.'}
             </p>
             <button
               type="button"
               className="profile-text-link"
-              onClick={() => navigate(report ? 'scan-report' : 'scan-intro')}
+              onClick={() => navigate(latestScan ? 'scan-report' : 'scan-intro')}
             >
-              {report ? 'View skin report' : 'Start skin scan'}
+              {latestScan ? 'View skin report' : 'Start skin scan'}
               <ChevronRight size={16} />
             </button>
           </section>
@@ -82,11 +98,11 @@ export const ProfileOverviewScreen = () => {
               </span>
               <ChevronRight size={16} className="profile-chevron" />
             </button>
-            <button type="button" className="profile-tile" onClick={() => navigate('recommend-routine')}>
+            <button type="button" className="profile-tile" onClick={() => navigate('recommend-overview')}>
               <span className="profile-tile-icon"><ListChecks size={18} /></span>
               <span className="profile-tile-copy">
-                <span className="profile-tile-label">Routine guide</span>
-                <span className="profile-tile-note">Morning and evening steps</span>
+                <span className="profile-tile-label">Skincare guides</span>
+                <span className="profile-tile-note">Routine, ingredients, patch test</span>
               </span>
               <ChevronRight size={16} className="profile-chevron" />
             </button>
@@ -103,7 +119,7 @@ export const ProfileOverviewScreen = () => {
           <p className="profile-label">Recent order</p>
           <section className="profile-card">
             {recentOrder ? (
-              <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-list')}>
+              <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-detail', { orderId: recentOrder.id })}>
                 <span className="profile-ticket-top">
                   <span className="profile-pill">{statusLabel(recentOrder.status)}</span>
                   <span className="profile-ticket-meta">₹{recentOrder.finalPayable.toLocaleString('en-IN')}</span>

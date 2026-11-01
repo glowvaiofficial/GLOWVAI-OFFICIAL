@@ -47,6 +47,8 @@ export interface AppContextType {
   screenHistory: ScreenName[];
   navigate: (screen: ScreenName, params?: any) => void;
   goBack: () => void;
+  /** Return to an earlier screen in the history, or open it when it is not in the history. */
+  goBackTo: (screen: ScreenName) => void;
   activeParams: any;
 
   // User state
@@ -94,6 +96,8 @@ export interface AppContextType {
   orders: Order[];
   activeOrder: Order | null;
   setActiveOrder: (order: Order | null) => void;
+  /** Adds or replaces an order in the local order history and makes it the active order. */
+  recordOrder: (order: Order) => void;
   placeOrder: (paymentMethod: PaymentMethodType, checkoutDiscount?: number, verification?: PaymentVerification) => Promise<Order>;
   cancelOrder: (orderId: string, reason: string) => Order | null;
 

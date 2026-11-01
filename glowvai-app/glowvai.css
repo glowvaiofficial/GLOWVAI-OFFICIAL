@@ -1118,3 +1118,8 @@
 /* Empty state and sample-result notice (no invented report data) */
 .glowvai-root .skin-sample-notice{ margin: 10px 0 0; padding: 9px 12px; border-radius: 10px; background: #fff7ed; color: #9a3412; font-size: 11px; font-weight: 650; line-height: 1.45; }
 .glowvai-root .commerce-empty-cta{ margin: 16px 0 0; height: 48px; width: 100%; border-radius: 12px; background: #0f5cf6; color: #fff; font-size: 14px; font-weight: 800; }
+
+/* iOS Safari zooms the page when a field under 16px gets focus, so the coupon field is 16px on phones. */
+@media (max-width: 719px) {
+  .glowvai-root .cart-coupon input{ font-size: 16px; }
+}

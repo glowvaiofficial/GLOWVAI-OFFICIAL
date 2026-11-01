@@ -5,6 +5,19 @@ import type { OrderDeliveryType, OrderItem, OrderPricing, PaymentStatus, UserAdd
 import type { CartTotals } from './pricing';
 import type { DeliveryAddress } from './addressStore';
 import { payChoiceMeta, type PayChoice } from './checkoutSession';
+import type { Order } from '../../../types';
+
+// One handover code per order, shared by the order record and the dispatch alert so the rider and the
+// customer see the same code.
+const orderOtps = new Map<string, string>();
+const deliveryOtpFor = (orderId: string): string => {
+  let otp = orderOtps.get(orderId);
+  if (!otp) {
+    otp = newDeliveryOtp();
+    orderOtps.set(orderId, otp);
+  }
+  return otp;
+};
 
 export interface PlaceOrderInput {
   orderId: string;
@@ -88,6 +101,7 @@ export const placeCartOrder = async (input: PlaceOrderInput) => {
       paidAt: paid ? Date.now() : undefined,
     },
     referralCodeUsed: null,
+    deliveryOtp: deliveryOtpFor(input.orderId),
   });
 };
 
@@ -103,6 +117,52 @@ export const sendDispatchAlert = (input: PlaceOrderInput) => {
     items: input.items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
     totalAmount: input.totals.grandTotal + (input.tipAmount ?? 0),
     paymentMethod: meta.group === 'cod' ? 'CASH ON DELIVERY' : `ONLINE (${meta.method})`,
-    deliveryOtp: newDeliveryOtp(),
+    deliveryOtp: deliveryOtpFor(input.orderId),
   }).catch(() => null);
+};
+
+// The orders list and tracking read the app's local order history, so a placed order is also recorded there.
+export const toLocalOrder = (input: PlaceOrderInput, paidOnline: boolean, etaMinutes: number | null): Order => {
+  const meta = payChoiceMeta(input.pay);
+  const tip = input.tipAmount ?? 0;
+  const label = (['Home', 'Work', 'Other'] as const).find((l) => l === input.address.label) ?? 'Other';
+  return {
+    id: input.orderId,
+    createdAt: new Date().toISOString(),
+    items: input.items.map((item) => ({
+      productId: item.productId,
+      productName: item.name,
+      brand: item.brand,
+      variantSize: '',
+      quantity: item.quantity,
+      unitPrice: item.price,
+      insuranceSelected: false,
+      insuranceFee: 0,
+      imageUrl: item.image,
+    })),
+    address: {
+      id: input.address.id,
+      label,
+      street: input.address.fullAddress,
+      landmark: input.address.landmark,
+      area: input.address.city,
+      city: input.address.city,
+      pincode: input.address.pincode,
+      serviceable: input.address.serviceable,
+      deliveryMinutes: etaMinutes ?? 0,
+      isDefault: false,
+      deliveryInstructions: input.address.deliveryInstructions,
+    },
+    itemSubtotal: input.totals.itemTotal,
+    discount: input.totals.catalogSavings + input.totals.couponDiscount,
+    deliveryFee: input.totals.deliveryFee,
+    insuranceTotal: 0,
+    finalPayable: input.totals.grandTotal + tip,
+    paymentMethod: meta.group === 'cod' ? 'cod' : meta.group === 'card' ? 'card' : 'upi',
+    paymentStatus: meta.group === 'cod' ? 'pending' : paidOnline ? 'successful' : 'failed',
+    status: 'order_placed',
+    estimatedDeliveryMinutes: etaMinutes ?? 0,
+    isSplitDelivery: false,
+    fulfilmentTasks: [],
+  };
 };

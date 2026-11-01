@@ -32,11 +32,14 @@ import { SupportScreen } from './screens/SupportScreen';
 import { StudentReferralScreen } from './screens/StudentReferralScreen';
 
 const AppContent: React.FC = () => {
-  const { currentScreen, toastMessage } = useApp();
+  const { currentScreen, screenHistory, toastMessage } = useApp();
+  // Every navigation step gets a fresh screen, so opening the same screen again (another product, another
+  // category, the tab bar's unfiltered Categories) does not keep the previous visit's filters or quantity.
+  const visitKey = `${currentScreen}:${screenHistory.length}`;
 
   const renderScreen = () => {
     const PortedScreen = portedRoutes[currentScreen as keyof typeof portedRoutes];
-    if (PortedScreen) return <PortedScreen />;
+    if (PortedScreen) return <PortedScreen key={visitKey} />;
 
     switch (currentScreen) {
       case 'welcome':

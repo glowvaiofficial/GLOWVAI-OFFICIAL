@@ -32,6 +32,8 @@ export interface CreateOrderParams {
   pricing: OrderPricing;
   payment: OrderPayment;
   referralCodeUsed?: string | null;
+  /** Handover code for this order. The same code must go to the rider and the customer. */
+  deliveryOtp?: string;
 }
 
 export interface BackendOrderResponse {
@@ -52,6 +54,13 @@ export interface SlaStatusResponse {
   deliveryOtp: string;
   phases: Array<{ name: string; targetSeconds: number; completed: boolean; current: boolean }>;
 }
+
+// Backend calls give up after 8 seconds so an unreachable server can't hang checkout.
+const fetchWithTimeout = (url: string, init?: RequestInit, ms = 8000): Promise<Response> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+};
 
 // A fresh 4-digit handover code per order, instead of the same code for every customer.
 export const newDeliveryOtp = (): string => {
@@ -107,13 +116,13 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
       price: it.unitPrice,
     })),
     paymentMethod: params.payment.method,
-    deliveryOtp: newDeliveryOtp(),
+    deliveryOtp: params.deliveryOtp ?? newDeliveryOtp(),
     storeId: 'DS-VIJ-01',
   };
 
   for (const url of candidateUrls) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -126,10 +135,13 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     }
   }
 
-  // 2. Non-blocking Firestore sync
+  // 2. Firestore sync in the background. setDoc only resolves once the server acknowledges the write, so
+  // awaiting it froze checkout whenever Firestore was unreachable.
   try {
     const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-    await setDoc(orderRef, JSON.parse(JSON.stringify(newOrder)));
+    void setDoc(orderRef, JSON.parse(JSON.stringify(newOrder))).catch((dbErr: any) => {
+      console.warn('[Firestore Sync Note]:', dbErr?.message);
+    });
   } catch (dbErr: any) {
     console.warn('[Firestore Sync Note]:', dbErr?.message);
   }
@@ -149,7 +161,7 @@ export const verifyOrderPayment = async (orderId: string, grandTotal: number): P
 
   for (const url of candidateUrls) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -184,7 +196,7 @@ export const fetchOrderSlaStatus = async (orderId: string): Promise<SlaStatusRes
 
   for (const url of candidateUrls) {
     try {
-      const res = await fetch(url);
+      const res = await fetchWithTimeout(url);
       if (res.ok) {
         return (await res.json()) as SlaStatusResponse;
       }

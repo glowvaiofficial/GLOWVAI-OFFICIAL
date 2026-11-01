@@ -102,8 +102,9 @@ export function useScrollTopOn(key: unknown) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // On phones the app scrolls inside .screen-content; on the website the page itself scrolls.
-    ref.current?.closest('.screen-content')?.scrollTo({ top: 0 });
-    window.scrollTo({ top: 0 });
+    // 'instant' overrides the page's smooth scrolling, which Firefox otherwise drops when the screen changes.
+    ref.current?.closest('.screen-content')?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [key]);
   return ref;
 }

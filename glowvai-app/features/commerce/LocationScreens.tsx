@@ -302,7 +302,7 @@ export const LocationMapPickerScreen: React.FC = () => {
 
 // Step 3: check whether the saved address is inside the delivery area.
 export const ServiceabilityScreen: React.FC = () => {
-  const { goBack, navigate } = useApp();
+  const { goBack, goBackTo } = useApp();
   const address = useDeliveryAddress();
   const hasSaved = useAddressStore((s) => s.addresses.length > 0);
   const hasCart = useCartStore((s) => Object.keys(s.items).length > 0);
@@ -339,10 +339,10 @@ export const ServiceabilityScreen: React.FC = () => {
       </div>
 
       <footer className="commerce-sticky-bar">
-        <button className="commerce-ghost" onClick={() => navigate(hasSaved ? 'address-list' : 'location-setup')}>
+        <button className="commerce-ghost" onClick={() => goBackTo(hasSaved ? 'address-list' : 'location-setup')}>
           Change address
         </button>
-        <button className="commerce-primary" disabled={!serviceable} onClick={() => navigate(hasCart ? 'checkout-review' : 'home')}>
+        <button className="commerce-primary" disabled={!serviceable} onClick={() => goBackTo(hasCart ? 'checkout-review' : 'shop-home')}>
           {hasCart ? 'Continue to checkout' : 'Start shopping'}
         </button>
       </footer>

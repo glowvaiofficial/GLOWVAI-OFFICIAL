@@ -41,6 +41,10 @@ export const LoginScreen: React.FC = () => {
       <section className="login-reference-hero" aria-label="Glowvai benefits">
         <span className="login-orb login-orb-right" aria-hidden="true" />
         <span className="login-orb login-orb-left" aria-hidden="true" />
+        {/* Logging in is optional: the shop, cart and scan all work without an account. */}
+        <button type="button" className="onboarding-skip" onClick={() => navigate('shop-home')}>
+          Skip
+        </button>
 
         <div className="login-brand-lockup">
           <span className="login-brand-mark" aria-hidden="true"><span>g</span></span>

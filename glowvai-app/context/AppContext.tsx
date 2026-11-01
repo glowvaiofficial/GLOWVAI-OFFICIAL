@@ -15,10 +15,14 @@ import {
 } from '../types';
 import { NO_ADDRESS } from '../data/serviceability';
 import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
+import { useCartStore } from '../core/state/cartStore';
 import { PRODUCTS } from '../data/products';
 import { ApiService } from '../services/api';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
+
+// Screens that run one step and then navigate on by themselves. Back never returns to them.
+const PASS_THROUGH_SCREENS: ScreenName[] = ['welcome', 'auth-onboarding', 'scan-analyzing', 'face-loading', 'checkout-payment-processing'];
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
 const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearchParams(window.location.search).get('screen') as ScreenName | null : null;
@@ -79,7 +83,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [cart]);
 
   // Wishlist
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  // Kept on this device so saved products are still there after a reload.
+  const [wishlist, setWishlist] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('glowvai:wishlist') || '[]');
+      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string') : [];
+    } catch { return []; }
+  });
+
+  useEffect(() => {
+    try { window.localStorage.setItem('glowvai:wishlist', JSON.stringify(wishlist)); } catch { /* storage unavailable */ }
+  }, [wishlist]);
 
   // Orders
   const [orders, setOrders] = useState<Order[]>(() => {
@@ -155,20 +169,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Navigation handlers
+  // Each history entry keeps the params its screen was opened with, so going back to a product, category or
+  // order shows that same item again instead of whatever was opened after it.
+  const [paramsHistory, setParamsHistory] = useState<any[]>([]);
+
   const navigate = (screen: ScreenName, params?: any) => {
     setScreenHistory((prev) => [...prev, currentScreen]);
+    setParamsHistory((prev) => [...prev, activeParams]);
     setCurrentScreen(screen);
-    if (params !== undefined) setActiveParams(params);
+    // A screen opened without params starts clean, so a filter or item from an earlier screen does not leak into it.
+    setActiveParams(params === undefined ? null : params);
   };
 
   const goBack = () => {
     if (screenHistory.length === 0) {
-      if (currentScreen !== 'home') setCurrentScreen('home');
+      if (currentScreen !== 'home' && currentScreen !== 'shop-home') {
+        setCurrentScreen('shop-home');
+        setActiveParams(null);
+      }
       return;
     }
-    const prev = screenHistory[screenHistory.length - 1];
-    setScreenHistory((h) => h.slice(0, -1));
-    setCurrentScreen(prev);
+    // Skip screens that only run a step and move on (analysing a scan, processing a payment, redirects):
+    // going back into them would rerun that step or bounce straight forward again.
+    let index = screenHistory.length - 1;
+    while (index > 0 && PASS_THROUGH_SCREENS.includes(screenHistory[index])) index -= 1;
+    if (PASS_THROUGH_SCREENS.includes(screenHistory[index])) {
+      setScreenHistory([]);
+      setParamsHistory([]);
+      setCurrentScreen('shop-home');
+      setActiveParams(null);
+      return;
+    }
+    setScreenHistory((h) => h.slice(0, index));
+    setParamsHistory((h) => h.slice(0, index));
+    setCurrentScreen(screenHistory[index]);
+    setActiveParams(paramsHistory[index] ?? null);
+  };
+
+  // Returns to an earlier screen in the history (dropping the steps after it), or opens it if it is not there.
+  // Used when a side flow such as adding an address finishes and should hand back to the screen that started it.
+  const goBackTo = (screen: ScreenName) => {
+    const index = screenHistory.lastIndexOf(screen);
+    if (index === -1) {
+      navigate(screen);
+      return;
+    }
+    setActiveParams(paramsHistory[index] ?? null);
+    setScreenHistory((h) => h.slice(0, index));
+    setParamsHistory((h) => h.slice(0, index));
+    setCurrentScreen(screen);
   };
 
   // Auth actions
@@ -191,6 +240,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteAccount = () => {
+    // Everything the settings screen promises to remove: scan history, saved addresses and profile details,
+    // plus the bag, wishlist and ratings kept on this device.
+    ['@glowvai_scan_history', 'glowvai:skin-concerns', 'glowvai:profile-demographics', 'glowvai:order-ratings', 'glowvai:wishlist'].forEach((key) => {
+      try { window.localStorage.removeItem(key); } catch { /* storage unavailable */ }
+    });
+    useAddressStore.setState({ addresses: [], selectedId: null });
+    useCartStore.getState().clearCart();
+    setCurrentAddress(NO_ADDRESS);
+    setSavedAddresses([]);
+    setWishlist([]);
     setUser(null);
     setCart([]);
     setOrders([]);
@@ -291,6 +350,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Place Order. One key per checkout attempt, so a retry after a network failure cannot create a second order.
   const pendingCheckoutKey = useRef<string | null>(null);
+  const recordOrder = (order: Order) => {
+    setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+    setActiveOrder(order);
+  };
+
   const placeOrder = async (paymentMethod: PaymentMethodType, checkoutDiscount = 0, verification?: PaymentVerification): Promise<Order> => {
     pendingCheckoutKey.current ??= `idemp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const newOrder = await ApiService.createOrder(pendingCheckoutKey.current, cart, currentAddress, paymentMethod, checkoutDiscount, verification);
@@ -422,6 +486,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         screenHistory,
         navigate,
         goBack,
+        goBackTo,
         activeParams,
         user,
         customerDetails,
@@ -449,6 +514,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         orders,
         activeOrder,
         setActiveOrder,
+        recordOrder,
         placeOrder,
         cancelOrder,
         capturedFaceImage,
