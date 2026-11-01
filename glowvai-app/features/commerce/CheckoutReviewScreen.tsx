@@ -52,7 +52,7 @@ export const CheckoutReviewScreen: React.FC = () => {
                 <p>Express delivery to your {address.label.toLowerCase()} address</p>
               </div>
             </section>
-          ) : (
+          ) : address.fullAddress ? (
             <section className="commerce-card commerce-warn-card" role="alert">
               <AlertTriangle size={18} />
               <div>
@@ -60,7 +60,7 @@ export const CheckoutReviewScreen: React.FC = () => {
                 <p>Choose an address with a Vijayawada pincode (520xxx) to place the order.</p>
               </div>
             </section>
-          )}
+          ) : null}
 
           <DeliveryAddressCard address={address} onChange={() => navigate('address-saved')} />
 

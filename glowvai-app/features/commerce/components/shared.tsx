@@ -85,12 +85,28 @@ export const DeliveryAddressCard: React.FC<{ address: DeliveryAddress; onChange?
   <section className="commerce-card commerce-address-card">
     <div className="commerce-card-head">
       <h2>Delivering to</h2>
-      {onChange && (
+      {onChange && address.fullAddress && (
         <button className="commerce-link" onClick={onChange}>
           Change
         </button>
       )}
     </div>
+    {!address.fullAddress ? (
+      <div className="commerce-address-body">
+        <span className="commerce-suggest-icon" aria-hidden="true">
+          <MapPin size={16} />
+        </span>
+        <div>
+          <b>No delivery address yet</b>
+          <p>Add the address we should deliver to before you pay.</p>
+          {onChange && (
+            <button className="commerce-link" onClick={onChange}>
+              Add address
+            </button>
+          )}
+        </div>
+      </div>
+    ) : (
     <div className="commerce-address-body">
       <span className="commerce-suggest-icon" aria-hidden="true">
         <MapPin size={16} />
@@ -106,6 +122,7 @@ export const DeliveryAddressCard: React.FC<{ address: DeliveryAddress; onChange?
         {address.phoneNumber && <small>Phone: {address.phoneNumber}</small>}
       </div>
     </div>
+    )}
   </section>
 );
 

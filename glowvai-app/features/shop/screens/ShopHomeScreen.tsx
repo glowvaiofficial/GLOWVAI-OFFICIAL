@@ -187,7 +187,8 @@ export const ShopHomeScreen: React.FC = () => {
   const openCategory = (categoryId: string) => navigate('shop-category', { categoryId });
 
   const eta = currentAddress?.serviceable ? currentAddress.deliveryMinutes : null;
-  const addressLine = currentAddress ? [currentAddress.area, currentAddress.city].filter(Boolean).join(', ') : 'Set delivery address';
+  const hasAddress = Boolean(currentAddress?.pincode);
+  const addressLine = hasAddress ? [currentAddress.area, currentAddress.city].filter(Boolean).join(', ') : 'Set delivery address';
   const concerns = SHOP_CONCERNS.map((c) => ({ ...c, count: concernCount(c.id) })).filter((c) => c.count > 0);
   const quickTiles = SHOP_CATEGORIES.filter((c) => c.id !== 'Treatments').slice(0, 4);
 
@@ -202,7 +203,7 @@ export const ShopHomeScreen: React.FC = () => {
             </span>
             <span className="shop-home-address">
               <span>
-                {currentAddress?.label ? `${currentAddress.label} · ` : ''}
+                {hasAddress && currentAddress.label ? `${currentAddress.label} · ` : ''}
                 {addressLine}
               </span>
               <ChevronRight size={14} />
