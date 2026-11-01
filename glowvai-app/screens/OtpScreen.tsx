@@ -165,7 +165,7 @@ export const OtpScreen: React.FC = () => {
           <div className="otp-copy">
             <h1 id="otp-title">Verify Your Number</h1>
             <p>We've sent a 6-digit OTP to<br /><strong>+91 {formattedPhone}</strong></p>
-            {(process.env.NODE_ENV !== 'production') && <p className="otp-dev-hint">Development demo code: 123456</p>}
+            <p className="otp-dev-hint">Test code: 123456. No SMS is sent yet.</p>
           </div>
 
           <div className="otp-cells" role="group" aria-label="Six-digit verification code">
