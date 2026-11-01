@@ -122,6 +122,7 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     storeId: 'DS-VIJ-01',
   };
 
+  let savedByBackend = false;
   for (const url of candidateUrls) {
     try {
       const res = await fetchWithTimeout(url, {
@@ -130,6 +131,7 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
         body: JSON.stringify(payload),
       });
       if (res.ok) {
+        savedByBackend = true;
         break;
       }
     } catch {
@@ -137,16 +139,18 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     }
   }
 
-  // 2. Firestore sync in the background. setDoc only resolves once the server acknowledges the write, so
-  // awaiting it froze checkout whenever Firestore was unreachable. The backend may already have written this
-  // order from /api/orders/create, so merge instead of replacing its fields.
-  try {
-    const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-    void setDoc(orderRef, JSON.parse(JSON.stringify(newOrder)), { merge: true }).catch((dbErr: any) => {
+  // 2. When the backend saved the order it owns orders/{id} (status, vendor, stock reservation), and a browser
+  // write would overwrite its fields, so only fall back to a direct Firestore write when no backend accepted it.
+  // setDoc runs in the background: it only resolves once the server acknowledges the write.
+  if (!savedByBackend) {
+    try {
+      const orderRef = doc(db, ORDERS_COLLECTION, orderId);
+      void setDoc(orderRef, JSON.parse(JSON.stringify(newOrder)), { merge: true }).catch((dbErr: any) => {
+        console.warn('[Firestore Sync Note]:', dbErr?.message);
+      });
+    } catch (dbErr: any) {
       console.warn('[Firestore Sync Note]:', dbErr?.message);
-    });
-  } catch (dbErr: any) {
-    console.warn('[Firestore Sync Note]:', dbErr?.message);
+    }
   }
 
   return newOrder;
