@@ -147,3 +147,28 @@
   .glowvai-root .shop-home .shop-home-showcase h1{ font-size: 36px; }
   .glowvai-root .shop-home .shop-home-categories{ gap: 10px 6px; }
 }
+
+/* For Her / For Him switch and Navratri festival block. Markup is shared with the legacy home; its styles are the zq-* rules in ../../../glowvai.css. */
+.glowvai-root .shop-home{ --mode-accent: #ef2f72; --mode-deep: #aa0c43; --mode-soft: #fff1f5; }
+.glowvai-root .shop-home.zq-mode-men{ --mode-accent: #075df7; --mode-deep: #073784; --mode-soft: #edf5ff; }
+.glowvai-root .shop-home .shop-home-mode{ margin-top: 12px; }
+.glowvai-root .shop-home .shop-home-location-btn.is-static{ cursor: default; }
+.glowvai-root .shop-home .shop-home-festival{ margin: 14px var(--shop-home-gutter) 0; animation: navratri-mode-in 420ms cubic-bezier(.2,.8,.2,1) both; }
+.glowvai-root .shop-home .shop-home-festival .zq-festival{ padding: 0; }
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .shop-home .shop-home-festival{ animation: none; }
+}
+@media (min-width: 720px){
+  .glowvai-root .shop-home .shop-home-mode{ max-width: 640px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-hero{ height: 260px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy{ top: 64px; left: 32px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy strong{ font-size: 44px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy em{ font-size: 13px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid{ gap: 12px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid button b{ min-height: 46px; padding: 12px 10px 4px; font-size: 12px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-promo{ height: 64px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-promo b{ font-size: 13px; }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
