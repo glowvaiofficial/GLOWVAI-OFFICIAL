@@ -16,6 +16,9 @@ const herCategoryAtlas = '/glowvai/assets/home/navratri-her-categories.png';
 const herHero = '/glowvai/assets/home/navratri-her-hero.png';
 const himCategoryAtlas = '/glowvai/assets/home/navratri-him-categories.png';
 const himHero = '/glowvai/assets/home/navratri-him-hero.png';
+
+// The Navratri edit stays off outside the festival. Turn this on for the festival and check the dates first.
+const SHOW_NAVRATRI_EDIT = false;
 import { ProductCard } from '../components/cards/ProductCard';
 import { AddressModal } from '../components/common/AddressModal';
 import { useApp } from '../context/AppContext';
@@ -200,16 +203,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ embedded = false }) => {
           </div>
         </div>
 
-        <section className="zq-festival" aria-label={`Navratri ${content.heroCopy}`}>
-          <button className="zq-festival-hero" onClick={() => navigate('categories')}>
-            <img src={content.heroImage} alt="" />
-            <span className="zq-festival-copy"><small>Celebrate</small><strong>NAVRATRI</strong><em>{content.heroCopy}</em></span>
-          </button>
-          <div className="zq-festival-grid">
-            {content.categories.map((category, index) => <button key={category.title} onClick={() => (category.query ? navigate('search', { query: category.query }) : navigate('categories'))}><span className="zq-category-photo" style={{ backgroundImage: `url(${content.categoryAtlas})`, '--category-index': index } as React.CSSProperties} /><b>{category.title}</b><ChevronRight size={14} /></button>)}
-          </div>
-          <button className="zq-festival-promo" onClick={() => navigate('categories')}><img src={content.heroImage} alt="" /><span><b>{content.promoTitle}</b><small>{content.promoCopy}</small></span><ChevronRight size={19} /></button>
-        </section>
+        {SHOW_NAVRATRI_EDIT && (
+          <section className="zq-festival" aria-label={`Navratri ${content.heroCopy}`}>
+            <button className="zq-festival-hero" onClick={() => navigate('categories')}>
+              <img src={content.heroImage} alt="" />
+              <span className="zq-festival-copy"><small>Celebrate</small><strong>NAVRATRI</strong><em>{content.heroCopy}</em></span>
+            </button>
+            <div className="zq-festival-grid">
+              {content.categories.map((category, index) => <button key={category.title} onClick={() => (category.query ? navigate('search', { query: category.query }) : navigate('categories'))}><span className="zq-category-photo" style={{ backgroundImage: `url(${content.categoryAtlas})`, '--category-index': index } as React.CSSProperties} /><b>{category.title}</b><ChevronRight size={14} /></button>)}
+            </div>
+            <button className="zq-festival-promo" onClick={() => navigate('categories')}><img src={content.heroImage} alt="" /><span><b>{content.promoTitle}</b><small>{content.promoCopy}</small></span><ChevronRight size={19} /></button>
+          </section>
+        )}
 
         <section className="zq-discovery" aria-labelledby="top-picks-title">
           <div className="zq-section-title zq-featured-title"><h2 id="top-picks-title">{content.shelfTitle}</h2><button onClick={() => navigate('categories')}>See all <ChevronRight size={15} /></button></div>
