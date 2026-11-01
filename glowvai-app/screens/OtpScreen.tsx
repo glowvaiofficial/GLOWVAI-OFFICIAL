@@ -5,6 +5,7 @@ import '../responsive/entry-scan.css';
 
 const OTP_LENGTH = 6;
 const KEYPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const WIDE_QUERY = '(min-width: 720px)';
 
 export const OtpScreen: React.FC = () => {
   const { navigate, goBack, verifyUserOtp, loginUser, showToast, activeParams } = useApp();
@@ -18,9 +19,20 @@ export const OtpScreen: React.FC = () => {
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const verificationLocked = useRef(false);
 
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia(WIDE_QUERY).matches);
+
   const phone: string = activeParams?.phone || '';
   const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-  const formattedPhone = cleanPhone ? `${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}` : '98765 43210';
+  const formattedPhone = cleanPhone ? `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}` : '';
+
+  // From tablet width up the code is typed on the keyboard beside the brand panel, so the on-screen keypad is not shown.
+  useEffect(() => {
+    const query = window.matchMedia(WIDE_QUERY);
+    const update = () => setWide(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
   useLayoutEffect(() => {
     const lockToAvailableHeight = () => {
@@ -137,13 +149,85 @@ export const OtpScreen: React.FC = () => {
     }
   };
 
+  const securityArt = (
+    <div className="otp-security-art" aria-hidden="true">
+      <span className="otp-cloud otp-cloud-one" />
+      <span className="otp-cloud otp-cloud-two" />
+      <span className="otp-shield"><Shield /><LockKeyhole /></span>
+      <Send className="otp-plane" />
+      <Sparkles className="otp-sparkle otp-sparkle-one" />
+      <Sparkles className="otp-sparkle otp-sparkle-two" />
+    </div>
+  );
+
+  const codeForm = (
+    <>
+      <div className="otp-copy">
+        <h1 id="otp-title">Verify your number</h1>
+        <p>
+          We've sent a 6-digit OTP to{' '}<br className="otp-copy-break" />
+          {formattedPhone ? <strong>{formattedPhone}</strong> : 'your mobile number'}
+        </p>
+        {(process.env.NODE_ENV !== 'production') && <p className="otp-dev-hint">Development demo code: 123456</p>}
+      </div>
+
+      <div className="otp-cells" role="group" aria-label="Six-digit verification code">
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            ref={(node) => { inputs.current[index] = node; }}
+            id={`otp-input-${index}`}
+            className={digit ? 'is-filled' : ''}
+            style={{ '--otp-order': index } as React.CSSProperties}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete={index === 0 ? 'one-time-code' : 'off'}
+            maxLength={index === 0 ? OTP_LENGTH : 1}
+            value={digit}
+            onFocus={() => {
+              setActiveIndex(index);
+              const host = screen.current?.parentElement;
+              if (host) host.scrollTop = 0;
+            }}
+            onChange={(event) => commitDigits(index, event.target.value)}
+            onPaste={(event) => {
+              event.preventDefault();
+              commitDigits(index, event.clipboardData.getData('text'));
+            }}
+            onKeyDown={(event) => handleKeyDown(index, event)}
+            aria-label={`OTP digit ${index + 1}`}
+            aria-invalid={Boolean(error)}
+            disabled={loading}
+          />
+        ))}
+      </div>
+
+      <div className="otp-resend" aria-live="polite">
+        <RefreshCw aria-hidden="true" />
+        {cooldown > 0 ? (
+          <span>Resend OTP in <strong>00:{String(cooldown).padStart(2, '0')}</strong></span>
+        ) : (
+          <button type="button" onClick={handleResend} disabled={!phone}>Resend OTP</button>
+        )}
+      </div>
+
+      <div className={`otp-validity${loading ? ' is-verifying' : ''}`}>
+        <ShieldCheck aria-hidden="true" />
+        <span>{loading ? 'Verifying your code…' : 'Never share this code with anyone'}</span>
+      </div>
+
+      {error && <p className="otp-error" role="alert">{error}</p>}
+    </>
+  );
+
   return (
     <main
       ref={screen}
-      className="otp-reference-screen"
-      style={lockedHeight ? { '--otp-locked-height': `${lockedHeight}px` } as React.CSSProperties : undefined}
+      className={`otp-reference-screen${wide ? ' is-wide' : ''}`}
+      style={lockedHeight && !wide ? { '--otp-locked-height': `${lockedHeight}px` } as React.CSSProperties : undefined}
     >
-      <section className="otp-reference-hero" aria-labelledby="otp-title">
+      <section className="otp-reference-hero" aria-labelledby={wide ? undefined : 'otp-title'} aria-label={wide ? 'glowvai' : undefined}>
         <span className="otp-orb otp-orb-top" aria-hidden="true" />
         <span className="otp-orb otp-orb-right" aria-hidden="true" />
         <span className="otp-orb otp-orb-bottom" aria-hidden="true" />
@@ -153,82 +237,33 @@ export const OtpScreen: React.FC = () => {
         </button>
 
         <div className="otp-hero-content">
-          <div className="otp-security-art" aria-hidden="true">
-            <span className="otp-cloud otp-cloud-one" />
-            <span className="otp-cloud otp-cloud-two" />
-            <span className="otp-shield"><Shield /><LockKeyhole /></span>
-            <Send className="otp-plane" />
-            <Sparkles className="otp-sparkle otp-sparkle-one" />
-            <Sparkles className="otp-sparkle otp-sparkle-two" />
-          </div>
+          {securityArt}
+          {wide ? (
+            <div className="otp-wide-brand">
+              <span className="brand-wordmark">glowvai</span>
+              <p>One quick check and you're signed in.</p>
+            </div>
+          ) : codeForm}
+        </div>
+      </section>
 
-          <div className="otp-copy">
-            <h1 id="otp-title">Verify Your Number</h1>
-            <p>We've sent a 6-digit OTP to<br /><strong>+91 {formattedPhone}</strong></p>
-            {(process.env.NODE_ENV !== 'production') && <p className="otp-dev-hint">Development demo code: 123456</p>}
-          </div>
-
-          <div className="otp-cells" role="group" aria-label="Six-digit verification code">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(node) => { inputs.current[index] = node; }}
-                id={`otp-input-${index}`}
-                className={digit ? 'is-filled' : ''}
-                style={{ '--otp-order': index } as React.CSSProperties}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                autoComplete={index === 0 ? 'one-time-code' : 'off'}
-                maxLength={index === 0 ? OTP_LENGTH : 1}
-                value={digit}
-                onFocus={() => {
-                  setActiveIndex(index);
-                  const host = screen.current?.parentElement;
-                  if (host) host.scrollTop = 0;
-                }}
-                onChange={(event) => commitDigits(index, event.target.value)}
-                onPaste={(event) => {
-                  event.preventDefault();
-                  commitDigits(index, event.clipboardData.getData('text'));
-                }}
-                onKeyDown={(event) => handleKeyDown(index, event)}
-                aria-label={`OTP digit ${index + 1}`}
-                aria-invalid={Boolean(error)}
-                disabled={loading}
-              />
+      {wide ? (
+        <section className="otp-keypad-sheet otp-form-sheet" aria-labelledby="otp-title">
+          <div className="otp-form-column">{codeForm}</div>
+        </section>
+      ) : (
+        <section className="otp-keypad-sheet" aria-label="Numeric keypad">
+          <span className="otp-sheet-handle" aria-hidden="true" />
+          <div className="otp-keypad">
+            {KEYPAD.map((digit, index) => (
+              <button key={digit} type="button" style={{ '--key-order': index } as React.CSSProperties} onClick={() => handleKeypadDigit(digit)} disabled={loading}>{digit}</button>
             ))}
+            <button className="otp-delete-key" type="button" style={{ '--key-order': 9 } as React.CSSProperties} onClick={() => removeDigit(undefined, false)} disabled={loading} aria-label="Delete digit"><Delete aria-hidden="true" /></button>
+            <button type="button" style={{ '--key-order': 10 } as React.CSSProperties} onClick={() => handleKeypadDigit('0')} disabled={loading}>0</button>
+            <span className="otp-key-spacer" aria-hidden="true" />
           </div>
-
-          <div className="otp-resend" aria-live="polite">
-            <RefreshCw aria-hidden="true" />
-            {cooldown > 0 ? (
-              <span>Resend OTP in <strong>00:{String(cooldown).padStart(2, '0')}</strong></span>
-            ) : (
-              <button type="button" onClick={handleResend}>Resend OTP</button>
-            )}
-          </div>
-
-          <div className={`otp-validity${loading ? ' is-verifying' : ''}`}>
-            <ShieldCheck aria-hidden="true" />
-            <span>{loading ? 'Verifying your code…' : 'This code is valid for 5 minutes'}</span>
-          </div>
-
-          {error && <p className="otp-error" role="alert">{error}</p>}
-        </div>
-      </section>
-
-      <section className="otp-keypad-sheet" aria-label="Numeric keypad">
-        <span className="otp-sheet-handle" aria-hidden="true" />
-        <div className="otp-keypad">
-          {KEYPAD.map((digit, index) => (
-            <button key={digit} type="button" style={{ '--key-order': index } as React.CSSProperties} onClick={() => handleKeypadDigit(digit)} disabled={loading}>{digit}</button>
-          ))}
-          <button className="otp-delete-key" type="button" style={{ '--key-order': 9 } as React.CSSProperties} onClick={() => removeDigit(undefined, false)} disabled={loading} aria-label="Delete digit"><Delete aria-hidden="true" /></button>
-          <button type="button" style={{ '--key-order': 10 } as React.CSSProperties} onClick={() => handleKeypadDigit('0')} disabled={loading}>0</button>
-          <span className="otp-key-spacer" aria-hidden="true" />
-        </div>
-      </section>
+        </section>
+      )}
     </main>
   );
 };

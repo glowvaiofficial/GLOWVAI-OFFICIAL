@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import '../responsive/entry-scan.css';
 const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.png';
@@ -22,7 +22,7 @@ const steps = [
     highlight: ' glow,',
     tail: ' delivered.',
     body: 'Personalized skincare products and quick commerce, right to your door.',
-    highlights: [{title:'Delivery in about 10 minutes',text:'Orders are dispatched from a nearby darkstore.'},{title:'Pay your way',text:'UPI, cards, wallets or cash on delivery.'},{title:'Follow your rider',text:'Track packing, dispatch and arrival live.'}],
+    highlights: [{title:'Quick local delivery',text:'Orders are packed at a store near you.'},{title:'Pay your way',text:'UPI, cards, netbanking or cash on delivery.'},{title:'Track your order',text:'See packing, dispatch and arrival in one place.'}],
     action: 'Next',
   },
   {
@@ -60,10 +60,10 @@ export const OnboardingScreen: React.FC = () => {
         <span className="brand-wordmark" style={{ position: 'absolute', top: 25, left: 29, color: '#fff', fontSize: 26, fontWeight: 500, letterSpacing: '-.055em', textShadow: '0 2px 12px rgba(0,53,170,.18)' }}>
           glowvai
         </span>
-        {step === 1 && (
-          <span style={{ position: 'absolute', top: 84, right: 18, display: 'inline-flex', minHeight: 48, alignItems: 'center', gap: 7, padding: '7px 12px', border: '2px solid rgba(255,255,255,.82)', borderRadius: 14, background: 'rgba(15,105,248,.72)', color: '#fff', fontSize: 12, fontWeight: 800, lineHeight: 1.05 }}>
-            <Zap size={18} fill="currentColor" /> Within<br />30 Minutes
-          </span>
+        {step < steps.length - 1 && (
+          <button type="button" className="onboarding-skip" onClick={() => navigate('login')}>
+            Skip
+          </button>
         )}
       </div>
 
@@ -89,7 +89,6 @@ export const OnboardingScreen: React.FC = () => {
         <button type="button" onClick={advance} style={{ display: 'flex', width: '100%', minHeight: 62, alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 19 : 25, borderRadius: 999, background: '#0d62f8', boxShadow: '0 10px 24px rgba(13,98,248,.22)', color: '#fff', fontSize: step === 2 ? 15 : 18, fontWeight: 750 }}>
           {item.action}<ArrowRight size={22} />
         </button>
-        <span aria-hidden="true" style={{ position: 'absolute', bottom: 8, left: '50%', width: 118, height: 4, transform: 'translateX(-50%)', borderRadius: 999, background: '#7f8794' }} />
       </section>
     </main>
   );

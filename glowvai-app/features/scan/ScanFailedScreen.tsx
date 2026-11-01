@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, CheckCircle2, Image as ImageIcon, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Camera, CheckCircle2, Image as ImageIcon, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { ScanHeader } from './components/ScanHeader';
 import type { ScanFailureReason } from './services/scanApi';
@@ -17,12 +17,12 @@ const COPY: Record<ScanFailureReason | 'default', FailureCopy> = {
     body: 'We couldn’t load the photo. Please capture it again or select an image from your gallery.',
   },
   backend_unreachable: {
-    headline: 'AI analysis is not available yet',
+    headline: 'Skin analysis is not available right now',
     title: 'Analysis service unavailable',
     body: 'We could not reach the skin analysis service. Check your connection and try again.',
   },
   invalid_response: {
-    headline: 'AI analysis is not available yet',
+    headline: 'Skin analysis is not available right now',
     title: 'Unexpected analysis response',
     body: 'The analysis service returned a result we could not read. Please try again in a moment.',
   },
@@ -44,8 +44,7 @@ const COPY: Record<ScanFailureReason | 'default', FailureCopy> = {
 };
 
 const NEXT_STEPS = [
-  'Try retaking the scan photo',
-  'Move to brighter, even light',
+  'Move to bright, even light',
   'Keep your face centred',
   'Remove glasses or sunglasses',
   'Look directly at the camera',
@@ -59,43 +58,51 @@ export const ScanFailedScreen: React.FC = () => {
 
   return (
     <div className="scan-screen">
-      <ScanHeader title="GlowVAI scan" subtitle="Beauty · smarter · faster" onBack={goBack} />
-      <div className="scan-body">
-        <h2 className="scan-headline">{copy.headline}</h2>
-        <p className="scan-error-title">{copy.title}</p>
-        <p className="scan-lead">{copy.body}</p>
-
-        <div className="scan-diagnostic">
-          <span className="scan-diagnostic-title">Diagnostic details</span>
-          <span className="scan-diagnostic-row">Reason: {reason}</span>
-          {details && <span className="scan-diagnostic-row">{details}</span>}
+      <ScanHeader title="Skin scan" subtitle="We could not finish this scan" onBack={goBack} />
+      <div className="scan-body scan-failed-body">
+        <div className="scan-failed-head">
+          <span className="scan-permission-icon is-warn" aria-hidden="true">
+            <AlertCircle size={34} />
+          </span>
+          <h2 className="scan-headline">{copy.headline}</h2>
+          <p className="scan-lead">{copy.body}</p>
         </div>
 
-        <h3 className="scan-section-label">Next steps</h3>
-        <ul className="scan-check-list">
-          {NEXT_STEPS.map((step) => (
-            <li key={step} className="scan-check-item">
-              <CheckCircle2 size={16} />
-              {step}
-            </li>
-          ))}
-        </ul>
+        <section className="scan-card scan-next-steps">
+          <h3 className="scan-section-label">Before you try again</h3>
+          <ul className="scan-check-list">
+            {NEXT_STEPS.map((step) => (
+              <li key={step} className="scan-check-item">
+                <CheckCircle2 size={16} />
+                {step}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <div className="scan-failed-actions">
+          <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
+            <Camera size={18} />
+            Try again
+          </button>
+          <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
+            <ImageIcon size={18} />
+            Choose another photo
+          </button>
+          <button type="button" className="scan-text-button" onClick={() => navigate('shop-home')}>
+            Continue shopping
+          </button>
+        </div>
 
         <p className="scan-privacy">
           <ShieldCheck size={14} /> Your photo is used only for this skin assessment.
         </p>
 
-        <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
-          <Camera size={18} />
-          Try again
-        </button>
-        <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
-          <ImageIcon size={18} />
-          Choose another photo
-        </button>
-        <button type="button" className="scan-text-button" onClick={() => navigate('home')}>
-          Continue shopping
-        </button>
+        <details className="scan-diagnostic">
+          <summary className="scan-diagnostic-title">Technical details</summary>
+          <span className="scan-diagnostic-row">{copy.title} ({reason})</span>
+          {details && <span className="scan-diagnostic-row">{details}</span>}
+        </details>
       </div>
     </div>
   );

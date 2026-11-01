@@ -10,9 +10,16 @@ import { errorMessageOf } from './authUtils';
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 30;
 
+// "+919876543210" -> "+91 98765 43210"
+const formatDisplayPhone = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(-10);
+  return digits.length === 10 ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}` : '';
+};
+
 export const OtpVerificationScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
-  const phoneNumber: string = activeParams?.phoneNumber || '+91 98765 43210';
+  const phoneNumber: string = activeParams?.phoneNumber || '';
+  const displayPhone = formatDisplayPhone(phoneNumber);
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isVerifying, setIsVerifying] = useState(false);
@@ -22,10 +29,6 @@ export const OtpVerificationScreen: React.FC = () => {
 
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const verifyingRef = useRef(false);
-
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -96,7 +99,7 @@ export const OtpVerificationScreen: React.FC = () => {
   };
 
   const handleResend = async () => {
-    if (countdown > 0) return;
+    if (countdown > 0 || !phoneNumber) return;
     safeHapticImpact();
     setCountdown(RESEND_SECONDS);
     setDigits(Array(OTP_LENGTH).fill(''));
@@ -111,21 +114,32 @@ export const OtpVerificationScreen: React.FC = () => {
 
   const countdownLabel = `0:${countdown < 10 ? `0${countdown}` : countdown}`;
 
+  const code = digits.join('');
+
   return (
     <AuthShell
       onBack={goBack}
-      topRight={
-        <button type="button" className="auth-text-button" onClick={goBack}>
-          Edit Number
+      footer={
+        <button
+          type="button"
+          className="auth-primary-button"
+          onClick={() => void verifyCode(code)}
+          disabled={code.length !== OTP_LENGTH || isVerifying}
+        >
+          {isVerifying ? <span className="auth-spinner" aria-label="Verifying" /> : 'Verify and continue'}
         </button>
       }
     >
       <h1 className="auth-title">Verify your number</h1>
       <p className="auth-subtitle">
-        Enter the {OTP_LENGTH}-digit code sent to <strong className="auth-strong">{phoneNumber}</strong>
+        Enter the {OTP_LENGTH}-digit code sent to{' '}
+        {displayPhone ? <strong className="auth-strong">{displayPhone}</strong> : 'your mobile number'}.{' '}
+        <button type="button" className="auth-text-button auth-inline-link" onClick={goBack}>
+          Change number
+        </button>
       </p>
 
-      <div className={`auth-otp-cells${isShaking ? ' is-shaking' : ''}${errorMessage ? ' has-error' : ''}`}>
+      <div className={`auth-otp-cells${isShaking ? ' is-shaking' : ''}${errorMessage ? ' has-error' : ''}`} role="group" aria-label="Verification code">
         {digits.map((digit, index) => (
           <input
             key={index}
@@ -140,6 +154,7 @@ export const OtpVerificationScreen: React.FC = () => {
             value={digit}
             disabled={isVerifying}
             aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
+            aria-invalid={Boolean(errorMessage)}
             onChange={(event) => handleChange(index, event.target.value)}
             onKeyDown={(event) => handleKeyDown(index, event)}
             onPaste={handlePaste}
@@ -165,16 +180,15 @@ export const OtpVerificationScreen: React.FC = () => {
       <div className="auth-status-row">
         {countdown > 0 ? (
           <span>
-            Resend OTP in <strong className="auth-strong auth-mono">{countdownLabel}</strong>
+            Resend code in <strong className="auth-strong auth-mono">{countdownLabel}</strong>
           </span>
         ) : (
-          <button type="button" className="auth-text-button auth-resend" onClick={handleResend}>
+          <button type="button" className="auth-text-button auth-resend" onClick={handleResend} disabled={!phoneNumber}>
             <RefreshCw aria-hidden="true" />
-            Resend OTP
+            Resend code
           </button>
         )}
       </div>
-
     </AuthShell>
   );
 };

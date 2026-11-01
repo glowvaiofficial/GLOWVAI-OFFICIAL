@@ -42,7 +42,7 @@ export const ScanPreviewScreen: React.FC = () => {
     <div className="scan-screen">
       <ScanHeader title="Review your photo" onBack={goBack} />
       <div className="scan-body">
-        <div className="scan-split">
+        <div className="scan-layout">
           <div className="scan-preview-frame">
             {previewUrl && !photoError ? (
               <img className="scan-preview-image" src={previewUrl} alt="Your captured face" />
@@ -53,7 +53,7 @@ export const ScanPreviewScreen: React.FC = () => {
             )}
           </div>
 
-          <div className="scan-split-side">
+          <div className="scan-layout-side">
             {photoError && (
               <div className="scan-alert" role="alert">
                 <AlertCircle size={18} />

@@ -1,21 +1,58 @@
 import React from 'react';
-import { AlertTriangle, ArrowLeft, ArrowRight, CreditCard, RotateCcw, ShoppingBag, X } from 'lucide-react';
+import { AlertTriangle, RotateCcw, Sparkles, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const PaymentStatusScreen: React.FC = () => {
   const { navigate, activeParams } = useApp();
   const status = activeParams?.status === 'failed' ? 'failed' : 'cancelled';
   const failed = status === 'failed';
-  return <main className={`payment-status-screen is-${status}`}>
-    <header><button onClick={() => navigate('checkout', activeParams?.checkoutParams)} aria-label="Back to checkout"><ArrowLeft size={21} /></button><h1>Payment update</h1></header>
-    <section>
-      <div className="payment-state-mark">{failed ? <AlertTriangle size={34} /> : <X size={34} />}</div>
-      <p className="payment-state-kicker">{failed ? 'PAYMENT NOT COMPLETED' : 'PAYMENT CANCELLED'}</p>
-      <h2>{failed ? 'Your payment did not go through.' : 'No payment was made.'}</h2>
-      <p>{failed ? 'The bank or payment app declined this attempt. If money was debited, it will be refunded by your bank or Razorpay within their usual timeline.' : 'Your bag and delivery slot are still saved. Pick another method when you are ready.'}</p>
-      <div className="payment-state-receipt"><span><ShoppingBag size={17} /> Bag total</span><b>₹{activeParams?.amount || 0}</b></div>
-      <button className="payment-primary" onClick={() => navigate('checkout', activeParams?.checkoutParams)}><RotateCcw size={18} /> Try another method</button>
-      <button className="payment-secondary" onClick={() => navigate('home')}><CreditCard size={18} /> Continue shopping <ArrowRight size={17} /></button>
-    </section>
-  </main>;
+  const amount = typeof activeParams?.amount === 'number' ? `₹${activeParams.amount}` : '—';
+
+  return (
+    <main className={`commerce-screen commerce-result is-${status}`}>
+      <header className="commerce-result-head">
+        <span className="commerce-brand">
+          <Sparkles size={16} />
+          glowvai
+        </span>
+        <span>Payment update</span>
+      </header>
+
+      <div className="commerce-body commerce-result-body">
+        <span className={failed ? 'commerce-result-icon is-failed' : 'commerce-result-icon is-neutral'}>{failed ? <AlertTriangle size={32} /> : <X size={32} />}</span>
+        <h1>{failed ? 'Your payment didn’t go through' : 'No payment was made'}</h1>
+        <p>
+          {failed
+            ? 'The bank or payment app declined this attempt. If money left your account, your bank or Razorpay returns it within their usual refund time.'
+            : 'You cancelled the payment. Your cart is still saved, so you can pick another method when you are ready.'}
+        </p>
+
+        <dl className="commerce-result-meta">
+          <div>
+            <dt>Status</dt>
+            <dd>{failed ? 'Not completed' : 'Cancelled'}</dd>
+          </div>
+          <div>
+            <dt>Cart total</dt>
+            <dd>{amount}</dd>
+          </div>
+          {typeof activeParams?.message === 'string' && activeParams.message && (
+            <div>
+              <dt>Reason</dt>
+              <dd>{activeParams.message}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+
+      <footer className="commerce-sticky-bar">
+        <button className="commerce-ghost" onClick={() => navigate('home')}>
+          Continue shopping
+        </button>
+        <button className="commerce-primary" onClick={() => navigate('checkout', activeParams?.checkoutParams)}>
+          <RotateCcw size={17} /> Try again
+        </button>
+      </footer>
+    </main>
+  );
 };

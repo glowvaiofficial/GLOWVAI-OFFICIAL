@@ -1,17 +1,18 @@
 import React from 'react';
-import { ArrowRight, Clock, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals, COUPON_CODE } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
-import { CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
+import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 
 export const CheckoutReviewScreen: React.FC = () => {
   const { goBack, navigate } = useApp();
   const items = useCartStore((s) => s.items);
   const couponApplied = useCheckoutSession((s) => s.couponApplied);
   const address = useDeliveryAddress();
+  const minutes = useDeliveryMinutes();
 
   const cartItems = Object.values(items);
   const totals = computeCartTotals(cartItems, couponApplied);
@@ -36,75 +37,76 @@ export const CheckoutReviewScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-review">
-      <FlowHeader title="Review order" subtitle={`${totals.itemCount} items`} onBack={goBack} />
+      <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'} · ₹${totals.grandTotal}`} onBack={goBack} />
       <CheckoutSteps step={2} />
 
-      <div className="commerce-body">
-        <section className="commerce-card commerce-eta-card">
-          <span className="commerce-eta-icon">
-            <Zap size={16} fill="currentColor" />
-          </span>
-          <div>
-            <b>Arriving in about 10 minutes</b>
-            <p>Dispatched from the Glowway darkstore nearest to you</p>
-          </div>
-        </section>
-
-        <DeliveryAddressCard address={address} onChange={() => navigate('address-saved')} />
-
-        <section className="commerce-card" aria-label="Items">
-          <div className="commerce-card-head">
-            <h2>Items</h2>
-            <button className="commerce-link" onClick={() => navigate('cart-tab')}>
-              Edit cart
-            </button>
-          </div>
-          {cartItems.map((item) => (
-            <div className="commerce-review-line" key={item.productId}>
-              <div className="commerce-thumb">
-                {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={20} />}
-              </div>
+      <div className="commerce-body commerce-split">
+        <div className="commerce-col">
+          {minutes ? (
+            <section className="commerce-card commerce-eta-card">
+              <span className="commerce-eta-icon">
+                <Zap size={16} fill="currentColor" />
+              </span>
               <div>
-                <small>{item.brand}</small>
-                <h3>{item.name}</h3>
-                <p>
-                  Qty {item.quantity} · ₹{item.price * item.quantity}
-                </p>
+                <b>Arriving in about {minutes} minutes</b>
+                <p>Express delivery to your {address.label.toLowerCase()} address</p>
               </div>
-            </div>
-          ))}
-        </section>
+            </section>
+          ) : address.fullAddress ? (
+            <section className="commerce-card commerce-warn-card" role="alert">
+              <AlertTriangle size={18} />
+              <div>
+                <b>We don’t deliver to this address yet</b>
+                <p>Choose an address with a Vijayawada pincode (520xxx) to place the order.</p>
+              </div>
+            </section>
+          ) : null}
 
-        <section className="commerce-card commerce-bill">
-          <h2>Bill details</h2>
-          <dl>
-            <div>
-              <dt>Item total</dt>
-              <dd>₹{totals.itemTotal}</dd>
+          <DeliveryAddressCard address={address} onChange={() => navigate('address-saved')} />
+
+          <section className="commerce-card" aria-label="Items">
+            <div className="commerce-card-head">
+              <h2>
+                {cartItems.length} {cartItems.length === 1 ? 'product' : 'products'}
+              </h2>
+              <button className="commerce-link" onClick={() => navigate('cart-tab')}>
+                Edit cart
+              </button>
             </div>
-            <div className="is-saving">
-              <dt>Catalog discount</dt>
-              <dd>−₹{totals.catalogSavings}</dd>
-            </div>
-            {couponApplied && (
-              <div className="is-saving">
-                <dt>Coupon ({COUPON_CODE})</dt>
-                <dd>−₹{totals.couponDiscount}</dd>
+            {cartItems.map((item) => (
+              <div className="commerce-review-line" key={item.productId}>
+                <div className="commerce-thumb">
+                  {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={20} />}
+                </div>
+                <div>
+                  <small>{item.brand}</small>
+                  <h3>{item.name}</h3>
+                  <p>Qty {item.quantity}</p>
+                </div>
+                <b className="commerce-review-price">₹{item.price * item.quantity}</b>
               </div>
-            )}
-            <div>
-              <dt>Delivery</dt>
-              <dd>{totals.deliveryFee === 0 ? 'FREE' : `₹${totals.deliveryFee}`}</dd>
-            </div>
-            <div className="commerce-bill-total">
-              <dt>Grand total</dt>
-              <dd>₹{totals.grandTotal}</dd>
-            </div>
-          </dl>
-          <p className="commerce-assure">
-            <Clock size={14} /> Pay securely in the next step <ShieldCheck size={14} />
-          </p>
-        </section>
+            ))}
+          </section>
+        </div>
+
+        <aside className="commerce-col commerce-side" aria-label="Bill details">
+          <section className="commerce-card commerce-bill">
+            <h2>Bill details</h2>
+            <BillRows
+              rows={[
+                { label: 'Item total', value: totals.itemTotal },
+                totals.catalogSavings > 0 && { label: 'Product discount', value: totals.catalogSavings, saving: true },
+                couponApplied && totals.couponDiscount > 0 && { label: `Coupon (${COUPON_CODE})`, value: totals.couponDiscount, saving: true },
+                { label: 'Delivery', value: totals.deliveryFee, free: totals.deliveryFee === 0 },
+              ]}
+              totalLabel="Grand total"
+              total={totals.grandTotal}
+            />
+            <p className="commerce-assure">
+              <ShieldCheck size={14} /> You choose how to pay in the next step
+            </p>
+          </section>
+        </aside>
       </div>
 
       <footer className="commerce-sticky-bar">
@@ -114,6 +116,7 @@ export const CheckoutReviewScreen: React.FC = () => {
         </div>
         <button
           className="commerce-primary"
+          disabled={!address.serviceable}
           onClick={() => {
             safeHapticImpact();
             navigate('checkout-payment-method');

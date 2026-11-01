@@ -23,14 +23,5 @@
   .glowvai-root .screen-content > .orders-v3 > .orders-list{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; gap: 16px; padding: 20px 24px 32px; }
 }
 
-/* Desktop: forms and receipts sit in one centred column (560px) under a full-width header. */
-@media (min-width: 1024px){
-  .glowvai-root .screen-content > .customer-details-screen,
-  .glowvai-root .screen-content > .payment-status-screen,
-  .glowvai-root .screen-content > .order-cancelled-screen,
-  .glowvai-root .screen-content > .order-confirmation{ padding-inline: max(16px, calc(50% - 280px)); }
-  .glowvai-root .screen-content > .customer-details-screen > .customer-details-form{ padding: 20px 0 40px; }
-  .glowvai-root .screen-content > .payment-status-screen > section{ padding-top: 56px; }
-  .glowvai-root .screen-content > .order-cancelled-screen{ padding-top: 56px; padding-bottom: 48px; }
-  .glowvai-root .screen-content > .order-confirmation{ padding-top: 36px; padding-bottom: 40px; }
-}
+/* Contact details, payment update, order confirmation and order cancelled now use the commerce layout
+   (features/commerce/commerce.css and responsive/commerce-ported.css). */

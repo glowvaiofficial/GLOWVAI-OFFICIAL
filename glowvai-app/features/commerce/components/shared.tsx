@@ -23,12 +23,23 @@ export const FlowHeader: React.FC<FlowHeaderProps> = ({ title, subtitle, onBack,
   </header>
 );
 
-export const DeliveryPill: React.FC<{ text?: string }> = ({ text = '10 min delivery' }) => (
-  <span className="commerce-eta-pill">
-    <Zap size={11} fill="currentColor" />
-    {text}
-  </span>
-);
+// Delivery time comes from the app's current address. Unserviceable addresses get no time at all.
+export const useDeliveryMinutes = (): number | null => {
+  const { currentAddress } = useApp();
+  const address = useDeliveryAddress();
+  if (!address.serviceable || !currentAddress.serviceable || !currentAddress.deliveryMinutes) return null;
+  return currentAddress.deliveryMinutes;
+};
+
+export const DeliveryPill: React.FC<{ minutes: number | null }> = ({ minutes }) =>
+  minutes ? (
+    <span className="commerce-eta-pill">
+      <Zap size={11} fill="currentColor" />
+      {minutes} min delivery
+    </span>
+  ) : (
+    <span className="commerce-eta-pill is-warn">Outside delivery area</span>
+  );
 
 const STEP_LABELS = ['Cart', 'Review', 'Pay'];
 
@@ -74,20 +85,65 @@ export const DeliveryAddressCard: React.FC<{ address: DeliveryAddress; onChange?
   <section className="commerce-card commerce-address-card">
     <div className="commerce-card-head">
       <h2>Delivering to</h2>
-      {onChange && (
+      {onChange && address.fullAddress && (
         <button className="commerce-link" onClick={onChange}>
           Change
         </button>
       )}
     </div>
+    {!address.fullAddress ? (
+      <div className="commerce-address-body">
+        <span className="commerce-suggest-icon" aria-hidden="true">
+          <MapPin size={16} />
+        </span>
+        <div>
+          <b>No delivery address yet</b>
+          <p>Add the address we should deliver to before you pay.</p>
+          {onChange && (
+            <button className="commerce-link" onClick={onChange}>
+              Add address
+            </button>
+          )}
+        </div>
+      </div>
+    ) : (
     <div className="commerce-address-body">
-      <MapPin size={18} />
+      <span className="commerce-suggest-icon" aria-hidden="true">
+        <MapPin size={16} />
+      </span>
       <div>
-        <span className="commerce-tag">{address.label}</span>
-        {address.recipientName && <b>{address.recipientName}</b>}
-        <p>{address.fullAddress}</p>
+        <span className="commerce-tag-row">
+          <span className="commerce-tag">{address.label}</span>
+          {address.recipientName && <b>{address.recipientName}</b>}
+          {!address.serviceable && <span className="commerce-tag is-warn">Not serviceable</span>}
+        </span>
+        <p>{address.fullAddress || '—'}</p>
         {address.landmark && <small>Landmark: {address.landmark}</small>}
+        {address.phoneNumber && <small>Phone: {address.phoneNumber}</small>}
       </div>
     </div>
+    )}
   </section>
+);
+
+// Bill rows shared by the cart, review and express screens. Zero-value savings rows are left out.
+export const BillRows: React.FC<{
+  rows: Array<{ label: string; value: number; saving?: boolean; free?: boolean } | false | null | undefined>;
+  totalLabel: string;
+  total: number;
+}> = ({ rows, totalLabel, total }) => (
+  <dl>
+    {rows.map((row) =>
+      row ? (
+        <div className={row.saving ? 'is-saving' : undefined} key={row.label}>
+          <dt>{row.label}</dt>
+          <dd className={row.free ? 'is-good' : undefined}>{row.free ? 'FREE' : `${row.saving ? '−' : ''}₹${row.value}`}</dd>
+        </div>
+      ) : null
+    )}
+    <div className="commerce-bill-total">
+      <dt>{totalLabel}</dt>
+      <dd>₹{total}</dd>
+    </div>
+  </dl>
 );

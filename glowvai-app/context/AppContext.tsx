@@ -13,7 +13,8 @@ import {
   SupportTicket,
   UserProfile,
 } from '../types';
-import { INITIAL_USER_ADDRESS, SAMPLE_SAVED_ADDRESSES } from '../data/serviceability';
+import { NO_ADDRESS } from '../data/serviceability';
+import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
 import { ApiService } from '../services/api';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
@@ -46,8 +47,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [customerDetails]);
 
   // Location
-  const [currentAddress, setCurrentAddress] = useState<Address>(INITIAL_USER_ADDRESS);
-  const [savedAddresses, setSavedAddresses] = useState<Address[]>(SAMPLE_SAVED_ADDRESSES);
+  // Start from the address the customer picked last time (kept by the checkout address store), or none.
+  const [currentAddress, setCurrentAddress] = useState<Address>(() => {
+    const { addresses, selectedId } = useAddressStore.getState();
+    const saved = addresses.find((a) => a.id === selectedId);
+    return saved ? toNovAddress(saved) : NO_ADDRESS;
+  });
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
 
   // Preference
   const [shoppingPreference, setShoppingPreference] = useState<ShoppingPreference>('all');
@@ -73,7 +79,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [cart]);
 
   // Wishlist
-  const [wishlist, setWishlist] = useState<string[]>(['prod-min-salicylic-2']);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Orders
   const [orders, setOrders] = useState<Order[]>(() => {
@@ -192,7 +198,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSkinReports([]);
     setCustomerDetails(null);
     navigate('welcome');
-    showToast('Your account and personal data have been scheduled for deletion.');
+    showToast('Your account data was removed from this device.');
   };
 
   const saveCustomerDetails = (details: CustomerDetails) => {

@@ -34,19 +34,19 @@ export const OnboardingSuccessScreen: React.FC = () => {
     <section className="auth-success">
       <CheckCircle2 className="auth-success-icon" aria-hidden="true" />
       <h1 className="auth-title auth-success-title">
-        {userName ? `Welcome to GlowVAI, ${userName}!` : 'Welcome to GlowVAI!'}
+        {userName ? `You're all set, ${userName}` : "You're all set"}
       </h1>
       <p className="auth-subtitle">
-        Your clinical skincare engine is ready. Explore formulations backed by computer vision diagnostics.
+        Welcome to glowvai. Taking you to the shop now.
       </p>
 
       <div className="auth-success-footer">
-        <button type="button" className="auth-primary-button" onClick={handleExplore}>
-          Explore Products
-        </button>
         <div className="auth-progress" aria-hidden="true">
           <span />
         </div>
+        <button type="button" className="auth-primary-button" onClick={handleExplore}>
+          Go to the shop
+        </button>
       </div>
     </section>
   );

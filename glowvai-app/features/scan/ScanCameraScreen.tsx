@@ -113,7 +113,7 @@ export const ScanCameraScreen: React.FC = () => {
 
   return (
     <div className="scan-screen scan-camera-screen">
-      <ScanHeader title="AI viewfinder" onBack={goBack} />
+      <ScanHeader title="Take your photo" subtitle="Front camera" onBack={goBack} />
 
       <div className="scan-body scan-camera-body">
         {isBlocked && (
@@ -141,7 +141,7 @@ export const ScanCameraScreen: React.FC = () => {
         )}
 
         {/* The video stays mounted so a retry can attach a new stream */}
-        <div className="scan-split">
+        <div className="scan-layout">
           <div className="scan-video-frame" hidden={isBlocked}>
             <video ref={videoRef} className="scan-video" playsInline muted autoPlay />
             <div className="scan-guide-oval" aria-hidden="true" />
@@ -149,7 +149,7 @@ export const ScanCameraScreen: React.FC = () => {
           </div>
 
           {!isBlocked && (
-            <div className="scan-split-side">
+            <div className="scan-layout-side">
               <p className={`scan-lighting-note scan-lighting-${lighting}`} role="status">
                 {status === 'ready' ? LIGHTING_MESSAGE[lighting] : 'Allow camera access when your browser asks.'}
               </p>

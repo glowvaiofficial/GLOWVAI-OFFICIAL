@@ -235,20 +235,6 @@
 .glowvai-root .login-legal-copy{ margin-top: 17px; color: #7c89a1; font-size: 9.2px; font-weight: 500; line-height: 1.55; text-align: center; }
 .glowvai-root .login-legal-copy button{ display: inline; padding: 0; color: #1460df; font-size: inherit; font-weight: 700; vertical-align: baseline; }
 .glowvai-root .login-home-indicator{ position: absolute; bottom: 20px; left: 50%; width: 113px; height: 4px; border-radius: 999px; background: #9bb1db; transform: translateX(-50%); }
-.glowvai-root .app-viewport:has(.login-reference-screen) > div:first-child > div > svg:last-child{ display: none; }
-.glowvai-root .app-viewport:has(.login-reference-screen) > div:first-child > div::after{
-  display: grid;
-  min-width: 22px;
-  height: 14px;
-  place-items: center;
-  border-radius: 4px;
-  background: #fff;
-  color: #1459e8;
-  content: '78';
-  font-size: 8px;
-  font-weight: 600;
-  line-height: 1;
-}
 
 /* OTP reference screen */
 .glowvai-root .otp-reference-screen{
@@ -422,20 +408,6 @@
 .glowvai-root .otp-keypad .otp-delete-key{ color: #173d7d; }
 .glowvai-root .otp-delete-key svg{ width: 22px; height: 22px; }
 .glowvai-root .otp-key-spacer{ border-color: transparent; background: transparent; box-shadow: none; }
-.glowvai-root .app-viewport:has(.otp-reference-screen) > div:first-child > div > svg:last-child{ display: none; }
-.glowvai-root .app-viewport:has(.otp-reference-screen) > div:first-child > div::after{
-  display: grid;
-  min-width: 22px;
-  height: 14px;
-  place-items: center;
-  border-radius: 4px;
-  background: #fff;
-  color: #1459e8;
-  content: '78';
-  font-size: 8px;
-  font-weight: 800;
-  line-height: 1;
-}
 @keyframes otp-art-arrive{ from{ opacity: 0; transform: translateY(-12px) scale(.88); } to{ opacity: 1; transform: none; } }
 @keyframes otp-shield-float{ 0%,100%{ transform: translate(-50%,0); } 50%{ transform: translate(-50%,-5px); } }
 @keyframes otp-plane-drift{ 0%,100%{ transform: translate(0,0) rotate(-12deg); } 50%{ transform: translate(4px,-4px) rotate(-6deg); } }

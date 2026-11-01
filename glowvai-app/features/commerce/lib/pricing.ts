@@ -4,8 +4,8 @@ import type { CartItem } from '../../../core/state/cartStore';
 export const FREE_DELIVERY_THRESHOLD = 2198;
 export const STANDARD_DELIVERY_FEE = 49;
 export const COUPON_CODE = 'GLOW10';
-const COUPON_RATE = 0.1;
-const COUPON_CAP = 150;
+export const COUPON_RATE = 0.1;
+export const COUPON_CAP = 150;
 
 export interface CartTotals {
   itemCount: number;

@@ -96,12 +96,12 @@ export const initiateRazorpayOrder = async (
     }
   }
 
-  // Graceful simulation fallback
+  // No payment server answered, so no payment session exists. Report failure rather than pretending it worked.
   return {
-    success: true,
+    success: false,
     orderId,
-    status: 'SUCCESS',
-    message: 'Order logged successfully.',
+    status: 'FAILED',
+    message: 'Could not reach the payment server. No payment was taken.',
   };
 };
 
@@ -132,14 +132,15 @@ export const verifyRazorpayPayment = async (
       });
       if (res.ok) {
         const data = await res.json();
-        return { verified: data.verified ?? true, status: data.status || 'PAID' };
+        return { verified: data.verified === true, status: data.verified === true ? data.status || 'PAID' : 'FAILED' };
       }
     } catch {
       // continue
     }
   }
 
-  return { verified: true, status: 'PAID' };
+  // Verification could not be reached: treat the payment as not verified.
+  return { verified: false, status: 'FAILED' };
 };
 
 // Backward compatibility aliases

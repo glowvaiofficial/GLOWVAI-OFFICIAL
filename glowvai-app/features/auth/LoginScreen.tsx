@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { AlertCircle, ChevronDown } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { sendPhoneOtp } from '../../core/services/authService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { logTouch } from '../../core/utils/touchDoctor';
 import { errorMessageOf } from './authUtils';
-const mascotFox = '/glowvai/features/auth/assets/mascot-fox.png';
-const mascotCat = '/glowvai/features/auth/assets/mascot-cat.png';
 
 export const validateIndianPhoneNumber = (digits: string): boolean => {
   const clean = digits.replace(/\D/g, '');
@@ -92,60 +90,65 @@ export const LoginScreen: React.FC = () => {
 
         <div className="auth-login-topbar">
           <button type="button" className="auth-skip-pill" onClick={handleSkip}>
-            skip
+            Skip
           </button>
         </div>
 
-        <button type="button" className="auth-brand-tap" onClick={handleLogoTap} aria-label="glowvai">
-          <span className="auth-brand-wordmark">glowvai</span>
-        </button>
-
-        <img className="auth-mascot auth-mascot-left" src={mascotFox} alt="" aria-hidden="true" />
-        <img className="auth-mascot auth-mascot-right" src={mascotCat} alt="" aria-hidden="true" />
+        <div className="auth-login-lockup">
+          <button type="button" className="auth-brand-tap" onClick={handleLogoTap} aria-label="glowvai">
+            <span className="auth-brand-wordmark">glowvai</span>
+          </button>
+          <p className="auth-login-tagline">Skin analysis, skincare and delivery in one place.</p>
+        </div>
       </div>
 
       <div className="auth-login-sheet">
-        <h1 className="auth-title">Enter your number</h1>
+        <div className="auth-login-content">
+          <h1 className="auth-title">Enter your mobile number</h1>
+          <p className="auth-subtitle">We&apos;ll text you a 6-digit code to sign in.</p>
 
-        <form className="auth-login-form" onSubmit={handleSendOtp} noValidate>
-          <label htmlFor="auth-mobile" className="auth-label">
-            Mobile Number
-          </label>
-          <div className={`auth-phone-field${errorMessage ? ' has-error' : ''}`}>
-            <span className="auth-flag" aria-hidden="true">🇮🇳</span>
-            <strong>+91</strong>
-            <ChevronDown className="auth-chevron" aria-hidden="true" />
-            <span className="auth-divider" aria-hidden="true" />
-            <input
-              id="auth-mobile"
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              autoFocus
-              maxLength={11}
-              value={formatPhoneNumber(rawDigits)}
-              onChange={(event) => handleTextChange(event.target.value)}
-              placeholder="98765 43210"
-              aria-invalid={Boolean(errorMessage)}
-            />
-          </div>
-
-          {errorMessage && (
-            <div className="auth-error" role="alert">
-              <AlertCircle aria-hidden="true" />
-              <span>{errorMessage}</span>
+          <form className="auth-login-form" onSubmit={handleSendOtp} noValidate>
+            <label htmlFor="auth-mobile" className="auth-label">
+              Mobile number
+            </label>
+            <div className={`auth-phone-field${errorMessage ? ' has-error' : ''}`}>
+              <span className="login-india-flag" role="img" aria-label="India">
+                <i className="is-saffron" /><i className="is-white"><b /></i><i className="is-green" />
+              </span>
+              <strong>+91</strong>
+              <span className="auth-divider" aria-hidden="true" />
+              <input
+                id="auth-mobile"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel-national"
+                maxLength={11}
+                value={formatPhoneNumber(rawDigits)}
+                onChange={(event) => handleTextChange(event.target.value)}
+                placeholder="10-digit number"
+                aria-invalid={Boolean(errorMessage)}
+                aria-describedby={errorMessage ? 'auth-mobile-error' : undefined}
+              />
             </div>
-          )}
 
-          <button type="submit" className="auth-primary-button auth-login-continue" disabled={!isValidNumber || isLoading}>
-            {isLoading ? <span className="auth-spinner" aria-label="Sending OTP" /> : 'Continue'}
-          </button>
-        </form>
+            {errorMessage && (
+              <div id="auth-mobile-error" className="auth-error" role="alert">
+                <AlertCircle aria-hidden="true" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
-        <p className="auth-legal">
-          By clicking, I accept the <span className="auth-link">privacy policy</span> and{' '}
-          <span className="auth-link">terms of use</span>
-        </p>
+            <button type="submit" className="auth-primary-button auth-login-continue" disabled={!isValidNumber || isLoading}>
+              {isLoading ? <span className="auth-spinner" aria-label="Sending OTP" /> : 'Continue'}
+            </button>
+          </form>
+
+          <p className="auth-legal">
+            By continuing, you accept the{' '}
+            <a className="auth-link" href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and{' '}
+            <a className="auth-link" href="/terms" target="_blank" rel="noopener noreferrer">terms of use</a>
+          </p>
+        </div>
       </div>
     </section>
   );

@@ -1,56 +1,83 @@
 /* Shop feature shared styles. Screen-specific rules live in styles/. */
 
-.glowvai-root .shop-screen{ position: relative; min-height: 100%; padding-bottom: 96px; background: var(--bg); color: var(--text-primary); }
-.glowvai-root .shop-screen button{ font: inherit; color: inherit; cursor: pointer; }
-.glowvai-root .shop-screen button:disabled{ cursor: default; }
+.glowvai-root .shop-screen{ position: relative; flex-shrink: 0; min-height: 100%; padding-bottom: 104px; background: var(--bg); color: var(--text-primary); font-size: 14px; }
+/* Low-specificity button reset: any class rule (.glowvai-root .x) still sets its own font size and colour. */
+.glowvai-root :where(.shop-screen) :where(button, input){ font: inherit; color: inherit; }
+.glowvai-root :where(.shop-screen) :where(button){ cursor: pointer; }
+.glowvai-root :where(.shop-screen) :where(button:disabled){ cursor: default; }
+.glowvai-root .shop-screen h1, .glowvai-root .shop-screen h2, .glowvai-root .shop-screen h3, .glowvai-root .shop-screen p{ margin: 0; }
+.glowvai-root .shop-screen :where(button, input, a):focus-visible{ outline: 2px solid var(--primary); outline-offset: 2px; }
 
-.glowvai-root .shop-header{ position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; min-height: 56px; padding: 8px 16px; background: var(--surface-elevated); border-bottom: 1px solid var(--border-light); }
-.glowvai-root .shop-header h1{ flex: 1; font-size: 16px; font-weight: 800; letter-spacing: -0.01em; }
-.glowvai-root .shop-icon-btn{ display: grid; flex-shrink: 0; width: 36px; height: 36px; place-items: center; border: 1px solid var(--border); border-radius: var(--radius-md, 8px); background: var(--surface-elevated); color: var(--text-primary); }
-.glowvai-root .shop-icon-btn:focus-visible, .glowvai-root .shop-product-open:focus-visible, .glowvai-root .shop-product-name:focus-visible{ outline: 2px solid var(--primary); outline-offset: 2px; }
+.glowvai-root .shop-header{ position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 16px; background: var(--surface-elevated); border-bottom: 1px solid var(--border-light); }
+.glowvai-root .shop-header h1{ flex: 1; min-width: 0; overflow: hidden; font-size: 17px; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; text-overflow: ellipsis; }
+.glowvai-root .shop-icon-btn{ position: relative; display: grid; flex-shrink: 0; width: 40px; height: 40px; place-items: center; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-elevated); color: var(--text-primary); }
+.glowvai-root .shop-icon-btn:hover{ border-color: var(--primary-border); background: var(--primary-light); }
+.glowvai-root .shop-icon-count{ position: absolute; top: -6px; right: -6px; display: grid; min-width: 18px; height: 18px; place-items: center; padding: 0 4px; border: 2px solid var(--surface-elevated); border-radius: 9px; background: var(--primary); color: var(--text-inverse); font-size: 10px; font-weight: 800; line-height: 1; }
 
 .glowvai-root .shop-section{ padding: 16px 16px 0; }
 .glowvai-root .shop-section-head{ display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-.glowvai-root .shop-section-head h2{ font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
-.glowvai-root .shop-section-head button{ color: var(--primary); font-size: 12px; font-weight: 700; background: none; border: 0; }
+.glowvai-root .shop-section-head h2{ font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+.glowvai-root .shop-section-head button{ color: var(--primary); font-size: 13px; font-weight: 700; background: none; border: 0; }
 
 .glowvai-root .shop-chip-row{ display: flex; gap: 8px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; }
 .glowvai-root .shop-chip-row::-webkit-scrollbar{ display: none; }
-.glowvai-root .shop-chip{ flex-shrink: 0; min-height: 32px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 9999px; background: var(--surface-elevated); color: var(--text-secondary); font-size: 12px; font-weight: 700; }
-.glowvai-root .shop-chip.is-active{ border-color: var(--primary); background: var(--primary); color: var(--text-inverse); }
+.glowvai-root .shop-chip{ display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; min-height: 36px; padding: 6px 14px; border: 1px solid var(--border); border-radius: 9999px; background: var(--surface-elevated); color: var(--text-secondary); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.glowvai-root .shop-chip:hover{ border-color: var(--primary-border); }
+.glowvai-root .shop-chip.is-active{ border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
 
-.glowvai-root .shop-btn-primary, .glowvai-root .shop-btn-secondary{ display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: var(--radius-md, 8px); font-size: 14px; font-weight: 700; }
+.glowvai-root .shop-btn-primary, .glowvai-root .shop-btn-secondary{ display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0 18px; border-radius: 12px; font-size: 14px; font-weight: 800; }
 .glowvai-root .shop-btn-primary{ border: 0; background: var(--primary); color: var(--text-inverse); }
 .glowvai-root .shop-btn-primary:hover{ background: var(--primary-dark); }
 .glowvai-root .shop-btn-secondary{ border: 1px solid var(--border); background: var(--surface-elevated); color: var(--text-primary); }
+.glowvai-root .shop-btn-secondary:hover{ border-color: var(--primary-border); color: var(--primary); }
 
 .glowvai-root .shop-empty{ display: grid; justify-items: center; gap: 8px; padding: 48px 24px; text-align: center; color: var(--text-muted); }
-.glowvai-root .shop-empty h3{ color: var(--text-primary); font-size: 15px; font-weight: 800; }
-.glowvai-root .shop-empty p{ font-size: 12px; line-height: 1.5; }
+.glowvai-root .shop-empty-icon{ display: grid; width: 64px; height: 64px; place-items: center; margin-bottom: 4px; border-radius: 50%; background: var(--primary-light); color: var(--primary); }
+.glowvai-root .shop-empty h3{ color: var(--text-primary); font-size: 17px; font-weight: 800; }
+.glowvai-root .shop-empty p{ max-width: 320px; font-size: 13px; line-height: 1.5; }
+.glowvai-root .shop-empty .shop-btn-primary, .glowvai-root .shop-empty .shop-btn-secondary{ width: auto; margin-top: 8px; }
 
 .glowvai-root .shop-skeleton{ border-radius: 12px; background: linear-gradient(90deg, var(--surface) 25%, var(--surface-muted) 50%, var(--surface) 75%); background-size: 200% 100%; animation: shop-shimmer 1.4s ease-in-out infinite; }
 @keyframes shop-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-.glowvai-root .shop-product-grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0 16px; }
-.glowvai-root .shop-product-card{ position: relative; display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--border-light); border-radius: 12px; background: var(--surface-elevated); box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.05)); }
-.glowvai-root .shop-product-media{ position: relative; aspect-ratio: 1 / 1; background: var(--surface); }
-.glowvai-root .shop-product-open{ display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; }
-.glowvai-root .shop-product-open img{ display: block; width: 100%; height: 100%; object-fit: cover; }
-.glowvai-root .shop-product-fallback{ display: grid; height: 100%; place-items: center; color: var(--text-muted); font-size: 12px; font-weight: 700; }
-.glowvai-root .shop-product-badge{ position: absolute; top: 8px; left: 8px; padding: 2px 6px; border-radius: 6px; background: var(--success-bg); color: var(--success); font-size: 10px; font-weight: 800; }
-.glowvai-root .shop-product-add{ position: absolute; right: 8px; bottom: 8px; display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: 9999px; background: var(--primary); color: var(--text-inverse); box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,.07)); }
-.glowvai-root .shop-stepper{ position: absolute; right: 8px; bottom: 8px; display: flex; align-items: center; height: 32px; overflow: hidden; border-radius: 9999px; background: var(--primary); color: var(--text-inverse); }
-.glowvai-root .shop-stepper button{ display: grid; width: 28px; height: 32px; place-items: center; border: 0; background: none; color: inherit; }
-.glowvai-root .shop-stepper b{ min-width: 18px; text-align: center; font-size: 12px; }
-.glowvai-root .shop-product-copy{ display: flex; min-width: 0; flex-direction: column; gap: 2px; padding: 10px 10px 12px; }
-.glowvai-root .shop-product-brand{ color: var(--text-muted); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
-.glowvai-root .shop-product-name{ display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; border: 0; background: none; padding: 0; text-align: left; font-size: 12px; font-weight: 700; line-height: 1.35; color: var(--text-primary); }
+/* Product grid and card */
+.glowvai-root .shop-product-grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0 16px; }
+.glowvai-root .shop-product-card{ position: relative; display: flex; min-width: 0; height: 100%; flex-direction: column; overflow: hidden; border: 1px solid var(--border-light); border-radius: 13px; background: var(--surface-elevated); transition: border-color .15s ease, box-shadow .15s ease; }
+.glowvai-root .shop-product-card:hover{ border-color: var(--border); box-shadow: 0 6px 18px rgba(31, 45, 78, .08); }
+.glowvai-root .shop-product-media{ position: relative; flex-shrink: 0; aspect-ratio: 1 / 1; overflow: hidden; background: var(--surface); }
+.glowvai-root .shop-product-open{ position: absolute; inset: 0; display: block; padding: 0; border: 0; background: none; }
+.glowvai-root .shop-product-open img{ position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .25s ease; }
+.glowvai-root .shop-product-card:hover .shop-product-open img{ transform: scale(1.03); }
+.glowvai-root .shop-product-fallback{ display: grid; height: 100%; place-items: center; padding: 8px; color: var(--text-muted); font-size: 12px; font-weight: 700; text-align: center; }
+.glowvai-root .shop-product-badge{ position: absolute; top: 8px; left: 8px; padding: 3px 6px; border-radius: 6px; background: var(--primary); color: var(--text-inverse); font-size: 10px; font-weight: 800; letter-spacing: .02em; pointer-events: none; }
+.glowvai-root .shop-product-save{ position: absolute; top: 4px; right: 4px; display: grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text-secondary); }
+.glowvai-root .shop-product-save::before{ content: ""; position: absolute; inset: 4px; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 1px 4px rgba(20, 30, 60, .12); }
+.glowvai-root .shop-product-save svg{ position: relative; }
+.glowvai-root .shop-product-save.is-saved{ color: var(--error); }
+
+.glowvai-root .shop-product-copy{ display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; padding: 8px 10px 10px; }
+.glowvai-root .shop-product-delivery{ display: inline-flex; align-self: flex-start; align-items: center; gap: 3px; margin-bottom: 4px; padding: 2px 6px; border-radius: 5px; background: var(--surface); color: var(--text-secondary); font-size: 10px; font-weight: 800; }
+.glowvai-root .shop-product-brand{ overflow: hidden; color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; text-overflow: ellipsis; }
+.glowvai-root .shop-product-name{ display: flex; align-items: flex-start; min-height: calc(13px * 1.35 * 2); padding: 0; border: 0; background: none; color: var(--text-primary); font-size: 13px; font-weight: 700; line-height: 1.35; text-align: left; }
+.glowvai-root .shop-product-name > span{ display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.glowvai-root .shop-product-name:hover{ color: var(--primary); }
 .glowvai-root .shop-product-volume{ color: var(--text-muted); font-size: 11px; }
-.glowvai-root .shop-product-price{ display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
+.glowvai-root .shop-product-foot{ display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; margin-top: auto; padding-top: 8px; }
+.glowvai-root .shop-product-price{ display: flex; min-width: 0; flex-direction: column; line-height: 1.15; }
 .glowvai-root .shop-product-price b{ font-size: 14px; font-weight: 800; }
 .glowvai-root .shop-product-price s{ color: var(--text-muted); font-size: 11px; }
-.glowvai-root .shop-product-delivery{ display: inline-flex; align-items: center; gap: 4px; color: var(--success); font-size: 10px; font-weight: 700; }
+.glowvai-root .shop-product-add{ position: relative; flex-shrink: 0; min-width: 62px; height: 34px; padding: 0 12px; border: 1px solid var(--primary); border-radius: 9px; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+.glowvai-root .shop-product-add::after{ content: ""; position: absolute; inset: -5px -3px; }
+.glowvai-root .shop-product-add:hover{ background: var(--primary); color: var(--text-inverse); }
+.glowvai-root .shop-stepper{ display: inline-flex; flex-shrink: 0; align-items: center; min-width: 74px; height: 34px; overflow: hidden; border-radius: 9px; background: var(--primary); color: var(--text-inverse); }
+.glowvai-root .shop-stepper button{ display: grid; width: 26px; height: 34px; place-items: center; padding: 0; border: 0; background: none; color: inherit; }
+.glowvai-root .shop-stepper b{ flex: 1; min-width: 18px; text-align: center; font-size: 13px; }
 
-@media (min-width: 768px){
-  .glowvai-root .shop-product-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 359px){
+  .glowvai-root .shop-product-add{ min-width: 52px; padding: 0 8px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .shop-product-open img, .glowvai-root .shop-product-card{ transition: none; }
+  .glowvai-root .shop-product-card:hover .shop-product-open img{ transform: none; }
 }

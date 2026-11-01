@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Bike, CheckCircle2, ChevronRight, Clock, MapPin, ShoppingBag, Zap } from 'lucide-react';
+import { ArrowLeft, Bike, CheckCircle2, ChevronRight, Clock, MapPin, Minus, Plus, ShoppingBag, Zap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { initiateRazorpayOrder, type InitiatePaymentParams } from '../../core/services/paymentService';
@@ -8,7 +8,7 @@ import type { CartItem } from '../../core/state/cartStore';
 import { computeCartTotals, type CartTotals } from './lib/pricing';
 import { newOrderId, payChoiceMeta, PAY_CHOICES, type PayChoice } from './lib/checkoutSession';
 import { placeCartOrder, sendDispatchAlert } from './lib/orderPlacement';
-import { useCustomer, useDeliveryAddress } from './components/shared';
+import { BillRows, useCustomer, useDeliveryAddress, useDeliveryMinutes } from './components/shared';
 
 type Stage = 'cart_review' | 'payment_selection' | 'order_processing' | 'live_tracking';
 
@@ -38,6 +38,7 @@ export const ExpressCheckoutScreen: React.FC = () => {
   const clearCart = useCartStore((s) => s.clearCart);
   const address = useDeliveryAddress();
   const customer = useCustomer();
+  const minutes = useDeliveryMinutes();
 
   const [stage, setStage] = useState<Stage>('cart_review');
   const [tip, setTip] = useState(0);
@@ -83,7 +84,8 @@ export const ExpressCheckoutScreen: React.FC = () => {
         customerEmail: customer.email,
         paymentMethod: meta.method as InitiatePaymentParams['paymentMethod'],
       });
-      const ok = session.success && (choice === 'cod' || (await verifyOrderPayment(id, payable)));
+      // Online payments need a real gateway order; the service's offline fallback is not a payment.
+      const ok = session.success && (choice === 'cod' || (Boolean(session.razorpayOrderId) && (await verifyOrderPayment(id, payable))));
       if (!ok) throw new Error('payment not confirmed');
 
       clearCart();
@@ -99,7 +101,7 @@ export const ExpressCheckoutScreen: React.FC = () => {
       <main className="commerce-screen commerce-express is-center">
         <span className="commerce-spinner" aria-hidden="true" />
         <h1>Placing your order</h1>
-        <p>Connecting to the Glowway darkstore for packing…</p>
+        <p>Confirming your order and payment. Please keep this page open.</p>
       </main>
     );
   }
@@ -122,8 +124,8 @@ export const ExpressCheckoutScreen: React.FC = () => {
               <Bike size={18} />
             </span>
             <div>
-              <b>Arriving in about 12 minutes</b>
-              <p>Packing at Glowway Darkstore Payikapuram</p>
+              <b>{minutes ? `Expected in about ${minutes} minutes` : 'Delivery time is shown in order tracking'}</b>
+              <p>Your order is placed. Live status is in order tracking.</p>
             </div>
           </section>
           <section className="commerce-card commerce-otp">
@@ -160,12 +162,12 @@ export const ExpressCheckoutScreen: React.FC = () => {
           </button>
           <div className="commerce-head-copy">
             <h1>Choose payment</h1>
-            <p>Total ₹{payable}</p>
+            <p>Express checkout · ₹{payable}</p>
           </div>
         </header>
         <div className="commerce-body">
           <section className="commerce-card commerce-pay-group">
-            <h2>Choose a method</h2>
+            <h2>Payment method</h2>
             {PAY_CHOICES.map((option) => (
               <label className={option.id === pay ? 'commerce-pay-option is-selected' : 'commerce-pay-option'} key={option.id}>
                 <input type="radio" name="express-pay" checked={option.id === pay} onChange={() => setPay(option.id)} />
@@ -209,113 +211,118 @@ export const ExpressCheckoutScreen: React.FC = () => {
           <ArrowLeft size={20} />
         </button>
         <div className="commerce-head-copy">
-          <h1>Bill total: ₹{payable}</h1>
+          <h1>Express checkout</h1>
           <p>
-            <Zap size={11} fill="currentColor" /> 10–12 min delivery from Glowway Darkstore
+            {minutes ? (
+              <>
+                <Zap size={11} fill="currentColor" /> {minutes} min delivery · ₹{payable}
+              </>
+            ) : (
+              `Outside delivery area · ₹${payable}`
+            )}
           </p>
         </div>
       </header>
 
-      <div className="commerce-body">
-        <section className="commerce-card commerce-savings">
-          <CheckCircle2 size={16} />
-          <span>You saved ₹{totals.totalSavings} on this order</span>
-        </section>
+      <div className="commerce-body commerce-split">
+        <div className="commerce-col">
+          {totals.totalSavings > 0 && (
+            <section className="commerce-card commerce-savings">
+              <CheckCircle2 size={16} />
+              <span>You save ₹{totals.totalSavings} on this order</span>
+            </section>
+          )}
 
-        <section className="commerce-card" aria-label="Items">
-          {cartItems.map((item) => (
-            <div className="commerce-line is-compact" key={item.productId}>
-              <div className="commerce-line-copy">
-                <h3>{item.name}</h3>
-                <small>
-                  {item.brand} · ₹{item.price}
-                </small>
-              </div>
-              <div className="commerce-stepper">
-                <button onClick={() => decrementItem(item.productId)} aria-label={`Remove one ${item.name}`}>
-                  −
-                </button>
-                <b>{item.quantity}</b>
-                <button onClick={() => incrementItem(item.productId)} aria-label={`Add one ${item.name}`}>
-                  +
-                </button>
-              </div>
+          <section className="commerce-card" aria-label="Items">
+            <div className="commerce-card-head">
+              <h2>
+                {cartItems.length} {cartItems.length === 1 ? 'product' : 'products'}
+              </h2>
             </div>
-          ))}
-        </section>
-
-        <section className="commerce-card">
-          <div className="commerce-card-head">
-            <h2>Delivery address</h2>
-            <button className="commerce-link" onClick={() => navigate('address-saved')}>
-              Change <ChevronRight size={13} />
-            </button>
-          </div>
-          <p className="commerce-muted">
-            <MapPin size={14} /> {address.fullAddress}
-          </p>
-          <label className="commerce-check">
-            <input type="checkbox" checked={avoidCalling} onChange={() => setAvoidCalling(!avoidCalling)} />
-            Avoid calling
-          </label>
-          <label className="commerce-check">
-            <input type="checkbox" checked={dontRingBell} onChange={() => setDontRingBell(!dontRingBell)} />
-            Don’t ring the bell
-          </label>
-        </section>
-
-        <section className="commerce-card">
-          <h2>Tip your delivery partner</h2>
-          <div className="commerce-tips">
-            {TIP_OPTIONS.map((amount) => (
-              <button key={amount} className={tip === amount ? 'is-on' : ''} onClick={() => setTip(tip === amount && amount !== 0 ? 0 : amount)}>
-                {amount === 0 ? 'No tip' : `₹${amount}`}
-              </button>
+            {cartItems.map((item) => (
+              <div className="commerce-line is-compact" key={item.productId}>
+                <div className="commerce-line-copy">
+                  <h3>{item.name}</h3>
+                  <small>
+                    {item.brand} · ₹{item.price}
+                  </small>
+                </div>
+                <div className="commerce-stepper">
+                  <button onClick={() => decrementItem(item.productId)} aria-label={`Remove one ${item.name}`}>
+                    <Minus size={14} />
+                  </button>
+                  <b>{item.quantity}</b>
+                  <button onClick={() => incrementItem(item.productId)} aria-label={`Add one ${item.name}`}>
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
             ))}
-          </div>
-        </section>
+          </section>
 
-        <section className="commerce-card commerce-bill">
-          <h2>Bill details</h2>
-          <dl>
-            <div>
-              <dt>Items total</dt>
-              <dd>₹{totals.discountedTotal}</dd>
+          <section className="commerce-card">
+            <div className="commerce-card-head">
+              <h2>Delivery address</h2>
+              <button className="commerce-link" onClick={() => navigate('address-saved')}>
+                Change <ChevronRight size={13} />
+              </button>
             </div>
-            <div>
-              <dt>Delivery charge</dt>
-              <dd className="is-good">FREE</dd>
+            <p className="commerce-muted">
+              <MapPin size={14} /> {address.fullAddress}
+            </p>
+            <label className="commerce-check">
+              <input type="checkbox" checked={avoidCalling} onChange={() => setAvoidCalling(!avoidCalling)} />
+              Avoid calling
+            </label>
+            <label className="commerce-check">
+              <input type="checkbox" checked={dontRingBell} onChange={() => setDontRingBell(!dontRingBell)} />
+              Don’t ring the bell
+            </label>
+          </section>
+
+          <section className="commerce-card">
+            <div className="commerce-card-head">
+              <h2>Tip your delivery partner</h2>
             </div>
-            {totals.couponDiscount > 0 && (
-              <div className="is-saving">
-                <dt>Coupon</dt>
-                <dd>−₹{totals.couponDiscount}</dd>
-              </div>
+            <div className="commerce-tips">
+              {TIP_OPTIONS.map((amount) => (
+                <button key={amount} className={tip === amount ? 'is-on' : ''} aria-pressed={tip === amount} onClick={() => setTip(tip === amount && amount !== 0 ? 0 : amount)}>
+                  {amount === 0 ? 'No tip' : `₹${amount}`}
+                </button>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <aside className="commerce-col commerce-side" aria-label="Bill details">
+          <section className="commerce-card commerce-bill">
+            <h2>Bill details</h2>
+            <BillRows
+              rows={[
+                { label: 'Item total', value: totals.discountedTotal },
+                { label: 'Delivery', value: 0, free: true },
+                totals.couponDiscount > 0 && { label: 'Express coupon', value: totals.couponDiscount, saving: true },
+                tip > 0 && { label: 'Delivery partner tip', value: tip },
+              ]}
+              totalLabel="Grand total"
+              total={payable}
+            />
+            {minutes && (
+              <p className="commerce-assure">
+                <Clock size={13} /> Free express delivery in about {minutes} minutes
+              </p>
             )}
-            {tip > 0 && (
-              <div>
-                <dt>Delivery partner tip</dt>
-                <dd>₹{tip}</dd>
-              </div>
-            )}
-            <div className="commerce-bill-total">
-              <dt>Grand total</dt>
-              <dd>₹{payable}</dd>
-            </div>
-          </dl>
-          <p className="commerce-assure">
-            <Clock size={13} /> Free 10-minute delivery across Vijayawada
-          </p>
-        </section>
+          </section>
+        </aside>
       </div>
 
       <footer className="commerce-sticky-bar">
         <div>
-          <small>Delivering to Home</small>
+          <small>Delivering to {address.label}</small>
           <b>₹{payable}</b>
         </div>
-        <button className="commerce-primary" onClick={() => setStage('payment_selection')}>
-          Select payment method
+        <button className="commerce-primary" disabled={!address.serviceable} onClick={() => setStage('payment_selection')}>
+          Choose payment
         </button>
       </footer>
     </main>
