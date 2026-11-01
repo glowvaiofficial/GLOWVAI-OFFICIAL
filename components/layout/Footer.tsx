@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, ScanLine, Truck, ShieldCheck, Headphones } from "lucide-react";
+import { Mail, Phone, MapPin, ScanLine, Truck, ShieldCheck, Headphones, ArrowRight } from "lucide-react";
 import { departmentEmails } from "@/config/emails";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { footerLinks } from "@/config/nav";
@@ -228,17 +228,38 @@ export function Footer() {
         {/* Department emails */}
         <div className="border-t border-ink/15 py-10 grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-8">
           <div className="lg:col-span-8">
-            <h2 className="font-display font-semibold text-lg text-ink">Write to the right team</h2>
-            <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
-              {departmentEmails.map((d) => (
-                <li key={d.key} className="flex items-baseline justify-between gap-3 border-b border-ink/10 py-2 text-[14px]">
-                  <span className="text-ink-muted">{d.label}</span>
-                  <a href={`mailto:${d.email}`} className={`text-ink hover:text-brand underline underline-offset-4 decoration-ink/25 rounded ${focusRing}`}>
-                    {d.email}
-                  </a>
-                </li>
+            <h2 className="font-display font-semibold text-xl text-ink">Department Directory</h2>
+            <p className="text-sm text-ink-muted mt-1 mb-4">Dedicated guides, policy documents, and support channels for each area.</p>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { key: "contact", label: "General enquiries", href: "/contact", desc: "Questions about scans, routines & care", email: "contact@glowvai.in" },
+                { key: "support", label: "Orders & delivery", href: "/delivery", desc: "15-min delivery areas & live rider status", email: "support@glowvai.in" },
+                { key: "returns", label: "Returns & refunds", href: "/returns", desc: "14-day guarantee & UPI refund timelines", email: "returns@glowvai.in" },
+                { key: "partners", label: "Partners & brands", href: "/partners", desc: "Retail pharmacy hubs & brand listings", email: "partners@glowvai.in" },
+                { key: "careers", label: "Careers", href: "/careers", desc: "Engineering, operations & beauty advisor jobs", email: "careers@glowvai.in" },
+                { key: "press", label: "Press & media", href: "/press", desc: "Official company facts & downloadable brand kit", email: "press@glowvai.in" },
+                { key: "privacy", label: "Privacy & data", href: "/privacy", desc: "Face scan data controls & DPDP compliance", email: "privacy@glowvai.in" },
+                { key: "grievance", label: "Grievance officer", href: "/grievance", desc: "Consumer protection & regulatory redressal", email: "grievance@glowvai.in" },
+              ].map((d) => (
+                <Link
+                  key={d.key}
+                  href={d.href}
+                  className="bg-white border border-ink/15 rounded-[12px] p-3.5 flex flex-col justify-between hover:border-brand/50 hover:shadow-2xs transition-all group"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-display font-semibold text-[15px] text-ink group-hover:text-brand transition-colors">
+                      {d.label}
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-ink-light group-hover:text-brand group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
+                  </div>
+                  <p className="mt-1 text-xs text-ink-muted line-clamp-1">{d.desc}</p>
+                  <div className="mt-2.5 pt-2 border-t border-ink/10 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-brand font-medium">Explore page &rarr;</span>
+                    <span className="text-ink-light">{d.email}</span>
+                  </div>
+                </Link>
               ))}
-            </ul>
+            </div>
           </div>
           <div className="lg:col-span-4">
             <h2 className="font-display font-semibold text-lg text-ink">Skin tips, once in a while.</h2>

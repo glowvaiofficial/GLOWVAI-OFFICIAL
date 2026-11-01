@@ -79,44 +79,55 @@ export function ContactClient() {
               Ask about your scan report, a routine, or an order. Tell us what you need and we will reply.
             </p>
 
-            <ul className="mt-10 border-t border-ink/20">
+            <ul className="mt-8 border-t border-ink/20">
               {siteConfig.supportEmail && siteConfig.supportEmail.trim() !== "" && (
-                <li className="flex items-start gap-4 py-5 border-b border-ink/20">
+                <li className="flex items-start gap-4 py-4 border-b border-ink/20">
                   <Mail className="w-5 h-5 text-brand shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold">Email</p>
-                    <a href={`mailto:${siteConfig.supportEmail}`} className={`text-[17px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+                    <p className="font-semibold text-sm">Direct Support Email</p>
+                    <a href={`mailto:${siteConfig.supportEmail}`} className={`text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
                       {siteConfig.supportEmail}
                     </a>
+                    <p className="text-xs text-ink-light mt-0.5">Replies within 2 to 4 business hours</p>
                   </div>
                 </li>
               )}
               {siteConfig.phone && siteConfig.phone.trim() !== "" && (
-                <li className="flex items-start gap-4 py-5 border-b border-ink/20">
+                <li className="flex items-start gap-4 py-4 border-b border-ink/20">
                   <Phone className="w-5 h-5 text-brand shrink-0 mt-1" aria-hidden="true" />
                   <div>
-                    <p className="font-semibold">Phone and WhatsApp</p>
+                    <p className="font-semibold text-sm">WhatsApp Helpline & Voice</p>
                     <a
                       href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`text-[17px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+                      className={`text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
                     >
                       {siteConfig.phone}
                     </a>
+                    <p className="text-xs text-ink-light mt-0.5">Telugu and English assistance</p>
                   </div>
                 </li>
               )}
             </ul>
 
-            {hasGrievanceInfo && (
-              <div className="mt-8 border border-ink/15 bg-white rounded-[10px] p-5 space-y-1 text-[15px]">
-                <p className="font-semibold">Grievance officer (DPDP Act)</p>
-                {complianceConfig.grievanceOfficerName && <p className="text-ink-muted">Name: {complianceConfig.grievanceOfficerName}</p>}
-                {complianceConfig.grievanceOfficerEmail && <p className="text-ink-muted">Email: {complianceConfig.grievanceOfficerEmail}</p>}
-                {complianceConfig.grievanceOfficerPhone && <p className="text-ink-muted">Phone: {complianceConfig.grievanceOfficerPhone}</p>}
-              </div>
-            )}
+            <div className="mt-6 p-4 rounded-[16px] bg-white border border-ink/15 space-y-2 text-xs text-ink-muted shadow-2xs">
+              <p className="font-semibold text-ink text-sm">Headquarters & Operating Hours</p>
+              <p>📍 GLOW VAI Retail, Vijayawada, Andhra Pradesh, 520001, India</p>
+              <p>⏰ Mon – Sat: 9:00 AM – 8:00 PM IST &middot; Sunday: 10:00 AM – 4:00 PM</p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-2 text-xs">
+              <Link href="/delivery" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+                15-Min Delivery Info &rarr;
+              </Link>
+              <Link href="/returns" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+                Returns & 14-Day Guarantee &rarr;
+              </Link>
+              <Link href="/grievance" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+                Grievance Officer &rarr;
+              </Link>
+            </div>
           </div>
 
           <div className="lg:col-span-7">
