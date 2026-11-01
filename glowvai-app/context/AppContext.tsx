@@ -73,7 +73,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [cart]);
 
   // Wishlist
-  const [wishlist, setWishlist] = useState<string[]>(['prod-min-salicylic-2']);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Orders
   const [orders, setOrders] = useState<Order[]>(() => {
