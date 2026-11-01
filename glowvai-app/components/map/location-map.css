@@ -8,6 +8,11 @@
   background: var(--surface-elevated);
 }
 .glowvai-root .location-map iframe{ display: block; width: 100%; height: 100%; border: 0; }
+/* Phone: OpenStreetMap's credit line wraps to two lines inside the embed at this width (it cannot be styled from here
+   and must stay visible), so the map is taller to keep a clear map area above it. */
+@media (max-width: 719px){
+  .glowvai-root .location-map{ height: 280px; }
+}
 
 .glowvai-root .orders-track-map{ margin-bottom: 16px; }
 .glowvai-root .orders-track-map .location-map{ height: 200px; }
