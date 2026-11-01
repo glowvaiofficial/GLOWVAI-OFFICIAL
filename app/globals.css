@@ -4,29 +4,29 @@
 
 @layer base {
   :root {
-    --bg-page: #F7F9FF;
+    --bg-page: #F6F3EE;
     --color-brand: #1447E6;
     --color-coral: #1447E6;
     --color-yellow: #FFD84D;
-    --color-skymist: #EEF3FF;
-    --color-blush: #F7F9FF;
+    --color-skymist: #ECE7DF;
+    --color-blush: #F6F3EE;
     --color-mint: #D9F7EA;
-    --color-ink: #071B4D;
+    --color-ink: #12161F;
   }
 
   html {
     color-scheme: light;
     scroll-padding-top: 96px;
     scroll-behavior: smooth;
-    background-color: #F7F9FF;
-    color: #071B4D;
+    background-color: #F6F3EE;
+    color: #12161F;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #F7F9FF !important;
-    color: #071B4D;
+    background-color: #F6F3EE !important;
+    color: #12161F;
     font-size: 1.0625rem;
     line-height: 1.6;
     font-family: var(--font-body), sans-serif;
