@@ -63,7 +63,8 @@ export const LoginScreen: React.FC = () => {
       const fullPhone = `+91${rawDigits}`;
       const confirmationResult = await sendPhoneOtp(fullPhone);
       setIsLoading(false);
-      navigate('auth-otp', {
+      // The three onboarding screens come between the phone number and the verification code.
+      navigate('onboarding', {
         phoneNumber: fullPhone,
         verificationId: confirmationResult?.verificationId || 'demo-vid',
       });

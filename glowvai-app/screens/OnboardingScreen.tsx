@@ -34,12 +34,17 @@ const steps = [
 ];
 
 export const OnboardingScreen: React.FC = () => {
-  const { navigate } = useApp();
+  const { navigate, activeParams } = useApp();
   const [step, setStep] = useState(0);
   const item = steps[step];
 
   const advance = () => {
-    if (step < steps.length - 1) setStep((value) => value + 1);
+    if (step < steps.length - 1) {
+      setStep((value) => value + 1);
+      return;
+    }
+    // After the phone number, the last step continues to the verification code. Without a number, the old login screen opens.
+    if (activeParams?.phoneNumber) navigate('auth-otp', activeParams);
     else navigate('login');
   };
 
