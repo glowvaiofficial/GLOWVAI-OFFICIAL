@@ -27,18 +27,35 @@ const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requ
 // A visitor who already passed the welcome screen goes straight to the shop. Storage can be blocked, so reads are guarded.
 const hasSeenWelcome = (): boolean => {
   try {
-    return window.localStorage.getItem('skipped_onboarding') === 'true' || window.localStorage.getItem('glowvai_onboarding_completed') === 'true';
+    return ['skipped_onboarding', 'glowvai_onboarding_completed', 'welcome_seen'].some((key) => window.localStorage.getItem(key) === 'true');
   } catch {
     return false;
   }
 };
 
+// Decided once per page load. Development StrictMode runs mount effects twice, so the decision must not be re-read from storage.
+let welcomeDecision: 'pending' | 'splash' | 'shop' = 'pending';
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation stack
   const [currentScreen, setCurrentScreen] = useState<ScreenName>(initialScreen);
-  // The first render matches the server HTML (welcome), so the shop switch happens after mount.
+  // The first render matches the server HTML (welcome), so the switch happens after mount.
   useEffect(() => {
-    if (!requestedQaScreen && initialScreen === 'welcome' && hasSeenWelcome()) setCurrentScreen('shop-home');
+    if (requestedQaScreen || initialScreen !== 'welcome') return;
+    if (welcomeDecision === 'pending') {
+      if (hasSeenWelcome()) {
+        welcomeDecision = 'shop';
+      } else {
+        // The splash plays once per device. Its timer moves on by itself, so it is marked as seen when it first shows.
+        welcomeDecision = 'splash';
+        try {
+          window.localStorage.setItem('welcome_seen', 'true');
+        } catch {
+          // Storage blocked: the splash simply shows again next time.
+        }
+      }
+    }
+    if (welcomeDecision === 'shop') setCurrentScreen('shop-home');
   }, []);
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>([]);
   const [activeParams, setActiveParams] = useState<any>(null);
