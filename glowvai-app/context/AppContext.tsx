@@ -24,9 +24,22 @@ const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearc
 // Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
 const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : 'welcome';
 
+// A visitor who already passed the welcome screen goes straight to the shop. Storage can be blocked, so reads are guarded.
+const hasSeenWelcome = (): boolean => {
+  try {
+    return window.localStorage.getItem('skipped_onboarding') === 'true' || window.localStorage.getItem('glowvai_onboarding_completed') === 'true';
+  } catch {
+    return false;
+  }
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation stack
   const [currentScreen, setCurrentScreen] = useState<ScreenName>(initialScreen);
+  // The first render matches the server HTML (welcome), so the shop switch happens after mount.
+  useEffect(() => {
+    if (!requestedQaScreen && initialScreen === 'welcome' && hasSeenWelcome()) setCurrentScreen('shop-home');
+  }, []);
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>([]);
   const [activeParams, setActiveParams] = useState<any>(null);
 
