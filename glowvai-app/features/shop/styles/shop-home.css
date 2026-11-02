@@ -187,3 +187,64 @@
   .glowvai-root .shop-home .shop-home-chips,
   .glowvai-root .shop-home .shop-home-mode{ max-width: none; }
 }
+
+/* Design pass: product images are brand tiles that fill their frame, deal cards match the rail cards, and the
+   spacing and type scale step up. */
+.glowvai-root .shop-home .shop-home-section{ margin-top: 36px; }
+.glowvai-root .shop-home .shop-home-section-head h2{ font-size: 21px; }
+.glowvai-root .shop-home .shop-home-category-tile{ aspect-ratio: 1 / 1; border: 1px solid var(--home-line); border-radius: 20px; background: #fff; }
+.glowvai-root .shop-home .shop-home-category-tile img{ padding: 0; object-fit: cover; }
+.glowvai-root .shop-home .shop-home-category-label{ font-size: 13px; }
+.glowvai-root .shop-home .shop-home-deal{ padding: 0; overflow: hidden; border-radius: 18px; transition: transform .2s ease, box-shadow .2s ease; }
+.glowvai-root .shop-home .shop-home-deal-media{ aspect-ratio: 1 / 1; margin-bottom: 0; border-radius: 0; background: var(--home-sky); }
+.glowvai-root .shop-home .shop-home-deal-media img{ padding: 0; object-fit: cover; }
+.glowvai-root .shop-home .shop-home-deal-open{ gap: 3px; }
+.glowvai-root .shop-home .shop-home-deal-brand{ padding: 12px 14px 0; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.glowvai-root .shop-home .shop-home-deal-name{ padding: 0 14px; font-size: 14px; }
+.glowvai-root .shop-home .shop-home-deal-price{ padding: 0 14px; }
+.glowvai-root .shop-home .shop-home-deal-add{ height: 40px; margin: 12px 14px 14px; border: 1.5px solid var(--home-brand); background: #fff; color: var(--home-brand); transition: background .15s ease, color .15s ease; }
+.glowvai-root .shop-home .shop-home-deal-add:hover{ background: var(--home-brand); color: #fff; }
+.glowvai-root .shop-home .shop-home-deal-badge{ top: 12px; left: 12px; font-size: 11px; }
+.glowvai-root .shop-home .shop-home-concern{ gap: 10px; padding: 16px; border-radius: 18px; transition: border-color .15s ease, transform .2s ease; }
+.glowvai-root .shop-home .shop-home-concern-icon{ width: 38px; height: 38px; }
+.glowvai-root .shop-home .shop-home-concern strong{ font-size: 14px; }
+@media (hover: hover){
+  .glowvai-root .shop-home .shop-home-deal:hover,
+  .glowvai-root .shop-home .shop-home-concern:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(26, 54, 120, .1); }
+  .glowvai-root .shop-home .shop-home-concern:hover{ border-color: var(--home-brand); }
+}
+
+/* Desktop: the web header already has search, the page links and the account, so the home drops its own copies.
+   The delivery address and a compact For Her / For Him switch share one row. */
+@media (min-width: 1024px){
+  .glowvai-root .shop-home{ --shop-home-gutter: 32px; }
+  .glowvai-root .shop-home .shop-home-search,
+  .glowvai-root .shop-home .shop-home-chips,
+  .glowvai-root .shop-home .shop-home-profile{ display: none; }
+  .glowvai-root .shop-home .shop-home-top{ display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; }
+  .glowvai-root .shop-home .shop-home-topbar{ flex: 1; min-height: 0; margin-bottom: 0; }
+  .glowvai-root .shop-home .shop-home-eta{ font-size: 15px; }
+  .glowvai-root .shop-home .shop-home-location-btn{ font-size: 14px; }
+  .glowvai-root .shop-home .shop-home-mode{ flex: 0 0 340px; width: 340px; max-width: 340px; margin-top: 0; }
+  .glowvai-root .shop-home .shop-home-showcase{ min-height: 360px; margin-top: 20px; border-radius: 28px; }
+  .glowvai-root .shop-home .shop-home-showcase-copy{ min-height: 360px; padding: 48px 56px; }
+  .glowvai-root .shop-home .shop-home-showcase h1{ font-size: 64px; }
+  .glowvai-root .shop-home .shop-home-showcase-sub{ font-size: 18px; }
+  .glowvai-root .shop-home .shop-home-festival{ margin-top: 20px; }
+  .glowvai-root .shop-home .shop-home-festival .zq-festival-hero{ height: 220px; }
+  .glowvai-root .shop-home .shop-home-categories{ gap: 16px; margin-top: 28px; }
+  .glowvai-root .shop-home .shop-home-category-label{ font-size: 14px; }
+  .glowvai-root .shop-home .shop-home-promos{ gap: 16px; margin-top: 20px; }
+  .glowvai-root .shop-home .shop-home-section{ margin-top: 48px; }
+  .glowvai-root .shop-home .shop-home-section-head{ margin-bottom: 16px; }
+  .glowvai-root .shop-home .shop-home-section-head h2{ font-size: 26px; }
+  .glowvai-root .shop-home .shop-home-section-titles p{ font-size: 14px; }
+  .glowvai-root .shop-home .shop-home-deals{ gap: 20px; }
+  .glowvai-root .shop-home .shop-home-deal-name{ font-size: 15px; }
+  .glowvai-root .shop-home .shop-home-deal-price b{ font-size: 18px; }
+  .glowvai-root .shop-home .shop-home-rail{ grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+  .glowvai-root .shop-home .shop-home-concerns{ gap: 16px; }
+  .glowvai-root .shop-home .shop-home-concern{ padding: 20px; }
+  .glowvai-root .shop-home .shop-home-scan{ margin-top: 48px; padding: 40px 48px; border-radius: 28px; }
+  .glowvai-root .shop-home .shop-home-scan h2{ font-size: 34px; }
+}
