@@ -43,7 +43,7 @@
 
   /* Orders list: three cards per row */
   /* Orders list: one full-width row per order (order info, total, actions), like a desktop order history */
-  .glowvai-root .orders-screen.is-list .orders-grid{ display: flex; flex-direction: column; gap: 16px; }
+  .glowvai-root .orders-screen.is-list .orders-grid{ display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
   .glowvai-root .orders-screen.is-list .orders-order-card{ display: grid; grid-template-columns: minmax(0, 1fr) 240px; column-gap: 32px; row-gap: 16px; align-items: center; padding: 20px 24px; }
   .glowvai-root .orders-screen.is-list .orders-card-open{ display: grid; grid-column: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; row-gap: 12px; align-items: center; }
   .glowvai-root .orders-screen.is-list .orders-card-open > .orders-card-head{ grid-column: 1; grid-row: 1; }

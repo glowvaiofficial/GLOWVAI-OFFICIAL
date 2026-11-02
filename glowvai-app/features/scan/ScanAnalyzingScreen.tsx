@@ -28,9 +28,14 @@ async function analyzeOnDevice(file: Blob, scanId: string): Promise<SkinAnalysis
   return runSkinAnalysis(prepared.maskedPixels, scanId);
 }
 
-export const ScanAnalyzingScreen: React.FC = () => {
+interface ScanAnalyzingScreenProps {
+  /** Photo to analyse; defaults to the file passed in the route params. */
+  file?: Blob;
+}
+
+export const ScanAnalyzingScreen: React.FC<ScanAnalyzingScreenProps> = ({ file: fileProp }) => {
   const { navigate, activeParams } = useApp();
-  const file: Blob | undefined = activeParams?.file;
+  const file: Blob | undefined = fileProp ?? activeParams?.file;
   const [stepIndex, setStepIndex] = useState(0);
   const [statusNote, setStatusNote] = useState('This usually takes 5–8 seconds');
 

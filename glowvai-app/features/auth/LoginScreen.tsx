@@ -5,8 +5,6 @@ import { sendPhoneOtp } from '../../core/services/authService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { logTouch } from '../../core/utils/touchDoctor';
 import { errorMessageOf } from './authUtils';
-const mascotFox = '/glowvai/features/auth/assets/mascot-fox.png';
-const mascotCat = '/glowvai/features/auth/assets/mascot-cat.png';
 
 export const validateIndianPhoneNumber = (digits: string): boolean => {
   const clean = digits.replace(/\D/g, '');
@@ -101,8 +99,6 @@ export const LoginScreen: React.FC = () => {
           <span className="auth-brand-wordmark">glowvai</span>
         </button>
 
-        <img className="auth-mascot auth-mascot-left" src={mascotFox} alt="" aria-hidden="true" />
-        <img className="auth-mascot auth-mascot-right" src={mascotCat} alt="" aria-hidden="true" />
       </div>
 
       <div className="auth-login-sheet">

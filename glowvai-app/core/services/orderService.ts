@@ -56,6 +56,13 @@ export interface SlaStatusResponse {
 }
 
 // A fresh 4-digit handover code per order, instead of the same code for every customer.
+// Backend calls give up after 8 seconds so an unreachable server can't hang checkout.
+const fetchWithTimeout = (url: string, init?: RequestInit, ms = 8000): Promise<Response> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+};
+
 export const newDeliveryOtp = (): string => {
   const values = new Uint32Array(1);
   crypto.getRandomValues(values);
@@ -113,14 +120,16 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     storeId: 'DS-VIJ-01',
   };
 
+  let savedByBackend = false;
   for (const url of candidateUrls) {
     try {
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       if (res.ok) {
+        savedByBackend = true;
         break;
       }
     } catch {
@@ -128,12 +137,15 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
     }
   }
 
-  // 2. Non-blocking Firestore sync
-  try {
+  // 2. A backend that accepted the order owns orders/{id}, so the browser only writes it when none did.
+  // If neither saved it, the order was not placed and the caller must not show it as placed.
+  if (!savedByBackend) {
     const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-    await setDoc(orderRef, JSON.parse(JSON.stringify(newOrder)));
-  } catch (dbErr: any) {
-    console.warn('[Firestore Sync Note]:', dbErr?.message);
+    const saved = await Promise.race([
+      setDoc(orderRef, JSON.parse(JSON.stringify(newOrder))).then(() => true, () => false),
+      new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 8000)),
+    ]);
+    if (!saved) throw new Error('We could not place your order. Check your connection and try again.');
   }
 
   return newOrder;

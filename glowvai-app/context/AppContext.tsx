@@ -212,7 +212,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSkinReports([]);
     setCustomerDetails(null);
     navigate('welcome');
-    showToast('Your account and personal data have been scheduled for deletion.');
+    showToast('Your data has been removed from this device.');
   };
 
   const saveCustomerDetails = (details: CustomerDetails) => {
@@ -375,7 +375,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return streak;
       })
     );
-    showToast('Daily check-in photo evidence uploaded!');
+    showToast('Check-in photo saved on this device.');
   };
 
   const reportAdverseReaction = async (trackingId: string, description: string) => {
@@ -387,7 +387,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       `Adverse Reaction on Tracking #${trackingId}`,
       description
     );
-    showToast('Safety ticket created. Our support team will contact you.');
+    showToast('Saved on this device. Message support on WhatsApp to report a reaction.');
   };
 
   // A claim is only recorded for review. No refund or decision is made on the device.
@@ -395,7 +395,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setStreaks((prev) =>
       prev.map((s) => (s.trackingId === trackingId ? { ...s, status: 'claim_submitted', claimFeedback: feedback } : s))
     );
-    showToast('Claim submitted for review. We will update you once a decision is made.');
+    showToast('Saved on this device. Message support on WhatsApp to make a claim.');
   };
 
   // Support
@@ -425,7 +425,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ): Promise<SupportTicket> => {
     const t = await ApiService.submitSupportTicket(category, subject, message, orderId);
     setSupportTickets((prev) => [t, ...prev]);
-    showToast(`Support ticket #${t.id} opened.`);
+    showToast('Saved on this device. Message support on WhatsApp for a reply.');
     return t;
   };
 

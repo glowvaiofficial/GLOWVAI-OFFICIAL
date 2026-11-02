@@ -348,11 +348,6 @@ export const ApiService = {
           text: initialMessage,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
-        {
-          sender: 'agent',
-          text: `Thank you for contacting Glowvai Support regarding ${category}. Our Vijayawada care team has received your ticket and is reviewing the details.`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
       ],
     };
     return newTicket;

@@ -14,6 +14,8 @@
   .glowvai-root .profile-body:has(> .profile-side){
     display: grid;
     grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+    /* The main column spans both rows; the flexible second row takes its extra height so the side cards stay together. */
+    grid-template-rows: auto 1fr;
     align-items: start;
     gap: 20px 28px;
   }

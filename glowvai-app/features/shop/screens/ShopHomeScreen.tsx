@@ -324,7 +324,9 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           const sample = firstProductIn(cat.id);
           return (
             <button key={cat.id} type="button" className="shop-home-category" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
-              <span className="shop-home-category-tile">{sample && <img src={getProductThumbUrl(sample)} alt="" width={400} height={300} loading="lazy" decoding="async" />}</span>
+              <span className={`shop-home-category-tile${sample ? '' : ' is-all'}`}>
+                {sample ? <img src={getProductThumbUrl(sample)} alt="" width={400} height={300} loading="lazy" decoding="async" /> : <Sparkles size={22} />}
+              </span>
               <span className="shop-home-category-label">{cat.label}</span>
             </button>
           );

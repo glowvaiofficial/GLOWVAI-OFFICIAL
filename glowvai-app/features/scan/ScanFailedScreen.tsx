@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, CheckCircle2, Image as ImageIcon, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Camera, CheckCircle2, Image as ImageIcon, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { ScanHeader } from './components/ScanHeader';
 import type { ScanFailureReason } from './services/scanApi';
@@ -58,44 +58,54 @@ export const ScanFailedScreen: React.FC = () => {
   const copy = COPY[reason] ?? COPY.default;
 
   return (
-    <div className="scan-screen">
-      <ScanHeader title="GlowVAI scan" subtitle="Beauty · smarter · faster" onBack={goBack} />
+    <div className="scan-screen scan-failed-screen">
+      <ScanHeader title="Face scan" subtitle="We couldn’t finish your scan" onBack={goBack} />
       <div className="scan-body">
-        <h2 className="scan-headline">{copy.headline}</h2>
-        <p className="scan-error-title">{copy.title}</p>
-        <p className="scan-lead">{copy.body}</p>
+        <div className="scan-split">
+          <div className="scan-split-main">
+            <span className="scan-failed-icon" aria-hidden="true">
+              <AlertCircle size={30} />
+            </span>
+            <h2 className="scan-headline">{copy.headline}</h2>
+            <p className="scan-error-title">{copy.title}</p>
+            <p className="scan-lead">{copy.body}</p>
 
-        <div className="scan-diagnostic">
-          <span className="scan-diagnostic-title">Diagnostic details</span>
-          <span className="scan-diagnostic-row">Reason: {reason}</span>
-          {details && <span className="scan-diagnostic-row">{details}</span>}
+            {reason !== 'default' && (
+              <div className="scan-diagnostic">
+                <span className="scan-diagnostic-title">Details for support</span>
+                <span className="scan-diagnostic-row">Reason: {reason}</span>
+                {details && <span className="scan-diagnostic-row">{details}</span>}
+              </div>
+            )}
+
+            <h3 className="scan-section-label">Tips for the next try</h3>
+            <ul className="scan-check-list">
+              {NEXT_STEPS.map((step) => (
+                <li key={step} className="scan-check-item">
+                  <CheckCircle2 size={16} />
+                  {step}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="scan-split-side">
+            <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
+              <Camera size={18} />
+              Try again
+            </button>
+            <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
+              <ImageIcon size={18} />
+              Choose another photo
+            </button>
+            <button type="button" className="scan-text-button" onClick={() => navigate('home')}>
+              Continue shopping
+            </button>
+            <p className="scan-privacy">
+              <ShieldCheck size={14} /> Your photo is used only for this skin assessment.
+            </p>
+          </div>
         </div>
-
-        <h3 className="scan-section-label">Next steps</h3>
-        <ul className="scan-check-list">
-          {NEXT_STEPS.map((step) => (
-            <li key={step} className="scan-check-item">
-              <CheckCircle2 size={16} />
-              {step}
-            </li>
-          ))}
-        </ul>
-
-        <p className="scan-privacy">
-          <ShieldCheck size={14} /> Your photo is used only for this skin assessment.
-        </p>
-
-        <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
-          <Camera size={18} />
-          Try again
-        </button>
-        <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
-          <ImageIcon size={18} />
-          Choose another photo
-        </button>
-        <button type="button" className="scan-text-button" onClick={() => navigate('home')}>
-          Continue with basic routine
-        </button>
       </div>
     </div>
   );

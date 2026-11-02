@@ -45,6 +45,8 @@
 .glowvai-root .commerce-icon-btn.is-static { border-color: transparent; background: var(--success-bg); color: var(--success); }
 
 .glowvai-root .commerce-body { display: flex; flex-direction: column; gap: 12px; padding: 16px 16px 24px; }
+/* The body grows so the action bar rests at the bottom of short pages. */
+.glowvai-root .commerce-screen > .commerce-body { flex: 1 0 auto; }
 
 .glowvai-root .commerce-card {
   padding: 16px;
@@ -280,7 +282,7 @@
 .glowvai-root .commerce-chip.is-on { border-color: var(--primary); background: var(--primary); color: #fff; }
 .glowvai-root .commerce-chip-static { padding: 6px 12px; border-radius: 999px; background: var(--success-bg); color: var(--success); font-size: 12px; font-weight: 800; }
 
-.glowvai-root .commerce-bill dl { display: grid; gap: 10px; margin-top: 4px; }
+.glowvai-root .commerce-bill dl { display: grid; gap: 10px; margin-top: 12px; }
 .glowvai-root .commerce-bill dl > div { display: flex; justify-content: space-between; gap: 12px; color: var(--text-secondary); font-size: 13px; }
 .glowvai-root .commerce-bill dd { color: var(--text-primary); font-weight: 700; }
 .glowvai-root .commerce-bill .is-saving dd { color: var(--success); }
@@ -325,6 +327,7 @@
 .glowvai-root .commerce-warn svg { flex: 0 0 auto; margin-top: 1px; }
 .glowvai-root .commerce-tag {
   display: inline-block;
+  font-style: normal;
   margin-right: 6px;
   padding: 2px 8px;
   border-radius: 6px;

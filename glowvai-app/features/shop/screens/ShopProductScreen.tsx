@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, Plus, Share2, ShoppingBag, Sparkles, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
@@ -28,6 +28,14 @@ export const ShopProductScreen: React.FC = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [imageFailed, setImageFailed] = useState(false);
+
+  // Open each product at the top, not at the scroll position of the list it was opened from.
+  useEffect(() => {
+    document.querySelector('.glowvai-root .screen-content')?.scrollTo?.(0, 0);
+    window.scrollTo(0, 0);
+    setQuantity(1);
+    setImageFailed(false);
+  }, [productId]);
 
   if (!product) {
     return (

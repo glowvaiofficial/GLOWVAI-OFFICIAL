@@ -4,7 +4,7 @@
 
 .glowvai-root .profile-header{ position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:12px; min-height:60px; padding:12px 16px; border-bottom:1px solid var(--border-light); background:#fff; }
 .glowvai-root .profile-header-copy{ flex:1; min-width:0; }
-.glowvai-root .profile-eyebrow{ display:block; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; }
+.glowvai-root .profile-eyebrow{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; }
 .glowvai-root .profile-title{ overflow:hidden; font-family:var(--font-heading); font-size:17px; font-weight:750; letter-spacing:-.25px; text-overflow:ellipsis; white-space:nowrap; }
 .glowvai-root .profile-icon-button{ display:inline-flex; width:44px; height:44px; flex:none; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:11px; background:#fff; transition:background-color .18s ease, border-color .18s ease; }
 .glowvai-root .profile-icon-button:hover{ border-color:var(--primary-border); background:var(--primary-light); }

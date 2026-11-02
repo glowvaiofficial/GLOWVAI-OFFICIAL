@@ -22,7 +22,7 @@
   .glowvai-root .commerce-screen > .commerce-body { gap: 16px; padding: 12px 24px 32px; }
   .glowvai-root .commerce-main,
   .glowvai-root .commerce-aside { gap: 16px; }
-  .glowvai-root .commerce-screen .commerce-card { padding: 20px; }
+  .glowvai-root .commerce-screen .commerce-card:not(.commerce-address) { padding: 20px; }
   .glowvai-root .commerce-screen > .commerce-sticky-bar { padding-inline: 24px; }
   .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-primary:not(.is-wide),
   .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-ghost {
@@ -56,6 +56,7 @@
     width: calc(100% - 48px);
     max-width: 640px;
     min-height: 0;
+    flex: 0 0 auto;
     margin: 32px auto;
     overflow: hidden;
     border: 1px solid var(--border-light);

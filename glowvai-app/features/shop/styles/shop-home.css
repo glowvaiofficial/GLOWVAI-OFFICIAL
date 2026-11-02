@@ -158,6 +158,7 @@
 .glowvai-root .shop-home{ --mode-accent: #ef2f72; --mode-deep: #aa0c43; --mode-soft: #fff1f5; }
 .glowvai-root .shop-home.zq-mode-men{ --mode-accent: #075df7; --mode-deep: #073784; --mode-soft: #edf5ff; }
 .glowvai-root .shop-home .shop-home-mode{ margin-top: 12px; }
+.glowvai-root .shop-home .shop-home-mode .zq-mode-toggle button{ min-height: 44px; font-size: 15px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-location-btn.is-static{ cursor: default; }
 .glowvai-root .shop-home .shop-home-festival{ margin: 14px var(--shop-home-gutter) 0; animation: navratri-mode-in 420ms cubic-bezier(.2,.8,.2,1) both; }
 .glowvai-root .shop-home .shop-home-festival .zq-festival{ padding: 0; }

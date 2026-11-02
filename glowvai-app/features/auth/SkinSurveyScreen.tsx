@@ -59,7 +59,7 @@ export const SkinSurveyScreen: React.FC = () => {
 
       <h1 className="auth-title">What are your main skin concerns?</h1>
       <p className="auth-subtitle">
-        Select all that apply. This helps us personalize your initial routine and diagnostic report.
+        Select all that apply. This helps us personalize your first routine and skin report.
       </p>
 
       <div className="auth-concern-grid">

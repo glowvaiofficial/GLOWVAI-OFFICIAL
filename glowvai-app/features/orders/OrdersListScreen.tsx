@@ -110,7 +110,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, o
         {tone === 'cancelled' && (
           <>
             <button type="button" className="orders-secondary-button" onClick={() => onCancelled(order)}>
-              View cancellation
+              View details
             </button>
             <button type="button" className="orders-primary-button" onClick={() => onBuyAgain(order)}>
               <RotateCcw size={16} /> Buy again

@@ -24,3 +24,12 @@ export const getDiscountPercent = (product: SkincareProduct): number => {
   if (product.originalPrice <= product.price) return 0;
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 };
+// The cart line a catalogue product adds, the same shape the shop screens use.
+export const cartLineFor = (product: SkincareProduct) => ({
+  productId: product.id,
+  name: product.name,
+  brand: product.brand,
+  image: getProductImageUrl(product),
+  price: product.price,
+  mrp: product.originalPrice,
+});

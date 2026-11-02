@@ -113,7 +113,7 @@ export const ScanCameraScreen: React.FC = () => {
 
   return (
     <div className="scan-screen scan-camera-screen">
-      <ScanHeader title="AI viewfinder" onBack={goBack} />
+      <ScanHeader title="Take a photo" subtitle="Face scan · Step 2 of 3" onBack={goBack} />
 
       <div className="scan-body scan-camera-body">
         {isBlocked && (

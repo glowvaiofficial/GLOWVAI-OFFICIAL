@@ -33,7 +33,13 @@ import { SupportScreen } from './screens/SupportScreen';
 import { StudentReferralScreen } from './screens/StudentReferralScreen';
 
 const AppContent: React.FC = () => {
-  const { currentScreen, toastMessage } = useApp();
+  const { currentScreen, activeParams, toastMessage } = useApp();
+
+  // Each screen opens at the top, rather than keeping the previous screen's scroll position.
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    document.querySelector('.glowvai-root .screen-content')?.scrollTo(0, 0);
+  }, [currentScreen, activeParams]);
 
   const renderScreen = () => {
     const PortedScreen = portedRoutes[currentScreen as keyof typeof portedRoutes];

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Mail, Phone, ShieldCheck, UserRound } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import '../responsive/cart-tracking.css';
 
 export const CustomerDetailsScreen: React.FC = () => {
   const { goBack, navigate, customerDetails, saveCustomerDetails, user, activeParams } = useApp();

@@ -53,10 +53,13 @@ export const getDeviceCurrentLocation = async (
       })
     );
 
+    // Real coordinates only: the city, pincode and address are unknown until they are reverse-geocoded.
     const result: UserLocationResult = {
-      ...fallback,
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
+      country: 'India',
+      countryCode: 'IN',
+      detectedCountryItem: fallback.detectedCountryItem,
     };
     cachedLocation = { data: result, timestamp: Date.now() };
     return result;
