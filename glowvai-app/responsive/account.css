@@ -53,7 +53,7 @@
 }
 
 @media (min-width: 1024px){
-  .glowvai-root main.profile-v3{ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 32px; padding: 28px 0 64px; }
+  .glowvai-root main.profile-v3{ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 32px; padding: 28px 20px 64px; }
   .glowvai-root main.profile-v3 > .profile-v3-side > header{ grid-template-columns: 56px minmax(0, 1fr) auto; }
   .glowvai-root main.profile-v3 > .profile-v3-side > header > button{ grid-column: auto; }
   .glowvai-root main.profile-v3 .profile-avatar{ width: 56px; height: 56px; font-size: 20px; }

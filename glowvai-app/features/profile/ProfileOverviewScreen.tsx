@@ -34,13 +34,6 @@ export const ProfileOverviewScreen = () => {
           </button>
         </section>
 
-        <p className="profile-label">Account settings</p>
-        <section className="profile-card">
-          <ProfileListItem icon={<MapPin size={16} />} title="My addresses" onClick={() => navigate('address-list')} />
-          <ProfileListItem icon={<CreditCard size={16} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
-          <ProfileListItem icon={<Settings size={16} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
-          <ProfileListItem icon={<HelpCircle size={16} />} title="Help & support" onClick={() => navigate('profile-support')} />
-        </section>
         </div>
 
         <div className="profile-main">
@@ -115,6 +108,16 @@ export const ProfileOverviewScreen = () => {
               <button type="button" className="profile-button is-secondary is-small" onClick={() => navigate('shop-home')}>Start shopping</button>
             </div>
           )}
+        </section>
+        </div>
+
+        <div className="profile-side">
+        <p className="profile-label">Account settings</p>
+        <section className="profile-card">
+          <ProfileListItem icon={<MapPin size={16} />} title="My addresses" onClick={() => navigate('address-list')} />
+          <ProfileListItem icon={<CreditCard size={16} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
+          <ProfileListItem icon={<Settings size={16} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
+          <ProfileListItem icon={<HelpCircle size={16} />} title="Help & support" onClick={() => navigate('profile-support')} />
         </section>
         </div>
       </div>

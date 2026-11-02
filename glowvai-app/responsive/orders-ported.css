@@ -42,7 +42,16 @@
   .glowvai-root .orders-screen .orders-body{ padding: 28px 32px; }
 
   /* Orders list: three cards per row */
-  .glowvai-root .orders-screen.is-list .orders-grid{ grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  /* Orders list: one full-width row per order (order info, total, actions), like a desktop order history */
+  .glowvai-root .orders-screen.is-list .orders-grid{ display: flex; flex-direction: column; gap: 16px; }
+  .glowvai-root .orders-screen.is-list .orders-order-card{ display: grid; grid-template-columns: minmax(0, 1fr) 240px; column-gap: 32px; row-gap: 16px; align-items: center; padding: 20px 24px; }
+  .glowvai-root .orders-screen.is-list .orders-card-open{ display: grid; grid-column: 1; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 24px; row-gap: 12px; align-items: center; }
+  .glowvai-root .orders-screen.is-list .orders-card-open > .orders-card-head{ grid-column: 1; grid-row: 1; }
+  .glowvai-root .orders-screen.is-list .orders-card-open > .orders-thumbs{ grid-column: 1; grid-row: 2; }
+  .glowvai-root .orders-screen.is-list .orders-card-open > .orders-summary-row{ grid-column: 2; grid-row: 1 / span 2; align-self: stretch; padding: 16px; }
+  .glowvai-root .orders-screen.is-list .orders-progress{ grid-column: 1; max-width: 560px; }
+  .glowvai-root .orders-screen.is-list .orders-card-actions{ grid-column: 2; grid-row: 1 / span 2; flex-direction: column; }
+  .glowvai-root .orders-screen.is-list .orders-card-actions > button{ flex: none; width: 100%; }
 
   /* Order details: items and bill on the left, progress and actions in a sticky column on the right */
   .glowvai-root .orders-screen.is-detail:not(.is-empty) .orders-body,

@@ -90,7 +90,7 @@
 .glowvai-root .profile-chip{ min-height:44px; padding:8px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-primary); font-size:12px; font-weight:700; }
 .glowvai-root .profile-chip.is-active{ border-color:var(--primary); background:var(--primary); color:#fff; }
 
-.glowvai-root .profile-button{ display:inline-flex; text-decoration:none; min-height:48px; align-items:center; justify-content:center; gap:8px; padding:0 16px; border-radius:14px; font-size:14px; font-weight:800; }
+.glowvai-root .profile-button{ display:inline-flex; flex:none; text-decoration:none; white-space:nowrap; min-height:48px; align-items:center; justify-content:center; gap:8px; padding:0 16px; border-radius:14px; font-size:14px; font-weight:800; }
 .glowvai-root .profile-button.is-block{ width:100%; }
 .glowvai-root .profile-button.is-primary{ background:var(--primary); color:#fff; }
 .glowvai-root .profile-button.is-secondary{ border:1px solid var(--primary-border); background:var(--primary-light); color:var(--primary); }

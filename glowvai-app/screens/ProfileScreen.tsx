@@ -10,6 +10,7 @@ export const ProfileScreen: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const name = customerDetails?.fullName || user?.name || 'Add your name';
   const phone = customerDetails?.phoneNumber || user?.phoneNumber || 'Contact details not added';
+  const hasAddress = Boolean(currentAddress.street || currentAddress.area);
 
   const row = (icon: React.ReactNode, title: string, note: string, action: () => void, danger = false) => <button className={danger ? 'profile-row is-danger' : 'profile-row'} onClick={action}><span>{icon}</span><p><b>{title}</b><small>{note}</small></p><ChevronRight size={17} /></button>;
 
@@ -22,7 +23,9 @@ export const ProfileScreen: React.FC = () => {
 
     <section className="profile-quick-stats"><button onClick={() => navigate('order-history')}><b>{orders.length}</b><span>Orders</span></button><button onClick={() => navigate('skin-report')}><b>{skinReports.length}</b><span>Skin reports</span></button><button onClick={() => navigate('streak-tracking')}><b>{streaks.length}</b><span>Active routines</span></button></section>
 
-    <section className="profile-address-card"><div><MapPin size={19} /><p><small>DELIVERING TO {currentAddress.label.toUpperCase()}</small><b>{currentAddress.street}, {currentAddress.area}</b><span>{currentAddress.city} · {currentAddress.pincode}</span></p></div><button onClick={() => setAddressModalOpen(true)}>Change</button></section>
+    {hasAddress
+      ? <section className="profile-address-card"><div><MapPin size={19} /><p><small>DELIVERING TO {(currentAddress.label || 'your address').toUpperCase()}</small><b>{[currentAddress.street, currentAddress.area].filter(Boolean).join(', ')}</b><span>{[currentAddress.city, currentAddress.pincode].filter(Boolean).join(' · ')}</span></p></div><button onClick={() => setAddressModalOpen(true)}>Change</button></section>
+      : <section className="profile-address-card"><div><MapPin size={19} /><p><small>DELIVERY ADDRESS</small><b>No address added yet</b><span>Add one to check delivery to your area</span></p></div><button onClick={() => setAddressModalOpen(true)}>Add</button></section>}
     </div>
 
     <div className="profile-v3-main">

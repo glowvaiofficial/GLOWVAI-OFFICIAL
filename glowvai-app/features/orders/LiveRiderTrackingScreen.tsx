@@ -19,7 +19,8 @@ import {
 
 const CANCEL_REASONS = ['Ordered by mistake', 'Need to change address', 'Delivery time is too long', 'Found another product'];
 
-const STAGE_NOTE = ['Your order is confirmed', 'Your bag is being packed', 'Your order is on its way', 'Delivered to your address'];
+const DONE_NOTE = ['Order confirmed', 'Bag packed and sealed', 'Picked up for delivery', 'Delivered to your address'];
+const CURRENT_NOTE = ['We have received your order', 'Your bag is being packed', 'On its way to you', 'Delivered to your address'];
 
 export const LiveRiderTrackingScreen: React.FC = () => {
   const { goBack, navigate, cancelOrder } = useApp();
@@ -113,7 +114,7 @@ export const LiveRiderTrackingScreen: React.FC = () => {
                       <span className="orders-vtimeline-dot">{done ? <Check size={14} /> : index + 1}</span>
                       <div>
                         <b>{label}</b>
-                        {(done || isCurrent) && <small>{STAGE_NOTE[index]}</small>}
+                        {(done || isCurrent) && <small>{done ? DONE_NOTE[index] : CURRENT_NOTE[index]}</small>}
                       </div>
                     </li>
                   );
