@@ -248,3 +248,63 @@
   .glowvai-root .shop-home .shop-home-scan{ margin-top: 48px; padding: 40px 48px; border-radius: 28px; }
   .glowvai-root .shop-home .shop-home-scan h2{ font-size: 34px; }
 }
+
+/* The quick links repeat the bottom tab bar (phone) and the web header (tablet and desktop), so they are not shown. */
+.glowvai-root .shop-home .shop-home-chips{ display: none; }
+
+/* Phone: a tighter home. Shorter hero and offer cards, deals as a swipe rail like the other rails, compact concern
+   rows, and no rail arrows on touch screens. */
+@media (max-width: 719px){
+  .glowvai-root .shop-home .shop-home-top{ padding-top: 12px; }
+  .glowvai-root .shop-home .shop-home-topbar{ min-height: 44px; margin-bottom: 10px; }
+  .glowvai-root .shop-home .shop-home-search{ height: 52px; margin-bottom: 0; border-radius: 16px; }
+  .glowvai-root .shop-home .shop-home-ai-btn{ height: 38px; padding: 0 12px; }
+  .glowvai-root .shop-home .shop-home-mode{ margin-top: 10px; }
+  .glowvai-root .shop-home .shop-home-mode .zq-mode-toggle button{ min-height: 44px; font-size: 14px; }
+
+  .glowvai-root .shop-home .shop-home-showcase{ min-height: 236px; margin-top: 12px; border-radius: 22px; }
+  .glowvai-root .shop-home .shop-home-showcase-copy{ min-height: 236px; padding: 22px 20px; }
+  .glowvai-root .shop-home .shop-home-showcase-tag{ margin-bottom: 10px; padding: 6px 12px; font-size: 12px; }
+  .glowvai-root .shop-home .shop-home-showcase h1{ font-size: 34px; }
+  .glowvai-root .shop-home .shop-home-showcase-sub{ margin-top: 8px; font-size: 14px; }
+  .glowvai-root .shop-home .shop-home-showcase-actions{ gap: 8px; margin-top: 16px; }
+  .glowvai-root .shop-home .shop-home-btn-dark,
+  .glowvai-root .shop-home .shop-home-btn-light{ min-height: 44px; padding: 0 18px; font-size: 13px; }
+
+  .glowvai-root .shop-home .shop-home-categories{ gap: 10px; }
+  .glowvai-root .shop-home .shop-home-category-tile{ border-radius: 16px; }
+  .glowvai-root .shop-home .shop-home-category-label{ font-size: 12px; }
+
+  .glowvai-root .shop-home .shop-home-promos{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .glowvai-root .shop-home .shop-home-promo{ min-height: 0; padding: 14px 14px 46px; border-radius: 18px; }
+  .glowvai-root .shop-home .shop-home-promo-kicker{ font-size: 10px; }
+  .glowvai-root .shop-home .shop-home-promo-title{ font-size: 16px; }
+  .glowvai-root .shop-home .shop-home-promo-sub{ font-size: 12px; line-height: 1.35; }
+  .glowvai-root .shop-home .shop-home-promo-icon{ right: 12px; bottom: 12px; width: 30px; height: 30px; }
+
+  .glowvai-root .shop-home .shop-home-section{ margin-top: 28px; }
+  .glowvai-root .shop-home .shop-home-section-head h2{ font-size: 19px; }
+  .glowvai-root .shop-home .shop-home-section-actions .shop-home-arrow{ display: none; }
+
+  .glowvai-root .shop-home .shop-home-deals{ display: flex; gap: 12px; margin: 0; padding: 4px var(--shop-home-gutter) 6px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .glowvai-root .shop-home .shop-home-deals::-webkit-scrollbar{ display: none; }
+  .glowvai-root .shop-home .shop-home-deal{ flex: 0 0 160px; scroll-snap-align: start; }
+  .glowvai-root .shop-home .shop-home-deal-brand{ padding: 10px 12px 0; font-size: 10px; }
+  .glowvai-root .shop-home .shop-home-deal-name{ min-height: 34px; padding: 0 12px; font-size: 13px; }
+  .glowvai-root .shop-home .shop-home-deal-price{ padding: 0 12px; }
+  .glowvai-root .shop-home .shop-home-deal-price b{ font-size: 15px; }
+  .glowvai-root .shop-home .shop-home-deal-add{ height: 36px; margin: 10px 12px 12px; }
+
+  .glowvai-root .shop-home .shop-home-concerns{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .glowvai-root .shop-home .shop-home-concern{ flex-direction: row; align-items: center; gap: 10px; min-height: 56px; padding: 10px 12px; border-radius: 14px; }
+  .glowvai-root .shop-home .shop-home-concern-icon{ flex-shrink: 0; width: 32px; height: 32px; }
+  .glowvai-root .shop-home .shop-home-concern strong{ font-size: 13px; }
+
+  .glowvai-root .shop-home .shop-home-scan{ margin-top: 28px; padding: 22px 20px; }
+  .glowvai-root .shop-home .shop-home-scan h2{ margin: 10px 0 6px; font-size: 22px; }
+  .glowvai-root .shop-home .shop-home-end{ padding-top: 24px; }
+}
+
+/* Snap rows start at the page gutter, not flush with the screen edge. */
+.glowvai-root .shop-home .shop-home-rail,
+.glowvai-root .shop-home .shop-home-deals{ scroll-padding-inline: var(--shop-home-gutter); }
