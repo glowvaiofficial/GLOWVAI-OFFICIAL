@@ -1,13 +1,12 @@
 /* Profile, settings, support, referrals and app doctor screens. Colors come from the :root tokens in index.css. */
 
-.glowvai-root .profile-screen{ display:flex; flex-direction:column; min-height:100%; background:var(--bg); color:var(--text-primary); }
+.glowvai-root .profile-screen{ --primary:#0057fb; --primary-dark:#0047d1; --primary-light:#eef4ff; --primary-border:#c8dafe; display:flex; flex-direction:column; min-height:100%; background:var(--bg); color:var(--text-primary); }
 
 .glowvai-root .profile-header{ position:sticky; top:0; z-index:30; display:flex; align-items:center; gap:12px; min-height:60px; padding:12px 16px; border-bottom:1px solid var(--border-light); background:#fff; }
 .glowvai-root .profile-header-copy{ flex:1; min-width:0; }
-.glowvai-root .profile-header-spacer{ width:38px; flex:none; }
-.glowvai-root .profile-eyebrow{ display:block; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; }
+.glowvai-root .profile-eyebrow{ display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:.6px; }
 .glowvai-root .profile-title{ overflow:hidden; font-family:var(--font-heading); font-size:17px; font-weight:750; letter-spacing:-.25px; text-overflow:ellipsis; white-space:nowrap; }
-.glowvai-root .profile-icon-button{ display:inline-flex; width:38px; height:38px; flex:none; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:11px; background:#fff; transition:background-color .18s ease, border-color .18s ease; }
+.glowvai-root .profile-icon-button{ display:inline-flex; width:44px; height:44px; flex:none; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:11px; background:#fff; transition:background-color .18s ease, border-color .18s ease; }
 .glowvai-root .profile-icon-button:hover{ border-color:var(--primary-border); background:var(--primary-light); }
 
 .glowvai-root .profile-body{ display:flex; flex-direction:column; gap:16px; padding:16px 16px 32px; }
@@ -17,7 +16,8 @@
 .glowvai-root .profile-card-title{ font-size:15px; font-weight:800; letter-spacing:-.02em; }
 .glowvai-root .profile-card-sub{ color:var(--text-secondary); font-size:12px; line-height:1.45; }
 .glowvai-root .profile-divider{ height:1px; background:var(--border-light); }
-.glowvai-root .profile-text-link{ align-self:flex-start; color:var(--primary); font-size:13px; font-weight:800; }
+.glowvai-root .profile-text-link{ display:inline-flex; min-height:44px; align-items:center; align-self:flex-start; color:var(--primary); font-size:13px; font-weight:800; }
+.glowvai-root .profile-ticket-button .profile-text-link, .glowvai-root .profile-field-head .profile-text-link{ min-height:0; }
 .glowvai-root .profile-chevron{ flex:none; color:var(--text-muted); }
 
 .glowvai-root .profile-user-button{ display:flex; width:100%; align-items:center; gap:12px; padding:16px; text-align:left; }
@@ -45,10 +45,12 @@
 .glowvai-root .profile-tile-label{ font-size:13px; font-weight:800; }
 .glowvai-root .profile-tile-note{ margin-top:-8px; color:var(--text-secondary); font-size:11px; }
 
-.glowvai-root .profile-list-item{ display:flex; width:100%; align-items:center; gap:12px; padding:12px 16px; text-align:left; }
-.glowvai-root .profile-card > :is(.profile-list-item, .profile-list-row, .profile-privacy-note) + :is(.profile-list-item, .profile-list-row, .profile-privacy-note){ border-top:1px solid var(--border-light); }
+.glowvai-root .profile-list-item{ display:flex; width:100%; min-height:56px; align-items:center; gap:12px; padding:12px 16px; color:inherit; text-align:left; text-decoration:none; transition:background-color .18s ease; }
+.glowvai-root .profile-list-item:hover{ background:var(--surface); }
+.glowvai-root .profile-card > :is(.profile-list-item, .profile-list-row, .profile-privacy-note, .profile-faq-item) + :is(.profile-list-item, .profile-list-row, .profile-privacy-note, .profile-faq-item){ border-top:1px solid var(--border-light); }
 .glowvai-root .profile-list-row{ display:flex; align-items:center; gap:12px; padding:12px 16px; }
 .glowvai-root .profile-list-icon{ display:grid; width:32px; height:32px; flex:none; place-items:center; border-radius:10px; background:var(--primary-light); color:var(--primary); }
+.glowvai-root .profile-list-icon.is-large{ width:40px; height:40px; border-radius:12px; }
 .glowvai-root .profile-list-icon.is-danger{ background:var(--error-bg); color:var(--error); }
 .glowvai-root .profile-list-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
 .glowvai-root .profile-list-title{ font-size:14px; font-weight:750; }
@@ -56,7 +58,7 @@
 .glowvai-root .profile-list-note{ color:var(--text-secondary); font-size:12px; line-height:1.4; }
 .glowvai-root .profile-list-value{ color:var(--text-secondary); font-size:13px; font-weight:600; white-space:nowrap; }
 .glowvai-root .profile-list-select{ max-width:150px; height:34px; padding:0 8px; border:1px solid var(--border); border-radius:10px; background:var(--surface); font-size:12px; font-weight:700; }
-.glowvai-root .profile-privacy-note{ display:flex; gap:10px; padding:0 16px 14px; color:var(--text-secondary); font-size:12px; line-height:1.5; }
+.glowvai-root .profile-privacy-note{ display:flex; gap:10px; padding:0 16px 14px 60px; color:var(--text-secondary); font-size:12px; line-height:1.5; }
 
 .glowvai-root .profile-switch{ position:relative; display:inline-flex; width:44px; height:26px; flex:none; }
 .glowvai-root .profile-switch input{ position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
@@ -85,16 +87,16 @@
 .glowvai-root .profile-field-error{ color:var(--error); font-size:12px; font-weight:600; }
 .glowvai-root .profile-field-hint{ color:var(--text-muted); font-size:11px; }
 .glowvai-root .profile-chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
-.glowvai-root .profile-chip{ padding:8px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-primary); font-size:12px; font-weight:700; }
+.glowvai-root .profile-chip{ min-height:44px; padding:8px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text-primary); font-size:12px; font-weight:700; }
 .glowvai-root .profile-chip.is-active{ border-color:var(--primary); background:var(--primary); color:#fff; }
 
-.glowvai-root .profile-button{ display:inline-flex; min-height:48px; align-items:center; justify-content:center; gap:8px; padding:0 16px; border-radius:14px; font-size:14px; font-weight:800; }
+.glowvai-root .profile-button{ display:inline-flex; flex:none; text-decoration:none; white-space:nowrap; min-height:48px; align-items:center; justify-content:center; gap:8px; padding:0 16px; border-radius:14px; font-size:14px; font-weight:800; }
 .glowvai-root .profile-button.is-block{ width:100%; }
 .glowvai-root .profile-button.is-primary{ background:var(--primary); color:#fff; }
 .glowvai-root .profile-button.is-secondary{ border:1px solid var(--primary-border); background:var(--primary-light); color:var(--primary); }
 .glowvai-root .profile-button.is-outline{ border:1px solid var(--border); background:#fff; color:var(--text-primary); }
 .glowvai-root .profile-button.is-danger{ background:var(--error); color:#fff; }
-.glowvai-root .profile-button.is-small{ min-height:36px; padding:0 12px; border-radius:10px; font-size:12px; }
+.glowvai-root .profile-button.is-small{ min-height:44px; padding:0 12px; border-radius:10px; font-size:12px; }
 .glowvai-root .profile-button:disabled{ cursor:not-allowed; opacity:.55; }
 
 .glowvai-root .profile-notice{ display:flex; gap:10px; padding:12px; border:1px solid var(--primary-border); border-radius:14px; background:var(--primary-light); color:var(--text-secondary); font-size:12px; line-height:1.45; }
@@ -112,7 +114,7 @@
 .glowvai-root .profile-stat-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
 .glowvai-root .profile-stat-value{ color:var(--primary); font-size:24px; font-weight:800; letter-spacing:-.02em; }
 
-.glowvai-root .profile-code-row{ display:flex; min-height:48px; align-items:center; gap:8px; padding:0 8px 0 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.glowvai-root .profile-code-row{ display:flex; min-height:56px; align-items:center; gap:8px; padding:6px 6px 6px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
 .glowvai-root .profile-code-text{ flex:1; min-width:0; overflow:hidden; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:14px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
 .glowvai-root .profile-button-row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
@@ -124,7 +126,7 @@
 .glowvai-root .profile-timeline-row{ display:flex; align-items:center; gap:10px; font-size:13px; font-weight:650; color:var(--text-primary); }
 .glowvai-root .profile-timeline-row.is-pending{ color:var(--text-muted); font-weight:600; }
 
-.glowvai-root .profile-faq-question{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; text-align:left; font-size:14px; font-weight:750; }
+.glowvai-root .profile-faq-question{ display:flex; width:100%; min-height:52px; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; text-align:left; font-size:14px; font-weight:750; }
 .glowvai-root .profile-faq-answer{ padding:0 16px 14px; color:var(--text-secondary); font-size:13px; line-height:1.5; }
 .glowvai-root .profile-ticket-button{ display:flex; width:100%; flex-direction:column; gap:6px; padding:14px 16px; text-align:left; }
 .glowvai-root .profile-ticket-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
@@ -159,6 +161,42 @@
 .glowvai-root .profile-modal{ display:flex; width:100%; max-width:360px; flex-direction:column; gap:12px; padding:20px; border-radius:16px; background:#fff; box-shadow:var(--shadow-float); }
 .glowvai-root .profile-modal h2{ font-size:17px; font-weight:800; }
 .glowvai-root .profile-modal p{ color:var(--text-secondary); font-size:13px; line-height:1.5; }
+
+.glowvai-root .profile-hero-avatar-lg{ border-width:3px; }
+.glowvai-root .profile-identity{ display:flex; align-items:center; gap:16px; padding:16px; }
+.glowvai-root .profile-identity .profile-hero-avatar-lg{ width:64px; height:64px; font-size:22px; }
+.glowvai-root .profile-user-name{ overflow-wrap:anywhere; }
+.glowvai-root .profile-empty-block{ display:flex; flex-direction:column; align-items:center; gap:4px; padding-bottom:16px; }
+.glowvai-root .profile-empty-block .profile-empty{ padding-bottom:4px; }
+.glowvai-root .profile-form-grid{ display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; }
+.glowvai-root select.profile-input{ cursor:pointer; }
+.glowvai-root .profile-title-icon{ display:inline-flex; align-items:center; gap:8px; }
+.glowvai-root .profile-feature-icon{ display:grid; width:48px; height:48px; place-items:center; border-radius:14px; background:var(--primary-light); color:var(--primary); }
+.glowvai-root .profile-steps{ display:flex; flex-direction:column; gap:14px; margin:0; padding:0; list-style:none; }
+.glowvai-root .profile-step{ display:flex; align-items:flex-start; gap:12px; color:var(--text-secondary); font-size:13px; line-height:1.5; }
+.glowvai-root .profile-step-number{ display:grid; width:28px; height:28px; flex:none; place-items:center; border-radius:50%; background:var(--primary-light); color:var(--primary); font-size:13px; font-weight:800; }
+.glowvai-root .profile-hero-title{ overflow-wrap:anywhere; }
+.glowvai-root .profile-hero-kicker{ text-transform:uppercase; }
+
+/* Suitability cover check-ins */
+.glowvai-root .profile-button.is-danger-outline{ border:1px solid var(--error-border); background:var(--error-bg); color:var(--error); }
+.glowvai-root .profile-empty-state{ align-items:flex-start; }
+.glowvai-root .profile-product-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; }
+.glowvai-root .profile-product-row .profile-pill{ align-self:flex-start; }
+.glowvai-root .profile-product-image{ width:64px; height:64px; flex:none; border-radius:12px; background:var(--surface); object-fit:cover; }
+.glowvai-root .profile-log-row{ align-items:center; justify-content:space-between; }
+.glowvai-root .profile-log-row b, .glowvai-root .profile-notice b{ color:var(--text-primary); }
+.glowvai-root .profile-notice.is-success b, .glowvai-root .profile-notice.is-warning b, .glowvai-root .profile-notice.is-error b{ color:inherit; }
+.glowvai-root .profile-notice > svg{ flex:none; margin-top:1px; }
+.glowvai-root .profile-day-grid{ display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:6px; }
+.glowvai-root .profile-day{ display:flex; min-height:52px; flex-direction:column; align-items:center; justify-content:center; gap:4px; border:1px solid var(--border); border-radius:10px; background:var(--surface); color:var(--text-muted); font-size:10px; font-weight:700; white-space:nowrap; }
+.glowvai-root .profile-day i{ width:5px; height:5px; border-radius:50%; background:var(--border); }
+.glowvai-root .profile-day.is-done{ border-color:var(--success-border); background:var(--success-bg); color:var(--success); }
+
+/* Phone: leave room for the floating View cart bar above the bottom navigation. */
+@media (max-width: 719px){
+  .glowvai-root:has(.mini-cart-bar) .profile-body{ padding-bottom:104px; }
+}
 
 /* Wrapper columns only change layout on tablet and desktop (see responsive/profile-admin.css). */
 .glowvai-root .profile-side, .glowvai-root .profile-main{ display:contents; }

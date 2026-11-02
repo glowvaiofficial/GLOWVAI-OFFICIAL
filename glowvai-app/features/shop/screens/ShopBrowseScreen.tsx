@@ -4,17 +4,22 @@ import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-browse.css';
 
-const stock = (id: string) => `https://images.unsplash.com/photo-${id}?w=400&auto=format&fit=crop&q=80`;
+// Each tile shows the first full-size catalogue product in that category, as on the shop home.
+const categoryImage = (id: string) => {
+  const sample = INDIAN_SKINCARE_CATALOG.find((p) => p.category === id && !isTrialProduct(p));
+  return sample ? getProductThumbUrl(sample) : '';
+};
 
 // Category ids match SkincareProduct['category'] exactly.
 const CATEGORY_ITEMS: { id: string; name: string; color: string; imageUri: string; Icon: LucideIcon }[] = [
-  { id: 'Serums', name: 'Serums & Actives', color: '#EBF5FF', imageUri: stock('1617897903246-719242758050'), Icon: Sparkles },
-  { id: 'Cleansers', name: 'Cleansers & Washes', color: '#F0FDF4', imageUri: stock('1556228720-195a672e8a03'), Icon: Droplet },
-  { id: 'Moisturizers', name: 'Moisturizers & Creams', color: '#FFF7ED', imageUri: stock('1571781926291-c477ebfd024b'), Icon: Leaf },
-  { id: 'Suncare', name: 'Sunscreen & SPF', color: '#FEF3C7', imageUri: stock('1598440947619-2c35fc9aa908'), Icon: Sun },
-  { id: 'Treatments', name: 'Spot Treatments', color: '#EFF6FF', imageUri: stock('1617897903246-719242758050'), Icon: Activity },
+  { id: 'Serums', name: 'Serums & Actives', color: '#EBF5FF', imageUri: categoryImage('Serums'), Icon: Sparkles },
+  { id: 'Cleansers', name: 'Cleansers & Washes', color: '#F0FDF4', imageUri: categoryImage('Cleansers'), Icon: Droplet },
+  { id: 'Moisturizers', name: 'Moisturizers & Creams', color: '#FFF7ED', imageUri: categoryImage('Moisturizers'), Icon: Leaf },
+  { id: 'Suncare', name: 'Sunscreen & SPF', color: '#FEF3C7', imageUri: categoryImage('Suncare'), Icon: Sun },
+  { id: 'Treatments', name: 'Spot Treatments', color: '#EFF6FF', imageUri: categoryImage('Treatments'), Icon: Activity },
 ];
 
 const CATEGORY_TINTS = ['#E8F0FE', '#E8F5E9', '#FFF8E1', '#F3E5F5', '#FCE4EC'];
@@ -95,7 +100,9 @@ export const ShopBrowseScreen: React.FC = () => {
   };
 
   const hasActiveFilters = Boolean(selectedBrand) || selectedConcern !== 'all';
-  const emptyHint = searchQuery || selectedBrand || (selectedConcern !== 'all' ? selectedConcern : '');
+  const concernLabel = SKIN_CONCERNS.find((c) => c.id === selectedConcern)?.label ?? '';
+  const emptyHint = searchQuery || selectedBrand || (selectedConcern !== 'all' ? concernLabel : '');
+  const itemsLabel = (n: number) => `${n} ${n === 1 ? 'item' : 'items'}`;
 
   return (
     <div className="shop-screen shop-browse">
@@ -183,7 +190,7 @@ export const ShopBrowseScreen: React.FC = () => {
           {selectedBrand && (
             <div className="shop-browse-banner">
               <span>
-                Showing: {selectedBrand} ({filteredProducts.length} items)
+                Showing: {selectedBrand} ({itemsLabel(filteredProducts.length)})
               </span>
               <button type="button" onClick={() => setSelectedBrand(null)}>
                 Show All
@@ -202,12 +209,12 @@ export const ShopBrowseScreen: React.FC = () => {
                   style={{ background: CATEGORY_TINTS[index % CATEGORY_TINTS.length] }}
                   onClick={() => navigate('shop-category', { categoryId: cat.id })}
                 >
-                  <img src={cat.imageUri} alt="" loading="lazy" />
+                  {cat.imageUri && <img src={cat.imageUri} alt="" width={140} height={140} loading="lazy" decoding="async" />}
                   <span className="shop-browse-cat-icon">
                     <cat.Icon size={16} />
                   </span>
                   <span className="shop-browse-cat-name">{cat.name}</span>
-                  <span className="shop-browse-cat-count">{categoryCounts[cat.id] ?? 0} Items</span>
+                  <span className="shop-browse-cat-count">{itemsLabel(categoryCounts[cat.id] ?? 0)}</span>
                 </button>
               ))}
             </div>
@@ -215,8 +222,10 @@ export const ShopBrowseScreen: React.FC = () => {
 
           <section className="shop-browse-products">
             <div className="shop-browse-products-head">
-              <h2>Featured Products</h2>
-              <span>{filteredProducts.length} results</span>
+              <h2>{selectedConcern !== 'all' ? concernLabel : 'All products'}</h2>
+              <span>
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'result' : 'results'}
+              </span>
             </div>
 
             {filteredProducts.length === 0 ? (

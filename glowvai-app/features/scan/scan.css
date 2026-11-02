@@ -3,7 +3,7 @@
 /* Layout wrappers are transparent on phones; tablet and desktop layouts are in responsive/scan-ported.css. */
 .glowvai-root .scan-split, .glowvai-root .scan-split-main, .glowvai-root .scan-split-side{ display: contents; }
 
-.glowvai-root .scan-screen{ display: flex; flex: 1; flex-direction: column; min-height: 0; background: #fff; color: var(--text-primary); font-family: var(--font-body); }
+.glowvai-root .scan-screen{ --primary: #0057fb; --primary-dark: #0046cc; --primary-light: #eaf1ff; --primary-border: #c4d7ff; display: flex; flex: 1; flex-direction: column; min-height: 0; background: #fff; color: var(--text-primary); font-family: var(--font-body); }
 .glowvai-root .scan-body{ display: flex; flex: 1; flex-direction: column; gap: 16px; min-height: 0; overflow-y: auto; padding: 16px 16px calc(24px + var(--safe-bottom)); }
 .glowvai-root .scan-body[hidden]{ display: none; }
 
@@ -12,7 +12,7 @@
 .glowvai-root .scan-header-text{ min-width: 0; }
 .glowvai-root .scan-header-title{ overflow: hidden; font-family: var(--font-heading); font-size: 17px; font-weight: 750; letter-spacing: -.25px; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .scan-header-subtitle{ margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
-.glowvai-root .scan-icon-button{ display: inline-flex; flex: 0 0 auto; width: 38px; height: 38px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 11px; background: #fff; cursor: pointer; }
+.glowvai-root .scan-icon-button{ display: inline-flex; flex: 0 0 auto; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 12px; background: #fff; cursor: pointer; }
 
 /* Type */
 .glowvai-root .scan-headline{ font-family: var(--font-heading); font-size: 22px; font-weight: 750; line-height: 1.2; letter-spacing: -.3px; }
@@ -29,12 +29,13 @@
 
 /* Buttons */
 .glowvai-root .scan-primary-button, .glowvai-root .scan-secondary-button, .glowvai-root .scan-capture-button{ display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 14px; font-family: var(--font-body); font-size: 15px; font-weight: 750; cursor: pointer; transition: background-color .18s ease, opacity .18s ease; }
-.glowvai-root .scan-primary-button{ border: 0; background: var(--primary); color: #fff; box-shadow: 0 6px 16px rgba(40,84,197,.22); }
+.glowvai-root .scan-primary-button{ border: 0; background: var(--primary); color: #fff; box-shadow: 0 6px 16px rgba(0,87,251,.2); }
 .glowvai-root .scan-primary-button:hover{ background: var(--primary-dark); }
-.glowvai-root .scan-primary-button:disabled{ background: #b9c8ec; box-shadow: none; cursor: not-allowed; }
+.glowvai-root .scan-primary-button:disabled{ background: #b7cbf5; box-shadow: none; cursor: not-allowed; }
+.glowvai-root .scan-secondary-button:disabled{ border-color: var(--border); color: var(--text-muted); background: #fff; cursor: not-allowed; }
 .glowvai-root .scan-secondary-button{ border: 1px solid var(--primary-border); background: #fff; color: var(--primary); }
 .glowvai-root .scan-secondary-button:hover{ background: var(--primary-light); }
-.glowvai-root .scan-text-button{ min-height: 40px; align-self: center; border: 0; background: none; color: var(--primary); font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer; }
+.glowvai-root .scan-text-button{ display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 6px; align-self: center; padding: 0 12px; border: 0; background: none; color: var(--primary); font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer; }
 .glowvai-root .scan-capture-button{ border: 0; background: var(--text-primary); color: #fff; }
 .glowvai-root .scan-capture-button:disabled{ background: #a7adb9; cursor: not-allowed; }
 
@@ -116,18 +117,24 @@
 .glowvai-root .scan-severity-mild{ background: var(--primary-light); color: var(--primary); }
 .glowvai-root .scan-severity-moderate{ background: var(--warning-bg); color: var(--warning); }
 .glowvai-root .scan-severity-pronounced{ background: var(--error-bg); color: var(--error); }
+.glowvai-root .scan-severity-none{ background: var(--success-bg); color: var(--success); }
+.glowvai-root .scan-concern-item:not(.is-present) .scan-meter-fill{ background: #9db8f0; }
 .glowvai-root .scan-meter{ height: 6px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: var(--surface-muted); }
 .glowvai-root .scan-meter-fill{ display: block; height: 100%; border-radius: 999px; background: var(--primary); transition: width .4s ease; }
 
-/* Routine (recommendations) */
+/* Routine (recommendations, picked from the shop catalogue) */
+.glowvai-root .scan-section-note{ margin-top: 4px; color: var(--text-muted); font-size: 13px; line-height: 1.45; }
 .glowvai-root .scan-routine-list{ display: flex; flex-direction: column; gap: 8px; list-style: none; }
-.glowvai-root .scan-routine-item{ display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border-light); border-radius: 14px; background: #fff; }
-.glowvai-root .scan-routine-step{ display: grid; flex: 0 0 auto; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 800; }
+.glowvai-root .scan-routine-item{ display: flex; width: 100%; min-height: 64px; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 14px; background: #fff; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.glowvai-root .scan-routine-item:hover{ border-color: var(--primary-border); background: var(--primary-light); }
+.glowvai-root .scan-routine-step{ display: grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 800; }
+.glowvai-root .scan-routine-image{ display: grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; padding: 3px; border: 1px solid var(--border-light); border-radius: 10px; background: #fff; object-fit: contain; }
+.glowvai-root .scan-routine-image.is-fallback{ background: var(--surface); color: var(--text-muted); }
 .glowvai-root .scan-routine-copy{ display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
-.glowvai-root .scan-routine-name{ font-size: 13px; font-weight: 750; }
-.glowvai-root .scan-routine-product{ overflow: hidden; color: var(--text-secondary); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .scan-routine-price{ display: flex; flex-direction: column; align-items: flex-end; font-size: 13px; font-weight: 800; white-space: nowrap; }
-.glowvai-root .scan-routine-mrp{ color: var(--text-muted); font-size: 11px; font-weight: 600; }
+.glowvai-root .scan-routine-name{ color: var(--text-muted); font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; }
+.glowvai-root .scan-routine-product{ display: -webkit-box; overflow: hidden; color: var(--text-primary); font-size: 13px; font-weight: 700; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.glowvai-root .scan-routine-price{ flex: 0 0 auto; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.glowvai-root .scan-routine-chevron{ flex: 0 0 auto; color: var(--text-muted); }
 
 /* Failed */
 .glowvai-root .scan-diagnostic{ display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--surface-muted); }
@@ -143,3 +150,24 @@
   .glowvai-root .scan-orb, .glowvai-root .scan-step-dot{ animation: none; }
   .glowvai-root .scan-meter-fill{ transition: none; }
 }
+
+/* Shared helpers for the tab, empty, failed, prep and skin-report screens */
+.glowvai-root .scan-desktop-only{ display: none !important; }
+.glowvai-root .scan-tab-header{ padding: 0 8px; }
+.glowvai-root .scan-how-list{ display: flex; flex-direction: column; gap: 14px; list-style: none; }
+.glowvai-root .scan-how-list li{ display: flex; align-items: flex-start; gap: 12px; }
+.glowvai-root .scan-how-list li > span{ display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 13px; font-weight: 800; }
+.glowvai-root .scan-how-list b{ font-size: 14px; font-weight: 750; }
+.glowvai-root .scan-how-list p{ margin-top: 2px; color: var(--text-secondary); font-size: 13px; line-height: 1.45; }
+.glowvai-root .scan-empty-panel{ display: flex; width: 100%; max-width: 520px; flex-direction: column; align-items: center; gap: 14px; margin: 0 auto; text-align: center; }
+.glowvai-root .scan-empty-actions{ display: flex; width: 100%; flex-direction: column; gap: 10px; margin-top: 8px; }
+.glowvai-root .scan-failed-icon{ display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: var(--error-bg); color: var(--error); }
+.glowvai-root .scan-consent-card{ display: flex; flex-direction: column; gap: 14px; padding: 16px; border: 1px solid var(--primary-border); border-radius: 16px; background: var(--primary-light); }
+.glowvai-root .scan-consent-title{ display: flex; align-items: flex-start; gap: 10px; color: var(--primary); }
+.glowvai-root .scan-consent-title svg{ flex: 0 0 auto; margin-top: 1px; }
+.glowvai-root .scan-consent-title .scan-card-title{ color: var(--text-primary); }
+.glowvai-root .scan-consent-check{ display: flex; min-height: 44px; align-items: flex-start; gap: 10px; color: var(--text-primary); font-size: 14px; font-weight: 600; line-height: 1.45; cursor: pointer; }
+.glowvai-root .scan-consent-check input{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; accent-color: var(--primary); }
+.glowvai-root .skin-report-screen{ flex: none; min-height: 100%; }
+.glowvai-root .skin-report-screen .scan-body{ flex: none; overflow: visible; }
+.glowvai-root .skin-report-cue{ display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-muted); font-size: 13px; font-weight: 700; }

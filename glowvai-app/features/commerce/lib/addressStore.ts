@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Address } from '../../../types';
+import { VIJAYAWADA_AREAS } from '../../../data/serviceability';
 
 // Full address details (recipient, phone, coordinates) that the NOV Address model does not carry.
 export interface SavedAddress {
@@ -34,10 +35,20 @@ export interface DeliveryAddress {
   longitude?: number;
   deliveryInstructions?: string;
   serviceable: boolean;
+  // Delivery estimate for the matched service area, when the address falls in one. Unknown otherwise.
+  etaMinutes?: number;
 }
 
 // Vijayawada service area: 520xxx pincodes.
 export const isServiceablePincode = (pincode: string): boolean => /^520\d{3}$/.test(pincode.trim());
+
+// Service areas, longest name first, matched by name inside the address text.
+const AREAS_BY_LENGTH = [...VIJAYAWADA_AREAS].sort((a, b) => b.name.length - a.name.length);
+export const etaMinutesFor = (text: string): number | undefined => {
+  const haystack = text.toLowerCase();
+  const match = AREAS_BY_LENGTH.find((area) => area.quickCommerceAvailable && haystack.includes(area.name.split(',')[0].toLowerCase()));
+  return match?.estimatedMinutes;
+};
 
 export const toDeliveryAddress = (a: SavedAddress): DeliveryAddress => ({
   id: a.id,
@@ -52,6 +63,7 @@ export const toDeliveryAddress = (a: SavedAddress): DeliveryAddress => ({
   longitude: a.longitude,
   deliveryInstructions: a.deliveryInstructions,
   serviceable: isServiceablePincode(a.pincode),
+  etaMinutes: etaMinutesFor(a.areaAddress),
 });
 
 export const novAddressToDelivery = (a: Address, phoneNumber = '', recipientName = ''): DeliveryAddress => ({
@@ -65,6 +77,7 @@ export const novAddressToDelivery = (a: Address, phoneNumber = '', recipientName
   pincode: a.pincode,
   deliveryInstructions: a.deliveryInstructions,
   serviceable: a.serviceable,
+  etaMinutes: etaMinutesFor(a.area) ?? (a.serviceable && a.deliveryMinutes > 0 ? a.deliveryMinutes : undefined),
 });
 
 // Maps a saved address onto the NOV Address shape so the header and AppContext stay in sync.
@@ -77,7 +90,7 @@ export const toNovAddress = (a: SavedAddress): Address => ({
   city: a.city,
   pincode: a.pincode,
   serviceable: isServiceablePincode(a.pincode),
-  deliveryMinutes: 12,
+  deliveryMinutes: etaMinutesFor(a.areaAddress) ?? 12,
   isDefault: a.isDefault,
   deliveryInstructions: a.deliveryInstructions,
 });

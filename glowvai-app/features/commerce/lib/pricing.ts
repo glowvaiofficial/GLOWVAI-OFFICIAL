@@ -1,17 +1,24 @@
 import type { CartItem } from '../../../core/state/cartStore';
+import { COUPON_VALUES, deliveryFeeFor, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 
-// Same thresholds and coupon rule as the mobile cart screen.
-export const FREE_DELIVERY_THRESHOLD = 2198;
-export const STANDARD_DELIVERY_FEE = 49;
-export const COUPON_CODE = 'GLOW10';
-const COUPON_RATE = 0.1;
-const COUPON_CAP = 150;
+// One rule set for the cart, checkout, express checkout and the payment amount: shared/pricing-rules.mjs,
+// the same file the payments server reads. Free delivery applies when the item total is above FREE_DELIVERY_ABOVE.
+export { FREE_DELIVERY_ABOVE };
+
+// Codes come from COUPON_VALUES. Returns the normalised code, or null when the code is not a real coupon.
+export const normaliseCoupon = (code: string | null | undefined): string | null => {
+  const key = (code || '').trim().toUpperCase();
+  return key && Object.prototype.hasOwnProperty.call(COUPON_VALUES, key) ? key : null;
+};
+
+export const couponValue = (code: string): number => COUPON_VALUES[code] ?? 0;
 
 export interface CartTotals {
   itemCount: number;
   itemTotal: number;
   catalogSavings: number;
   discountedTotal: number;
+  couponCode: string | null;
   couponDiscount: number;
   deliveryFee: number;
   isFreeDelivery: boolean;
@@ -21,29 +28,32 @@ export interface CartTotals {
   totalSavings: number;
 }
 
-export const computeCartTotals = (items: CartItem[], couponApplied: boolean): CartTotals => {
+// area is the delivery address text; the fee for an area is matched inside it (AREA_DELIVERY_FEES).
+export const computeCartTotals = (items: CartItem[], couponCode: string | null, area = ''): CartTotals => {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   // Falls back to the selling price when no MRP is stored, so no savings are invented.
-  const itemTotal = items.reduce((sum, item) => sum + (item.mrp ?? item.price) * item.quantity, 0);
+  const itemTotal = items.reduce((sum, item) => sum + Math.max(item.mrp ?? item.price, item.price) * item.quantity, 0);
   const discountedTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const catalogSavings = itemTotal - discountedTotal;
-  const couponDiscount = couponApplied ? Math.min(COUPON_CAP, Math.round(discountedTotal * COUPON_RATE)) : 0;
-  const isFreeDelivery = discountedTotal >= FREE_DELIVERY_THRESHOLD;
-  const deliveryFee = isFreeDelivery ? 0 : STANDARD_DELIVERY_FEE;
-  const grandTotal = discountedTotal - couponDiscount + deliveryFee;
-  const totalSavings = catalogSavings + couponDiscount + (isFreeDelivery ? STANDARD_DELIVERY_FEE : 0);
+  const code = normaliseCoupon(couponCode);
+  const couponDiscount = code ? Math.min(couponValue(code), discountedTotal) : 0;
+  const isFreeDelivery = discountedTotal > FREE_DELIVERY_ABOVE;
+  const deliveryFee = items.length === 0 ? 0 : deliveryFeeFor({ itemTotal: discountedTotal, area });
+  const grandTotal = Math.max(0, discountedTotal - couponDiscount + deliveryFee);
 
   return {
     itemCount,
     itemTotal,
     catalogSavings,
     discountedTotal,
+    couponCode: code,
     couponDiscount,
     deliveryFee,
     isFreeDelivery,
-    amountNeededForFreeDelivery: Math.max(0, FREE_DELIVERY_THRESHOLD - discountedTotal),
-    freeDeliveryProgress: Math.min(1, discountedTotal / FREE_DELIVERY_THRESHOLD),
+    // "Above ₹499" means the item total has to reach ₹500.
+    amountNeededForFreeDelivery: isFreeDelivery ? 0 : FREE_DELIVERY_ABOVE + 1 - discountedTotal,
+    freeDeliveryProgress: Math.min(1, discountedTotal / (FREE_DELIVERY_ABOVE + 1)),
     grandTotal,
-    totalSavings,
+    totalSavings: catalogSavings + couponDiscount,
   };
 };

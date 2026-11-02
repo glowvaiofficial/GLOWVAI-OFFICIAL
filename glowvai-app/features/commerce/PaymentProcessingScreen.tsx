@@ -11,18 +11,21 @@ import { useCustomer, useDeliveryAddress } from './components/shared';
 
 const MIN_DISPLAY_MS = 2800;
 
-const STEPS = ['Creating order session', 'Verifying bank payment status', 'Confirming order and reserving stock'];
+const ONLINE_STEPS = ['Saving your order', 'Starting secure payment', 'Verifying the payment'];
+const COD_STEPS = ['Saving your order', 'Confirming cash on delivery', 'Finishing up'];
 
 export const PaymentProcessingScreen: React.FC = () => {
   const { navigate, showToast } = useApp();
-  const couponApplied = useCheckoutSession((s) => s.couponApplied);
+  const couponCode = useCheckoutSession((s) => s.couponCode);
   const payChoice = useCheckoutSession((s) => s.payChoice);
   const address = useDeliveryAddress();
   const customer = useCustomer();
   const [step, setStep] = useState(0);
   const [orderId] = useState(() => newOrderId());
-  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponApplied).grandTotal);
+  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress).grandTotal);
   const started = useRef(false);
+  const isCodChoice = payChoice === 'cod';
+  const steps = isCodChoice ? COD_STEPS : ONLINE_STEPS;
 
   useEffect(() => {
     // Runs once per mount, even under React strict-mode double effects.
@@ -36,8 +39,12 @@ export const PaymentProcessingScreen: React.FC = () => {
         navigate('cart-tab');
         return;
       }
+      if (!address?.serviceable) {
+        navigate('checkout-review');
+        return;
+      }
       const meta = payChoiceMeta(payChoice);
-      const totals = computeCartTotals(cartItems, couponApplied);
+      const totals = computeCartTotals(cartItems, couponCode, address.fullAddress);
       const isCod = payChoice === 'cod';
 
       let ok = false;
@@ -64,7 +71,8 @@ export const PaymentProcessingScreen: React.FC = () => {
           paymentMethod: meta.method as InitiatePaymentParams['paymentMethod'],
         });
 
-        ok = session.success && (isCod || (await verifyOrderPayment(orderId, totals.grandTotal)));
+        // Fail closed: an online payment counts only when the server verified it. COD needs no payment.
+        ok = session.success === true && (isCod || (await verifyOrderPayment(orderId, totals.grandTotal)) === true);
         setStep(2);
       } catch {
         ok = false;
@@ -75,9 +83,9 @@ export const PaymentProcessingScreen: React.FC = () => {
 
       if (ok) {
         useCartStore.getState().clearCart();
-        navigate('checkout-payment-success', { orderId, amount: totals.grandTotal, method: payChoice });
+        navigate('checkout-payment-success', { orderId, amount: totals.grandTotal, method: payChoice, confirmed: true });
       } else {
-        showToast('Payment could not be confirmed');
+        showToast(isCod ? 'The order could not be placed' : 'Payment could not be confirmed');
         navigate('checkout-payment-failed', { orderId, amount: totals.grandTotal, method: payChoice });
       }
     };
@@ -96,41 +104,45 @@ export const PaymentProcessingScreen: React.FC = () => {
       </header>
 
       <div className="commerce-processing-body">
-        <div className="commerce-orb" aria-hidden="true">
-          <span className="commerce-orb-pulse" />
-          <span className="commerce-orb-spin" />
-          <span className="commerce-orb-core">
-            <Lock size={24} />
-          </span>
+        <div className="commerce-processing-hero">
+          <div className="commerce-orb" aria-hidden="true">
+            <span className="commerce-orb-pulse" />
+            <span className="commerce-orb-spin" />
+            <span className="commerce-orb-core">
+              <Lock size={24} />
+            </span>
+          </div>
+          <h1>{isCodChoice ? 'Placing your order' : 'Processing your payment'}</h1>
+          <p>Please don’t close this screen or press back.</p>
         </div>
-        <h1>Securely processing your payment</h1>
-        <p>Please don’t close this screen or press back.</p>
 
-        <dl className="commerce-processing-summary">
-          <div>
-            <dt>Order total</dt>
-            <dd>₹{amount}</dd>
-          </div>
-          <div>
-            <dt>Payment method</dt>
-            <dd>{payMethodLabel(payChoice)}</dd>
-          </div>
-          <div>
-            <dt>Order ID</dt>
-            <dd className="is-muted">{orderId}</dd>
-          </div>
-        </dl>
+        <div className="commerce-processing-detail" role="status" aria-live="polite">
+          <dl className="commerce-processing-summary">
+            <div>
+              <dt>Order total</dt>
+              <dd>₹{amount}</dd>
+            </div>
+            <div>
+              <dt>Payment method</dt>
+              <dd>{payMethodLabel(payChoice)}</dd>
+            </div>
+            <div>
+              <dt>Order ID</dt>
+              <dd className="is-muted">{orderId}</dd>
+            </div>
+          </dl>
 
-        <ol className="commerce-processing-steps">
-          {STEPS.map((label, index) => (
-            <li key={label} className={index < step ? 'is-done' : index === step ? 'is-active' : ''}>
-              {index < step ? <CheckCircle2 size={18} /> : <span className="commerce-step-dot" />}
-              {label}
-            </li>
-          ))}
-        </ol>
+          <ol className="commerce-processing-steps">
+            {steps.map((label, index) => (
+              <li key={label} className={index < step ? 'is-done' : index === step ? 'is-active' : ''}>
+                {index < step ? <CheckCircle2 size={18} /> : <span className="commerce-step-dot" />}
+                {label}
+              </li>
+            ))}
+          </ol>
 
-        <p className="commerce-processing-foot">Secured by Razorpay</p>
+          {!isCodChoice && <p className="commerce-processing-foot">Online payments are processed by Razorpay</p>}
+        </div>
       </div>
     </main>
   );

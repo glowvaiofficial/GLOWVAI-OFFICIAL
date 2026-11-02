@@ -10,9 +10,9 @@ export const PAY_CHOICES: Array<{
   group: 'upi' | 'card' | 'cod';
   method: PaymentMethod;
 }> = [
-  { id: 'gpay', label: 'Google Pay', sub: 'Pay via linked bank account', group: 'upi', method: 'GPAY' },
-  { id: 'phonepe', label: 'PhonePe UPI', sub: 'Instant 1-tap authorization', group: 'upi', method: 'PHONEPE' },
-  { id: 'paytm', label: 'Paytm UPI', sub: 'Paytm wallet and UPI', group: 'upi', method: 'PAYTM' },
+  { id: 'gpay', label: 'Google Pay', sub: 'Pay with the Google Pay app', group: 'upi', method: 'GPAY' },
+  { id: 'phonepe', label: 'PhonePe UPI', sub: 'Pay with the PhonePe app', group: 'upi', method: 'PHONEPE' },
+  { id: 'paytm', label: 'Paytm UPI', sub: 'Pay with the Paytm app', group: 'upi', method: 'PAYTM' },
   { id: 'bhim', label: 'BHIM / Other UPI', sub: 'Any UPI handle or QR', group: 'upi', method: 'BHIM' },
   { id: 'card', label: 'Credit or debit card', sub: 'Visa, Mastercard, RuPay', group: 'card', method: 'CARD' },
   { id: 'cod', label: 'Cash on delivery', sub: 'Pay the rider at your doorstep', group: 'cod', method: 'COD' },
@@ -22,16 +22,17 @@ export const payChoiceMeta = (id: PayChoice) => PAY_CHOICES.find((c) => c.id ===
 
 // Cart and checkout state shared between the review and payment steps (in memory only).
 interface CheckoutSessionState {
-  couponApplied: boolean;
+  // A code from COUPON_VALUES in shared/pricing-rules.mjs, or null. Nothing is applied until the customer enters one.
+  couponCode: string | null;
   payChoice: PayChoice;
-  setCouponApplied: (applied: boolean) => void;
+  setCouponCode: (code: string | null) => void;
   setPayChoice: (choice: PayChoice) => void;
 }
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
-  couponApplied: true,
+  couponCode: null,
   payChoice: 'gpay',
-  setCouponApplied: (couponApplied) => set({ couponApplied }),
+  setCouponCode: (couponCode) => set({ couponCode }),
   setPayChoice: (payChoice) => set({ payChoice }),
 }));
 

@@ -8,15 +8,13 @@ interface AuthShellProps {
   topRight?: React.ReactNode;
 }
 
-const brandMascot = '/glowvai/features/auth/assets/mascot-fox.png';
 
 /** Shared frame for auth screens: optional top bar, scrolling body, sticky footer. Brand panel shows at 1024px+. */
 export const AuthShell: React.FC<AuthShellProps> = ({ children, footer, onBack, topRight }) => (
   <section className="auth-screen">
     <aside className="auth-brand-panel" aria-hidden="true" hidden>
       <span className="auth-brand-wordmark">glowvai</span>
-      <p className="auth-brand-copy">Skin analysis, cosmetics and express delivery in one place.</p>
-      <img className="auth-brand-mascot" src={brandMascot} alt="" />
+      <p className="auth-brand-copy">AI skin check, skincare and doorstep delivery in one place.</p>
     </aside>
     {(onBack || topRight) && (
       <header className="auth-topbar">

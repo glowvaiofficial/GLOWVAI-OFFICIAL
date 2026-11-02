@@ -17,10 +17,10 @@
 
 .glowvai-root{
   --commerce-blue: #075cff;
-  --primary: #2854c5;
-  --primary-dark: #1d3f9d;
-  --primary-light: #edf2ff;
-  --primary-border: #cdd9fb;
+  --primary: #0057fb;
+  --primary-dark: #0046cc;
+  --primary-light: #eaf1ff;
+  --primary-border: #c7d8ff;
   --accent: #176b5b;
   --accent-light: #eaf6f2;
   --bg: #f7f8fb;
@@ -64,7 +64,7 @@
 
 .glowvai-root button, .glowvai-root input, .glowvai-root textarea, .glowvai-root select{ font: inherit; }
 .glowvai-root button{ border: 0; background: none; color: inherit; cursor: pointer; user-select: none; }
-.glowvai-root button:focus-visible, .glowvai-root input:focus-visible, .glowvai-root textarea:focus-visible, .glowvai-root select:focus-visible{ outline: 3px solid rgba(40, 84, 197, .24); outline-offset: 2px; }
+.glowvai-root button:focus-visible, .glowvai-root a:focus-visible, .glowvai-root input:focus-visible, .glowvai-root textarea:focus-visible, .glowvai-root select:focus-visible{ outline: 2px solid var(--primary); outline-offset: 2px; }
 .glowvai-root button:active{ transform: scale(.98); }
 .glowvai-root img{ display: block; max-width: 100%; }
 .glowvai-root ::selection{ background: #c8d9ff; color: #102052; }
@@ -226,20 +226,6 @@
 .glowvai-root .login-legal-copy{ margin-top: 17px; color: #7c89a1; font-size: 9.2px; font-weight: 500; line-height: 1.55; text-align: center; }
 .glowvai-root .login-legal-copy button{ display: inline; padding: 0; color: #1460df; font-size: inherit; font-weight: 700; vertical-align: baseline; }
 .glowvai-root .login-home-indicator{ position: absolute; bottom: 20px; left: 50%; width: 113px; height: 4px; border-radius: 999px; background: #9bb1db; transform: translateX(-50%); }
-.glowvai-root .app-viewport:has(.login-reference-screen) > div:first-child > div > svg:last-child{ display: none; }
-.glowvai-root .app-viewport:has(.login-reference-screen) > div:first-child > div::after{
-  display: grid;
-  min-width: 22px;
-  height: 14px;
-  place-items: center;
-  border-radius: 4px;
-  background: #fff;
-  color: #1459e8;
-  content: '78';
-  font-size: 8px;
-  font-weight: 600;
-  line-height: 1;
-}
 
 /* OTP reference screen */
 .glowvai-root .otp-reference-screen{
@@ -413,20 +399,6 @@
 .glowvai-root .otp-keypad .otp-delete-key{ color: #173d7d; }
 .glowvai-root .otp-delete-key svg{ width: 22px; height: 22px; }
 .glowvai-root .otp-key-spacer{ border-color: transparent; background: transparent; box-shadow: none; }
-.glowvai-root .app-viewport:has(.otp-reference-screen) > div:first-child > div > svg:last-child{ display: none; }
-.glowvai-root .app-viewport:has(.otp-reference-screen) > div:first-child > div::after{
-  display: grid;
-  min-width: 22px;
-  height: 14px;
-  place-items: center;
-  border-radius: 4px;
-  background: #fff;
-  color: #1459e8;
-  content: '78';
-  font-size: 8px;
-  font-weight: 800;
-  line-height: 1;
-}
 @keyframes otp-art-arrive{ from{ opacity: 0; transform: translateY(-12px) scale(.88); } to{ opacity: 1; transform: none; } }
 @keyframes otp-shield-float{ 0%,100%{ transform: translate(-50%,0); } 50%{ transform: translate(-50%,-5px); } }
 @keyframes otp-plane-drift{ 0%,100%{ transform: translate(0,0) rotate(-12deg); } 50%{ transform: translate(4px,-4px) rotate(-6deg); } }
@@ -488,24 +460,22 @@
 .glowvai-root .commerce-reveal.is-revealed{ opacity: 1; transform: translateY(0) scale(1); clip-path: inset(0 0 0 0 round 28px 28px 0 0); }
 .glowvai-root .commerce-reveal-handle{ position: absolute; top: 8px; left: 50%; z-index: 5; width: 36px; height: 4px; border-radius: 4px; background: #d7dbe3; transform: translateX(-50%); }
 
-/* Floating cart and Blinkit-like compact navigation */
-.glowvai-root .bottom-commerce-shell{ position: relative; z-index: 80; padding-bottom: var(--safe-bottom); background: #fff; box-shadow: 0 -7px 20px rgba(34,44,68,.08); }
-.glowvai-root .mini-cart-bar{ position: absolute; right: 28px; bottom: calc(63px + var(--safe-bottom)); left: 28px; display: flex; height: 46px; align-items: center; gap: 8px; padding: 5px 6px 5px 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 15px; background: #228c35; box-shadow: 0 10px 24px rgba(25,102,43,.24); color: #fff; }
-.glowvai-root .mini-cart-icon{ display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: rgba(255,255,255,.15); }
-.glowvai-root .mini-cart-copy{ min-width: 0; flex: 1; text-align: left; }
-.glowvai-root .mini-cart-copy b, .glowvai-root .mini-cart-copy small{ display: block; }
-.glowvai-root .mini-cart-copy b{ font-size: 10.5px; font-variant-numeric: tabular-nums; }
-.glowvai-root .mini-cart-copy small{ color: #d8f1dd; font-size: 7.5px; }
-.glowvai-root .mini-cart-action{ display: flex; height: 34px; align-items: center; gap: 2px; padding: 0 9px; border-radius: 10px; background: rgba(255,255,255,.14); font-size: 9.5px; font-weight: 850; white-space: nowrap; }
-.glowvai-root .quick-bottom-nav{ display: grid; height: 62px; grid-template-columns: repeat(4,1fr); border-top: 1px solid #eceef2; background: #fff; }
-.glowvai-root .quick-bottom-nav > button{ position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #747b88; font-size: 8px; font-weight: 700; }
-.glowvai-root .quick-bottom-nav > button.is-active{ color: #15171d; }
-.glowvai-root .quick-bottom-nav > button.is-active::before{ position: absolute; top: 0; width: 27px; height: 3px; border-radius: 0 0 4px 4px; background: #f2c632; content: ''; }
-.glowvai-root .quick-bottom-nav .is-vaithra::before{ display: none; }
-.glowvai-root .nav-face-scan{ display: grid; width: 20px; height: 20px; place-items: center; line-height: 0; }
-.glowvai-root .nav-face-scan > *{ grid-area: 1 / 1; }
-.glowvai-root .glowvai-nav-mark{ display: grid; min-width: 54px; height: 25px; place-items: center; border-radius: 7px; background: #f3cc35; color: #17181c; font-family: var(--font-brand); font-size: 10px; font-weight: 700; letter-spacing: -.04em; }
-.glowvai-root .quick-bottom-nav .is-vaithra.is-active .glowvai-nav-mark{ background: #0f5cf6; color: #fff; }
+/* Shell: phone tab bar and cart bar (BottomNavBar). Both sit in the page flow under the scrolling screen, so they never cover
+   the screen's own buttons, whichever element of the screen scrolls. */
+.glowvai-root .bottom-commerce-shell{ position: relative; z-index: 100; flex: 0 0 auto; padding-bottom: var(--safe-bottom); border-top: 1px solid var(--border-light); background: #fff; box-shadow: 0 -4px 16px rgba(24,44,80,.06); }
+.glowvai-root .mini-cart-bar{ display: flex; width: calc(100% - 24px); max-width: 420px; height: 56px; align-items: center; gap: 10px; margin: 8px auto 0; padding: 8px 10px 8px 8px; border-radius: 16px; background: #16883a; box-shadow: 0 6px 16px rgba(22,136,58,.22); color: #fff; text-align: left; }
+.glowvai-root .mini-cart-bar:focus-visible{ outline: 3px solid var(--text-primary); outline-offset: 2px; }
+.glowvai-root .mini-cart-icon{ display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: rgba(255,255,255,.16); }
+.glowvai-root .mini-cart-copy{ display: grid; min-width: 0; flex: 1; gap: 2px; }
+.glowvai-root .mini-cart-copy b{ font-size: 15px; font-weight: 800; line-height: 1.15; }
+.glowvai-root .mini-cart-copy small{ overflow: hidden; color: #e3f6e7; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .mini-cart-action{ display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; }
+.glowvai-root .quick-bottom-nav{ display: grid; height: 60px; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #fff; }
+.glowvai-root .quick-bottom-nav > button{ position: relative; display: flex; min-width: 0; min-height: 44px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 6px 2px 4px; color: #5a6880; font-size: 11px; font-weight: 700; line-height: 1.1; }
+.glowvai-root .quick-bottom-nav > button > span{ max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .quick-bottom-nav > button.is-active{ color: var(--commerce-blue); }
+.glowvai-root .quick-bottom-nav > button.is-active::before{ position: absolute; top: -1px; left: 50%; width: 32px; height: 3px; margin-left: -16px; border-radius: 0 0 3px 3px; background: currentColor; content: ''; }
+.glowvai-root .quick-bottom-nav > button:focus-visible{ border-radius: 12px; outline: 2px solid var(--commerce-blue); outline-offset: -4px; }
 
 @media (max-width: 365px){
 }
@@ -620,10 +590,6 @@
 .glowvai-root .commerce-reveal.is-revealed .commerce-color-wash{ animation: report-home-wash 1.08s cubic-bezier(.16,1,.3,1) both; }
 @keyframes report-home-wash { 0% { opacity: 0; transform: scaleY(.04); background: #0f5cf6; } 26% { opacity: .94; transform: scaleY(1); background: #0f5cf6; } 56% { opacity: .86; background: #22a94c; } 78% { opacity: .72; background: #f1cc34; } 100% { opacity: 0; transform: scaleY(1); background: #fff; } }
 
-/* Compact Blinkit-style floating cart */
-.glowvai-root .mini-cart-bar{ right: 14px; bottom: calc(70px + var(--safe-bottom)); left: auto; width: 56px; height: 56px; min-height: 56px; padding: 0; border-radius: 18px; justify-content: center; background: #16883a; box-shadow: 0 10px 24px rgba(22,136,58,.3); }
-.glowvai-root .mini-cart-icon{ width: 42px; height: 42px; border-radius: 13px; }
-
 /* Scan preparation */
 .glowvai-root .scan-prep{ min-height: 100%; padding: 12px 16px 110px; background: #fff; }
 .glowvai-root .scan-prep-header > button{ display: block; min-height: 44px; margin-left: auto; color: #657082; font-size: 11px; font-weight: 750; }
@@ -676,12 +642,6 @@
 .glowvai-root .zepto-departments button.is-active{ color: var(--mode); }
 .glowvai-root .zepto-departments button.is-active::after{ position: absolute; right: 14px; bottom: 0; left: 14px; height: 3px; border-radius: 3px; background: var(--mode); content: ''; }
 @keyframes skeleton-pulse { to { background: #f8f9fa; } }
-
-/* Restore the requested compact floating cart bar */
-.glowvai-root .mini-cart-bar{ right: 18px; bottom: calc(68px + var(--safe-bottom)); left: 18px; width: auto; height: 48px; min-height: 48px; justify-content: flex-start; gap: 8px; padding: 5px 6px 5px 8px; border-radius: 15px; background: #218f32; }
-.glowvai-root .mini-cart-icon{ width: 34px; height: 34px; border-radius: 10px; }
-.glowvai-root .mini-cart-copy{ display: block; min-width: 0; flex: 1; text-align: left; }.glowvai-root .mini-cart-copy b, .glowvai-root .mini-cart-copy small{ display: block; }.glowvai-root .mini-cart-copy b{ font-size: 10px; }.glowvai-root .mini-cart-copy small{ color: #d9f2dd; font-size: 7.5px; }
-.glowvai-root .mini-cart-action{ display: flex; height: 36px; align-items: center; gap: 2px; padding: 0 10px; border-radius: 10px; background: rgba(255,255,255,.15); font-size: 9px; font-weight: 850; }
 
 @media (prefers-reduced-motion: reduce){ .glowvai-root .is-mode-changing .zepto-mode-orb, .glowvai-root .is-mode-changing .zepto-campaign, .glowvai-root .is-mode-changing .zepto-section, .glowvai-root .is-mode-changing .zepto-explore, .glowvai-root .is-mode-changing .zepto-offers{ animation: none !important; } }
 
@@ -866,20 +826,6 @@
 .glowvai-root .zq-featured-title > button{ margin: 0; color: #0505ff; font-size: 10px; }
 .glowvai-root .zq-home.is-mode-changing .zq-festival-hero, .glowvai-root .zq-home.is-mode-changing .zq-festival-grid, .glowvai-root .zq-home.is-mode-changing .zq-festival-promo, .glowvai-root .zq-home.is-mode-changing .zq-discovery, .glowvai-root .zq-home.is-mode-changing .zq-section{ animation: navratri-mode-in 420ms cubic-bezier(.2,.8,.2,1) both; }
 @keyframes navratri-mode-in { from { opacity: .28; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-
-.glowvai-root .bottom-commerce-shell{ z-index: 100; background: #fff; box-shadow: 0 -5px 18px rgba(24,44,80,.08); }
-.glowvai-root .mini-cart-bar{ right: auto; bottom: calc(72px + var(--safe-bottom)); left: 50%; width: 208px; height: 50px; min-height: 50px; justify-content: flex-start; gap: 8px; padding: 5px 9px 5px 11px; border: 0; border-radius: 28px; background: #25a33b; box-shadow: 0 8px 18px rgba(25,120,44,.24); transform: translateX(-50%); }
-.glowvai-root .mini-cart-bar:active{ transform: translateX(-50%) scale(.98); }
-.glowvai-root .mini-cart-icon{ width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.14); }
-.glowvai-root .mini-cart-copy{ display: grid; align-content: center; }
-.glowvai-root .mini-cart-copy b{ font-size: 12px; line-height: 1.05; }.glowvai-root .mini-cart-copy small{ margin-top: 3px; color: #e9f8ec; font-size: 7.5px; font-weight: 800; text-transform: uppercase; }
-.glowvai-root .mini-cart-action{ width: 28px; height: 28px; justify-content: center; margin-left: auto; padding: 0; border-radius: 50%; background: transparent; }
-.glowvai-root .quick-bottom-nav{ height: 72px; }
-.glowvai-root .quick-bottom-nav > button{ gap: 4px; color: #496184; font-size: 8.5px; font-weight: 700; }
-.glowvai-root .quick-bottom-nav > button.is-active{ color: #075df7; }
-.glowvai-root .quick-bottom-nav > button.is-active::before{ display: none; }
-.glowvai-root .quick-bottom-nav > button.is-active svg{ fill: currentColor; }
-.glowvai-root .glowvai-nav-mark{ min-width: 52px; background: #f3cc35; }
 
 @media (max-width: 390px){
   .glowvai-root .zq-header, .glowvai-root .zq-mode-wrap, .glowvai-root .zq-festival{ padding-right: 12px; padding-left: 12px; }

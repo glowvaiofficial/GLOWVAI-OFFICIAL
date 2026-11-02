@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, ChevronDown, ScanFace, ShieldCheck, Sparkles, Truck } from 'lucide-react';
+import { AlertCircle, ScanFace, ShieldCheck, Sparkles, Truck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import '../responsive/entry-scan.css';
 
@@ -71,7 +71,6 @@ export const LoginScreen: React.FC = () => {
               <i className="is-saffron" /><i className="is-white"><b /></i><i className="is-green" />
             </span>
             <strong>+91</strong>
-            <ChevronDown className="login-country-chevron" aria-hidden="true" />
             <span className="login-phone-divider" aria-hidden="true" />
             <input
               id="mobile"
@@ -84,7 +83,7 @@ export const LoginScreen: React.FC = () => {
                 setError(null);
                 setPhone(event.target.value.replace(/\D/g, ''));
               }}
-              placeholder="Enter your 10 digit mobile number"
+              placeholder="10-digit mobile number"
               aria-invalid={Boolean(error)}
               aria-describedby={error ? 'login-phone-error' : undefined}
             />
@@ -103,8 +102,8 @@ export const LoginScreen: React.FC = () => {
         </form>
 
         <p className="login-legal-copy">
-          By continuing, you accept the <button type="button">Terms &amp; Conditions</button><br />
-          and <button type="button">Privacy Policy</button>
+          By continuing, you accept the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a><br />
+          and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
         </p>
         <span className="login-home-indicator" aria-hidden="true" />
       </section>

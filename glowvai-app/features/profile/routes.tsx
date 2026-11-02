@@ -8,6 +8,8 @@ import { SettingsAndSecurityScreen } from './SettingsAndSecurityScreen';
 import { HelpAndSupportScreen } from './HelpAndSupportScreen';
 import { ReferralHubScreen } from './ReferralHubScreen';
 import { StudentReferralScreen } from './StudentReferralScreen';
+import { ReferralTransactionsScreen } from './ReferralTransactionsScreen';
+import { StudentStatusScreen } from './StudentStatusScreen';
 import { AppDoctorScreen } from './AppDoctorScreen';
 
 export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
@@ -19,5 +21,7 @@ export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'profile-support': HelpAndSupportScreen,
   'profile-referrals': ReferralHubScreen,
   'profile-referral-code': StudentReferralScreen,
+  'profile-referral-transactions': ReferralTransactionsScreen,
+  'profile-student-status': StudentStatusScreen,
   'debug-app-doctor': AppDoctorScreen,
 };

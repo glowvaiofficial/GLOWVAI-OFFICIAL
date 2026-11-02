@@ -1,18 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { ScreenName } from '../../../context/contextDefinition';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
-import { getDeviceCurrentLocation } from '../../../core/services/locationService';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
-import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-home.css';
 
-const DELIVERY_ETA = 10;
 const HERO_IMAGE = '/glowvai/assets/home/glowvai-shopping-hero.png';
 
 // Real shop subcategories. Each tile image is the first catalogue product in that category.
@@ -48,16 +46,17 @@ const CONCERNS: { id: string; label: string; Icon: LucideIcon }[] = [
   { id: 'barrier', label: 'Barrier Repair', Icon: Wind },
 ];
 
-// Catalogue rails: sorted or filtered from the real product data.
-const TOP_RATED = [...INDIAN_SKINCARE_CATALOG].sort((a, b) => b.rating - a.rating).slice(0, 6);
-const UNDER_500 = INDIAN_SKINCARE_CATALOG.filter((p) => p.price < 500).slice(0, 6);
+// Catalogue rails: sorted or filtered from the real product data. Trial samples are left out so they don't top the rankings.
+const FULL_SIZE_PRODUCTS = INDIAN_SKINCARE_CATALOG.filter((p) => !isTrialProduct(p));
+const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount).slice(0, 6);
+const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500).slice(0, 6);
 
 // Deals are real catalogue products with a discount from their own MRP.
-const DEAL_PRODUCTS = INDIAN_SKINCARE_CATALOG.filter((p) => getDiscountPercent(p) > 0)
+const DEAL_PRODUCTS = FULL_SIZE_PRODUCTS.filter((p) => getDiscountPercent(p) > 0)
   .sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a))
   .slice(0, 4);
 
-const firstProductIn = (category: SkincareProduct['category']) => INDIAN_SKINCARE_CATALOG.find((p) => p.category === category);
+const firstProductIn = (category: SkincareProduct['category']) => FULL_SIZE_PRODUCTS.find((p) => p.category === category);
 
 function Rail({
   title,
@@ -134,7 +133,7 @@ function DealCard({ product }: { product: SkincareProduct }) {
       {discount > 0 && <span className="shop-home-deal-badge">{discount}% OFF</span>}
       <button type="button" className="shop-home-deal-open" onClick={() => navigate('shop-product', { productId: product.id })}>
         <span className="shop-home-deal-media">
-          <img src={getProductImageUrl(product)} alt={product.name} loading="lazy" />
+          <img src={getProductThumbUrl(product)} alt={product.name} width={400} height={300} loading="lazy" decoding="async" />
         </span>
         <small className="shop-home-deal-brand">{product.brand}</small>
         <span className="shop-home-deal-name">{product.name}</span>
@@ -196,25 +195,14 @@ const FESTIVAL: Record<Mode, FestivalContent> = {
 };
 
 export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
-  const { navigate, setShoppingPreference, shoppingPreference } = useApp();
+  const { navigate, setShoppingPreference, shoppingPreference, currentAddress } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
-  const [userLocation, setUserLocation] = useState('Payikapuram, Vijayawada');
   const mode: Mode = shoppingPreference === 'men' ? 'men' : 'women';
   const festival = FESTIVAL[mode];
 
-  useEffect(() => {
-    let active = true;
-    if (!embedded) {
-      getDeviceCurrentLocation()
-        .then((loc) => {
-          if (active && loc?.formattedAddress) setUserLocation(loc.formattedAddress);
-        })
-        .catch(() => {});
-    }
-    return () => {
-      active = false;
-    };
-  }, [embedded]);
+  // Location and delivery time come from the selected delivery address, so the ETA always matches the place shown.
+  const userLocation = [currentAddress?.area, currentAddress?.city].filter(Boolean).join(', ') || 'Set delivery location';
+  const deliveryEta = currentAddress?.serviceable && currentAddress.deliveryMinutes > 0 ? currentAddress.deliveryMinutes : null;
 
   const switchMode = (next: Mode) => {
     if (next !== mode) setShoppingPreference(next);
@@ -227,7 +215,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           <div className="shop-home-location">
             <span className="shop-home-eta">
               <Zap size={16} fill="currentColor" />
-              {DELIVERY_ETA} MINS
+              {deliveryEta ? `${deliveryEta} MINS` : 'DELIVER TO'}
             </span>
             {embedded ? (
               <span className="shop-home-location-btn is-static">
@@ -281,11 +269,13 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
       </header>
 
       <section className="shop-home-showcase">
-        <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" />
+        <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" width={1891} height={831} fetchPriority="high" decoding="async" />
         <div className="shop-home-showcase-copy">
           <p className="shop-home-showcase-tag">Discover. Shop. Glow.</p>
           <h1>Glow your way.</h1>
-          <p className="shop-home-showcase-sub">Skincare delivered in {DELIVERY_ETA} mins.</p>
+          <p className="shop-home-showcase-sub">
+            {deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.'}
+          </p>
           <div className="shop-home-showcase-actions">
             <button type="button" className="shop-home-btn-dark" onClick={() => navigate('shop-browse')}>
               Shop now
@@ -319,7 +309,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
             ))}
           </div>
           <button type="button" className="zq-festival-promo" onClick={() => navigate('shop-browse')}>
-            <img src={festival.heroImage} alt="" />
+            <img src={festival.heroImage} alt="" width={1200} height={545} loading="lazy" decoding="async" />
             <span>
               <b>{festival.promoTitle}</b>
               <small>{festival.promoCopy}</small>
@@ -334,7 +324,9 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           const sample = firstProductIn(cat.id);
           return (
             <button key={cat.id} type="button" className="shop-home-category" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
-              <span className="shop-home-category-tile">{sample && <img src={getProductImageUrl(sample)} alt="" loading="lazy" />}</span>
+              <span className={`shop-home-category-tile${sample ? '' : ' is-all'}`}>
+                {sample ? <img src={getProductThumbUrl(sample)} alt="" width={400} height={300} loading="lazy" decoding="async" /> : <Sparkles size={22} />}
+              </span>
               <span className="shop-home-category-label">{cat.label}</span>
             </button>
           );
@@ -351,7 +343,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         <button type="button" className="shop-home-promo is-dark" onClick={() => navigate('shop-browse')}>
           <span className="shop-home-promo-kicker">Delivery</span>
           <span className="shop-home-promo-title">Free delivery above ₹{FREE_DELIVERY_ABOVE}</span>
-          <span className="shop-home-promo-sub">On orders above ₹{FREE_DELIVERY_ABOVE}</span>
+          <span className="shop-home-promo-sub">Applied automatically at checkout.</span>
           <span className="shop-home-promo-icon">
             <Truck size={18} />
           </span>
@@ -426,12 +418,24 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </button>
       </section>
 
+      <section className="shop-home-end">
+        <Sparkles size={32} />
+        <h2>You've seen it all!</h2>
+        <p>Browse the full catalogue</p>
+        <button type="button" className="shop-home-end-btn" onClick={() => navigate('shop-browse')}>
+          Explore full catalogue
+          <ArrowRight size={16} />
+        </button>
+      </section>
+
       <footer className="shop-home-footer">
-        <div className="shop-home-footer-brand">
-          <Sparkles size={16} />
-          <strong>GlowVAI</strong>
+        <div className="shop-home-footer-about">
+          <div className="shop-home-footer-brand">
+            <Sparkles size={16} />
+            <strong>GlowVai</strong>
+          </div>
+          <p>Skincare, delivered.</p>
         </div>
-        <p>Skincare delivered in {DELIVERY_ETA} minutes.</p>
         <div className="shop-home-footer-links-wrap">
           <span>Quick Links</span>
           <div className="shop-home-footer-links">
@@ -443,23 +447,12 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           </div>
         </div>
         <div className="shop-home-footer-legal">
-          <span>© 2026 GlowVAI Technologies Pvt. Ltd. All rights reserved.</span>
-          <span>Privacy Policy · Terms of Use · Disclaimer</span>
+          <span>© 2026 GlowVai</span>
+          <span>
+            <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Use</a>
+          </span>
         </div>
       </footer>
-
-      <section className="shop-home-end">
-        <Sparkles size={36} />
-        <h2>You've seen it all!</h2>
-        <p>Browse the full catalogue</p>
-        <button type="button" className="shop-home-end-btn" onClick={() => navigate('shop-browse')}>
-          Explore Full Catalog →
-        </button>
-      </section>
-
-      <div className="shop-home-watermark" aria-hidden="true">
-        GlowVAI
-      </div>
 
       {totalCount > 0 && (
         <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>

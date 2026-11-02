@@ -12,7 +12,6 @@
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { getCurrentUser } from './authService';
-import { getDeviceCurrentLocation } from './locationService';
 import { getBackendBaseUrl, getCloudBackendUrl } from './apiConfig';
 const devicePlatformName = (): string => (typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent) ? 'android' : 'web');
 
@@ -54,44 +53,27 @@ export const syncUserOnboardingData = async (
     }
     const userId = user?.uid || customData?.userId || cachedGuestUserId!;
 
-    // 1. Fetch live GPS location if available
-    let locationData: any = {};
-    try {
-      const loc = await getDeviceCurrentLocation();
-      if (loc && loc.latitude) {
-        locationData = {
-          latitude: loc.latitude,
-          longitude: loc.longitude,
-          address: loc.formattedAddress || 'Payikapuram, Vijayawada, Andhra Pradesh',
-          city: loc.city || 'Vijayawada',
-          country: loc.countryCode || 'IN',
-        };
-      }
-    } catch {
-      locationData = {
-        latitude: 16.5417,
-        longitude: 80.6425,
-        address: 'Payikapuram, Vijayawada, Andhra Pradesh',
-        city: 'Vijayawada',
-        country: 'IN',
-      };
-    }
-
-    const payload: UserSyncPayload = {
+    // Only send what we actually know. Missing values are left out rather than filled with sample data, and the
+    // location is only sent when the caller passes one the user confirmed.
+    const raw: UserSyncPayload = {
       userId,
-      name: customData?.name || user?.displayName || 'Dr. Mukesh Glow',
-      phone: customData?.phone || user?.phoneNumber || '+91 98765 43210',
-      email: customData?.email || user?.email || 'founder@glowvai.com',
-      ...(customData?.avatarUri ? { avatarUri: customData.avatarUri } : {}),
-      address: customData?.address || locationData.address,
-      latitude: customData?.latitude || locationData.latitude,
-      longitude: customData?.longitude || locationData.longitude,
-      cameraGranted: customData?.cameraGranted ?? true,
-      locationGranted: customData?.locationGranted ?? true,
+      name: customData?.name || user?.displayName || undefined,
+      phone: customData?.phone || user?.phoneNumber || undefined,
+      email: customData?.email || user?.email || undefined,
+      avatarUri: customData?.avatarUri,
+      address: customData?.address,
+      latitude: customData?.latitude,
+      longitude: customData?.longitude,
+      cameraGranted: customData?.cameraGranted,
+      locationGranted: customData?.locationGranted,
+      onboardingCompleted: customData?.onboardingCompleted,
+      consents: customData?.consents,
       devicePlatform: devicePlatformName(),
       lastActiveAt: Date.now(),
-      consentTimestamp: Date.now(),
+      consentTimestamp: customData?.consentTimestamp,
     };
+    // Firestore rejects undefined fields, so drop them.
+    const payload = Object.fromEntries(Object.entries(raw).filter(([, value]) => value !== undefined)) as UserSyncPayload;
 
     // 2. Call backend /api/users/save endpoint (Cloud primary, fallback silently with fast timeout)
     const candidateUrls = [

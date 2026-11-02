@@ -61,8 +61,8 @@
 .glowvai-root .shop-home .shop-home-section-titles{ display: grid; gap: 2px; }
 .glowvai-root .shop-home .shop-home-section-titles p{ color: var(--home-muted); font-size: 12px; }
 .glowvai-root .shop-home .shop-home-section-actions{ display: flex; align-items: center; gap: 6px; }
-.glowvai-root .shop-home .shop-home-arrow{ display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--home-line); border-radius: 50%; background: #fff; color: var(--home-brand); }
-.glowvai-root .shop-home .shop-home-see-all{ display: inline-flex; flex-shrink: 0; align-items: center; gap: 2px; margin-left: 4px; padding: 0; border: 0; background: none; color: var(--home-brand); font-size: 13px; font-weight: 700; }
+.glowvai-root .shop-home .shop-home-arrow{ display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--home-line); border-radius: 50%; background: #fff; color: var(--home-brand); }
+.glowvai-root .shop-home .shop-home-see-all{ display: inline-flex; min-height: 44px; flex-shrink: 0; align-items: center; gap: 2px; margin-left: 4px; padding: 0 2px; border: 0; background: none; color: var(--home-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-rail{ display: flex; gap: 12px; overflow-x: auto; padding: 4px var(--shop-home-gutter) 6px; scroll-snap-type: x proximity; scrollbar-width: none; }
 .glowvai-root .shop-home .shop-home-rail::-webkit-scrollbar{ display: none; }
 .glowvai-root .shop-home .shop-home-rail-item{ display: flex; flex: 0 0 160px; scroll-snap-align: start; }
@@ -86,6 +86,7 @@
 .glowvai-root .shop-home .shop-home-concerns{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 var(--shop-home-gutter); }
 .glowvai-root .shop-home .shop-home-concern{ display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; border: 1px solid #e1e7f3; border-radius: 16px; background: #fff; text-align: left; }
 .glowvai-root .shop-home .shop-home-concern-icon{ display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--home-sky); color: var(--home-brand); }
+.glowvai-root .shop-home .shop-home-concern:last-child:nth-child(odd){ grid-column: 1 / -1; }
 .glowvai-root .shop-home .shop-home-concern strong{ color: var(--home-ink); font-size: 13px; font-weight: 700; line-height: 1.3; }
 
 /* Skin scan call to action */
@@ -101,19 +102,21 @@
 .glowvai-root .shop-home .shop-home-footer-brand{ display: flex; align-items: center; gap: 6px; }
 .glowvai-root .shop-home .shop-home-footer-brand svg{ color: #9dc4ff; }
 .glowvai-root .shop-home .shop-home-footer-brand strong{ font-size: 18px; font-weight: 800; }
-.glowvai-root .shop-home .shop-home-footer > p{ color: rgba(255, 255, 255, .6); font-size: 12px; line-height: 1.6; }
+.glowvai-root .shop-home .shop-home-footer-about{ display: grid; gap: 6px; }
+.glowvai-root .shop-home .shop-home-footer-about > p{ color: rgba(255, 255, 255, .6); font-size: 13px; line-height: 1.6; }
 .glowvai-root .shop-home .shop-home-footer-links-wrap{ display: grid; gap: 12px; }
-.glowvai-root .shop-home .shop-home-footer-links-wrap > span{ font-size: 12px; font-weight: 700; }
+.glowvai-root .shop-home .shop-home-footer-links-wrap > span{ font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
 .glowvai-root .shop-home .shop-home-footer-links{ display: flex; flex-wrap: wrap; gap: 8px; }
-.glowvai-root .shop-home .shop-home-footer-links button{ padding: 6px 10px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .75); font-size: 11px; }
-.glowvai-root .shop-home .shop-home-footer-legal{ display: grid; gap: 4px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .1); color: rgba(255, 255, 255, .4); font-size: 10px; }
+.glowvai-root .shop-home .shop-home-footer-links button{ min-height: 40px; padding: 8px 14px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .8); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-home .shop-home-footer-links button:hover{ background: rgba(255, 255, 255, .16); color: #fff; }
+.glowvai-root .shop-home .shop-home-footer-legal{ display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .1); color: rgba(255, 255, 255, .5); font-size: 12px; }
+.glowvai-root .shop-home .shop-home-footer-legal a{ display: inline-block; padding: 6px 0; color: rgba(255, 255, 255, .75); text-decoration: none; }
+.glowvai-root .shop-home .shop-home-footer-legal a:hover{ color: #fff; text-decoration: underline; }
 
-.glowvai-root .shop-home .shop-home-end{ display: grid; justify-items: center; gap: 4px; margin: 20px var(--shop-home-gutter) 0; padding: 40px 24px; text-align: center; color: var(--home-brand); }
+.glowvai-root .shop-home .shop-home-end{ display: grid; justify-items: center; gap: 4px; margin: 20px var(--shop-home-gutter) 0; padding: 32px 24px 12px; text-align: center; color: var(--home-brand); }
 .glowvai-root .shop-home .shop-home-end h2{ margin-top: 8px; color: var(--home-ink); font-size: 18px; font-weight: 800; }
 .glowvai-root .shop-home .shop-home-end > p{ color: var(--home-muted); font-size: 13px; }
-.glowvai-root .shop-home .shop-home-end-btn{ margin-top: 16px; padding: 12px 24px; border: 0; border-radius: 999px; background: var(--home-brand); color: #fff; font-size: 13px; font-weight: 700; }
-
-.glowvai-root .shop-home .shop-home-watermark{ padding: 28px 0 0; color: rgba(20, 71, 230, .08); font-size: 28px; font-weight: 800; letter-spacing: .04em; text-align: center; }
+.glowvai-root .shop-home .shop-home-end-btn{ display: inline-flex; min-height: 46px; align-items: center; gap: 8px; margin-top: 16px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--home-brand); color: #fff; font-size: 14px; font-weight: 700; }
 
 /* Floating cart pill (phones only; the web header has its own cart) */
 .glowvai-root .shop-home .shop-home-cart-pill{ position: fixed; bottom: 88px; left: 50%; z-index: 50; display: inline-flex; height: 44px; align-items: center; gap: 6px; padding: 0 16px; transform: translateX(-50%); border: 0; border-radius: 22px; background: var(--home-brand); color: #fff; font-size: 13px; font-weight: 700; box-shadow: 0 2px 8px rgba(20, 30, 60, .2); }
@@ -131,6 +134,9 @@
   .glowvai-root .shop-home .shop-home-promos{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .glowvai-root .shop-home .shop-home-rail-item{ flex-basis: 180px; }
   .glowvai-root .shop-home .shop-home-concerns{ grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .glowvai-root .shop-home .shop-home-concern:last-child:nth-child(odd){ grid-column: auto; }
+  .glowvai-root .shop-home .shop-home-footer{ grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: 32px; padding-top: 32px; padding-bottom: 32px; }
+  .glowvai-root .shop-home .shop-home-footer-legal{ grid-column: 1 / -1; }
   .glowvai-root .shop-home .shop-home-scan{ padding: 32px; }
   .glowvai-root .shop-home .shop-home-cart-pill{ display: none; }
 }
@@ -152,6 +158,7 @@
 .glowvai-root .shop-home{ --mode-accent: #ef2f72; --mode-deep: #aa0c43; --mode-soft: #fff1f5; }
 .glowvai-root .shop-home.zq-mode-men{ --mode-accent: #075df7; --mode-deep: #073784; --mode-soft: #edf5ff; }
 .glowvai-root .shop-home .shop-home-mode{ margin-top: 12px; }
+.glowvai-root .shop-home .shop-home-mode .zq-mode-toggle button{ min-height: 44px; font-size: 15px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-location-btn.is-static{ cursor: default; }
 .glowvai-root .shop-home .shop-home-festival{ margin: 14px var(--shop-home-gutter) 0; animation: navratri-mode-in 420ms cubic-bezier(.2,.8,.2,1) both; }
 .glowvai-root .shop-home .shop-home-festival .zq-festival{ padding: 0; }

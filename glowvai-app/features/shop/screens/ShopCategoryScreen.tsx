@@ -31,6 +31,34 @@ export const ShopCategoryScreen: React.FC = () => {
   const categoryLabel = CATEGORY_LABELS[categoryId] ?? categoryId;
   const sortLabel = SORT_OPTIONS.find((s) => s.id === sortBy)?.label;
 
+  // Opened without a known category: offer the real ones instead of an empty list.
+  if (!CATEGORY_LABELS[categoryId]) {
+    return (
+      <div className="shop-screen shop-category">
+        <header className="shop-header shop-category-header">
+          <button type="button" className="shop-icon-btn" onClick={goBack} aria-label="Go back">
+            <ArrowLeft size={20} />
+          </button>
+          <h1>Categories</h1>
+          <button type="button" className="shop-icon-btn" onClick={() => navigate('cart-tab')} aria-label="Open cart">
+            <ShoppingBag size={20} />
+          </button>
+        </header>
+        <div className="shop-empty shop-category-pick">
+          <h3>Pick a category</h3>
+          <p>Choose what you'd like to shop.</p>
+          <div className="shop-category-pick-list">
+            {Object.entries(CATEGORY_LABELS).map(([id, label]) => (
+              <button key={id} type="button" className="shop-chip" onClick={() => navigate('shop-category', { categoryId: id })}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const q = searchQuery.trim().toLowerCase();
   const products = INDIAN_SKINCARE_CATALOG.filter((p) => {
     if (p.category !== categoryId) return false;
@@ -45,7 +73,8 @@ export const ShopCategoryScreen: React.FC = () => {
       case 'rating':
         return b.rating - a.rating;
       default:
-        return b.matchScore - a.matchScore;
+        // Popularity: the products with the most catalogue reviews first.
+        return b.reviewCount - a.reviewCount;
     }
   });
 
@@ -78,7 +107,7 @@ export const ShopCategoryScreen: React.FC = () => {
         </label>
 
         <div className="shop-category-sort-row">
-          <span className="shop-category-count">{products.length} products</span>
+          <span className="shop-category-count">{products.length} {products.length === 1 ? 'product' : 'products'}</span>
           <div className="shop-category-sort">
             <button
               type="button"

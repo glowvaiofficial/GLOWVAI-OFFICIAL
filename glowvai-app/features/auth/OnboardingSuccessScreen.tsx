@@ -37,10 +37,11 @@ export const OnboardingSuccessScreen: React.FC = () => {
         {userName ? `Welcome to GlowVAI, ${userName}!` : 'Welcome to GlowVAI!'}
       </h1>
       <p className="auth-subtitle">
-        Your clinical skincare engine is ready. Explore formulations backed by computer vision diagnostics.
+        Your profile is set up. Explore products picked for you based on your skin check.
       </p>
 
       <div className="auth-success-footer">
+        <p className="auth-hint">Taking you to the shop…</p>
         <button type="button" className="auth-primary-button" onClick={handleExplore}>
           Explore Products
         </button>

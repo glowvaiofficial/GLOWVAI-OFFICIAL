@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Check, CheckCircle2, Copy, MapPin, PackageCheck, ShoppingBag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import '../responsive/cart-tracking.css';
 
 export const OrderConfirmationScreen: React.FC = () => {
   const { navigate, activeOrder, showToast } = useApp();

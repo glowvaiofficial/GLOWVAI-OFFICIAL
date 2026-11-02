@@ -1,4 +1,4 @@
-import { ChevronRight, CreditCard, Gift, Heart, HelpCircle, MapPin, Package, RotateCcw, Settings, Sparkles } from 'lucide-react';
+import { ChevronRight, CreditCard, Gift, Heart, HelpCircle, MapPin, Package, ScanFace, Settings, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getInitials, ProfileHeader, ProfileListItem } from './ProfileShared';
 
@@ -6,6 +6,9 @@ const statusLabel = (status: string): string => {
   const text = status.replace(/_/g, ' ');
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
+
+const countLabel = (count: number, singular: string, plural = `${singular}s`): string =>
+  `${count} ${count === 1 ? singular : plural}`;
 
 export const ProfileOverviewScreen = () => {
   const { user, customerDetails, orders, skinReports, activeReport, wishlist, navigate } = useApp();
@@ -16,12 +19,12 @@ export const ProfileOverviewScreen = () => {
 
   return (
     <main className="profile-screen">
-      <ProfileHeader eyebrow="SMART SKIN · BEAUTY · FASTER" title="My Profile" />
+      <ProfileHeader title="My account" />
 
       <div className="profile-body">
         <div className="profile-side">
         <section className="profile-card">
-          <button type="button" className="profile-user-button" onClick={() => navigate('profile-settings')}>
+          <button type="button" className="profile-user-button" onClick={() => navigate('profile-edit')}>
             <span className="profile-hero-avatar">{getInitials(customerDetails?.fullName || user?.name)}</span>
             <span className="profile-user-copy">
               <span className="profile-user-name">{name}</span>
@@ -30,6 +33,7 @@ export const ProfileOverviewScreen = () => {
             <ChevronRight size={20} className="profile-chevron" />
           </button>
         </section>
+
         </div>
 
         <div className="profile-main">
@@ -65,26 +69,29 @@ export const ProfileOverviewScreen = () => {
           <button type="button" className="profile-tile" onClick={() => navigate('orders-list')}>
             <span className="profile-tile-top"><Package size={20} /><ChevronRight size={16} /></span>
             <span className="profile-tile-label">My orders</span>
+            <span className="profile-tile-note">{orders.length ? countLabel(orders.length, 'order') : 'No orders yet'}</span>
           </button>
           <button type="button" className="profile-tile" onClick={() => navigate('shop-wishlist')}>
             <span className="profile-tile-top"><Heart size={20} /><ChevronRight size={16} /></span>
             <span className="profile-tile-label">Wishlist</span>
             <span className="profile-tile-note">{wishlist.length} saved</span>
           </button>
-          <button type="button" className="profile-tile is-blue" onClick={() => navigate('scan-report')}>
-            <span className="profile-tile-top"><RotateCcw size={20} /><ChevronRight size={16} /></span>
-            <span className="profile-tile-label">Saved routines</span>
+          <button type="button" className="profile-tile" onClick={() => navigate(report ? 'scan-report' : 'scan-intro')}>
+            <span className="profile-tile-top"><ScanFace size={20} /><ChevronRight size={16} /></span>
+            <span className="profile-tile-label">Skin reports</span>
+            <span className="profile-tile-note">{skinReports.length ? countLabel(skinReports.length, 'report') : 'Scan to get one'}</span>
           </button>
-          <button type="button" className="profile-tile is-blue" onClick={() => navigate('profile-referrals')}>
+          <button type="button" className="profile-tile" onClick={() => navigate('profile-referrals')}>
             <span className="profile-tile-top"><Gift size={20} /><ChevronRight size={16} /></span>
-            <span className="profile-tile-label">Glow rewards</span>
+            <span className="profile-tile-label">Refer friends</span>
+            <span className="profile-tile-note">Share GlowVai</span>
           </button>
         </div>
 
         <p className="profile-label">Recent order</p>
         <section className="profile-card">
           {recentOrder ? (
-            <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-list')}>
+            <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-detail', { orderId: recentOrder.id })}>
               <span className="profile-ticket-top">
                 <span className="profile-pill">{statusLabel(recentOrder.status)}</span>
                 <span className="profile-ticket-meta">₹{recentOrder.finalPayable.toLocaleString('en-IN')}</span>
@@ -96,7 +103,10 @@ export const ProfileOverviewScreen = () => {
               <span className="profile-text-link">View order →</span>
             </button>
           ) : (
-            <p className="profile-empty">No orders yet. Your recent order will show up here.</p>
+            <div className="profile-empty-block">
+              <p className="profile-empty">No orders yet. Your recent order will show up here.</p>
+              <button type="button" className="profile-button is-secondary is-small" onClick={() => navigate('shop-home')}>Start shopping</button>
+            </div>
           )}
         </section>
         </div>

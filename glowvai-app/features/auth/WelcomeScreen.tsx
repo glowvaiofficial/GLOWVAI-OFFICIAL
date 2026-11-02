@@ -6,36 +6,28 @@ import { logScreenMount, logTouch } from '../../core/utils/touchDoctor';
 const slideAiScan = '/glowvai/features/auth/assets/slide-ai-face-scan.png';
 const slideSkincare = '/glowvai/features/auth/assets/slide-skincare-ordering.png';
 const slideExpress = '/glowvai/features/auth/assets/slide-express-delivery.png';
-const slideFifteenMin = '/glowvai/features/auth/assets/slide-fifteen-min-guarantee.png';
 
 const SLIDES = [
   {
     id: 'slide-1',
     image: slideAiScan,
     badge: 'AI FACE SCAN',
-    title: 'AI Skin Scan in Seconds',
-    body: 'Scan your face using smartphone AI computer vision to uncover acne, hydration & 8-point skin metrics.',
+    title: 'AI Skin Scan',
+    body: 'Use your phone camera to check acne, hydration and other skin signals, then see products that suit your skin.',
   },
   {
     id: 'slide-2',
     image: slideSkincare,
     badge: 'COSMETICS CATALOG',
-    title: 'Custom Skincare & Cosmetics',
-    body: 'Zero guesswork. Browse and order targeted serums, creams & derm-backed cosmetics tailored to your skin.',
+    title: 'Skincare Picked for You',
+    body: 'Zero guesswork. Browse serums, creams and cosmetics, and order the ones made for your skin type.',
   },
   {
     id: 'slide-3',
     image: slideExpress,
     badge: 'DOORSTEP DELIVERY',
-    title: 'Hyperlocal Express Parcel',
-    body: 'Verified Glow VAI rider hands over your tamper-proof skincare parcel right at your doorstep.',
-  },
-  {
-    id: 'slide-4',
-    image: slideFifteenMin,
-    badge: '15-MIN EXPRESS',
-    title: '15-Minute Delivery Guarantee',
-    body: 'Ultra-fast hyper-commerce delivery guarantee — get your skincare products delivered in 15 minutes flat.',
+    title: 'Fast Delivery in Vijayawada',
+    body: 'Order from the shop and get your skincare delivered to your door.',
   },
 ];
 
@@ -95,6 +87,8 @@ export const WelcomeScreen: React.FC = () => {
     navigate('shop-home');
   };
 
+  const activeSlide = SLIDES[activeIndex];
+
   return (
     <section className="auth-welcome">
       <div className="auth-welcome-brand">
@@ -103,38 +97,44 @@ export const WelcomeScreen: React.FC = () => {
 
       <div className="auth-slider" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <div className="auth-slider-track" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
-          {SLIDES.map((slide) => (
-            <article className="auth-slide" key={slide.id}>
+          {SLIDES.map((slide, index) => (
+            <div className="auth-slide" key={slide.id} aria-hidden={index !== activeIndex}>
               <div className="auth-slide-image">
                 <img src={slide.image} alt="" />
                 <span className="auth-slide-badge">{slide.badge}</span>
               </div>
-              <h2 className="auth-slide-title">{slide.title}</h2>
-              <p className="auth-slide-body">{slide.body}</p>
-            </article>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="auth-dots">
-        {SLIDES.map((slide, index) => (
-          <button
-            key={slide.id}
-            type="button"
-            className={`auth-dot${index === activeIndex ? ' is-active' : ''}`}
-            onClick={() => goToSlide(index)}
-            aria-label={`Show slide ${index + 1}`}
-          />
-        ))}
-      </div>
+      <div className="auth-welcome-panel">
+        <div className="auth-welcome-copy" aria-live="polite">
+          <h2 className="auth-slide-title">{activeSlide.title}</h2>
+          <p className="auth-slide-body">{activeSlide.body}</p>
+        </div>
 
-      <div className="auth-welcome-footer">
-        <button type="button" className="auth-primary-button" onClick={handleGetStarted}>
-          Get Started
-        </button>
-        <button type="button" className="auth-secondary-button" onClick={handleExploreProducts}>
-          Explore Products
-        </button>
+        <div className="auth-dots">
+          {SLIDES.map((slide, index) => (
+            <button
+              key={slide.id}
+              type="button"
+              className={`auth-dot${index === activeIndex ? ' is-active' : ''}`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Show slide ${index + 1}`}
+              aria-current={index === activeIndex ? 'true' : undefined}
+            />
+          ))}
+        </div>
+
+        <div className="auth-welcome-footer">
+          <button type="button" className="auth-primary-button" onClick={handleGetStarted}>
+            Get Started
+          </button>
+          <button type="button" className="auth-secondary-button" onClick={handleExploreProducts}>
+            Explore Products
+          </button>
+        </div>
       </div>
     </section>
   );

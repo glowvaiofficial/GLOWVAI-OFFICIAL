@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { AlertCircle, ChevronDown } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { sendPhoneOtp } from '../../core/services/authService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { logTouch } from '../../core/utils/touchDoctor';
 import { errorMessageOf } from './authUtils';
-const mascotFox = '/glowvai/features/auth/assets/mascot-fox.png';
-const mascotCat = '/glowvai/features/auth/assets/mascot-cat.png';
 
 export const validateIndianPhoneNumber = (digits: string): boolean => {
   const clean = digits.replace(/\D/g, '');
@@ -101,8 +99,6 @@ export const LoginScreen: React.FC = () => {
           <span className="auth-brand-wordmark">glowvai</span>
         </button>
 
-        <img className="auth-mascot auth-mascot-left" src={mascotFox} alt="" aria-hidden="true" />
-        <img className="auth-mascot auth-mascot-right" src={mascotCat} alt="" aria-hidden="true" />
       </div>
 
       <div className="auth-login-sheet">
@@ -113,9 +109,10 @@ export const LoginScreen: React.FC = () => {
             Mobile Number
           </label>
           <div className={`auth-phone-field${errorMessage ? ' has-error' : ''}`}>
-            <span className="auth-flag" aria-hidden="true">🇮🇳</span>
+            <span className="login-india-flag" role="img" aria-label="India">
+              <i className="is-saffron" /><i className="is-white"><b /></i><i className="is-green" />
+            </span>
             <strong>+91</strong>
-            <ChevronDown className="auth-chevron" aria-hidden="true" />
             <span className="auth-divider" aria-hidden="true" />
             <input
               id="auth-mobile"
@@ -144,8 +141,9 @@ export const LoginScreen: React.FC = () => {
         </form>
 
         <p className="auth-legal">
-          By clicking, I accept the <span className="auth-link">privacy policy</span> and{' '}
-          <span className="auth-link">terms of use</span>
+          By continuing, I accept the{' '}
+          <a className="auth-link" href="/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and{' '}
+          <a className="auth-link" href="/terms" target="_blank" rel="noopener noreferrer">terms of use</a>
         </p>
       </div>
     </section>

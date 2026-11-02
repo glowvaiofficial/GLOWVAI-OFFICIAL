@@ -38,9 +38,36 @@ export const ScanPreviewScreen: React.FC = () => {
 
   const canUse = verified && !photoError && !!file;
 
+  if (!file || !previewUrl) {
+    return (
+      <div className="scan-screen">
+        <ScanHeader title="Review your photo" subtitle="Face scan · Step 3 of 3" onBack={goBack} />
+        <div className="scan-body scan-empty">
+          <div className="scan-empty-panel">
+            <span className="scan-permission-icon">
+              <ImageIcon size={36} />
+            </span>
+            <h2 className="scan-headline">No photo to review</h2>
+            <p className="scan-lead">Take a photo with your camera or choose one from your gallery to continue.</p>
+            <div className="scan-empty-actions">
+              <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
+                <Camera size={18} />
+                Open camera
+              </button>
+              <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
+                <ImageIcon size={18} />
+                Choose from gallery
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="scan-screen">
-      <ScanHeader title="Review your photo" onBack={goBack} />
+      <ScanHeader title="Review your photo" subtitle="Face scan · Step 3 of 3" onBack={goBack} />
       <div className="scan-body">
         <div className="scan-split">
           <div className="scan-preview-frame">

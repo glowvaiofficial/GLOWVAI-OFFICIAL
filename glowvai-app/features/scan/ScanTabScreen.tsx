@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Camera, FileText, ScanFace } from 'lucide-react';
+import { Camera, FileText, Image as ImageIcon, ScanFace, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { loadLatestScanResult } from './services/scanHistory';
 
-const METRICS = [
-  'Acne & blemishes',
-  'Hydration level',
-  'Pore density',
-  'Melanin index',
-  'Sebum output',
-  'Barrier strength',
+// What the model actually reports (skin type plus the five concern labels in skinModelService).
+const CHECKS = ['Skin type', 'Oiliness', 'Dryness', 'Redness', 'Uneven tone', 'Visible blemishes'];
+
+const HOW_IT_WORKS = [
+  { title: 'Take or upload a photo', body: 'Face the camera in even light, without glasses.' },
+  { title: 'We check what is visible', body: 'Skin type and five common concerns, in a few seconds.' },
+  { title: 'Get a simple routine', body: 'Four steps picked from our shop for what the scan found.' },
 ];
 
 export const ScanTabScreen: React.FC = () => {
@@ -27,25 +27,23 @@ export const ScanTabScreen: React.FC = () => {
   }, []);
 
   return (
-    <div className="scan-screen">
+    <div className="scan-screen scan-tab-screen">
       <div className="scan-body scan-tab-body">
         <div className="scan-split">
           <div className="scan-split-main">
             <div className="scan-tab-header">
-              <span className="scan-badge">Biometric AI engine</span>
-              <h1 className="scan-tab-title">Clinical face scan</h1>
-              <p className="scan-tab-subtitle">
-                Compute your skin pulse across six dimensions using multi-task CNN analysis.
-              </p>
+              <span className="scan-badge">Cosmetic skin check</span>
+              <h1 className="scan-tab-title">Face scan</h1>
+              <p className="scan-tab-subtitle">One clear photo shows your skin type and five visible concerns, with a routine to match.</p>
             </div>
 
             <div className="scan-target-card">
               <div className="scan-target-icon">
                 <ScanFace size={56} strokeWidth={1.6} />
               </div>
-              <h2 className="scan-target-heading">8 skin metrics analysed</h2>
+              <h2 className="scan-target-heading">What the scan checks</h2>
               <div className="scan-metric-grid">
-                {METRICS.map((name) => (
+                {CHECKS.map((name) => (
                   <span key={name} className="scan-metric-pill">
                     {name}
                   </span>
@@ -55,17 +53,36 @@ export const ScanTabScreen: React.FC = () => {
           </div>
 
           <div className="scan-split-side">
+            <h2 className="scan-section-title scan-desktop-only">How it works</h2>
+            <ol className="scan-how-list scan-desktop-only">
+              {HOW_IT_WORKS.map((step, index) => (
+                <li key={step.title}>
+                  <span>{index + 1}</span>
+                  <div>
+                    <b>{step.title}</b>
+                    <p>{step.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
             <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
               <Camera size={20} />
-              Launch AI viewfinder
+              Start face scan
             </button>
-
+            <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
+              <ImageIcon size={18} />
+              Upload a photo
+            </button>
             {hasPreviousReport && (
-              <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-report')}>
-                <FileText size={18} />
+              <button type="button" className="scan-text-button" onClick={() => navigate('scan-report')}>
+                <FileText size={16} />
                 View latest skin report
               </button>
             )}
+            <p className="scan-privacy">
+              <ShieldCheck size={14} /> Cosmetic assessment only, not a medical diagnosis.
+            </p>
           </div>
         </div>
       </div>

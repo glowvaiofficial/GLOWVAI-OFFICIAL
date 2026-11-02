@@ -1,4 +1,4 @@
-import { createOrder } from '../../../core/services/orderService';
+import { createOrder, newDeliveryOtp } from '../../../core/services/orderService';
 import { triggerWhatsAppDispatchAlert } from '../../../core/utils/whatsapp';
 import type { CartItem } from '../../../core/state/cartStore';
 import type { OrderDeliveryType, OrderItem, OrderPricing, PaymentStatus, UserAddress } from '../../../core/types';
@@ -53,6 +53,17 @@ const toShippingAddress = (address: DeliveryAddress): UserAddress => ({
   isQuickCommerceServiceable: address.serviceable,
 });
 
+// One delivery OTP per order, so the order record and the rider's dispatch alert carry the same code.
+const deliveryOtps = new Map<string, string>();
+export const deliveryOtpFor = (orderId: string): string => {
+  let code = deliveryOtps.get(orderId);
+  if (!code) {
+    code = newDeliveryOtp();
+    deliveryOtps.set(orderId, code);
+  }
+  return code;
+};
+
 // Writes the order through the shared orderService, the same call the mobile checkout used.
 export const placeCartOrder = async (input: PlaceOrderInput) => {
   const { totals, items, pay, paid, address, customer } = input;
@@ -61,6 +72,7 @@ export const placeCartOrder = async (input: PlaceOrderInput) => {
 
   return createOrder({
     orderId: input.orderId,
+    deliveryOtp: deliveryOtpFor(input.orderId),
     userId: customer.userId,
     customerName: customer.name,
     customerPhone: customer.phone,
@@ -103,6 +115,6 @@ export const sendDispatchAlert = (input: PlaceOrderInput) => {
     items: input.items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
     totalAmount: input.totals.grandTotal + (input.tipAmount ?? 0),
     paymentMethod: meta.group === 'cod' ? 'CASH ON DELIVERY' : `ONLINE (${meta.method})`,
-    deliveryOtp: '4892',
+    deliveryOtp: deliveryOtpFor(input.orderId),
   }).catch(() => null);
 };

@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, CircleDot, Droplets, Flame, Palette, Sparkles, Waves } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
 
 const SKIN_CONCERNS = [
-  { id: 'ACNE', label: 'Acne & Blemishes', emoji: '🔴' },
-  { id: 'HYPERPIGMENTATION', label: 'Hyperpigmentation', emoji: '🟤' },
-  { id: 'DRYNESS', label: 'Dryness & Dehydration', emoji: '💧' },
-  { id: 'OILINESS', label: 'Excess Oiliness', emoji: '✨' },
-  { id: 'SENSITIVITY', label: 'Sensitivity & Redness', emoji: '⚡' },
-  { id: 'FINE_LINES', label: 'Fine Lines & Aging', emoji: '🕰️' },
+  { id: 'ACNE', label: 'Acne & Blemishes', icon: <CircleDot /> },
+  { id: 'HYPERPIGMENTATION', label: 'Hyperpigmentation', icon: <Palette /> },
+  { id: 'DRYNESS', label: 'Dryness & Dehydration', icon: <Droplets /> },
+  { id: 'OILINESS', label: 'Excess Oiliness', icon: <Sparkles /> },
+  { id: 'SENSITIVITY', label: 'Sensitivity & Redness', icon: <Flame /> },
+  { id: 'FINE_LINES', label: 'Fine Lines & Aging', icon: <Waves /> },
 ];
 
 export const SkinSurveyScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
-  const [selectedConcerns, setSelectedConcerns] = useState<string[]>(['ACNE']);
+  const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const toggleConcern = (id: string) => {
@@ -26,12 +27,13 @@ export const SkinSurveyScreen: React.FC = () => {
     );
   };
 
-  // Mirrors the mobile app: concerns are shown but only the consent timestamp is synced
-  const handleSaveAndContinue = async () => {
+  // Concerns are not part of the account sync yet, so they are kept on this device; only the consent time is synced.
+  const handleSaveAndContinue = async (saveAnswers = true) => {
     if (isLoading) return;
     safeHapticImpact();
     setIsLoading(true);
     try {
+      if (saveAnswers) await storage.setItem('glowvai_skin_concerns', JSON.stringify(selectedConcerns));
       await syncUserOnboardingData({ consentTimestamp: Date.now() });
     } catch {
       // continue even if sync fails, as in the mobile app
@@ -45,7 +47,7 @@ export const SkinSurveyScreen: React.FC = () => {
     <AuthShell
       onBack={goBack}
       footer={
-        <button type="button" className="auth-primary-button" onClick={handleSaveAndContinue} disabled={isLoading}>
+        <button type="button" className="auth-primary-button" onClick={() => void handleSaveAndContinue()} disabled={isLoading}>
           {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Save & Finish Setup'}
         </button>
       }
@@ -57,7 +59,7 @@ export const SkinSurveyScreen: React.FC = () => {
 
       <h1 className="auth-title">What are your main skin concerns?</h1>
       <p className="auth-subtitle">
-        Select all that apply. This helps us personalize your initial routine and diagnostic report.
+        Select all that apply. This helps us personalize your first routine and skin report.
       </p>
 
       <div className="auth-concern-grid">
@@ -72,7 +74,7 @@ export const SkinSurveyScreen: React.FC = () => {
               onClick={() => toggleConcern(item.id)}
             >
               <span className="auth-concern-top">
-                <span className="auth-concern-emoji" aria-hidden="true">{item.emoji}</span>
+                <span className="auth-concern-icon" aria-hidden="true">{item.icon}</span>
                 {isSelected && (
                   <span className="auth-concern-check" aria-hidden="true"><Check /></span>
                 )}
@@ -83,7 +85,7 @@ export const SkinSurveyScreen: React.FC = () => {
         })}
       </div>
 
-      <button type="button" className="auth-text-button auth-skip-link" onClick={handleSaveAndContinue}>
+      <button type="button" className="auth-text-button auth-skip-link" onClick={() => void handleSaveAndContinue(false)}>
         Skip for now
       </button>
     </AuthShell>

@@ -32,18 +32,16 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ title, eyebrow, onBack, right }: ProfileHeaderProps) => (
   <header className="profile-header">
-    {onBack ? (
+    {onBack && (
       <button type="button" className="profile-icon-button" onClick={onBack} aria-label="Go back">
         <ArrowLeft size={20} strokeWidth={2.2} />
       </button>
-    ) : (
-      <span className="profile-header-spacer" />
     )}
     <div className="profile-header-copy">
       {eyebrow && <span className="profile-eyebrow">{eyebrow}</span>}
       <h1 className="profile-title">{title}</h1>
     </div>
-    {right ?? <span className="profile-header-spacer" />}
+    {right}
   </header>
 );
 

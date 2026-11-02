@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, ArrowLeft, ArrowRight, CreditCard, RotateCcw, ShoppingBag, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import '../responsive/cart-tracking.css';
 
 export const PaymentStatusScreen: React.FC = () => {
   const { navigate, activeParams } = useApp();
@@ -12,8 +13,8 @@ export const PaymentStatusScreen: React.FC = () => {
       <div className="payment-state-mark">{failed ? <AlertTriangle size={34} /> : <X size={34} />}</div>
       <p className="payment-state-kicker">{failed ? 'PAYMENT NOT COMPLETED' : 'PAYMENT CANCELLED'}</p>
       <h2>{failed ? 'Your payment did not go through.' : 'No payment was made.'}</h2>
-      <p>{failed ? 'The bank or payment app declined this attempt. If money was debited, it will be refunded by your bank or Razorpay within their usual timeline.' : 'Your bag and delivery slot are still saved. Pick another method when you are ready.'}</p>
-      <div className="payment-state-receipt"><span><ShoppingBag size={17} /> Bag total</span><b>₹{activeParams?.amount || 0}</b></div>
+      <p>{failed ? 'The bank or payment app declined this attempt. If money was debited, it will be refunded by your bank or Razorpay within their usual timeline.' : 'Your cart is still saved. Pick another method when you are ready.'}</p>
+      {typeof activeParams?.amount === 'number' && <div className="payment-state-receipt"><span><ShoppingBag size={17} /> Bag total</span><b>₹{activeParams.amount}</b></div>}
       <button className="payment-primary" onClick={() => navigate('checkout', activeParams?.checkoutParams)}><RotateCcw size={18} /> Try another method</button>
       <button className="payment-secondary" onClick={() => navigate('home')}><CreditCard size={18} /> Continue shopping <ArrowRight size={17} /></button>
     </section>

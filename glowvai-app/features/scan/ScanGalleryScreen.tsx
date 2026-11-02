@@ -34,7 +34,7 @@ export const ScanGalleryScreen: React.FC = () => {
 
   return (
     <div className="scan-screen">
-      <ScanHeader title="Choose a clear photo" onBack={goBack} />
+      <ScanHeader title="Upload a photo" subtitle="Face scan · Step 2 of 3" onBack={goBack} />
       <div className="scan-body">
         <div className="scan-split">
           <div className="scan-split-main">

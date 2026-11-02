@@ -19,33 +19,16 @@ export const VIJAYAWADA_AREAS: ServiceArea[] = [
   { id: 'area-7', name: 'Gannavaram', pincode: '521101', quickCommerceAvailable: false, estimatedMinutes: 120, deliveryFee: 49 },
 ];
 
-export const INITIAL_USER_ADDRESS: Address = {
-  id: 'addr-default-1',
+// Shown until the customer saves or picks a delivery address. Empty on purpose: no sample address is ever
+// presented as the customer's own, and an empty address is not serviceable, so checkout asks for one.
+export const NO_ADDRESS: Address = {
+  id: 'addr-none',
   label: 'Home',
-  street: 'Flat 402, Sri Krishna Heights, Near Sweet Magic',
-  landmark: 'Opposite Sub-Collector Office',
-  area: 'Benz Circle',
-  city: 'Vijayawada',
-  pincode: '520010',
-  serviceable: true,
-  deliveryMinutes: 12,
-  isDefault: true,
-  deliveryInstructions: 'Leave with security guard if not answering bell.',
+  street: '',
+  area: '',
+  city: '',
+  pincode: '',
+  serviceable: false,
+  deliveryMinutes: 0,
+  isDefault: false,
 };
-
-export const SAMPLE_SAVED_ADDRESSES: Address[] = [
-  INITIAL_USER_ADDRESS,
-  {
-    id: 'addr-work-2',
-    label: 'Work',
-    street: 'Floor 3, Tech Valley Towers, MG Road',
-    landmark: 'Beside Trendset Mall',
-    area: 'MG Road, Labbipet',
-    city: 'Vijayawada',
-    pincode: '520010',
-    serviceable: true,
-    deliveryMinutes: 15,
-    isDefault: false,
-    deliveryInstructions: 'Reception desk delivery',
-  },
-];
