@@ -12,7 +12,9 @@ const RESEND_SECONDS = 30;
 
 export const OtpVerificationScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
-  const phoneNumber: string = activeParams?.phoneNumber || '+91 98765 43210';
+  const phoneNumber: string = activeParams?.phoneNumber || '';
+  const phoneDigits = phoneNumber.replace(/\D/g, '').slice(-10);
+  const displayPhone = phoneDigits.length === 10 ? `+91 ${phoneDigits.slice(0, 5)} ${phoneDigits.slice(5)}` : '';
 
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isVerifying, setIsVerifying] = useState(false);
@@ -52,7 +54,13 @@ export const OtpVerificationScreen: React.FC = () => {
     safeHapticImpact();
 
     try {
-      await verifyPhoneOtp(code);
+      const result = await verifyPhoneOtp(code);
+      if (!result.success) {
+        setDigits(Array(OTP_LENGTH).fill(''));
+        focusCell(0);
+        showError(result.error || 'Incorrect verification code. Please try again.');
+        return;
+      }
       navigate(getCurrentUser() ? 'shop-home' : 'auth-profile-setup');
     } catch (err: unknown) {
       setDigits(Array(OTP_LENGTH).fill(''));
@@ -103,9 +111,9 @@ export const OtpVerificationScreen: React.FC = () => {
     setErrorMessage(null);
     focusCell(0);
     try {
-      await sendPhoneOtp(phoneNumber);
+      if (phoneNumber) await sendPhoneOtp(phoneNumber);
     } catch {
-      // safe fallback
+      // No SMS is sent yet, so a failed request changes nothing for the user.
     }
   };
 
@@ -115,15 +123,20 @@ export const OtpVerificationScreen: React.FC = () => {
     <AuthShell
       onBack={goBack}
       topRight={
-        <button type="button" className="auth-text-button" onClick={goBack}>
-          Edit Number
+        <button type="button" className="auth-text-button" onClick={() => navigate('auth-login')}>
+          Edit number
         </button>
       }
     >
       <h1 className="auth-title">Verify your number</h1>
       <p className="auth-subtitle">
-        Enter the {OTP_LENGTH}-digit code sent to <strong className="auth-strong">{phoneNumber}</strong>
+        {displayPhone ? (
+          <>Enter the {OTP_LENGTH}-digit code for <strong className="auth-strong">{displayPhone}</strong></>
+        ) : (
+          <>Enter the {OTP_LENGTH}-digit code for your number.</>
+        )}
       </p>
+      <p className="auth-dev-hint">Test code: 123456. No SMS is sent yet.</p>
 
       <div className={`auth-otp-cells${isShaking ? ' is-shaking' : ''}${errorMessage ? ' has-error' : ''}`}>
         {digits.map((digit, index) => (

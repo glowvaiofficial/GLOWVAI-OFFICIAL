@@ -16,6 +16,7 @@ import {
 import { auth } from '../config/firebase';
 import { initializeCustomerProfile, getUserProfile } from './userService';
 import { BaseUserDocument, CustomerUserDocument } from '../types';
+import { DEMO_OTP } from '../../services/api';
 
 let pendingPhoneNumber: string | null = null;
 
@@ -26,18 +27,19 @@ const createFallbackProfile = (user: Partial<FirebaseUser>, phone?: string | nul
   const uid = user.uid || 'user_' + Date.now();
   return {
     uid,
-    phoneNumber: user.phoneNumber || phone || '+91 98765 43210',
+    phoneNumber: user.phoneNumber || phone || '',
     role: 'customer',
-    displayName: user.displayName || 'GlowVAI Member',
+    displayName: user.displayName || null,
     email: user.email || null,
     isStudentVerified: false,
     referralCode: `GLOW-${uid.substring(0, 6).toUpperCase()}`,
-    referralCoinBalance: 50,
+    referralCoinBalance: 0,
+    // Terms and privacy are accepted on the sign-in screen; camera and the medical disclaimer are asked for later.
     consents: {
-      cameraAndScanConsent: true,
+      cameraAndScanConsent: false,
       termsAcceptedAt: Date.now(),
       privacyAcceptedAt: Date.now(),
-      medicalDisclaimerAcceptedAt: Date.now(),
+      medicalDisclaimerAcceptedAt: 0,
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),
@@ -70,11 +72,18 @@ export const verifyPhoneOtp = async (
   error?: string;
 }> => {
   try {
-    const cleanPhone = pendingPhoneNumber || '+919876543210';
+    // No SMS provider is connected yet, so only the published test code signs in.
+    if (verificationCode.trim() !== DEMO_OTP) {
+      return { success: false, error: 'Incorrect code. Use the test code shown on screen.' };
+    }
+    if (!pendingPhoneNumber && !auth?.currentUser) {
+      return { success: false, error: 'Your session expired. Enter your mobile number again.' };
+    }
+    const cleanPhone = pendingPhoneNumber || auth?.currentUser?.phoneNumber || '';
     const user: Partial<FirebaseUser> = auth?.currentUser || {
       uid: 'user_' + cleanPhone.replace(/[^\d]/g, ''),
       phoneNumber: cleanPhone,
-      displayName: 'GlowVAI Member',
+      displayName: null,
       email: null,
       isAnonymous: false,
       emailVerified: true,
@@ -90,10 +99,10 @@ export const verifyPhoneOtp = async (
           uid: user.uid,
           phoneNumber: user.phoneNumber || pendingPhoneNumber || '',
           consents: {
-            cameraAndScanConsent: true,
+            cameraAndScanConsent: false,
             termsAcceptedAt: Date.now(),
             privacyAcceptedAt: Date.now(),
-            medicalDisclaimerAcceptedAt: Date.now(),
+            medicalDisclaimerAcceptedAt: 0,
           },
         });
       }
@@ -108,19 +117,8 @@ export const verifyPhoneOtp = async (
       user,
       profile: profile || createFallbackProfile(user),
     };
-  } catch (err: unknown) {
-    const cleanPhone = pendingPhoneNumber || '+919876543210';
-    const fallbackUser: Partial<FirebaseUser> = {
-      uid: 'user_' + cleanPhone.replace(/[^\d]/g, ''),
-      phoneNumber: cleanPhone,
-      displayName: 'GlowVAI Member',
-    };
-
-    return {
-      success: true,
-      user: fallbackUser,
-      profile: createFallbackProfile(fallbackUser, cleanPhone),
-    };
+  } catch {
+    return { success: false, error: 'We could not verify the code. Try again.' };
   }
 };
 
@@ -153,10 +151,10 @@ export const signInWithEmail = async (
           phoneNumber: '',
           email: user.email || email,
           consents: {
-            cameraAndScanConsent: true,
+            cameraAndScanConsent: false,
             termsAcceptedAt: Date.now(),
             privacyAcceptedAt: Date.now(),
-            medicalDisclaimerAcceptedAt: Date.now(),
+            medicalDisclaimerAcceptedAt: 0,
           },
         });
       }
@@ -216,10 +214,10 @@ export const registerWithEmail = async (
           phoneNumber: '',
           email: user.email || email,
           consents: {
-            cameraAndScanConsent: true,
+            cameraAndScanConsent: false,
             termsAcceptedAt: Date.now(),
             privacyAcceptedAt: Date.now(),
-            medicalDisclaimerAcceptedAt: Date.now(),
+            medicalDisclaimerAcceptedAt: 0,
           },
         });
       }

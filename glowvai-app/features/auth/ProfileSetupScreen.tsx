@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { Camera } from 'lucide-react';
+import React, { useState } from 'react';
+import { UserRound } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getCurrentUser } from '../../core/services/authService';
 import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
 
 const AGE_RANGES = ['Under 18', '18-24', '25-34', '35-44', '45+'];
@@ -12,21 +13,16 @@ const GENDERS = ['Female', 'Male', 'Non-Binary', 'Prefer not to say'];
 export const ProfileSetupScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
   const currentUser = getCurrentUser();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(currentUser?.displayName || '');
-  const [selectedAge, setSelectedAge] = useState('18-24');
-  const [selectedGender, setSelectedGender] = useState('Female');
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(currentUser?.photoURL || null);
+  const [selectedAge, setSelectedAge] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
+  const avatarUrl = currentUser?.photoURL || null;
   const [isLoading, setIsLoading] = useState(false);
 
-  const isFormValid = fullName.trim().length >= 2 && !!selectedAge && !!selectedGender;
-  const initial = fullName.trim() ? fullName.trim().charAt(0).toUpperCase() : 'P';
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) setAvatarUrl(URL.createObjectURL(file));
-  };
+  // Age range and gender are optional; only the name is required.
+  const isFormValid = fullName.trim().length >= 2;
+  const initial = fullName.trim() ? fullName.trim().charAt(0).toUpperCase() : '';
 
   const handleContinue = async () => {
     if (!isFormValid || isLoading) return;
@@ -34,6 +30,8 @@ export const ProfileSetupScreen: React.FC = () => {
     safeHapticImpact();
     setIsLoading(true);
     try {
+      // Age range and gender are not part of the account sync yet, so they are kept on this device.
+      await storage.setItem('glowvai_profile_answers', JSON.stringify({ ageRange: selectedAge, gender: selectedGender }));
       await syncUserOnboardingData({ name: fullName.trim() });
     } catch {
       // continue even if sync fails, as in the mobile app
@@ -48,32 +46,22 @@ export const ProfileSetupScreen: React.FC = () => {
       onBack={goBack}
       footer={
         <button type="button" className="auth-primary-button" onClick={handleContinue} disabled={!isFormValid || isLoading}>
-          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Continue to Skin Survey →'}
+          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Continue to Skin Survey'}
         </button>
       }
     >
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '50%' }} /></div>
-        <span className="auth-step-label">STEP 1 OF 2: PROFILE SETUP</span>
+        <span className="auth-step-label">Step 1 of 2: Profile setup</span>
       </div>
 
       <h1 className="auth-title">Set Up Your Profile</h1>
-      <p className="auth-subtitle">Personalize your identity for express deliveries &amp; diagnostic tracking.</p>
+      <p className="auth-subtitle">Tell us a little about you so we can personalise your recommendations.</p>
 
-      <div className="auth-avatar-section">
-        <button type="button" className="auth-avatar" onClick={() => fileInputRef.current?.click()} aria-label="Add profile photo">
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : <span>{initial}</span>}
-          <span className="auth-avatar-badge" aria-hidden="true"><Camera /></span>
-        </button>
-        <input
-          ref={fileInputRef}
-          className="sr-only"
-          type="file"
-          accept="image/*"
-          tabIndex={-1}
-          onChange={handleAvatarChange}
-        />
-        <p className="auth-hint">Tap to add profile photo (optional)</p>
+      <div className="auth-avatar-section" aria-hidden="true">
+        <span className="auth-avatar">
+          {avatarUrl ? <img src={avatarUrl} alt="" /> : initial ? <span>{initial}</span> : <UserRound />}
+        </span>
       </div>
 
       <label className="auth-label" htmlFor="auth-profile-name">Full Name</label>
@@ -86,7 +74,7 @@ export const ProfileSetupScreen: React.FC = () => {
         />
       </div>
 
-      <span className="auth-label">Age Range</span>
+      <span className="auth-label auth-label-spaced">Age range (optional)</span>
       <div className="auth-chips">
         {AGE_RANGES.map((range) => (
           <button
@@ -96,7 +84,7 @@ export const ProfileSetupScreen: React.FC = () => {
             aria-pressed={selectedAge === range}
             onClick={() => {
               safeHapticImpact();
-              setSelectedAge(range);
+              setSelectedAge((current) => (current === range ? '' : range));
             }}
           >
             {range}
@@ -104,7 +92,7 @@ export const ProfileSetupScreen: React.FC = () => {
         ))}
       </div>
 
-      <span className="auth-label">Gender</span>
+      <span className="auth-label">Gender (optional)</span>
       <div className="auth-chips">
         {GENDERS.map((gender) => (
           <button
@@ -114,7 +102,7 @@ export const ProfileSetupScreen: React.FC = () => {
             aria-pressed={selectedGender === gender}
             onClick={() => {
               safeHapticImpact();
-              setSelectedGender(gender);
+              setSelectedGender((current) => (current === gender ? '' : gender));
             }}
           >
             {gender}

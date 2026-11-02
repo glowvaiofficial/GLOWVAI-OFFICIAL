@@ -1,196 +1,200 @@
 import React, { useState } from 'react';
-import { Bell, CheckCircle2, ChevronRight, Clock, MapPin, RotateCcw, Star, Zap } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Clock, HelpCircle, MapPin, RotateCcw, Star, Truck, XCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import type { Order } from '../../types';
 import { OrdersHeader } from './components/OrdersHeader';
+import {
+  DELIVERY_STAGES,
+  OrderThumb,
+  OrdersEmpty,
+  STATUS_LABEL,
+  formatOrderDate,
+  formatRupee,
+  isActiveOrder,
+  itemCountLabel,
+  orderTone,
+  stageIndex,
+  useBuyAgain,
+} from './orderUtils';
 
-const ACTIVE_THUMBS = [
-  'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=80',
-  'https://images.unsplash.com/photo-1608248597263-00de46196f65?auto=format&fit=crop&w=200&q=80',
-  'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=200&q=80',
-  'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=200&q=80',
-];
+const MAX_THUMBS = 4;
 
-const PAST_THUMBS_1 = [
-  'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=80',
-  'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=200&q=80',
-];
+const StatusBadge: React.FC<{ order: Order }> = ({ order }) => {
+  const tone = orderTone(order);
+  const Icon = tone === 'delivered' ? CheckCircle2 : tone === 'cancelled' ? XCircle : Clock;
+  return (
+    <span className={`orders-badge is-${tone}`}>
+      <Icon size={13} /> {STATUS_LABEL[order.status]}
+    </span>
+  );
+};
 
-const PAST_THUMBS_2 = ['https://images.unsplash.com/photo-1608248597263-00de46196f65?auto=format&fit=crop&w=200&q=80'];
+const Thumbs: React.FC<{ order: Order }> = ({ order }) => {
+  const extra = order.items.length - MAX_THUMBS;
+  return (
+    <div className="orders-thumbs">
+      {order.items.slice(0, MAX_THUMBS).map((item) => (
+        <OrderThumb key={`${item.productId}-${item.variantSize}`} item={item} />
+      ))}
+      {extra > 0 && <span className="orders-more-items">+{extra} more</span>}
+    </div>
+  );
+};
 
-const ACTIVE_ORDER_ID = 'GV28491';
+const Progress: React.FC<{ order: Order }> = ({ order }) => {
+  const current = stageIndex(order);
+  return (
+    <ol className="orders-progress" aria-label={`Delivery progress: ${STATUS_LABEL[order.status]}`}>
+      {DELIVERY_STAGES.map((label, index) => (
+        <li key={label} className={index < current ? 'is-done' : index === current ? 'is-current' : ''}>
+          <span className="orders-progress-dot">{index < current ? <CheckCircle2 size={14} /> : index === current ? <Truck size={13} /> : null}</span>
+          <small>{label}</small>
+        </li>
+      ))}
+    </ol>
+  );
+};
 
-interface PastOrderCardProps {
-  id: string;
-  date: string;
-  total: string;
-  thumbs: string[];
-  moreItems?: boolean;
-  onRate: (id: string) => void;
+interface OrderCardProps {
+  order: Order;
+  onOpen: (order: Order) => void;
+  onTrack: (order: Order) => void;
+  onRate: (order: Order) => void;
+  onBuyAgain: (order: Order) => void;
+  onCancelled: (order: Order) => void;
 }
 
-const PastOrderCard: React.FC<PastOrderCardProps> = ({ id, date, total, thumbs, moreItems, onRate }) => (
-  <article className="orders-past-card">
-    <div className="orders-card-head">
-      <div>
-        <strong>#{id}</strong>
-        <span>{date}</span>
-      </div>
-      <span className="orders-badge is-delivered">
-        <CheckCircle2 size={12} /> Delivered
-      </span>
-    </div>
+const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, onBuyAgain, onCancelled }) => {
+  const tone = orderTone(order);
+  const placed = formatOrderDate(order.createdAt);
+  return (
+    <article className={`orders-order-card is-${tone}`}>
+      <button type="button" className="orders-card-open" onClick={() => onOpen(order)} aria-label={`View details of order ${order.id}`}>
+        <div className="orders-card-head">
+          <div>
+            <strong>#{order.id}</strong>
+            <span>{placed ? `Placed ${placed}` : 'Placed recently'}</span>
+          </div>
+          <StatusBadge order={order} />
+        </div>
+        <Thumbs order={order} />
+        <div className="orders-summary-row">
+          <div>
+            <strong>{formatRupee(order.finalPayable)}</strong>
+            <span className="orders-address-line">
+              <MapPin size={12} /> {itemCountLabel(order)} · {order.address.label}, {order.address.area}
+            </span>
+          </div>
+          <ChevronRight size={18} />
+        </div>
+      </button>
 
-    <div className="orders-thumbs">
-      {thumbs.map((url, i) => (
-        <img key={i} src={url} alt="" />
-      ))}
-      {moreItems && <span className="orders-more-items">+1 item</span>}
-    </div>
+      {tone === 'active' && <Progress order={order} />}
 
-    <div className="orders-past-footer">
-      <strong>{total}</strong>
-      <div className="orders-past-actions">
-        <button className="orders-chip is-rate" onClick={() => onRate(id)}>
-          <Star size={13} /> Rate Order
-        </button>
-        <button className="orders-chip is-buy">
-          <RotateCcw size={13} /> Buy Again
-        </button>
+      <div className="orders-card-actions">
+        {tone === 'active' && (
+          <button type="button" className="orders-primary-button" onClick={() => onTrack(order)}>
+            <Truck size={16} /> Track order
+          </button>
+        )}
+        {tone === 'delivered' && (
+          <>
+            <button type="button" className="orders-secondary-button" onClick={() => onRate(order)}>
+              <Star size={16} /> Rate order
+            </button>
+            <button type="button" className="orders-primary-button" onClick={() => onBuyAgain(order)}>
+              <RotateCcw size={16} /> Buy again
+            </button>
+          </>
+        )}
+        {tone === 'cancelled' && (
+          <>
+            <button type="button" className="orders-secondary-button" onClick={() => onCancelled(order)}>
+              View cancellation
+            </button>
+            <button type="button" className="orders-primary-button" onClick={() => onBuyAgain(order)}>
+              <RotateCcw size={16} /> Buy again
+            </button>
+          </>
+        )}
       </div>
-    </div>
-  </article>
-);
+    </article>
+  );
+};
 
 export const OrdersListScreen: React.FC = () => {
-  const { goBack, navigate, showToast } = useApp();
-  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+  const { goBack, navigate, orders, setActiveOrder } = useApp();
+  const buyAgain = useBuyAgain();
+  const activeOrders = orders.filter(isActiveOrder);
+  const pastOrders = orders.filter((order) => !isActiveOrder(order));
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>(activeOrders.length ? 'active' : 'past');
 
-  const handleTrack = (id: string) => navigate('orders-tracking', { orderId: id });
-  const handleDetails = (id: string) => navigate('orders-detail', { orderId: id });
-  const handleRate = (id: string) => navigate('orders-rate', { orderId: id });
+  const select = (order: Order) => setActiveOrder(order);
+  const handleOpen = (order: Order) => {
+    select(order);
+    navigate('orders-detail', { orderId: order.id });
+  };
+  const handleTrack = (order: Order) => {
+    select(order);
+    navigate('orders-tracking', { orderId: order.id });
+  };
+  const handleRate = (order: Order) => navigate('orders-rate', { orderId: order.id });
+  const handleCancelled = (order: Order) => {
+    select(order);
+    navigate('order-cancelled', { orderId: order.id });
+  };
+
+  const visible = activeTab === 'active' ? activeOrders : pastOrders;
 
   return (
     <main className="orders-screen is-list">
       <OrdersHeader
-        title="My Orders"
-        subtitle="BEAUTY · FASTER."
+        title="My orders"
+        subtitle="Track, reorder or get help"
         onBack={goBack}
         right={
-          <button className="orders-icon-button" aria-label="Notifications" onClick={() => showToast('No new notifications')}>
-            <Bell size={18} />
-            <span className="orders-unread-dot" />
+          <button type="button" className="orders-icon-button" aria-label="Help with an order" onClick={() => navigate('support')}>
+            <HelpCircle size={18} />
           </button>
         }
       />
 
       <div className="orders-body">
-        <div className="orders-segment" role="tablist">
-          <button
-            role="tab"
-            aria-selected={activeTab === 'active'}
-            className={activeTab === 'active' ? 'is-active' : ''}
-            onClick={() => setActiveTab('active')}
-          >
-            Active (1)
-          </button>
-          <button
-            role="tab"
-            aria-selected={activeTab === 'past'}
-            className={activeTab === 'past' ? 'is-active' : ''}
-            onClick={() => setActiveTab('past')}
-          >
-            Past Orders
-          </button>
-        </div>
-
-        {activeTab === 'active' ? (
-          <>
-            <p className="orders-section-label">ACTIVE ORDER</p>
-            <article
-              className="orders-active-card"
-              role="button"
-              tabIndex={0}
-              onClick={() => handleDetails(ACTIVE_ORDER_ID)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') handleDetails(ACTIVE_ORDER_ID);
-              }}
-            >
-              <div className="orders-card-head">
-                <div>
-                  <strong className="is-large">#{ACTIVE_ORDER_ID}</strong>
-                  <span>Placed today · 12:42 PM</span>
-                </div>
-                <div className="orders-badge-stack">
-                  <span className="orders-badge is-on-way">On the way</span>
-                  <span className="orders-badge is-eta">
-                    <Zap size={11} /> Arriving in 6 mins
-                  </span>
-                </div>
-              </div>
-
-              <div className="orders-thumbs">
-                {ACTIVE_THUMBS.map((url, i) => (
-                  <img key={i} src={url} alt="" />
-                ))}
-              </div>
-
-              <div className="orders-summary-row">
-                <div>
-                  <strong>Total: ₹1,347</strong>
-                  <span className="orders-address-line">
-                    <MapPin size={12} /> Home · Vijayawada
-                  </span>
-                </div>
-                <ChevronRight size={18} />
-              </div>
-
-              <div className="orders-timeline">
-                <div className="orders-timeline-step is-done">
-                  <span className="orders-dot">
-                    <CheckCircle2 size={12} />
-                  </span>
-                  <small>Confirmed</small>
-                </div>
-                <div className="orders-timeline-line is-done" />
-                <div className="orders-timeline-step is-done">
-                  <span className="orders-dot">
-                    <CheckCircle2 size={12} />
-                  </span>
-                  <small>Packed</small>
-                </div>
-                <div className="orders-timeline-line" />
-                <div className="orders-timeline-step is-current">
-                  <span className="orders-dot">
-                    <Clock size={12} />
-                  </span>
-                  <small>On the way</small>
-                </div>
-                <div className="orders-timeline-line" />
-                <div className="orders-timeline-step">
-                  <span className="orders-dot is-pending" />
-                  <small>Delivered</small>
-                </div>
-              </div>
-
-              <button
-                className="orders-primary-button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleTrack(ACTIVE_ORDER_ID);
-                }}
-              >
-                <Zap size={16} /> Track Order →
-              </button>
-            </article>
-
-            <p className="orders-section-label">RECENTLY COMPLETED</p>
-            <PastOrderCard id="GV27356" date="Delivered · Apr 28, 2025" total="₹2,892" thumbs={PAST_THUMBS_1} moreItems onRate={handleRate} />
-          </>
+        {orders.length === 0 ? (
+          <OrdersEmpty title="No orders yet" body="When you place an order, you can track it, reorder and get help from here." actionLabel="Shop now" />
         ) : (
           <>
-            <p className="orders-section-label">PAST ORDERS HISTORY</p>
-            <PastOrderCard id="GV27356" date="Delivered · Apr 28, 2025" total="₹2,892" thumbs={PAST_THUMBS_1} onRate={handleRate} />
-            <PastOrderCard id="GV26190" date="Delivered · Mar 14, 2025" total="₹1,649" thumbs={PAST_THUMBS_2} onRate={handleRate} />
+            <div className="orders-segment" role="tablist" aria-label="Order status">
+              <button type="button" role="tab" aria-selected={activeTab === 'active'} className={activeTab === 'active' ? 'is-active' : ''} onClick={() => setActiveTab('active')}>
+                Active ({activeOrders.length})
+              </button>
+              <button type="button" role="tab" aria-selected={activeTab === 'past'} className={activeTab === 'past' ? 'is-active' : ''} onClick={() => setActiveTab('past')}>
+                Past ({pastOrders.length})
+              </button>
+            </div>
+
+            {visible.length === 0 ? (
+              <OrdersEmpty
+                title={activeTab === 'active' ? 'No active orders' : 'No past orders'}
+                body={activeTab === 'active' ? 'Orders on their way to you will show up here.' : 'Delivered and cancelled orders will show up here.'}
+                actionLabel={activeTab === 'active' ? 'Shop now' : 'See active orders'}
+                onAction={activeTab === 'active' ? undefined : () => setActiveTab('active')}
+              />
+            ) : (
+              <div className="orders-grid">
+                {visible.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    onOpen={handleOpen}
+                    onTrack={handleTrack}
+                    onRate={handleRate}
+                    onBuyAgain={buyAgain}
+                    onCancelled={handleCancelled}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

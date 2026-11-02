@@ -32,6 +32,8 @@ export interface CreateOrderParams {
   pricing: OrderPricing;
   payment: OrderPayment;
   referralCodeUsed?: string | null;
+  /** Handover code for this order. The same code must go to the rider and the customer. */
+  deliveryOtp?: string;
 }
 
 export interface BackendOrderResponse {
@@ -52,6 +54,13 @@ export interface SlaStatusResponse {
   deliveryOtp: string;
   phases: Array<{ name: string; targetSeconds: number; completed: boolean; current: boolean }>;
 }
+
+// A fresh 4-digit handover code per order, instead of the same code for every customer.
+export const newDeliveryOtp = (): string => {
+  const values = new Uint32Array(1);
+  crypto.getRandomValues(values);
+  return String(1000 + (values[0] % 9000));
+};
 
 /**
  * Creates a real order in the backend orchestrator (Express server + Firestore)
@@ -100,7 +109,7 @@ export const createOrder = async (params: CreateOrderParams): Promise<OrderDocum
       price: it.unitPrice,
     })),
     paymentMethod: params.payment.method,
-    deliveryOtp: '4892',
+    deliveryOtp: params.deliveryOtp ?? newDeliveryOtp(),
     storeId: 'DS-VIJ-01',
   };
 
@@ -155,13 +164,14 @@ export const verifyOrderPayment = async (orderId: string, grandTotal: number): P
       });
       if (res.ok) {
         const data = await res.json();
-        return data.verified || data.ok;
+        return data.verified === true;
       }
     } catch {
       // try next
     }
   }
-  return true; // graceful fallback for offline/local sandbox
+  // Verification could not be reached, so the payment is not confirmed.
+  return false;
 };
 
 /**

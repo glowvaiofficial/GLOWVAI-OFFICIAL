@@ -1,56 +1,33 @@
 import React, { useState } from 'react';
-import {
-  ArrowLeft,
-  Award,
-  CheckCircle2,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Droplet,
-  Heart,
-  Minus,
-  Plus,
-  Share2,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Star,
-  Zap,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, Plus, Share2, ShoppingBag, Sparkles, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import '../styles/shop-product.css';
 
-const STOCK_IMAGES = [
-  'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=800&q=80',
-  'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80',
-];
+// Shop category ids mapped to the names used on the browse screen.
+const CATEGORY_LABELS: Record<string, string> = {
+  Serums: 'Serums & Actives',
+  Cleansers: 'Cleansers & Washes',
+  Moisturizers: 'Moisturizers & Creams',
+  Suncare: 'Sunscreen & SPF',
+  Treatments: 'Spot Treatments',
+};
 
-const BENEFITS = ['Repairs skin barrier', 'Deep hydration', 'Boosts natural glow', 'Gentle & non-irritating'];
-
-const KEY_INGREDIENTS: { name: string; desc: string; Icon: LucideIcon }[] = [
-  { name: 'Ceramides (3%)', desc: 'Helps maintain and reinforce skin barrier integrity', Icon: ShieldCheck },
-  { name: 'Panthenol (B5)', desc: 'Provides deep cosmetic hydration and soothing feel', Icon: Droplet },
-  { name: 'Niacinamide (5%)', desc: 'Promotes smooth texture and radiant, even tone', Icon: Award },
-];
-
+// Everything on this screen comes from the product's own catalogue entry. Sections without data are not shown.
 export const ShopProductScreen: React.FC = () => {
-  const { navigate, goBack, activeParams } = useApp();
+  const { navigate, goBack, activeParams, currentAddress, wishlist, toggleWishlist, showToast } = useApp();
   const rawId = activeParams?.productId ?? activeParams?.id;
   const productId = typeof rawId === 'string' ? rawId : undefined;
   const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === productId);
 
   const cartTotalCount = useCartStore((state) => state.totalCount);
+  const inCartCount = useCartStore((state) => (product ? state.items[product.id]?.quantity ?? 0 : 0));
   const addItem = useCartStore((state) => state.addItem);
 
   const [quantity, setQuantity] = useState(1);
-  const [howToUseOpen, setHowToUseOpen] = useState(true);
-  const [ingredientsOpen, setIngredientsOpen] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const [imageFailed, setImageFailed] = useState(false);
 
   if (!product) {
     return (
@@ -75,22 +52,27 @@ export const ShopProductScreen: React.FC = () => {
     );
   }
 
-  const heroImage = getProductImageUrl(product) || STOCK_IMAGES[0];
-  const images = [heroImage, ...STOCK_IMAGES];
+  const heroImage = getProductImageUrl(product);
   const discount = getDiscountPercent(product);
-  const fullIngredientsText = product.keyActives.length
-    ? product.keyActives.join(', ')
-    : 'Ceramides, Panthenol, Niacinamide, Glycerin, Hyaluronic Acid';
-
-  const prevImage = () => setActiveImageIdx((i) => (i > 0 ? i - 1 : images.length - 1));
-  const nextImage = () => setActiveImageIdx((i) => (i + 1) % images.length);
+  const isWishlisted = wishlist.includes(product.id);
+  const deliverTo = [currentAddress?.area, currentAddress?.city].filter(Boolean).join(', ');
+  const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category;
 
   const handleShare = async () => {
-    const text = `Check out ${product.brand} ${product.name} delivered in ${product.deliveryMinutes} mins on GlowVAI!`;
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const text = `${product.brand} ${product.name} on GlowVAI`;
     try {
-      if (navigator.share) await navigator.share({ text });
-      else await navigator.clipboard?.writeText(text);
-    } catch {}
+      if (navigator.share) {
+        await navigator.share({ title: product.name, text, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url ? `${text}: ${url}` : text);
+        showToast('Link copied');
+      } else {
+        showToast("Sharing isn't available in this browser");
+      }
+    } catch (error) {
+      if ((error as { name?: string })?.name !== 'AbortError') showToast("Couldn't share this product");
+    }
   };
 
   const handleAddToCart = () => {
@@ -131,8 +113,8 @@ export const ShopProductScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            className="shop-icon-btn"
-            onClick={() => setIsWishlisted((v) => !v)}
+            className={`shop-icon-btn shop-product-save${isWishlisted ? ' is-saved' : ''}`}
+            onClick={() => toggleWishlist(product.id)}
             aria-pressed={isWishlisted}
             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           >
@@ -153,39 +135,12 @@ export const ShopProductScreen: React.FC = () => {
       <div className="shop-product-layout">
         <section className="shop-product-gallery">
           <div className="shop-product-hero">
-            <span className="shop-product-express">
-              <Zap size={10} fill="currentColor" />
-              10 MIN EXPRESS
-            </span>
-
-            <img src={images[activeImageIdx]} alt={product.name} />
-
-            <button type="button" className="shop-product-arrow is-prev" onClick={prevImage} aria-label="Previous image">
-              <ChevronLeft size={16} />
-            </button>
-            <button type="button" className="shop-product-arrow is-next" onClick={nextImage} aria-label="Next image">
-              <ChevronRight size={16} />
-            </button>
-
-            <div className="shop-product-dots" aria-hidden="true">
-              {images.map((_, i) => (
-                <span key={i} className={i === activeImageIdx ? 'is-active' : undefined} />
-              ))}
-            </div>
-          </div>
-
-          <div className="shop-product-thumbs">
-            {images.map((src, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className={`shop-product-thumb${activeImageIdx === idx ? ' is-active' : ''}`}
-                onClick={() => setActiveImageIdx(idx)}
-                aria-label={`Show image ${idx + 1}`}
-              >
-                <img src={src} alt="" />
-              </button>
-            ))}
+            {discount > 0 && <span className="shop-product-hero-off">{discount}% OFF</span>}
+            {heroImage && !imageFailed ? (
+              <img src={heroImage} alt={product.name} width={800} height={800} decoding="async" onError={() => setImageFailed(true)} />
+            ) : (
+              <span className="shop-product-hero-fallback">{product.brand}</span>
+            )}
           </div>
         </section>
 
@@ -201,14 +156,15 @@ export const ShopProductScreen: React.FC = () => {
                 {product.rating.toFixed(1)}
               </span>
               <button type="button" className="shop-product-reviews-link" onClick={openReviews}>
-                {product.reviewCount.toLocaleString('en-IN')} verified reviews →
+                {product.reviewCount.toLocaleString('en-IN')} reviews
+                <ChevronRight size={14} />
               </button>
             </div>
 
             <div className="shop-product-pricebar">
               <span className="shop-product-price-now">{formatRupee(product.price)}</span>
               {product.originalPrice > product.price && (
-                <span className="shop-product-price-mrp">{formatRupee(product.originalPrice)}</span>
+                <span className="shop-product-price-mrp">MRP {formatRupee(product.originalPrice)}</span>
               )}
               {discount > 0 && <span className="shop-product-off">{discount}% OFF</span>}
             </div>
@@ -220,11 +176,12 @@ export const ShopProductScreen: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={quantity <= 1}
                   aria-label="Decrease quantity"
                 >
                   <Minus size={14} />
                 </button>
-                <span>{quantity}</span>
+                <span aria-live="polite">{quantity}</span>
                 <button type="button" onClick={() => setQuantity((q) => q + 1)} aria-label="Increase quantity">
                   <Plus size={14} />
                 </button>
@@ -232,84 +189,71 @@ export const ShopProductScreen: React.FC = () => {
             </div>
 
             <div className="shop-product-actions">
-              <button type="button" className="shop-btn-primary" onClick={handleAddToCart}>
+              <button type="button" className="shop-btn-primary shop-product-add-btn" onClick={handleAddToCart}>
                 <ShoppingBag size={18} />
-                ADD TO CART — {formatRupee(product.price * quantity)}
+                Add to cart · {formatRupee(product.price * quantity)}
               </button>
               <button type="button" className="shop-product-buynow" onClick={handleBuyNow}>
-                INSTANT BUY NOW
+                Buy now
               </button>
             </div>
+
+            {inCartCount > 0 && (
+              <button type="button" className="shop-product-incart" onClick={() => navigate('cart-tab')}>
+                {inCartCount} in your cart
+                <span>
+                  View cart
+                  <ChevronRight size={14} />
+                </span>
+              </button>
+            )}
           </div>
 
           <div className="shop-product-eta">
             <Zap size={20} fill="currentColor" />
             <div>
               <p className="shop-product-eta-title">Delivered in {product.deliveryMinutes} minutes</p>
-              <p className="shop-product-eta-sub">to Vijayawada · Order now for instant dispatch</p>
+              {deliverTo && <p className="shop-product-eta-sub">to {deliverTo}</p>}
             </div>
           </div>
 
-          <div className="shop-product-panel">
-            <h2 className="shop-product-section-title">Why You'll Love It</h2>
-            <div className="shop-product-benefits">
-              {BENEFITS.map((benefit) => (
-                <span key={benefit} className="shop-product-benefit">
-                  <CheckCircle2 size={14} />
-                  {benefit}
-                </span>
-              ))}
+          {product.keyActives.length > 0 && (
+            <div className="shop-product-panel">
+              <h2 className="shop-product-section-title">Key actives</h2>
+              <ul className="shop-product-actives">
+                {product.keyActives.map((active) => (
+                  <li key={active}>
+                    <FlaskConical size={14} />
+                    {active}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
+          )}
 
           <div className="shop-product-panel">
-            <h2 className="shop-product-section-title">Key Ingredients</h2>
-            {KEY_INGREDIENTS.map(({ name, desc, Icon }) => (
-              <div key={name} className="shop-product-ingredient">
-                <span className="shop-product-ingredient-icon">
-                  <Icon size={16} />
-                </span>
-                <div>
-                  <p className="shop-product-ingredient-name">{name}</p>
-                  <p className="shop-product-ingredient-desc">{desc}</p>
-                </div>
+            <h2 className="shop-product-section-title">Product details</h2>
+            <dl className="shop-product-specs">
+              <div>
+                <dt>Brand</dt>
+                <dd>{product.brand}</dd>
               </div>
-            ))}
-          </div>
-
-          <div className="shop-product-panel shop-product-accordions">
-            <button
-              type="button"
-              className="shop-product-acc-btn"
-              aria-expanded={howToUseOpen}
-              onClick={() => setHowToUseOpen((v) => !v)}
-            >
-              <span>How to Use</span>
-              <ChevronDown size={18} className={howToUseOpen ? 'is-open' : undefined} />
-            </button>
-            {howToUseOpen && (
-              <p className="shop-product-acc-body">
-                Apply 3-4 drops to cleansed face morning and night. Gently pat into skin before moisturizer.
-              </p>
-            )}
-
+              <div>
+                <dt>Category</dt>
+                <dd>
+                  <button type="button" onClick={() => navigate('shop-category', { categoryId: product.category })}>
+                    {categoryLabel}
+                  </button>
+                </dd>
+              </div>
+              <div>
+                <dt>Size</dt>
+                <dd>{product.volume}</dd>
+              </div>
+            </dl>
             <div className="shop-product-acc-divider" />
-
-            <button
-              type="button"
-              className="shop-product-acc-btn"
-              aria-expanded={ingredientsOpen}
-              onClick={() => setIngredientsOpen((v) => !v)}
-            >
-              <span>Full Ingredients List</span>
-              <ChevronDown size={18} className={ingredientsOpen ? 'is-open' : undefined} />
-            </button>
-            {ingredientsOpen && <p className="shop-product-acc-body">{fullIngredientsText}</p>}
-
-            <div className="shop-product-acc-divider" />
-
             <button type="button" className="shop-product-acc-btn" onClick={openReviews}>
-              <span>Customer Reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
+              <span>Ratings &amp; reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
               <ChevronRight size={18} />
             </button>
           </div>
@@ -325,11 +269,13 @@ export const ShopProductScreen: React.FC = () => {
             )}
           </div>
           <small>
-            {discount > 0 && `${discount}% OFF · `}Delivered in {product.deliveryMinutes} mins
+            {inCartCount > 0
+              ? `${inCartCount} in your cart`
+              : `${discount > 0 ? `${discount}% OFF · ` : ''}Delivered in ${product.deliveryMinutes} mins`}
           </small>
         </div>
         <button type="button" className="shop-btn-primary shop-product-buybar-btn" onClick={handleAddToCart}>
-          ADD TO CART
+          Add to cart
         </button>
       </div>
     </div>

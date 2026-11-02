@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Crosshair, MapPin, Search, Store } from 'lucide-react';
+import { ArrowRight, Crosshair, MapPin, Pencil, Search } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { getDeviceCurrentLocation } from '../../core/services/locationService';
-import { searchPlaces, type PlaceResult } from './lib/geocode';
+import { VIJAYAWADA_AREAS } from '../../data/serviceability';
+import { locateDevice, searchPlaces, type PlaceResult } from './lib/geocode';
 import { isServiceablePincode, useAddressStore } from './lib/addressStore';
 import { FlowHeader, useDeliveryAddress } from './components/shared';
+import { readReturnTo } from './AddressScreens';
 
-const FALLBACK = { latitude: 16.5417, longitude: 80.6425, pincode: '520015' };
+// Areas we deliver to (data/serviceability.ts). Coordinates are not stored for them, so picking one fills the area and pincode.
+const SERVICE_AREAS = VIJAYAWADA_AREAS.filter((area) => area.quickCommerceAvailable);
 
-const DEFAULT_SUGGESTIONS: PlaceResult[] = [
-  { id: 'd1', name: 'Payakapuram, Vijayawada', locality: 'Near Water Tank Road, Sector 4', latitude: 16.532, longitude: 80.648 },
-  { id: 'd2', name: 'Benz Circle, Vijayawada', locality: 'Opposite Trendset Mall, MG Road', latitude: 16.5078, longitude: 80.6477 },
-  { id: 'd3', name: 'Governorpet, Vijayawada', locality: 'Near Prakasam Road Junction', latitude: 16.5143, longitude: 80.6151 },
-];
-
-// Step 1 of adding an address: search or use the device location.
+// Step 1 of adding an address: search, use the device location, or pick a service area.
 export const LocationSetupScreen: React.FC = () => {
-  const { goBack, navigate, showToast } = useApp();
+  const { goBack, navigate, showToast, activeParams } = useApp();
+  const returnTo = readReturnTo(activeParams);
+  const carry = returnTo ? { returnTo } : {};
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -56,15 +54,14 @@ export const LocationSetupScreen: React.FC = () => {
   const useCurrent = async () => {
     setLocating(true);
     try {
-      const loc = await getDeviceCurrentLocation();
-      navigate('location-map-picker', {
-        address: loc.formattedAddress || loc.city || 'Current location',
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        pincode: loc.postalCode || '',
-      });
+      const spot = await locateDevice();
+      if (!spot) {
+        showToast('Location is off or blocked. Search or pick your area instead.');
+        return;
+      }
+      navigate('location-map-picker', { ...carry, ...spot });
     } catch {
-      showToast('Could not read your location. Pick it from the list instead.');
+      showToast('Could not read your location. Search or pick your area instead.');
     } finally {
       setLocating(false);
     }
@@ -72,6 +69,7 @@ export const LocationSetupScreen: React.FC = () => {
 
   const pick = (place: PlaceResult) => {
     navigate('location-map-picker', {
+      ...carry,
       address: place.locality,
       latitude: place.latitude,
       longitude: place.longitude,
@@ -80,216 +78,312 @@ export const LocationSetupScreen: React.FC = () => {
   };
 
   const showingSearch = query.trim().length >= 3;
-  const visible = showingSearch ? results : DEFAULT_SUGGESTIONS;
 
   return (
-    <main className="commerce-screen commerce-location">
+    <main className="commerce-screen commerce-location commerce-location-setup">
       <FlowHeader title="Set delivery location" subtitle="Where should we deliver?" onBack={goBack} />
 
-      <div className="commerce-body">
-        <label className="commerce-search">
-          <Search size={18} />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search area, street or landmark"
-            aria-label="Search location"
-          />
-        </label>
+      <div className="commerce-body commerce-split">
+        <div className="commerce-main">
+          <label className="commerce-search">
+            <Search size={18} />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search area, street or landmark"
+              aria-label="Search location"
+            />
+          </label>
 
-        <button className="commerce-locate" onClick={useCurrent} disabled={locating}>
-          <span>
-            <Crosshair size={18} />
-          </span>
-          <div>
-            <b>{locating ? 'Finding your location…' : 'Use current location'}</b>
-            <small>Allow location access for an exact pin</small>
-          </div>
-          <ArrowRight size={16} />
-        </button>
+          <button className="commerce-locate" onClick={useCurrent} disabled={locating}>
+            <span>
+              <Crosshair size={18} />
+            </span>
+            <div>
+              <b>{locating ? 'Finding your location…' : 'Use current location'}</b>
+              <small>Allow location access for an exact pin</small>
+            </div>
+            <ArrowRight size={16} />
+          </button>
 
-        {searching && <p className="commerce-muted">Searching…</p>}
-        {error && <p className="commerce-error">{error}</p>}
+          <button className="commerce-locate is-plain" onClick={() => navigate('location-map-picker', carry)}>
+            <span>
+              <Pencil size={18} />
+            </span>
+            <div>
+              <b>Enter address manually</b>
+              <small>Type your area and pincode</small>
+            </div>
+            <ArrowRight size={16} />
+          </button>
 
-        <section className="commerce-card commerce-suggest" aria-label="Suggested locations">
-          <h2>{showingSearch ? 'Search results' : 'Popular areas'}</h2>
-          {visible.map((place) => (
-            <button className="commerce-suggest-row" key={place.id} onClick={() => pick(place)}>
-              <span className="commerce-suggest-icon">
-                <MapPin size={16} />
-              </span>
-              <span>
-                <b>{place.name}</b>
-                <small>{place.locality}</small>
-              </span>
-              <ArrowRight size={15} />
-            </button>
-          ))}
-        </section>
+          {searching && <p className="commerce-muted" role="status">Searching…</p>}
+          {error && <p className="commerce-error" role="alert">{error}</p>}
 
-        <button className="commerce-link-block" onClick={() => navigate('location-map-picker', { address: '', ...FALLBACK })}>
-          Enter address manually
-        </button>
+          {showingSearch && results.length > 0 && (
+            <section className="commerce-card commerce-suggest" aria-label="Search results">
+              <h2>Search results</h2>
+              {results.map((place) => (
+                <button className="commerce-suggest-row" key={place.id} onClick={() => pick(place)}>
+                  <span className="commerce-suggest-icon">
+                    <MapPin size={16} />
+                  </span>
+                  <span>
+                    <b>{place.name}</b>
+                    <small>{place.locality}</small>
+                  </span>
+                  <ArrowRight size={15} />
+                </button>
+              ))}
+            </section>
+          )}
+        </div>
+
+        <div className="commerce-aside">
+          <section className="commerce-card commerce-suggest" aria-label="Areas we deliver to">
+            <h2>Areas we deliver to</h2>
+            <p className="commerce-muted">Vijayawada, pincodes 520xxx</p>
+            {SERVICE_AREAS.map((area) => (
+              <button
+                className="commerce-suggest-row"
+                key={area.id}
+                onClick={() => navigate('location-map-picker', { ...carry, address: `${area.name}, Vijayawada`, pincode: area.pincode })}
+              >
+                <span className="commerce-suggest-icon">
+                  <MapPin size={16} />
+                </span>
+                <span>
+                  <b>{area.name}</b>
+                  <small>
+                    Vijayawada {area.pincode} · about {area.estimatedMinutes} min
+                  </small>
+                </span>
+                <ArrowRight size={15} />
+              </button>
+            ))}
+          </section>
+        </div>
       </div>
     </main>
   );
 };
 
-// Step 2: confirm the pin. Web has no native map view, so this is a form with the device location button.
+// Step 2: confirm the area and pincode. Web has no map view, so the pin comes from search or the device location.
 export const LocationMapPickerScreen: React.FC = () => {
   const { activeParams, goBack, navigate, showToast } = useApp();
+  const returnTo = readReturnTo(activeParams);
   const params = (activeParams || {}) as { address?: string; latitude?: number; longitude?: number; pincode?: string };
+  const initialPin =
+    typeof params.latitude === 'number' && typeof params.longitude === 'number' ? { latitude: params.latitude, longitude: params.longitude } : null;
 
   const [address, setAddress] = useState(params.address || '');
-  const [latitude, setLatitude] = useState<number>(Number(params.latitude ?? FALLBACK.latitude));
-  const [longitude, setLongitude] = useState<number>(Number(params.longitude ?? FALLBACK.longitude));
+  const [pin, setPin] = useState<{ latitude: number; longitude: number } | null>(initialPin);
   const [pincode, setPincode] = useState(params.pincode || '');
   const [query, setQuery] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<'search' | 'locate' | null>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
 
   const useCurrent = async () => {
-    setBusy(true);
+    setBusy('locate');
     try {
-      const loc = await getDeviceCurrentLocation();
-      setLatitude(loc.latitude);
-      setLongitude(loc.longitude);
-      setAddress(loc.formattedAddress || address);
-      setPincode(loc.postalCode || pincode);
+      const spot = await locateDevice();
+      if (!spot) {
+        showToast('Location is off or blocked. Search or type your address instead.');
+        return;
+      }
+      setPin({ latitude: spot.latitude, longitude: spot.longitude });
+      if (spot.address) setAddress(spot.address);
+      if (spot.pincode) setPincode(spot.pincode);
+    } catch {
+      showToast('Could not read your location');
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   };
 
   const search = async () => {
     const q = query.trim();
-    if (q.length < 3) return;
-    setBusy(true);
+    if (q.length < 3) {
+      showToast('Type at least 3 letters to search');
+      return;
+    }
+    setBusy('search');
     try {
       const [first] = await searchPlaces(q, 1);
       if (!first) {
         showToast('No place found for that search');
         return;
       }
-      setLatitude(first.latitude);
-      setLongitude(first.longitude);
+      setPin({ latitude: first.latitude, longitude: first.longitude });
       setAddress(first.locality);
       setPincode(first.pincode || pincode);
     } catch {
       showToast('Could not reach location search');
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   };
 
   const confirm = () => {
     if (!address.trim()) {
-      showToast('Add the area or street to continue');
+      setAddressError('Add the area or street to continue');
       return;
     }
-    navigate('address-add', { address: address.trim(), latitude, longitude, pincode });
+    navigate('address-add', { ...(returnTo ? { returnTo } : {}), address: address.trim(), latitude: pin?.latitude, longitude: pin?.longitude, pincode });
   };
 
   return (
-    <main className="commerce-screen commerce-location">
-      <FlowHeader title="Confirm location" subtitle="Check the pin before adding details" onBack={goBack} />
+    <main className="commerce-screen commerce-location commerce-location-picker">
+      <FlowHeader title="Confirm location" subtitle="Check the area and pincode before adding details" onBack={goBack} />
 
-      <div className="commerce-body">
-        <section className="commerce-pin-card" aria-label="Selected location">
-          <span className="commerce-pin-icon">
-            <Store size={20} />
-          </span>
-          <div>
-            <b>Selected pin</b>
-            <small>
-              {latitude.toFixed(4)}, {longitude.toFixed(4)}
-            </small>
-          </div>
-        </section>
+      <div className="commerce-body commerce-split">
+        <div className="commerce-main">
+          <section className="commerce-pin-card" aria-label="Selected location">
+            <span className="commerce-pin-icon">
+              <MapPin size={20} />
+            </span>
+            <div>
+              <b>{pin ? 'Location pinned' : 'No pin yet'}</b>
+              <small>
+                {pin ? `${pin.latitude.toFixed(4)}, ${pin.longitude.toFixed(4)}` : 'Search or use your current location to pin it. You can also just type the address.'}
+              </small>
+            </div>
+          </section>
 
-        <label className="commerce-search">
-          <Search size={18} />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') search();
+          <form
+            className="commerce-search-row"
+            onSubmit={(e) => {
+              e.preventDefault();
+              search();
             }}
-            placeholder="Search to move the pin"
-            aria-label="Search to move the pin"
-          />
-        </label>
+          >
+            <label className="commerce-search">
+              <Search size={18} />
+              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search a place to pin it" aria-label="Search a place to pin it" />
+            </label>
+            <button className="commerce-ghost" type="submit" disabled={busy !== null}>
+              {busy === 'search' ? 'Searching…' : 'Search'}
+            </button>
+          </form>
 
-        <button className="commerce-locate" onClick={useCurrent} disabled={busy}>
-          <span>
-            <Crosshair size={18} />
-          </span>
-          <div>
-            <b>{busy ? 'Working…' : 'Use my current location'}</b>
-            <small>Uses your browser location permission</small>
-          </div>
-          <ArrowRight size={16} />
-        </button>
+          <button className="commerce-locate" onClick={useCurrent} disabled={busy !== null}>
+            <span>
+              <Crosshair size={18} />
+            </span>
+            <div>
+              <b>{busy === 'locate' ? 'Finding your location…' : 'Use my current location'}</b>
+              <small>Uses your browser location permission</small>
+            </div>
+            <ArrowRight size={16} />
+          </button>
+        </div>
 
-        <section className="commerce-card commerce-form">
-          <label>
-            <span>Area and street</span>
-            <textarea rows={3} value={address} onChange={(e) => setAddress(e.target.value)} />
-          </label>
-          <label>
-            <span>Pincode</span>
-            <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} />
-          </label>
-          {pincode && !isServiceablePincode(pincode) && <p className="commerce-error">We deliver to Vijayawada pincodes (520xxx) right now.</p>}
-        </section>
+        <div className="commerce-aside">
+          <section className="commerce-card commerce-form" aria-labelledby="pick-addr">
+            <h2 id="pick-addr">Address</h2>
+            <label>
+              <span>Area and street</span>
+              <textarea
+                rows={3}
+                value={address}
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                  setAddressError(null);
+                }}
+              />
+              {addressError && <em className="commerce-error">{addressError}</em>}
+            </label>
+            <label>
+              <span>Pincode</span>
+              <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} autoComplete="postal-code" />
+            </label>
+            {pincode.length === 6 && !isServiceablePincode(pincode) && <p className="commerce-warn">We deliver to Vijayawada pincodes (520xxx) right now.</p>}
+            <button className="commerce-primary is-wide commerce-aside-cta" onClick={confirm}>
+              Confirm and add details
+            </button>
+          </section>
+        </div>
       </div>
 
       <footer className="commerce-sticky-bar">
         <button className="commerce-primary is-wide" onClick={confirm}>
-          Confirm location
+          Confirm and add details
         </button>
       </footer>
     </main>
   );
 };
 
-// Step 3: check whether the saved address is inside the delivery area.
+// Step 3: check whether the selected address is inside the delivery area.
 export const ServiceabilityScreen: React.FC = () => {
   const { goBack, navigate } = useApp();
   const address = useDeliveryAddress();
   const hasSaved = useAddressStore((s) => s.addresses.length > 0);
-  const serviceable = address.serviceable;
+  const serviceable = Boolean(address?.serviceable);
+  const changeAddress = () => navigate(hasSaved ? 'address-list' : 'location-setup');
+
+  if (!address) {
+    return (
+      <main className="commerce-screen commerce-location commerce-serviceability">
+        <FlowHeader title="Delivery check" onBack={goBack} />
+        <div className="commerce-body">
+          <div className="commerce-empty-state is-card">
+            <span className="commerce-empty-icon">
+              <MapPin size={30} />
+            </span>
+            <h2>Add a delivery address</h2>
+            <p>Tell us where to deliver and we will check that we serve that area.</p>
+            <button className="commerce-primary" onClick={() => navigate('location-setup')}>
+              Add delivery address
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="commerce-screen commerce-location">
+    <main className="commerce-screen commerce-location commerce-serviceability">
       <FlowHeader title="Delivery check" onBack={goBack} />
 
-      <div className="commerce-body">
-        <section className={serviceable ? 'commerce-serve is-ok' : 'commerce-serve is-no'}>
-          <span className="commerce-serve-icon">
-            <MapPin size={24} />
-          </span>
-          <h1>{serviceable ? 'We deliver here' : 'Not serviceable yet'}</h1>
-          <p>{serviceable ? 'Express delivery in about 10 to 12 minutes from the nearest darkstore.' : 'We currently deliver only within Vijayawada (520xxx pincodes).'}</p>
-        </section>
+      <div className="commerce-body commerce-split">
+        <div className="commerce-main">
+          <section className={serviceable ? 'commerce-serve is-ok' : 'commerce-serve is-no'}>
+            <span className="commerce-serve-icon">
+              <MapPin size={24} />
+            </span>
+            <h1>{serviceable ? 'We deliver here' : 'Not serviceable yet'}</h1>
+            <p>
+              {serviceable
+                ? address.etaMinutes
+                  ? `Delivery to this area takes about ${address.etaMinutes} minutes.`
+                  : 'This pincode is inside our delivery area.'
+                : 'We currently deliver only within Vijayawada (520xxx pincodes).'}
+            </p>
+          </section>
+        </div>
 
-        <section className="commerce-card">
-          <div className="commerce-card-head">
-            <h2>Delivering to</h2>
-          </div>
-          <p className="commerce-muted">{address.fullAddress}</p>
-        </section>
+        <div className="commerce-aside">
+          <section className="commerce-card">
+            <div className="commerce-card-head">
+              <h2>Delivering to</h2>
+              <span className="commerce-tag">{address.label}</span>
+            </div>
+            <p className="commerce-muted">
+              <MapPin size={14} /> {address.fullAddress}
+            </p>
+            <div className="commerce-card-actions">
+              <button className="commerce-primary is-wide" disabled={!serviceable} onClick={() => navigate('home')}>
+                Start shopping
+              </button>
+              <button className="commerce-ghost is-wide" onClick={changeAddress}>
+                Change address
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
-
-      <footer className="commerce-sticky-bar">
-        <button className="commerce-ghost" onClick={() => navigate(hasSaved ? 'address-list' : 'location-setup')}>
-          Change address
-        </button>
-        <button className="commerce-primary" disabled={!serviceable} onClick={() => navigate('home')}>
-          Start shopping
-        </button>
-      </footer>
     </main>
   );
 };

@@ -282,7 +282,7 @@ export const ProductDetailScreen: React.FC = () => {
             </div>
 
             <p style={{ fontSize: '12px', color: '#0369A1', lineHeight: '18px', marginBottom: '12px' }}>
-              {product.insuranceTerms || '14-Day Suitability Coverage. Log daily routine in the app; if clinically unsuitable, receive full refund support.'}
+              {product.insuranceTerms || '14-day suitability cover. If you have severe irritation or a breakout within 14 days of daily use, contact support with photos. We review each claim for a replacement or refund.'}
             </p>
 
             <label

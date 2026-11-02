@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
 import { Briefcase, Home, MapPin, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import type { ScreenName } from '../../context/contextDefinition';
 import { safeHapticSelection } from '../../core/utils/haptics';
 import { useAddressStore, toNovAddress, isServiceablePincode, type SavedAddress } from './lib/addressStore';
 import { FlowHeader } from './components/shared';
 
 const LABEL_ICON = { Home, Work: Briefcase, Other: MoreHorizontal } as const;
 
+// Checkout screens that send the customer here to pick or add an address, and get them back afterwards.
+const RETURN_SCREENS: ScreenName[] = ['checkout-review', 'checkout-express'];
+export const readReturnTo = (params: unknown): ScreenName | undefined => {
+  const value = (params as { returnTo?: string } | null)?.returnTo;
+  return RETURN_SCREENS.find((screen) => screen === value);
+};
+
 export const AddressListScreen: React.FC = () => {
-  const { goBack, navigate, selectAddress } = useApp();
+  const { goBack, navigate, selectAddress, activeParams } = useApp();
+  const returnTo = readReturnTo(activeParams);
   const addresses = useAddressStore((s) => s.addresses);
   const selectedId = useAddressStore((s) => s.selectedId);
   const selectSaved = useAddressStore((s) => s.selectAddress);
@@ -19,21 +28,29 @@ export const AddressListScreen: React.FC = () => {
     safeHapticSelection();
     selectSaved(address.id);
     selectAddress(toNovAddress(address));
-    navigate('location-serviceability');
+    navigate(returnTo ?? 'location-serviceability');
   };
+  const addNew = () => navigate('location-setup', returnTo ? { returnTo } : undefined);
 
   return (
     <main className="commerce-screen commerce-addresses">
-      <FlowHeader title="Saved addresses" subtitle={`${addresses.length} saved`} onBack={goBack} />
+      <FlowHeader
+        title={returnTo ? 'Choose delivery address' : 'Saved addresses'}
+        subtitle={addresses.length > 0 ? `${addresses.length} saved` : undefined}
+        onBack={goBack}
+      />
 
-      <div className="commerce-body">
+      <div className="commerce-body commerce-address-grid">
         {addresses.length === 0 && (
-          <div className="commerce-empty-state is-inline">
+          <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
               <MapPin size={28} />
             </span>
             <h2>No saved addresses yet</h2>
             <p>Add your home or office so checkout is one tap away.</p>
+            <button className="commerce-primary" onClick={addNew}>
+              <Plus size={16} /> Add new address
+            </button>
           </div>
         )}
 
@@ -43,17 +60,20 @@ export const AddressListScreen: React.FC = () => {
           const serviceable = isServiceablePincode(address.pincode);
           return (
             <article className={isSelected ? 'commerce-card commerce-address is-selected' : 'commerce-card commerce-address'} key={address.id}>
-              <button className="commerce-address-pick" onClick={() => choose(address)}>
+              <button className="commerce-address-pick" onClick={() => choose(address)} aria-pressed={isSelected}>
                 <span className="commerce-suggest-icon">
                   <Icon size={16} />
                 </span>
                 <span>
                   <span className="commerce-tag-row">
                     <b>{address.label}</b>
+                    {isSelected && <i className="commerce-tag">Selected</i>}
                     {address.isDefault && <i className="commerce-tag">Default</i>}
                     {!serviceable && <i className="commerce-tag is-warn">Not serviceable</i>}
                   </span>
-                  <span className="commerce-muted">{address.recipientName} · {address.phoneNumber}</span>
+                  <span className="commerce-muted">
+                    {address.recipientName} · {address.phoneNumber}
+                  </span>
                   <small>
                     {address.houseNo}
                     {address.buildingName ? `, ${address.buildingName}` : ''}, {address.areaAddress}, {address.city} {address.pincode}
@@ -79,21 +99,37 @@ export const AddressListScreen: React.FC = () => {
                     </button>
                   </>
                 ) : (
-                  <button className="commerce-link is-danger" onClick={() => setConfirmId(address.id)}>
-                    <Trash2 size={13} /> Delete
-                  </button>
+                  <>
+                    <button className="commerce-link" onClick={() => choose(address)}>
+                      {returnTo ? 'Deliver here' : 'Use this address'}
+                    </button>
+                    <button className="commerce-link is-danger" onClick={() => setConfirmId(address.id)} aria-label={`Delete ${address.label} address`}>
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  </>
                 )}
               </div>
             </article>
           );
         })}
+
+        {addresses.length > 0 && (
+          <button className="commerce-address-add-tile" onClick={addNew}>
+            <span className="commerce-suggest-icon">
+              <Plus size={18} />
+            </span>
+            <b>Add new address</b>
+          </button>
+        )}
       </div>
 
-      <footer className="commerce-sticky-bar">
-        <button className="commerce-primary is-wide" onClick={() => navigate('location-setup')}>
-          <Plus size={16} /> Add new address
-        </button>
-      </footer>
+      {addresses.length > 0 && (
+        <footer className="commerce-sticky-bar commerce-phone-only">
+          <button className="commerce-primary is-wide" onClick={addNew}>
+            <Plus size={16} /> Add new address
+          </button>
+        </footer>
+      )}
     </main>
   );
 };
@@ -102,15 +138,19 @@ const LABELS: SavedAddress['label'][] = ['Home', 'Work', 'Other'];
 
 // Final step: house details, recipient and label. Saves to the address store and the NOV header address.
 export const AddAddressScreen: React.FC = () => {
-  const { activeParams, goBack, navigate, addAddress, showToast } = useApp();
+  const { activeParams, goBack, navigate, addAddress, showToast, customerDetails, user } = useApp();
   const params = (activeParams || {}) as { address?: string; latitude?: number; longitude?: number; pincode?: string };
+  const returnTo = readReturnTo(activeParams);
   const saveAddress = useAddressStore((s) => s.saveAddress);
+  const hasAddresses = useAddressStore((s) => s.addresses.length > 0);
 
   const [houseNo, setHouseNo] = useState('');
   const [buildingName, setBuildingName] = useState('');
   const [landmark, setLandmark] = useState('');
-  const [recipientName, setRecipientName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [recipientName, setRecipientName] = useState(customerDetails?.fullName || user?.name || '');
+  const [phoneNumber, setPhoneNumber] = useState(
+    (customerDetails?.phoneNumber || user?.phoneNumber || '').replace(/^\+91\s*/, '').replace(/\D/g, '').slice(-10)
+  );
   const [areaAddress, setAreaAddress] = useState(params.address || '');
   const [pincode, setPincode] = useState(params.pincode || '');
   const [label, setLabel] = useState<SavedAddress['label']>('Home');
@@ -151,69 +191,82 @@ export const AddAddressScreen: React.FC = () => {
     saveAddress(address);
     addAddress(toNovAddress(address));
     showToast('Address saved');
-    navigate('location-serviceability');
+    navigate(returnTo && isServiceablePincode(address.pincode) ? returnTo : 'location-serviceability', returnTo ? { returnTo } : undefined);
   };
 
   return (
-    <main className="commerce-screen commerce-addresses">
-      <FlowHeader title="Add address" subtitle="Complete the details for your rider" onBack={goBack} />
+    <main className="commerce-screen commerce-addresses commerce-address-form">
+      <FlowHeader title="Add address" subtitle="Complete the details for your delivery partner" onBack={goBack} />
 
-      <form className="commerce-body" onSubmit={save} noValidate>
-        <section className="commerce-card commerce-form">
-          <Field label="House / flat number" error={errors.houseNo}>
-            <input value={houseNo} onChange={(e) => setHouseNo(e.target.value)} placeholder="Flat 402" />
-          </Field>
-          <Field label="Building or society (optional)">
-            <input value={buildingName} onChange={(e) => setBuildingName(e.target.value)} placeholder="Sri Krishna Apartments" />
-          </Field>
-          <Field label="Area and street" error={errors.areaAddress}>
-            <textarea rows={2} value={areaAddress} onChange={(e) => setAreaAddress(e.target.value)} />
-          </Field>
-          <Field label="Landmark (optional)">
-            <input value={landmark} onChange={(e) => setLandmark(e.target.value)} placeholder="Near water tank" />
-          </Field>
-          <Field label="Pincode" error={errors.pincode}>
-            <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} />
-          </Field>
-        </section>
+      <form className="commerce-body commerce-split" onSubmit={save} noValidate>
+        <div className="commerce-main">
+          <section className="commerce-card commerce-form" aria-labelledby="addr-where">
+            <h2 id="addr-where">Address</h2>
+            <Field label="House / flat number" error={errors.houseNo}>
+              <input value={houseNo} onChange={(e) => setHouseNo(e.target.value)} autoComplete="address-line1" />
+            </Field>
+            <Field label="Building or society (optional)">
+              <input value={buildingName} onChange={(e) => setBuildingName(e.target.value)} autoComplete="address-line2" />
+            </Field>
+            <Field label="Area and street" error={errors.areaAddress}>
+              <textarea rows={2} value={areaAddress} onChange={(e) => setAreaAddress(e.target.value)} />
+            </Field>
+            <div className="commerce-field-row">
+              <Field label="Landmark (optional)">
+                <input value={landmark} onChange={(e) => setLandmark(e.target.value)} />
+              </Field>
+              <Field label="Pincode" error={errors.pincode}>
+                <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} autoComplete="postal-code" />
+              </Field>
+            </div>
+            {pincode.length === 6 && !isServiceablePincode(pincode) && (
+              <p className="commerce-warn">We deliver only to Vijayawada pincodes (520xxx) right now. You can still save this address.</p>
+            )}
+          </section>
+        </div>
 
-        <section className="commerce-card commerce-form">
-          <Field label="Receiver name" error={errors.recipientName}>
-            <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} autoComplete="name" />
-          </Field>
-          <Field label="Mobile number" error={errors.phoneNumber}>
-            <input
-              inputMode="tel"
-              maxLength={10}
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-              autoComplete="tel-national"
-            />
-          </Field>
-          <Field label="Delivery instructions (optional)">
-            <input value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Ring the bell twice" />
-          </Field>
-        </section>
+        <div className="commerce-aside">
+          <section className="commerce-card commerce-form" aria-labelledby="addr-who">
+            <h2 id="addr-who">Receiver</h2>
+            <Field label="Receiver name" error={errors.recipientName}>
+              <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} autoComplete="name" />
+            </Field>
+            <Field label="Mobile number" error={errors.phoneNumber}>
+              <input
+                inputMode="tel"
+                maxLength={10}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                autoComplete="tel-national"
+              />
+            </Field>
+            <Field label="Delivery instructions (optional)">
+              <input value={instructions} onChange={(e) => setInstructions(e.target.value)} />
+            </Field>
+          </section>
 
-        <section className="commerce-card">
-          <h2>Save as</h2>
-          <div className="commerce-segment" role="radiogroup" aria-label="Address type">
-            {LABELS.map((item) => (
-              <button type="button" key={item} role="radio" aria-checked={label === item} className={label === item ? 'is-on' : ''} onClick={() => setLabel(item)}>
-                {item}
-              </button>
-            ))}
+          <section className="commerce-card">
+            <h2>Save as</h2>
+            <div className="commerce-segment" role="radiogroup" aria-label="Address type">
+              {LABELS.map((item) => (
+                <button type="button" key={item} role="radio" aria-checked={label === item} className={label === item ? 'is-on' : ''} onClick={() => setLabel(item)}>
+                  {item}
+                </button>
+              ))}
+            </div>
+            {hasAddresses && (
+              <label className="commerce-check">
+                <input type="checkbox" checked={isDefault} onChange={() => setIsDefault(!isDefault)} />
+                Make this my default address
+              </label>
+            )}
+          </section>
+
+          <div className="commerce-form-footer">
+            <button className="commerce-primary is-wide" type="submit">
+              Save address
+            </button>
           </div>
-          <label className="commerce-check">
-            <input type="checkbox" checked={isDefault} onChange={() => setIsDefault(!isDefault)} />
-            Make this my default address
-          </label>
-        </section>
-
-        <div className="commerce-form-footer">
-          <button className="commerce-primary is-wide" type="submit">
-            Save and continue
-          </button>
         </div>
       </form>
     </main>

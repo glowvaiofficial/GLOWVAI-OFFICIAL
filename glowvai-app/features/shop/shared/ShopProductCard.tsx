@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Minus, Plus } from 'lucide-react';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
-import { formatRupee, getDiscountPercent, getProductImageUrl } from './shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from './shopUtils';
 
 interface ShopProductCardProps {
   product: SkincareProduct;
@@ -35,7 +35,15 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
           {imageFailed ? (
             <span className="shop-product-fallback">{product.brand}</span>
           ) : (
-            <img src={getProductImageUrl(product)} alt={product.name} loading="lazy" onError={() => setImageFailed(true)} />
+            <img
+              src={getProductThumbUrl(product)}
+              alt={product.name}
+              width={400}
+              height={400}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImageFailed(true)}
+            />
           )}
         </button>
         {discount > 0 && <span className="shop-product-badge">{discount}% OFF</span>}

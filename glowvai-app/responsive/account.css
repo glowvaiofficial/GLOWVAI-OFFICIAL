@@ -1,35 +1,60 @@
-/* Account screens (profile, support, student referral) for tablet and desktop. Phone layout stays in glowvai.css and the inline styles. */
+/* Account screen (legacy 'profile' route). The base phone styles live in glowvai.css; these rules raise the
+   type to readable sizes, give touch targets 44px, and lay the page out in two columns on tablet and desktop.
+   The legacy 'support' and 'student-referral' routes now render the features/profile screens. */
 
+.glowvai-root main.profile-v3{ --account-blue: #0057fb; }
+.glowvai-root main.profile-v3 .profile-v3-side,
+.glowvai-root main.profile-v3 .profile-v3-main{ display: contents; }
+
+/* The column wrappers moved these out of direct-child position, so the base rules from glowvai.css are restated here. */
+.glowvai-root main.profile-v3 > .profile-v3-side > header{ display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 22px 16px 17px; background: #fff; }
+.glowvai-root main.profile-v3 > .profile-v3-main > h2{ margin: 18px 16px 7px; font-weight: 900; }
+.glowvai-root main.profile-v3 > .profile-v3-main > footer{ padding: 20px; color: #8a92a0; text-align: center; }
+.glowvai-root main.profile-v3 > .profile-v3-side > header small{ font-size: 11px; letter-spacing: .06em; }
+.glowvai-root main.profile-v3 > .profile-v3-side > header h1{ font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; }
+.glowvai-root main.profile-v3 > .profile-v3-side > header p{ font-size: 13px; }
+.glowvai-root main.profile-v3 > .profile-v3-side > header > button{ min-height: 44px; padding: 0 14px; border: 1px solid #c8dafe; border-radius: 10px; background: #eef4ff; color: var(--account-blue); font-size: 13px; }
+.glowvai-root main.profile-v3 .profile-complete{ color: var(--account-blue); }
+.glowvai-root main.profile-v3 .profile-complete > span{ background: var(--account-blue); }
+.glowvai-root main.profile-v3 .profile-complete b{ font-size: 14px; }
+.glowvai-root main.profile-v3 .profile-complete small{ font-size: 12px; }
+.glowvai-root main.profile-v3 .profile-quick-stats button{ min-height: 64px; }
+.glowvai-root main.profile-v3 .profile-quick-stats b{ font-size: 18px; }
+.glowvai-root main.profile-v3 .profile-quick-stats span{ font-size: 12px; }
+.glowvai-root main.profile-v3 .profile-address-card svg{ flex: none; color: var(--account-blue); }
+.glowvai-root main.profile-v3 .profile-address-card small{ font-size: 11px; letter-spacing: .04em; }
+.glowvai-root main.profile-v3 .profile-address-card b{ font-size: 13px; line-height: 1.4; }
+.glowvai-root main.profile-v3 .profile-address-card span{ font-size: 12px; }
+.glowvai-root main.profile-v3 .profile-address-card > button{ min-height: 44px; padding: 0 8px; color: var(--account-blue); font-size: 13px; }
+.glowvai-root main.profile-v3 h2{ font-size: 14px; }
+.glowvai-root main.profile-v3 .profile-row{ min-height: 60px; gap: 12px; padding: 10px 14px; }
+.glowvai-root main.profile-v3 .profile-row:hover{ background: #f7f8fb; }
+.glowvai-root main.profile-v3 .profile-row b{ font-size: 14px; }
+.glowvai-root main.profile-v3 .profile-row small{ font-size: 12px; line-height: 1.4; }
+.glowvai-root main.profile-v3 footer{ font-size: 12px; }
+.glowvai-root main.profile-v3 .profile-dialog p{ font-size: 13px; }
+.glowvai-root main.profile-v3 .profile-dialog button{ font-size: 14px; }
+
+/* Tablet and desktop: account summary on the left, menus on the right. */
 @media (min-width: 720px){
-  /* Support: ticket list beside the thread pane */
-  .glowvai-root .support-layout{ display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); align-items: start; gap: 20px; }
-  .glowvai-root .support-inline-thread{ display: none; }
-  .glowvai-root .support-pane[hidden]{ display: flex; flex-direction: column; gap: 12px; position: sticky; top: 96px; min-height: 360px; box-sizing: border-box; padding: 18px; border: 1px solid #E2E5EB; border-radius: 16px; background: #FFFFFF; }
-  .glowvai-root .support-pane-head{ display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid #F0F2F6; }
-  .glowvai-root .support-pane-head h2{ font-size: 18px; font-weight: 800; color: #161A22; line-height: 1.3; }
-  .glowvai-root .support-pane-empty{ margin: auto; max-width: 320px; color: #687080; font-size: 13px; line-height: 1.5; text-align: center; }
-  .glowvai-root .support-form{ max-width: 560px; }
-
-  /* Student referral: code on the left, perks and activity on the right */
-  .glowvai-root .referral-body.is-dashboard{ --referral-display: grid; --referral-pad: 24px; --referral-gap: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-  .glowvai-root .referral-body.is-dashboard > :nth-child(1),
-  .glowvai-root .referral-body.is-dashboard > :nth-child(5){ grid-column: 1 / -1; }
-  .glowvai-root .referral-body.is-dashboard > :nth-child(2){ grid-column: 1; grid-row: 2 / span 2; }
-  .glowvai-root .referral-body.is-dashboard > :nth-child(3){ grid-column: 2; grid-row: 2; }
-  .glowvai-root .referral-body.is-dashboard > :nth-child(4){ grid-column: 2; grid-row: 3; }
-  .glowvai-root .referral-body.is-verify > div{ max-width: 560px; }
+  .glowvai-root main.profile-v3{ display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); align-items: start; gap: 20px; padding: 24px 20px 56px; background: transparent; }
+  .glowvai-root main.profile-v3 .profile-v3-side{ display: flex; min-width: 0; flex-direction: column; gap: 12px; }
+  .glowvai-root main.profile-v3 .profile-v3-main{ display: block; min-width: 0; }
+  .glowvai-root main.profile-v3 > .profile-v3-side > header{ grid-template-columns: 48px minmax(0, 1fr); padding: 18px 16px; border: 1px solid #dfe4ea; border-radius: 12px; }
+  .glowvai-root main.profile-v3 > .profile-v3-side > header > button{ grid-column: 1 / -1; }
+  .glowvai-root main.profile-v3 .profile-v3-side > :is(.profile-complete, .profile-quick-stats, .profile-address-card){ width: 100%; margin: 0; box-sizing: border-box; }
+  .glowvai-root main.profile-v3 .profile-v3-main > h2{ margin: 22px 0 8px; }
+  .glowvai-root main.profile-v3 .profile-v3-main > h2:first-child{ margin-top: 0; }
+  .glowvai-root main.profile-v3 .profile-v3-main > .profile-list{ margin: 0; }
+  .glowvai-root main.profile-v3 .profile-v3-main > footer{ padding: 16px 0 0; text-align: left; }
+  .glowvai-root main.profile-v3 .profile-dialog-backdrop{ position: fixed; z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+  .glowvai-root main.profile-v3 .profile-dialog{ max-width: 420px; border-radius: 20px; }
+  .glowvai-root main.profile-v3 :focus-visible{ outline: 3px solid var(--account-blue); outline-offset: 2px; }
 }
 
 @media (min-width: 1024px){
-  /* Profile: account summary and menu in a left column, settings on the right */
-  .glowvai-root main.profile-v3{ display: flow-root; padding: 22px 24px 56px; }
-  .glowvai-root main.profile-v3 > header,
-  .glowvai-root main.profile-v3 > .profile-complete,
-  .glowvai-root main.profile-v3 > .profile-quick-stats,
-  .glowvai-root main.profile-v3 > .profile-address-card{ float: left; clear: left; box-sizing: border-box; width: 320px; margin: 0 0 12px; }
-  .glowvai-root main.profile-v3 > header{ border: 1px solid #dfe4ea; border-radius: 12px; }
-  .glowvai-root main.profile-v3 > h2{ margin: 0 0 8px 344px; }
-  .glowvai-root main.profile-v3 > .profile-list{ margin: 0 0 22px 344px; }
-  .glowvai-root main.profile-v3 > footer{ margin-left: 344px; padding: 8px 0 0; text-align: left; }
+  .glowvai-root main.profile-v3{ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 32px; padding: 28px 0 64px; }
+  .glowvai-root main.profile-v3 > .profile-v3-side > header{ grid-template-columns: 56px minmax(0, 1fr) auto; }
+  .glowvai-root main.profile-v3 > .profile-v3-side > header > button{ grid-column: auto; }
+  .glowvai-root main.profile-v3 .profile-avatar{ width: 56px; height: 56px; font-size: 20px; }
 }
-

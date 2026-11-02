@@ -13,7 +13,8 @@ import {
   SupportTicket,
   UserProfile,
 } from '../types';
-import { INITIAL_USER_ADDRESS, SAMPLE_SAVED_ADDRESSES } from '../data/serviceability';
+import { NO_ADDRESS } from '../data/serviceability';
+import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
 import { ApiService } from '../services/api';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
@@ -21,9 +22,6 @@ export { AppContext, type AppContextType, type ScreenName } from './contextDefin
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
 const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearchParams(window.location.search).get('screen') as ScreenName | null : null;
-// Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
-const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : 'welcome';
-
 // A visitor who already passed the welcome screen goes straight to the shop. Storage can be blocked, so reads are guarded.
 const hasSeenWelcome = (): boolean => {
   try {
@@ -33,30 +31,24 @@ const hasSeenWelcome = (): boolean => {
   }
 };
 
-// Decided once per page load. Development StrictMode runs mount effects twice, so the decision must not be re-read from storage.
-let welcomeDecision: 'pending' | 'splash' | 'shop' = 'pending';
+// The app renders only in the browser (GlowVaiShop loads it with ssr: false), so the first screen is chosen once,
+// at load, before the first paint. The splash plays once per device and is marked as seen when it first shows.
+const firstScreen = (): ScreenName => {
+  if (hasSeenWelcome()) return 'shop-home';
+  try {
+    window.localStorage.setItem('welcome_seen', 'true');
+  } catch {
+    // Storage blocked: the splash simply shows again next time.
+  }
+  return 'welcome';
+};
+
+// Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
+const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : firstScreen();
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation stack
   const [currentScreen, setCurrentScreen] = useState<ScreenName>(initialScreen);
-  // The first render matches the server HTML (welcome), so the switch happens after mount.
-  useEffect(() => {
-    if (requestedQaScreen || initialScreen !== 'welcome') return;
-    if (welcomeDecision === 'pending') {
-      if (hasSeenWelcome()) {
-        welcomeDecision = 'shop';
-      } else {
-        // The splash plays once per device. Its timer moves on by itself, so it is marked as seen when it first shows.
-        welcomeDecision = 'splash';
-        try {
-          window.localStorage.setItem('welcome_seen', 'true');
-        } catch {
-          // Storage blocked: the splash simply shows again next time.
-        }
-      }
-    }
-    if (welcomeDecision === 'shop') setCurrentScreen('shop-home');
-  }, []);
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>([]);
   const [activeParams, setActiveParams] = useState<any>(null);
 
@@ -76,8 +68,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [customerDetails]);
 
   // Location
-  const [currentAddress, setCurrentAddress] = useState<Address>(INITIAL_USER_ADDRESS);
-  const [savedAddresses, setSavedAddresses] = useState<Address[]>(SAMPLE_SAVED_ADDRESSES);
+  // Start from the address the customer picked last time (kept by the checkout address store), or none.
+  const [currentAddress, setCurrentAddress] = useState<Address>(() => {
+    const { addresses, selectedId } = useAddressStore.getState();
+    const saved = addresses.find((a) => a.id === selectedId);
+    return saved ? toNovAddress(saved) : NO_ADDRESS;
+  });
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
 
   // Preference
   const [shoppingPreference, setShoppingPreference] = useState<ShoppingPreference>('all');
@@ -87,15 +84,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const saved = window.localStorage.getItem('glowvai:cart');
       if (saved !== null) return JSON.parse(saved) as CartItem[];
-    } catch { /* fall through to the development starter bag */ }
-    return [{
-      id: 'cart-init-1',
-      product: PRODUCTS[0], // Minimalist SPF 50
-      variantId: 'v-1',
-      quantity: 1,
-      withInsurance: true,
-      insuranceFee: 29,
-    }];
+    } catch { /* storage blocked: start with an empty bag */ }
+    return [];
   });
 
   useEffect(() => {
@@ -103,7 +93,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [cart]);
 
   // Wishlist
-  const [wishlist, setWishlist] = useState<string[]>(['prod-min-salicylic-2']);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   // Orders
   const [orders, setOrders] = useState<Order[]>(() => {

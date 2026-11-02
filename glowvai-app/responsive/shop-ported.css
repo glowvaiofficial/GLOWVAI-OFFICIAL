@@ -23,27 +23,22 @@
 /* Product: gallery left, buy box right */
 @media (min-width: 720px){
   .glowvai-root .shop-product-layout{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 24px; align-items: start; }
-  .glowvai-root .shop-product-hero{ height: 360px; }
-  .glowvai-root .shop-product-thumbs{ display: flex; }
+  .glowvai-root .shop-product-hero{ max-height: none; }
   .glowvai-root .shop-product-actions{ display: flex; }
   .glowvai-root .shop-product-buybar{ display: none; }
   .glowvai-root .shop-screen .shop-product-buynow{ color: var(--text-inverse); }
 }
 @media (min-width: 1024px){
   .glowvai-root .shop-product-layout{ max-width: 1120px; margin: 0 auto; padding: 32px; gap: 40px; }
-  .glowvai-root .shop-product-hero{ height: 460px; }
   .glowvai-root .shop-product-gallery{ position: sticky; top: 88px; }
   .glowvai-root .shop-product-title{ font-size: 28px; }
 }
 
 /* Reviews: summary and filters left, review list right */
 @media (min-width: 1024px){
-  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 360px) minmax(0, 1fr); column-gap: 24px; align-items: start; max-width: 1120px; padding: 32px; }
-  .glowvai-root .shop-reviews-body > section{ grid-column: 1; }
-  .glowvai-root .shop-reviews-body > .shop-reviews-card{ grid-column: 2; }
-  .glowvai-root .shop-reviews-buybar{ max-width: 1120px; }
-  .glowvai-root .shop-reviews-filters{ min-width: 0; }
-  .glowvai-root .shop-reviews-filters .shop-chip-row{ margin: 0; flex-wrap: wrap; overflow: visible; padding: 0; }
+  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 380px) minmax(0, 1fr); column-gap: 24px; align-items: start; max-width: 1120px; padding: 32px; }
+  .glowvai-root .shop-reviews-side{ position: sticky; top: 88px; }
+  .glowvai-root .shop-reviews-none{ min-height: 320px; align-content: center; }
 }
 
 /* Search and filters */
@@ -53,14 +48,5 @@
 
 /* Wishlist */
 @media (min-width: 720px){
-  .glowvai-root .shop-wishlist{ padding-bottom: 0; }
-  .glowvai-root .shop-wishlist-nav,
-  .glowvai-root .shop-wishlist-cart-pill{ display: none; }
-  .glowvai-root .shop-wishlist-main{ padding: 24px; }
-  .glowvai-root .shop-screen .shop-wishlist-add{ color: var(--text-inverse); font-size: 13px; font-weight: 800; }
-  .glowvai-root .shop-screen .shop-wishlist-cart{ display: inline-flex; align-items: center; }
-  .glowvai-root .shop-wishlist-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-}
-@media (min-width: 1024px){
-  .glowvai-root .shop-wishlist-media{ height: 160px; }
+  .glowvai-root .shop-wishlist-main{ padding: 24px 8px 40px; }
 }

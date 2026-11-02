@@ -43,7 +43,7 @@ export const PRODUCTS: Product[] = [
     isSourcedNearby: true,
     insuranceEligible: true,
     insuranceFee: 29,
-    insuranceTerms: '14-Day Suitability Coverage. Use daily for 14 days; if severe irritation or breakout occurs, get an approved replacement coupon or 100% monetary refund.',
+    insuranceTerms: '14-day suitability cover. If you have severe irritation or a breakout within 14 days of daily use, contact support with photos. We review each claim for a replacement or refund.',
   },
   {
     id: 'prod-min-salicylic-2',
@@ -74,7 +74,7 @@ export const PRODUCTS: Product[] = [
     isSourcedNearby: true,
     insuranceEligible: true,
     insuranceFee: 39,
-    insuranceTerms: '14-Day Anti-Acne Suitability Guarantee. Log daily routine; if clinically unsuitable for your skin, receive full refund support.',
+    insuranceTerms: '14-day suitability cover. If you have severe irritation or a breakout within 14 days of daily use, contact support with photos. We review each claim for a replacement or refund.',
   },
   {
     id: 'prod-cet-gentle-cleanser',
@@ -149,7 +149,7 @@ export const PRODUCTS: Product[] = [
     category: 'skincare',
     subcategory: 'Moisturisers & Creams',
     genderTarget: 'all',
-    description: 'Intense barrier repair moisturizer infused with 5 essential ceramides, Japanese rice water, and hyaluronic acid. Clinically proven to strengthen damaged skin barrier.',
+    description: 'Intense barrier repair moisturizer infused with 5 essential ceramides, Japanese rice water, and hyaluronic acid. Helps support a damaged skin barrier.',
     ingredients: [
       'Water',
       'Ceramide NP',

@@ -15,7 +15,7 @@ export const AuthShell: React.FC<AuthShellProps> = ({ children, footer, onBack, 
   <section className="auth-screen">
     <aside className="auth-brand-panel" aria-hidden="true" hidden>
       <span className="auth-brand-wordmark">glowvai</span>
-      <p className="auth-brand-copy">Skin analysis, cosmetics and express delivery in one place.</p>
+      <p className="auth-brand-copy">AI skin check, skincare and doorstep delivery in one place.</p>
       <img className="auth-brand-mascot" src={brandMascot} alt="" />
     </aside>
     {(onBack || topRight) && (

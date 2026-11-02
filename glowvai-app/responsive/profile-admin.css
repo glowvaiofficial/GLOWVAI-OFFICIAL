@@ -5,7 +5,9 @@
 
 @media (min-width: 720px){
   .glowvai-root .profile-screen{ padding-inline: 20px; }
-  .glowvai-root .profile-header{ position: static; margin-top: 20px; padding: 16px 20px; border: 1px solid var(--border-light); border-radius: 16px; }
+  /* The web header already frames the page, so the screen title sits on the page instead of in a card. */
+  .glowvai-root .profile-header{ position: static; min-height: 0; margin-top: 24px; padding: 0; border: 0; background: transparent; }
+  .glowvai-root .profile-title{ font-size: 22px; letter-spacing: -.4px; }
   .glowvai-root .profile-body{ padding: 20px 0 40px; }
   .glowvai-root .profile-body:not(:has(> .profile-side)){ max-width: 560px; }
   .glowvai-root .profile-side, .glowvai-root .profile-main{ display: flex; min-width: 0; flex-direction: column; gap: 16px; }
@@ -20,6 +22,8 @@
   .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .glowvai-root .profile-main .profile-tile{ min-height: 110px; }
   .glowvai-root .profile-screen :focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
+  .glowvai-root .profile-form-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glowvai-root .profile-modal-backdrop{ z-index: 200; }
 }
 
 @media (min-width: 720px) and (max-width: 1023px){
@@ -28,10 +32,11 @@
 }
 
 @media (min-width: 1024px){
-  .glowvai-root .profile-header{ padding: 18px 24px; }
+  .glowvai-root .profile-header{ margin-top: 28px; }
   .glowvai-root .profile-body{ padding: 24px 0 48px; }
   .glowvai-root .profile-body:has(> .profile-side){ grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 24px 32px; }
-  .glowvai-root .profile-title{ font-size: 20px; }
+  .glowvai-root .profile-title{ font-size: 26px; }
+  .glowvai-root .profile-hero{ padding: 24px; }
   .glowvai-root .profile-main .profile-tiles{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 

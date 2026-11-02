@@ -1,12 +1,14 @@
-import React, { useMemo, useState } from 'react';
-import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG, ALL_SKINCARE_BRANDS } from '../../../core/data/indianSkincareCatalog';
-import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import '../styles/shop-search-filters.css';
 
 const REAL_CATEGORIES = ['Serums', 'Cleansers', 'Moisturizers', 'Suncare', 'Treatments'];
+const OPTION_LABELS: Record<string, string> = { Suncare: 'Sunscreen' };
+// Only brands with at least one catalogue product, so a brand filter never empties the list on its own.
+const STOCKED_BRANDS = ALL_SKINCARE_BRANDS.filter((brand) => INDIAN_SKINCARE_CATALOG.some((p) => p.brand === brand));
 const PRICE_BUCKETS: Record<string, (price: number) => boolean> = {
   'Under ₹500': (p) => p < 500,
   '₹500–₹1000': (p) => p >= 500 && p <= 1000,
@@ -19,19 +21,26 @@ type ActiveFilters = Record<FilterKey, string>;
 const EMPTY_FILTERS: ActiveFilters = { category: 'All', brand: 'All', price: 'All' };
 
 const FILTER_GROUPS: { title: string; key: FilterKey; options: string[] }[] = [
-  { title: '1. Category', key: 'category', options: ['All', ...REAL_CATEGORIES] },
-  { title: '2. Brand', key: 'brand', options: ['All', ...ALL_SKINCARE_BRANDS] },
-  { title: '3. Price Range', key: 'price', options: ['All', ...Object.keys(PRICE_BUCKETS)] },
+  { title: 'Category', key: 'category', options: ['All', ...REAL_CATEGORIES] },
+  { title: 'Brand', key: 'brand', options: ['All', ...STOCKED_BRANDS] },
+  { title: 'Price', key: 'price', options: ['All', ...Object.keys(PRICE_BUCKETS)] },
 ];
 
 export const ShopSearchFiltersScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
-  const addItem = useCartStore((state) => state.addItem);
 
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const resultsRef = useRef<HTMLElement>(null);
+
+  // The mic is shown only in browsers that have speech recognition.
+  useEffect(() => {
+    const w = window as any;
+    setVoiceSupported(Boolean(w.SpeechRecognition || w.webkitSpeechRecognition));
+  }, []);
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -70,10 +79,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const handleVoiceSearch = () => {
     const w = window as any;
     const Recognition = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!Recognition) {
-      window.alert('Voice search supported on Chrome, Edge and Safari browsers.');
-      return;
-    }
+    if (!Recognition) return;
     try {
       const recognition = new Recognition();
       recognition.continuous = false;
@@ -94,7 +100,8 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   };
 
   const count = results.length;
-  const suggestTitle = query.trim() ? `Live Autocomplete Matches for "${query}"` : 'Popular Skincare Queries';
+  const suggestTitle = query.trim() ? `Matches for "${query.trim()}"` : 'Products in the shop';
+  const showResults = () => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   return (
     <div className="shop-screen shop-search">
@@ -102,9 +109,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
         <button type="button" className="shop-icon-btn" onClick={goBack} aria-label="Go back">
           <ArrowLeft size={18} />
         </button>
-        <h1 className="shop-search-title">
-          <Sparkles size={16} /> GlowVAI <span>|</span> Search &amp; Filters
-        </h1>
+        <h1 className="shop-search-title">Search</h1>
       </header>
 
       <div className="shop-search-body">
@@ -127,18 +132,20 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                 <X size={16} />
               </button>
             )}
-            <button
-              type="button"
-              className={`shop-search-mic${isListening ? ' is-listening' : ''}`}
-              onClick={() => {
-                setIsSearchFocused(true);
-                handleVoiceSearch();
-              }}
-              aria-label="Voice search"
-            >
-              <Mic size={18} />
-              {isListening && <span>Listening...</span>}
-            </button>
+            {voiceSupported && (
+              <button
+                type="button"
+                className={`shop-search-mic${isListening ? ' is-listening' : ''}`}
+                onClick={() => {
+                  setIsSearchFocused(true);
+                  handleVoiceSearch();
+                }}
+                aria-label="Voice search"
+              >
+                <Mic size={18} />
+                {isListening && <span>Listening...</span>}
+              </button>
+            )}
           </div>
 
           {isSearchFocused && (
@@ -169,7 +176,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                     <span>
                       <Search size={14} /> {term}
                     </span>
-                    <span>Select →</span>
+                    <span>Select</span>
                   </button>
                 ))}
               </div>
@@ -202,7 +209,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                         onClick={() => selectOption(group.key, opt)}
                       >
                         {isSelected && <Check size={12} />}
-                        {opt}
+                        {OPTION_LABELS[opt] ?? opt}
                       </button>
                     );
                   })}
@@ -211,17 +218,19 @@ export const ShopSearchFiltersScreen: React.FC = () => {
             ))}
           </aside>
 
-          <section className="shop-search-results">
+          <section className="shop-search-results" ref={resultsRef}>
             <div className="shop-search-toolbar">
               <div>
-                <h2>{count} Products Found</h2>
-                <p>{query.trim() ? `Showing results matching "${query}"` : 'Showing all formulations'}</p>
+                <h2>
+                  {count} {count === 1 ? 'product' : 'products'} found
+                </h2>
+                <p>{query.trim() ? `Results for "${query.trim()}"` : 'Showing all products'}</p>
               </div>
               {activeChips.length > 0 && (
                 <div className="shop-search-applied">
                   {activeChips.map((chip) => (
                     <span key={chip.key} className="shop-search-applied-chip">
-                      {chip.value}
+                      {OPTION_LABELS[chip.value] ?? chip.value}
                       <button type="button" onClick={() => clearChip(chip.key)} aria-label={`Remove ${chip.value} filter`}>
                         <X size={12} />
                       </button>
@@ -254,12 +263,10 @@ export const ShopSearchFiltersScreen: React.FC = () => {
         </div>
       </div>
 
+      {/* Phones: filters sit above the results, so this jumps down to them. */}
       <div className="shop-search-bottom">
-        <button type="button" className="shop-btn-secondary" onClick={clearAll}>
-          Clear All
-        </button>
-        <button type="button" className="shop-btn-primary" onClick={goBack}>
-          Show {count} Results →
+        <button type="button" className="shop-btn-primary" onClick={showResults}>
+          Show {count} {count === 1 ? 'result' : 'results'}
         </button>
       </div>
     </div>

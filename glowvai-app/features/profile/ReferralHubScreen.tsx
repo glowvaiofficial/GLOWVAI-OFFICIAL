@@ -1,45 +1,43 @@
 import { useEffect, useState } from 'react';
-import { Check, Coins, Copy, GraduationCap, Share2, Sparkles } from 'lucide-react';
+import { Check, ChevronRight, Coins, Copy, ExternalLink, GraduationCap, MessageSquare, Share2, Users } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { copyText, getReferralCode, openExternal, ProfileHeader } from './ProfileShared';
 
-// Glow Coins are not on the NOV user context yet, so the hub shows zero until the balance is wired in.
-const GLOW_COIN_BALANCE = 0;
-const COIN_GOAL = 5000;
-const STUDENT_PORTAL_URL = 'https://earn.glowvai.in';
+const SHOP_URL = 'https://glowvai.in/shop';
+// The partner and campus referral programme runs on the glowvai.in referral page, which has its own sign-up and terms.
+const REFERRAL_PAGE_URL = '/referral';
+const SHARE_MESSAGE = `I shop my skincare on GlowVai. Have a look: ${SHOP_URL}`;
 
 export const ReferralHubScreen = () => {
   const { user, goBack, navigate, showToast } = useApp();
-  const [copied, setCopied] = useState(false);
-  const referralCode = getReferralCode(user?.id);
-  const inviteLink = `glowvai.in/invite/${referralCode}`;
-  const inviteMessage = `Join me on GlowVAI and get FLAT ₹100 off your first clinical skincare order! https://${inviteLink}`;
-  const progress = Math.min(100, Math.round((GLOW_COIN_BALANCE / COIN_GOAL) * 100));
+  const [copied, setCopied] = useState<'link' | 'code' | null>(null);
+  // Glow Coins and referral rewards are not wired to an account yet, so no balance or reward amount is shown.
+  const referralCode = user?.id ? getReferralCode(user.id) : null;
 
   useEffect(() => {
     if (!copied) return;
-    const timer = window.setTimeout(() => setCopied(false), 1500);
+    const timer = window.setTimeout(() => setCopied(null), 1500);
     return () => window.clearTimeout(timer);
   }, [copied]);
 
-  const handleCopy = async () => {
-    const ok = await copyText(`https://${inviteLink}`);
-    if (ok) setCopied(true);
-    else showToast('Could not copy. Select the link and copy it manually.');
+  const handleCopy = async (kind: 'link' | 'code', text: string) => {
+    const ok = await copyText(text);
+    if (ok) setCopied(kind);
+    else showToast('Could not copy. Select the text and copy it manually.');
   };
 
   const handleShareWhatsApp = () => {
-    openExternal(`https://wa.me/?text=${encodeURIComponent(inviteMessage)}`);
+    openExternal(`https://wa.me/?text=${encodeURIComponent(SHARE_MESSAGE)}`);
   };
 
   const handleShareElsewhere = async () => {
     if (!navigator.share) {
-      const ok = await copyText(inviteMessage);
-      showToast(ok ? 'Invite message copied' : 'Sharing is not available on this browser');
+      const ok = await copyText(SHARE_MESSAGE);
+      showToast(ok ? 'Message copied' : 'Sharing is not available on this browser');
       return;
     }
     try {
-      await navigator.share({ text: inviteMessage });
+      await navigator.share({ text: SHARE_MESSAGE });
     } catch {
       // user cancelled the share sheet
     }
@@ -47,49 +45,40 @@ export const ReferralHubScreen = () => {
 
   return (
     <main className="profile-screen">
-      <ProfileHeader
-        title="Glow rewards"
-        eyebrow="Referral hub"
-        onBack={goBack}
-        right={<span className="profile-pill"><Sparkles size={12} />Rewards</span>}
-      />
+      <ProfileHeader title="Refer friends" eyebrow="Glow rewards" onBack={goBack} />
 
       <div className="profile-body">
         <div className="profile-side">
         <section className="profile-hero">
-          <span className="profile-hero-kicker">STUDENT & FRIENDS REFERRAL PROGRAM</span>
-          <h2 className="profile-hero-title">Give ₹100, Get ₹100</h2>
+          <span className="profile-hero-kicker">GLOWVAI REFERRALS</span>
+          <h2 className="profile-hero-title">Share GlowVai with friends</h2>
           <p className="profile-hero-sub">
-            Invite friends to GlowVAI. They get FLAT ₹100 off their first clinical order, and you earn ₹100 Glow Cash once they order.
+            Rewards for referrals are coming soon. Until then, you can share the shop with friends who would like it.
           </p>
         </section>
 
         <section className="profile-card profile-card-body">
           <div className="profile-stat-row">
-            <span className="profile-card-title"><Coins size={16} /> Glow Coins</span>
-            <span className="profile-stat-value">{GLOW_COIN_BALANCE.toLocaleString('en-IN')}</span>
+            <span className="profile-card-title profile-title-icon"><Coins size={16} /> Glow Coins</span>
+            <span className="profile-pill is-muted">Not available yet</span>
           </div>
-          <div className="profile-progress" role="progressbar" aria-valuemin={0} aria-valuemax={COIN_GOAL} aria-valuenow={GLOW_COIN_BALANCE}>
-            <span style={{ width: `${progress}%` }} />
-          </div>
-          <p className="profile-card-sub">{GLOW_COIN_BALANCE} / {COIN_GOAL.toLocaleString('en-IN')} coins toward your next reward (₹500)</p>
+          <p className="profile-card-sub">Your coin balance will show here once referral rewards are live.</p>
         </section>
-
         </div>
 
         <div className="profile-main">
-        <p className="profile-label">Your invite link</p>
+        <p className="profile-label">Share the shop</p>
         <section className="profile-card profile-card-body">
           <div className="profile-code-row">
-            <span className="profile-code-text">{inviteLink}</span>
-            <button type="button" className="profile-button is-primary is-small" onClick={handleCopy}>
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? 'Copied' : 'Copy'}
+            <span className="profile-code-text">glowvai.in/shop</span>
+            <button type="button" className="profile-button is-primary is-small" onClick={() => handleCopy('link', SHOP_URL)}>
+              {copied === 'link' ? <Check size={14} /> : <Copy size={14} />}
+              {copied === 'link' ? 'Copied' : 'Copy'}
             </button>
           </div>
           <div className="profile-button-row">
             <button type="button" className="profile-button is-primary" onClick={handleShareWhatsApp}>
-              <Share2 size={16} />
+              <MessageSquare size={16} />
               WhatsApp
             </button>
             <button type="button" className="profile-button is-outline" onClick={handleShareElsewhere}>
@@ -97,24 +86,49 @@ export const ReferralHubScreen = () => {
               Share
             </button>
           </div>
+          {referralCode ? (
+            <>
+              <div className="profile-divider" />
+              <div className="profile-field">
+                <span className="profile-field-label">Your referral code</span>
+                <div className="profile-code-row">
+                  <span className="profile-code-text">{referralCode}</span>
+                  <button type="button" className="profile-button is-outline is-small" onClick={() => handleCopy('code', referralCode)}>
+                    {copied === 'code' ? <Check size={14} /> : <Copy size={14} />}
+                    {copied === 'code' ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+                <span className="profile-field-hint">Keep this code handy. Referral rewards are not live yet.</span>
+              </div>
+            </>
+          ) : (
+            <p className="profile-field-hint">Sign in to see your referral code.</p>
+          )}
         </section>
 
-        <section className="profile-card profile-card-body">
-          <div className="profile-stat-row">
-            <span className="profile-card-title"><GraduationCap size={18} /> Student verification</span>
-          </div>
-          <p className="profile-card-sub">Verify your student status to unlock extra Glow Coins for every successful invite.</p>
-          <button type="button" className="profile-button is-secondary is-block" onClick={() => navigate('profile-referral-code')}>
-            Verify student status →
-          </button>
-          <button type="button" className="profile-text-link" onClick={() => openExternal(STUDENT_PORTAL_URL)}>
-            Open the student earn portal ↗
+        <p className="profile-label">Students and partners</p>
+        <section className="profile-card">
+          <a className="profile-list-item" href={REFERRAL_PAGE_URL} target="_blank" rel="noopener noreferrer">
+            <span className="profile-list-icon"><Users size={16} /></span>
+            <span className="profile-list-copy">
+              <span className="profile-list-title">GlowVai referral programme</span>
+              <span className="profile-list-note">Campus ambassadors and partners sign up here. Terms and payouts are listed on the page.</span>
+            </span>
+            <ExternalLink size={16} className="profile-chevron" />
+          </a>
+          <button type="button" className="profile-list-item" onClick={() => navigate('profile-referral-code')}>
+            <span className="profile-list-icon"><GraduationCap size={16} /></span>
+            <span className="profile-list-copy">
+              <span className="profile-list-title">Student verification</span>
+              <span className="profile-list-note">How student sign-up works</span>
+            </span>
+            <ChevronRight size={18} className="profile-chevron" />
           </button>
         </section>
 
         <p className="profile-label">Referral history</p>
         <section className="profile-card">
-          <p className="profile-empty">Friends who join with your link will show up here.</p>
+          <p className="profile-empty">Referral tracking is not live yet. Friends who join will show up here once it is.</p>
         </section>
         </div>
       </div>
