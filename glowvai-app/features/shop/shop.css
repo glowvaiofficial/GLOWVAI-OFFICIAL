@@ -56,3 +56,19 @@
 @media (min-width: 768px){
   .glowvai-root .shop-product-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* Design pass: product cards across the shop get rounder corners, a lift on hover and a larger type scale. */
+.glowvai-root .shop-product-card{ border-radius: 18px; transition: transform .2s ease, box-shadow .2s ease; }
+.glowvai-root .shop-product-media{ background: #eef3ff; }
+.glowvai-root .shop-product-copy{ gap: 3px; padding: 12px 12px 14px; }
+.glowvai-root .shop-product-brand{ font-size: 11px; }
+.glowvai-root .shop-product-name{ font-size: 13px; }
+.glowvai-root .shop-product-price b{ font-size: 15px; }
+@media (hover: hover){
+  .glowvai-root .shop-product-card:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(26, 54, 120, .1); }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-product-copy{ padding: 14px 14px 16px; }
+  .glowvai-root .shop-product-name{ font-size: 14px; }
+  .glowvai-root .shop-product-price b{ font-size: 16px; }
+}
