@@ -68,7 +68,7 @@
   .glowvai-root main.profile-v3 > .profile-v3-main > h2{ margin:var(--ds-section) 0 12px; }
   .glowvai-root main.profile-v3 .profile-v3-main > .profile-list{ margin:0; }
   .glowvai-root main.profile-v3 > .profile-v3-main > footer{ padding:20px 0 0; text-align:left; }
-  .glowvai-root main.profile-v3 > .profile-v3-side > header{ padding:20px; }
+  .glowvai-root main.profile-v3 > .profile-v3-side > header{ width:100%; margin:0; padding:20px; box-sizing:border-box; }
   .glowvai-root main.profile-v3 .profile-dialog-backdrop{ position:fixed; z-index:200; align-items:center; justify-content:center; padding:16px; }
   .glowvai-root main.profile-v3 .profile-dialog{ max-width:420px; padding:24px; border-radius:var(--ds-radius-lg); }
 }

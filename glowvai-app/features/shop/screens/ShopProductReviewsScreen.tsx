@@ -109,7 +109,7 @@ export const ShopProductReviewsScreen: React.FC = () => {
           </span>
           <h2>No written reviews yet</h2>
           <p>
-            The rating above is the product's catalogue rating. Written reviews from GlowVAI customers will appear here once
+            The rating shown here is the product's catalogue rating. Written reviews from GlowVAI customers will appear here once
             they are available.
           </p>
           <button type="button" className="shop-btn-primary shop-reviews-empty-btn" onClick={() => navigate('shop-product', { productId: product.id })}>
