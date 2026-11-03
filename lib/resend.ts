@@ -3,8 +3,6 @@
  * Properties now - never in this bundle. See docs/google-apps-script-email-proxy.js.
  * Set EMAIL_PROXY_URL below once that proxy is deployed.
  */
-const EMAIL_PROXY_URL = process.env.NEXT_PUBLIC_EMAIL_PROXY_URL || "";
-const EMAIL_PROXY_SECRET = process.env.NEXT_PUBLIC_EMAIL_PROXY_SECRET || "";
 
 export interface SendEmailOptions {
   to: string;
@@ -194,37 +192,23 @@ export function generateGlowVaiEmailHTML(
   `;
 }
 
+// The proxy URL and secret live on the server, so the browser always sends mail through /api/admin/email.
 export function isEmailProxyConfigured(): boolean {
-  return EMAIL_PROXY_URL.length > 0;
+  return true;
 }
 
 export async function sendResendEmail(options: SendEmailOptions) {
-  if (!EMAIL_PROXY_URL) {
-    return { ok: false, error: "Email proxy not configured (NEXT_PUBLIC_EMAIL_PROXY_URL is empty)." };
-  }
-
-  const html = generateGlowVaiEmailHTML(options.templateType, options.data);
-
   try {
-    const res = await fetch(EMAIL_PROXY_URL, {
+    const res = await fetch("/api/admin/email", {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        secret: EMAIL_PROXY_SECRET,
-        to: options.to,
-        subject: options.subject,
-        html,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to: options.to, subject: options.subject, templateType: options.templateType, data: options.data }),
     });
-
-    const data = await res.json().catch(() => ({ ok: false, error: "Bad proxy response" }));
-    if (!data.ok) {
-      throw new Error(data.error || "Email proxy call failed");
-    }
+    const data = await res.json().catch(() => ({ ok: false, error: "Bad server response" }));
+    if (!res.ok || !data.ok) throw new Error(data.error || "Email could not be sent");
     return { ok: true, data };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to send email";
-    console.error("Email proxy error:", message);
     return { ok: false, error: message };
   }
 }

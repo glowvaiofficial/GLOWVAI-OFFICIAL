@@ -336,7 +336,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <p className="font-display font-bold text-lg text-brand truncate">{emailProxyReady ? "Connected" : "Not configured"}</p>
-            <p className="text-xs text-brand font-semibold">{emailProxyReady ? "Ready to send" : "Set NEXT_PUBLIC_EMAIL_PROXY_URL"}</p>
+            <p className="text-xs text-brand font-semibold">{emailProxyReady ? "Ready to send" : "Email is not configured on the server"}</p>
           </div>
 
         </div>
