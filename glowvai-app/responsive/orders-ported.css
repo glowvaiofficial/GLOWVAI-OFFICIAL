@@ -8,9 +8,10 @@
 
 @media (min-width: 720px){
   .glowvai-root .orders-screen{ padding-bottom: 48px; }
-  .glowvai-root .orders-screen .orders-header{ position: static; padding: 14px 24px; }
-  .glowvai-root .orders-screen .orders-header-copy h1{ font-size: 20px; }
-  .glowvai-root .orders-screen .orders-body{ padding: 24px; gap: 20px; }
+  .glowvai-root .orders-screen .orders-header{ position: static; padding: 20px var(--ds-gutter) 8px; }
+  .glowvai-root .orders-screen .orders-body{ padding: 8px var(--ds-gutter) var(--ds-gutter); gap: var(--ds-gap); }
+  .glowvai-root .orders-screen .orders-card,
+  .glowvai-root .orders-screen .orders-order-card{ padding: 20px; }
 
   /* Orders list: two cards per row on tablet */
   .glowvai-root .orders-screen.is-list .orders-segment{ width: 100%; max-width: 360px; }
@@ -33,15 +34,14 @@
   .glowvai-root .orders-screen.is-rate .orders-rate-actions > button{ width: auto; min-width: 180px; }
 
   .glowvai-root .orders-dialog-backdrop{ align-items: center; padding: 24px; }
-  .glowvai-root .orders-dialog{ padding: 28px; border-radius: 20px; }
+  .glowvai-root .orders-dialog{ padding: 28px; border-radius: var(--ds-radius-lg); }
 
-  .glowvai-root .orders-screen .orders-empty-state{ padding: 64px 32px; }
+  .glowvai-root .orders-screen .orders-empty-state{ margin-top: 32px; padding: 40px 32px; }
 }
 
 @media (min-width: 1024px){
-  .glowvai-root .orders-screen .orders-body{ padding: 28px 32px; }
+  .glowvai-root .orders-screen .orders-card{ padding: 24px; }
 
-  /* Orders list: three cards per row */
   /* Orders list: one full-width row per order (order info, total, actions), like a desktop order history */
   .glowvai-root .orders-screen.is-list .orders-grid{ display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
   .glowvai-root .orders-screen.is-list .orders-order-card{ display: grid; grid-template-columns: minmax(0, 1fr) 240px; column-gap: 32px; row-gap: 16px; align-items: center; padding: 20px 24px; }
@@ -57,7 +57,7 @@
   .glowvai-root .orders-screen.is-detail:not(.is-empty) .orders-body,
   .glowvai-root .orders-screen.is-tracking:not(.is-empty) .orders-body{
     display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+    grid-template-columns: minmax(0, 1fr) var(--ds-aside);
     gap: 24px;
     align-items: start;
   }
@@ -68,8 +68,8 @@
   .glowvai-root .orders-screen.is-tracking:not(.is-empty) .orders-body{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .glowvai-root .orders-screen.is-tracking .orders-track-panel{ grid-column: 1; grid-row: 1; position: sticky; top: 88px; }
   .glowvai-root .orders-screen.is-tracking .orders-track-details{ grid-column: 2; grid-row: 1; }
-  .glowvai-root .orders-screen.is-tracking .orders-eta-card{ padding: 24px; }
-  .glowvai-root .orders-screen.is-tracking .orders-eta-card strong{ font-size: 24px; }
+  .glowvai-root .orders-screen.is-tracking .orders-eta-card{ padding: 28px; }
+  .glowvai-root .orders-screen.is-tracking .orders-eta-card strong{ font-size: 26px; }
 
   .glowvai-root .orders-screen.is-rate .orders-body{ gap: 24px; }
 }

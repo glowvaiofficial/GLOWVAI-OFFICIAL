@@ -22,25 +22,24 @@ export const ShopWishlistScreen: React.FC = () => {
           <ArrowLeft size={18} />
         </button>
         <h1 className="shop-wishlist-title">
-          <Heart size={18} fill="var(--primary)" color="var(--primary)" />
           My Wishlist
           {savedProducts.length > 0 && <span className="shop-wishlist-count">{savedProducts.length}</span>}
         </h1>
         <button type="button" className="shop-icon-btn shop-wishlist-cart" onClick={() => navigate('cart-tab')} aria-label={`Cart, ${cartTotalCount} items`}>
           <ShoppingBag size={18} />
-          {cartTotalCount > 0 && <span className="shop-wishlist-badge">{cartTotalCount}</span>}
+          {cartTotalCount > 0 && <span className="shop-icon-count">{cartTotalCount}</span>}
         </button>
       </header>
 
       <main className="shop-wishlist-main">
         {savedProducts.length === 0 ? (
-          <div className="shop-empty shop-wishlist-empty">
-            <span className="shop-wishlist-empty-icon">
-              <Heart size={26} />
+          <div className="shop-empty">
+            <span className="shop-empty-icon">
+              <Heart size={24} />
             </span>
             <h3>Your wishlist is empty</h3>
             <p>Tap the heart on any product page to save it here.</p>
-            <button type="button" className="shop-btn-primary shop-wishlist-empty-btn" onClick={() => navigate('shop-browse')}>
+            <button type="button" className="shop-btn-primary" onClick={() => navigate('shop-browse')}>
               Browse products
             </button>
           </div>

@@ -10,10 +10,11 @@ export const ReferralTransactionsScreen = () => {
   const { goBack } = useApp();
 
   return (
-    <main className="profile-screen is-narrow">
+    <main className="profile-screen">
       <ProfileHeader title="Glow Coins activity" eyebrow="Glow rewards" onBack={goBack} />
 
       <div className="profile-body">
+        <div className="profile-side">
         <section className="profile-card profile-card-body">
           <div className="profile-stat-row">
             <span className="profile-card-title profile-inline-title"><Coins size={16} />Glow Coins balance</span>
@@ -24,17 +25,20 @@ export const ReferralTransactionsScreen = () => {
             Glow Coins are not connected to web shop accounts yet, so your balance stays at zero.
           </p>
         </section>
+        </div>
 
+        <div className="profile-main">
         <p className="profile-label">Coin activity</p>
         <section className="profile-card">
           <div className="profile-empty-row">
-            <span className="profile-list-icon is-muted"><ReceiptText size={16} /></span>
+            <span className="profile-list-icon"><ReceiptText size={24} /></span>
             <span className="profile-list-copy">
               <span className="profile-list-title">No activity yet</span>
               <span className="profile-list-note">Coins earned or used would be listed here once Glow Coins are connected.</span>
             </span>
           </div>
         </section>
+        </div>
       </div>
     </main>
   );

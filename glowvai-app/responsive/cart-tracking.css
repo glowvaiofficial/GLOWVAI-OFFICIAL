@@ -16,39 +16,4 @@
   .glowvai-root .screen-content > .orders-v3 > .orders-list{ display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; gap: 16px; padding: 20px 24px 32px; }
 }
 
-/* Contact details, payment update, cancelled order and order receipt: readable type on every width. */
-.glowvai-root .customer-details-screen .commerce-flow-header p{ font-size: 12px; }
-.glowvai-root .customer-trust-line, .glowvai-root .customer-save-note{ font-size: 12px; }
-.glowvai-root .customer-details-form label > span{ font-size: 13px; }
-.glowvai-root .customer-details-form label em{ font-size: 12px; }
-.glowvai-root .customer-details-form input{ font-size: 15px; }
-.glowvai-root .customer-details-form textarea{ font-size: 15px; }
-.glowvai-root .customer-details-form label > div b{ font-size: 14px; }
-.glowvai-root .customer-details-form label > small{ font-size: 12px; }
-.glowvai-root .customer-details-form label > i{ font-size: 11px; }
-.glowvai-root .payment-status-screen > header button{ width: 44px; height: 44px; }
-.glowvai-root .payment-state-kicker, .glowvai-root .cancelled-kicker{ font-size: 11px; }
-.glowvai-root .payment-status-screen section > p:not(.payment-state-kicker), .glowvai-root .order-cancelled-screen > p:not(.cancelled-kicker){ font-size: 14px; }
-.glowvai-root .payment-state-receipt span, .glowvai-root .order-cancelled-screen > section span, .glowvai-root .order-cancelled-screen > section b{ font-size: 13px; }
-.glowvai-root .payment-status-screen section > button, .glowvai-root .order-cancelled-screen > button:not(.cancelled-orders-link){ font-size: 14px; }
-.glowvai-root .cancelled-orders-link{ min-height: 44px; font-size: 13px; }
-.glowvai-root .commerce-empty p{ font-size: 14px; }
-.glowvai-root .commerce-empty div > button{ font-size: 14px; }
-.glowvai-root .customer-details-submit{ font-size: 15px; }
-
-/* Tablet and up: each of these is one card on the page canvas, not a full-width white slab. */
-@media (min-width: 720px){
-  .glowvai-root .screen-content > .customer-details-screen,
-  .glowvai-root .screen-content > .payment-status-screen,
-  .glowvai-root .screen-content > .order-cancelled-screen,
-  .glowvai-root .screen-content > .order-confirmation,
-  .glowvai-root .screen-content > .commerce-empty{ width: calc(100% - 48px); max-width: 640px; min-height: 0; flex: 0 0 auto; margin: 40px auto; overflow: hidden; border: 1px solid #e6e9ef; border-radius: 20px; background: #fff; }
-  .glowvai-root .screen-content > .customer-details-screen.commerce-flow-screen{ background: #fff; }
-  .glowvai-root .screen-content > .customer-details-screen > .customer-details-form{ padding: 20px 32px 32px; }
-  .glowvai-root .screen-content > .customer-details-screen > .commerce-flow-header{ position: static; padding-inline: 24px; }
-  .glowvai-root .screen-content > .payment-status-screen{ padding: 0 32px 32px; }
-  .glowvai-root .screen-content > .payment-status-screen > section{ padding-top: 40px; }
-  .glowvai-root .screen-content > .order-cancelled-screen{ padding: 48px 32px 32px; }
-  .glowvai-root .screen-content > .order-confirmation{ padding: 32px; }
-  .glowvai-root .screen-content > .commerce-empty > div{ max-width: 420px; padding: 48px 32px; }
-}
+/* Contact details, payment update, order placed and cancelled order now use the commerce classes (features/commerce/commerce.css and responsive/commerce-ported.css). */

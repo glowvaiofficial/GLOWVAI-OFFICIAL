@@ -1,45 +1,42 @@
-/* Product reviews. Shared shop classes (.shop-screen, .shop-header, .shop-icon-btn, .shop-empty) live in ../shop.css. */
+/* Product reviews. Shared shop classes (.shop-screen, .shop-header, .shop-icon-btn, .shop-btn-*, .shop-empty) live in ../shop.css.
+   Phone: rating summary, product, then the reviews area. Desktop: reviews area left, sticky summary panel right. */
 
 .glowvai-root .shop-reviews{ --shop-reviews-star: #f59e0b; }
-.glowvai-root .shop-reviews h1, .glowvai-root .shop-reviews h2, .glowvai-root .shop-reviews p{ margin: 0; }
 .glowvai-root .shop-reviews img{ display: block; }
 
-.glowvai-root .shop-reviews-product{ display: flex; min-width: 0; flex: 1; align-items: center; gap: 10px; }
-.glowvai-root .shop-reviews-thumb{ width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: var(--surface); object-fit: cover; }
-.glowvai-root .shop-reviews-titles{ min-width: 0; }
-.glowvai-root .shop-reviews-titles h1{ font-size: 15px; font-weight: 800; color: var(--text-primary); }
-.glowvai-root .shop-reviews-titles p{ overflow: hidden; color: var(--text-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-
-.glowvai-root .shop-reviews-body{ display: grid; gap: 14px; padding: 16px; }
-.glowvai-root .shop-reviews-side{ display: grid; gap: 14px; min-width: 0; align-content: start; }
+.glowvai-root .shop-reviews-body{ display: grid; gap: var(--ds-gap); padding: 16px var(--ds-gutter) 24px; }
+.glowvai-root .shop-reviews-side{ display: grid; gap: var(--ds-gap); min-width: 0; align-content: start; }
 
 /* Rating summary: catalogue rating and count only */
-.glowvai-root .shop-reviews-summary{ display: flex; align-items: center; gap: 16px; padding: 18px; border: 1px solid var(--border-light); border-radius: 16px; background: var(--surface-elevated); }
-.glowvai-root .shop-reviews-score-value{ font-size: 40px; font-weight: 800; line-height: 1; color: var(--text-primary); }
+.glowvai-root .shop-reviews-summary{ display: flex; align-items: center; gap: 16px; padding: 20px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
+.glowvai-root .shop-reviews-score-value{ color: var(--ds-ink); font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
 .glowvai-root .shop-reviews-score-meta{ display: grid; gap: 6px; min-width: 0; }
 .glowvai-root .shop-reviews-stars{ display: inline-flex; gap: 2px; color: var(--shop-reviews-star); }
-.glowvai-root .shop-reviews-stars svg:not(.is-on){ color: var(--border); }
-.glowvai-root .shop-reviews-total{ color: var(--text-secondary); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-reviews-stars svg:not(.is-on){ color: var(--ds-line); }
+.glowvai-root .shop-reviews-total{ color: var(--ds-muted); font-size: 14px; font-weight: 600; }
 
 /* Product card with add to cart */
-.glowvai-root .shop-reviews-buybar{ display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border-light); border-radius: 16px; background: var(--surface-elevated); }
-.glowvai-root .shop-reviews-buybar-thumb{ width: 56px; height: 56px; flex-shrink: 0; border-radius: 10px; background: var(--surface); object-fit: cover; }
+.glowvai-root .shop-reviews-buybar{ display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
+.glowvai-root .shop-reviews-buybar-thumb{ width: 64px; height: 64px; flex-shrink: 0; border-radius: var(--ds-radius-sm); background: var(--ds-sky); object-fit: cover; }
 .glowvai-root .shop-reviews-buybar-info{ display: grid; min-width: 0; flex: 1; gap: 2px; padding: 0; border: 0; background: none; text-align: left; }
-.glowvai-root .shop-reviews-buybar-brand{ color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.glowvai-root .shop-reviews-buybar-title{ overflow: hidden; color: var(--text-primary); font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .shop-reviews-buybar-price{ color: var(--text-primary); font-size: 14px; font-weight: 800; }
-.glowvai-root .shop-reviews-buybar-price s{ margin-left: 6px; color: var(--text-muted); font-size: 12px; font-weight: 400; }
-.glowvai-root .shop-reviews-add{ flex-shrink: 0; min-height: 44px; padding: 0 18px; border: 0; border-radius: 22px; background: var(--primary); color: var(--text-inverse); font-size: 13px; font-weight: 800; }
-.glowvai-root .shop-reviews-add:hover{ background: var(--primary-dark); }
+.glowvai-root .shop-reviews-buybar-brand{ color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.glowvai-root .shop-reviews-buybar-title{ overflow: hidden; color: var(--ds-ink); font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-reviews-buybar-price{ color: var(--ds-ink); font-size: 15px; font-weight: 800; }
+.glowvai-root .shop-reviews-buybar-price s{ margin-left: 6px; color: var(--ds-muted); font-size: 12px; font-weight: 400; }
+.glowvai-root .shop-reviews-add{ flex-shrink: 0; width: auto; min-height: 44px; padding: 0 18px; font-size: 13px; }
 
 /* Honest empty state: no review service yet */
-.glowvai-root .shop-reviews-card{ padding: 16px; border: 1px solid var(--border-light); border-radius: 16px; background: var(--surface-elevated); }
-.glowvai-root .shop-reviews-none{ display: grid; justify-items: center; gap: 8px; padding: 36px 24px; text-align: center; }
-.glowvai-root .shop-reviews-none-icon{ display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: var(--primary-light); color: var(--primary); }
-.glowvai-root .shop-reviews-none h2{ margin-top: 4px; color: var(--text-primary); font-size: 16px; font-weight: 800; }
-.glowvai-root .shop-reviews-none p{ max-width: 420px; color: var(--text-muted); font-size: 13px; line-height: 1.55; }
-.glowvai-root .shop-reviews-empty-btn{ width: auto; min-width: 180px; margin-top: 8px; padding: 0 20px; }
+.glowvai-root .shop-reviews-none{ display: grid; justify-items: center; align-content: center; gap: 8px; min-width: 0; padding: 36px 24px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); text-align: center; }
+.glowvai-root .shop-reviews-none-icon{ display: grid; width: 56px; height: 56px; margin-bottom: 4px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
+.glowvai-root .shop-reviews-none h2{ color: var(--ds-ink); font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.glowvai-root .shop-reviews-none p{ max-width: 440px; color: var(--ds-muted); font-size: 14px; line-height: 1.55; }
+.glowvai-root .shop-reviews-empty-btn{ width: auto; min-width: 200px; margin-top: 8px; }
 
-@media (min-width: 768px){
-  .glowvai-root .shop-reviews-body{ width: 100%; max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+@media (min-width: 720px){
+  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 1fr) minmax(300px, 340px); column-gap: 24px; align-items: start; padding: 20px var(--ds-gutter) 48px; }
+  .glowvai-root .shop-reviews-side{ position: sticky; top: 88px; grid-column: 2; grid-row: 1; }
+  .glowvai-root .shop-reviews-none{ grid-column: 1; grid-row: 1; min-height: 360px; }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 1fr) var(--ds-aside); column-gap: 32px; padding-top: 24px; }
 }

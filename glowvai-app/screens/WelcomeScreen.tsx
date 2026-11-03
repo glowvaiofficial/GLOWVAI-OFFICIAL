@@ -30,7 +30,7 @@ export const WelcomeScreen: React.FC = () => {
       <span className="brand-wordmark" style={{ transform: 'translateY(-54px)', fontSize: 'clamp(46px, 14vw, 64px)', fontWeight: 500, letterSpacing: '-.065em' }}>
         glowvai
       </span>
-      <strong style={{ position: 'absolute', bottom: '11%', color: '#111522', fontSize: 18, fontWeight: 800, letterSpacing: '-.03em' }}>
+      <strong style={{ position: 'absolute', bottom: '11%', color: 'var(--ds-ink)', fontSize: 18, fontWeight: 800, letterSpacing: '-.02em' }}>
         always for you!!
       </strong>
     </button>

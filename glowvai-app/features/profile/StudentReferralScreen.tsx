@@ -53,7 +53,7 @@ export const StudentReferralScreen = () => {
 
         <section className="profile-card">
           <button type="button" className="profile-list-item" onClick={() => navigate('profile-support')}>
-            <span className="profile-list-icon"><HelpCircle size={16} /></span>
+            <span className="profile-list-icon"><HelpCircle size={18} /></span>
             <span className="profile-list-copy">
               <span className="profile-list-title">Questions about your application?</span>
               <span className="profile-list-note">Contact GlowVai support</span>

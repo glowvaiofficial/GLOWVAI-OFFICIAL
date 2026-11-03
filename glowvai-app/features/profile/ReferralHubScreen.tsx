@@ -109,7 +109,7 @@ export const ReferralHubScreen = () => {
         <p className="profile-label">Students and partners</p>
         <section className="profile-card">
           <a className="profile-list-item" href={REFERRAL_PAGE_URL} target="_blank" rel="noopener noreferrer">
-            <span className="profile-list-icon"><Users size={16} /></span>
+            <span className="profile-list-icon"><Users size={18} /></span>
             <span className="profile-list-copy">
               <span className="profile-list-title">GlowVai referral programme</span>
               <span className="profile-list-note">Campus ambassadors and partners sign up here. Terms and payouts are listed on the page.</span>
@@ -117,7 +117,7 @@ export const ReferralHubScreen = () => {
             <ExternalLink size={16} className="profile-chevron" />
           </a>
           <button type="button" className="profile-list-item" onClick={() => navigate('profile-referral-code')}>
-            <span className="profile-list-icon"><GraduationCap size={16} /></span>
+            <span className="profile-list-icon"><GraduationCap size={18} /></span>
             <span className="profile-list-copy">
               <span className="profile-list-title">Student verification</span>
               <span className="profile-list-note">How student sign-up works</span>

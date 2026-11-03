@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, Plus, Share2, ShoppingBag, Sparkles, Star, Zap } from 'lucide-react';
+import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, PackageSearch, Plus, Share2, ShoppingBag, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
@@ -44,15 +44,14 @@ export const ShopProductScreen: React.FC = () => {
           <button type="button" className="shop-icon-btn" onClick={goBack} aria-label="Go back">
             <ArrowLeft size={18} />
           </button>
-          <div className="shop-product-logo">
-            <Sparkles size={16} />
-            <span>GlowVAI</span>
-          </div>
         </header>
         <div className="shop-empty">
+          <span className="shop-empty-icon">
+            <PackageSearch size={24} />
+          </span>
           <h3>Product not found</h3>
           <p>This product is unavailable right now.</p>
-          <button type="button" className="shop-btn-secondary shop-product-empty-btn" onClick={goBack}>
+          <button type="button" className="shop-btn-primary" onClick={goBack}>
             Go back
           </button>
         </div>
@@ -110,12 +109,9 @@ export const ShopProductScreen: React.FC = () => {
           <ArrowLeft size={18} />
         </button>
 
-        <div className="shop-product-logo">
-          <Sparkles size={16} />
-          <span>GlowVAI</span>
-        </div>
+        <span className="shop-product-crumb">{categoryLabel}</span>
 
-        <div className="shop-product-header-actions">
+        <div className="shop-header-actions">
           <button type="button" className="shop-icon-btn" onClick={handleShare} aria-label="Share product">
             <Share2 size={18} />
           </button>
@@ -135,7 +131,7 @@ export const ShopProductScreen: React.FC = () => {
             aria-label={`Cart, ${cartTotalCount} items`}
           >
             <ShoppingBag size={18} />
-            {cartTotalCount > 0 && <span className="shop-product-cart-count">{cartTotalCount}</span>}
+            {cartTotalCount > 0 && <span className="shop-icon-count">{cartTotalCount}</span>}
           </button>
         </div>
       </header>
@@ -152,7 +148,7 @@ export const ShopProductScreen: React.FC = () => {
           </div>
         </section>
 
-        <section className="shop-product-info">
+        <aside className="shop-product-buy" aria-label="Buy">
           <div className="shop-product-panel">
             <span className="shop-product-maker">{product.brand}</span>
             <h1 className="shop-product-title">{product.name}</h1>
@@ -201,7 +197,7 @@ export const ShopProductScreen: React.FC = () => {
                 <ShoppingBag size={18} />
                 Add to cart · {formatRupee(product.price * quantity)}
               </button>
-              <button type="button" className="shop-product-buynow" onClick={handleBuyNow}>
+              <button type="button" className="shop-btn-secondary shop-product-buynow" onClick={handleBuyNow}>
                 Buy now
               </button>
             </div>
@@ -218,53 +214,55 @@ export const ShopProductScreen: React.FC = () => {
           </div>
 
           <div className="shop-product-eta">
-            <Zap size={20} fill="currentColor" />
+            <span className="shop-product-eta-icon">
+              <Zap size={18} fill="currentColor" />
+            </span>
             <div>
               <p className="shop-product-eta-title">Delivered in {product.deliveryMinutes} minutes</p>
               {deliverTo && <p className="shop-product-eta-sub">to {deliverTo}</p>}
             </div>
           </div>
+        </aside>
 
-          {product.keyActives.length > 0 && (
-            <div className="shop-product-panel">
-              <h2 className="shop-product-section-title">Key actives</h2>
-              <ul className="shop-product-actives">
-                {product.keyActives.map((active) => (
-                  <li key={active}>
-                    <FlaskConical size={14} />
-                    {active}
-                  </li>
-                ))}
-              </ul>
+        {product.keyActives.length > 0 && (
+          <section className="shop-product-panel shop-product-more">
+            <h2 className="shop-product-section-title">Key actives</h2>
+            <ul className="shop-product-actives">
+              {product.keyActives.map((active) => (
+                <li key={active}>
+                  <FlaskConical size={14} />
+                  {active}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section className="shop-product-panel shop-product-more">
+          <h2 className="shop-product-section-title">Product details</h2>
+          <dl className="shop-product-specs">
+            <div>
+              <dt>Brand</dt>
+              <dd>{product.brand}</dd>
             </div>
-          )}
-
-          <div className="shop-product-panel">
-            <h2 className="shop-product-section-title">Product details</h2>
-            <dl className="shop-product-specs">
-              <div>
-                <dt>Brand</dt>
-                <dd>{product.brand}</dd>
-              </div>
-              <div>
-                <dt>Category</dt>
-                <dd>
-                  <button type="button" onClick={() => navigate('shop-category', { categoryId: product.category })}>
-                    {categoryLabel}
-                  </button>
-                </dd>
-              </div>
-              <div>
-                <dt>Size</dt>
-                <dd>{product.volume}</dd>
-              </div>
-            </dl>
-            <div className="shop-product-acc-divider" />
-            <button type="button" className="shop-product-acc-btn" onClick={openReviews}>
-              <span>Ratings &amp; reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
-              <ChevronRight size={18} />
-            </button>
-          </div>
+            <div>
+              <dt>Category</dt>
+              <dd>
+                <button type="button" onClick={() => navigate('shop-category', { categoryId: product.category })}>
+                  {categoryLabel}
+                </button>
+              </dd>
+            </div>
+            <div>
+              <dt>Size</dt>
+              <dd>{product.volume}</dd>
+            </div>
+          </dl>
+          <div className="shop-product-acc-divider" />
+          <button type="button" className="shop-product-acc-btn" onClick={openReviews}>
+            <span>Ratings &amp; reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
+            <ChevronRight size={18} />
+          </button>
         </section>
       </div>
 

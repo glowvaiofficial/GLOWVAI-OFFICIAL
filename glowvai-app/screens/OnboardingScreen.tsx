@@ -67,17 +67,17 @@ export const OnboardingScreen: React.FC = () => {
       </div>
 
       <section className="onboarding-sheet" style={{ position: 'absolute', inset: 'var(--onb-sheet-inset, auto 0 0 0)', minHeight: `var(--onb-sheet-min, ${step === 2 ? '43%' : '40%'})`, padding: `var(--onb-sheet-pad, ${step === 2 ? 27 : 34}px 30px calc(${step === 2 ? 32 : 22}px + var(--safe-bottom)))`, borderRadius: 'var(--onb-sheet-radius, 30px 30px 0 0)', background: '#fff', boxShadow: '0 -10px 32px rgba(0,48,150,.08)' }}>
-        <h1 aria-live="polite" style={{ maxWidth: 350, fontFamily: 'var(--font-heading)', fontSize: step === 2 ? 'clamp(29px, 8vw, 36px)' : 'clamp(31px, 8.6vw, 39px)', lineHeight: 1.08, letterSpacing: '-.035em' }}>
-          {item.lead}<span style={{ color: '#0d62f8' }}>{item.highlight}</span>{item.tail}
+        <h1 aria-live="polite" style={{ maxWidth: 350, color: 'var(--ds-ink)', fontFamily: 'var(--font-heading)', fontSize: step === 2 ? 'clamp(29px, 8vw, 36px)' : 'clamp(31px, 8.6vw, 39px)', lineHeight: 1.08, letterSpacing: '-.03em' }}>
+          {item.lead}<span style={{ color: 'var(--ds-brand)' }}>{item.highlight}</span>{item.tail}
         </h1>
-        <p style={{ maxWidth: 360, marginTop: 15, color: '#6d7589', fontSize: 16, lineHeight: 1.55 }}>{item.body}</p>
+        <p style={{ maxWidth: 360, marginTop: 15, color: 'var(--ds-muted)', fontSize: 16, lineHeight: 1.55 }}>{item.body}</p>
 
         <div aria-label={`Step ${step + 1} of ${steps.length}`} style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 23 : 30 }}>
-          {steps.map((_, index) => <span key={index} aria-hidden="true" style={{ width: 11, height: 11, borderRadius: '50%', background: index === step ? '#0d62f8' : '#dce8fa', transition: 'background-color .2s ease' }} />)}
+          {steps.map((_, index) => <span key={index} aria-hidden="true" style={{ width: 11, height: 11, borderRadius: '50%', background: index === step ? 'var(--ds-brand)' : 'var(--ds-line)', transition: 'background-color .2s ease' }} />)}
         </div>
 
-        <button type="button" className="onboarding-next" onClick={advance} style={{ display: 'flex', width: '100%', minHeight: 62, alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 19 : 25, borderRadius: 999, background: '#0d62f8', boxShadow: '0 10px 24px rgba(13,98,248,.22)', color: '#fff', fontSize: step === 2 ? 15 : 18, fontWeight: 750 }}>
-          {item.action}<ArrowRight size={22} />
+        <button type="button" className="onboarding-next" onClick={advance} style={{ display: 'flex', width: '100%', minHeight: 52, alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: step === 2 ? 19 : 25, borderRadius: 'var(--ds-pill)', background: 'var(--ds-brand)', color: '#fff', fontSize: 16, fontWeight: 700 }}>
+          {item.action}<ArrowRight size={20} />
         </button>
         <span aria-hidden="true" className="onboarding-home-indicator" style={{ position: 'absolute', bottom: 8, left: '50%', width: 118, height: 4, transform: 'translateX(-50%)', borderRadius: 999, background: '#7f8794' }} />
       </section>

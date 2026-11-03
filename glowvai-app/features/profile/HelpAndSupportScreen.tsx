@@ -41,9 +41,9 @@ const FAQS = [
 ];
 
 const HELP_PAGES = [
-  { href: '/returns', title: 'Returns & refunds', icon: <RotateCcw size={16} /> },
-  { href: '/delivery', title: 'Delivery areas', icon: <Truck size={16} /> },
-  { href: '/faq', title: 'All questions', icon: <FileText size={16} /> },
+  { href: '/returns', title: 'Returns & refunds', icon: <RotateCcw size={18} /> },
+  { href: '/delivery', title: 'Delivery areas', icon: <Truck size={18} /> },
+  { href: '/faq', title: 'All questions', icon: <FileText size={18} /> },
 ];
 
 export const HelpAndSupportScreen = () => {

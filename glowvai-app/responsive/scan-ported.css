@@ -2,24 +2,24 @@
 
 /* Tablet: single column, content centred at 640px. */
 @media (min-width: 720px){
-  .glowvai-root .scan-screen .scan-header{ position: static; min-height: 64px; padding: 10px max(24px, calc(50% - 296px)); }
-  .glowvai-root .scan-screen .scan-body{ width: 100%; max-width: 640px; margin-inline: auto; overflow: visible; gap: 20px; padding: 32px 24px calc(40px + var(--safe-bottom)); }
+  .glowvai-root .scan-screen .scan-header{ position: static; min-height: 72px; padding: 20px max(var(--ds-gutter), calc(50% - 296px)) 8px; }
+  .glowvai-root .scan-screen .scan-body{ width: 100%; max-width: 640px; margin-inline: auto; overflow: visible; gap: var(--ds-gap); padding: 16px var(--ds-gutter) calc(40px + var(--safe-bottom)); }
   .glowvai-root .scan-screen .scan-icon-button{ width: 44px; height: 44px; }
   .glowvai-root .scan-screen .scan-text-button{ min-height: 44px; }
-  .glowvai-root .scan-screen .scan-primary-button, .glowvai-root .scan-screen .scan-secondary-button, .glowvai-root .scan-screen .scan-capture-button{ min-height: 54px; }
-  .glowvai-root .scan-screen :focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
+  .glowvai-root .scan-screen .scan-primary-button, .glowvai-root .scan-screen .scan-secondary-button, .glowvai-root .scan-screen .scan-capture-button{ min-height: var(--ds-control); }
+  .glowvai-root .scan-screen :focus-visible{ outline: 2px solid var(--ds-brand); outline-offset: 2px; }
 
   /* Two-column pages (camera, preview, gallery, tab, report) */
-  .glowvai-root .scan-screen:has(.scan-split) .scan-header{ padding-inline: max(24px, calc(50% - 496px)); }
-  .glowvai-root .scan-screen:has(.scan-split) .scan-body{ max-width: 1040px; }
+  .glowvai-root .scan-screen:has(.scan-split) .scan-header{ padding-inline: max(var(--ds-gutter), calc(50% - 520px)); }
+  .glowvai-root .scan-screen:has(.scan-split) .scan-body{ max-width: 1104px; }
   .glowvai-root .scan-screen .scan-split{ display: flex; flex-direction: column; gap: 20px; }
   .glowvai-root .scan-screen .scan-split-main, .glowvai-root .scan-screen .scan-split-side{ display: flex; flex-direction: column; gap: 16px; min-width: 0; }
   .glowvai-root .scan-screen .scan-split-side{ gap: 12px; }
   .glowvai-root .scan-screen .scan-video-frame, .glowvai-root .scan-screen .scan-preview-frame{ width: auto; max-width: 100%; height: min(60vh, 560px); max-height: none; aspect-ratio: 4 / 3; align-self: center; }
   .glowvai-root .scan-screen .scan-preview-frame{ aspect-ratio: 3 / 4; height: min(64vh, 620px); }
   .glowvai-root .scan-screen .scan-report-body .scan-split-main, .glowvai-root .scan-screen .scan-report-body .scan-split-side{ gap: 20px; }
-  .glowvai-root .scan-screen .scan-concern-list{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .glowvai-root .scan-screen .scan-concern-item{ padding: 16px; border: 1px solid var(--border-light); border-radius: 14px; background: #fff; }
+  .glowvai-root .scan-screen .scan-concern-list{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; border: 0; background: none; box-shadow: none; }
+  .glowvai-root .scan-screen .scan-concern-item{ padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
   .glowvai-root .scan-screen .scan-routine-item{ padding: 14px 16px; }
   .glowvai-root .scan-screen .scan-dropzone{ padding: 40px 24px; }
   .glowvai-root .scan-screen .scan-permission{ width: 100%; max-width: 480px; margin: 0 auto; }
@@ -33,29 +33,27 @@
 
 /* Desktop: form on the left, summary or controls on the right. */
 @media (min-width: 1024px){
-  .glowvai-root .scan-screen .scan-split{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 40px; align-items: start; }
-  .glowvai-root .scan-screen .scan-split-side{ position: sticky; top: 88px; }
+  .glowvai-root .scan-screen .scan-split{ display: grid; grid-template-columns: minmax(0, 1fr) var(--ds-aside); gap: 40px; align-items: start; }
+  /* Side panel: a sticky card holding the screen's actions */
+  .glowvai-root .scan-screen .scan-split-side{ position: sticky; top: 88px; gap: 14px; padding: 24px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
   .glowvai-root .scan-screen .scan-desktop-only{ display: revert !important; }
   .glowvai-root .scan-screen .scan-how-list.scan-desktop-only{ display: flex !important; }
   .glowvai-root .scan-screen .scan-body{ padding-top: 40px; }
 
   /* Tab: the scan card on the left, how it works and the actions in a panel on the right */
-  .glowvai-root .scan-tab-screen .scan-split{ grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 48px; }
+  .glowvai-root .scan-tab-screen .scan-split{ gap: 48px; }
   .glowvai-root .scan-tab-screen .scan-tab-header{ align-items: flex-start; text-align: left; }
-  .glowvai-root .scan-tab-screen .scan-tab-title{ font-size: 32px; }
   .glowvai-root .scan-tab-screen .scan-tab-subtitle{ max-width: 520px; font-size: 15px; }
   .glowvai-root .scan-tab-screen .scan-target-card{ padding: 40px 32px; }
-  .glowvai-root .scan-tab-screen .scan-split-side{ gap: 14px; padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: #fff; }
   .glowvai-root .scan-tab-screen .scan-text-button,
   .glowvai-root .scan-failed-screen .scan-text-button{ align-self: stretch; }
 
   /* Report: concerns on the left, the routine panel on the right */
-  .glowvai-root .scan-report-screen .scan-split{ grid-template-columns: minmax(0, 1fr) minmax(0, 420px); }
-  .glowvai-root .scan-headline{ font-size: 26px; }
+  .glowvai-root .scan-report-screen .scan-split{ grid-template-columns: minmax(0, 1fr) minmax(0, 400px); }
+  .glowvai-root .scan-report-screen .scan-split-side{ padding: 0; border: 0; background: none; box-shadow: none; }
   .glowvai-root .scan-screen .scan-video-frame, .glowvai-root .scan-screen .scan-preview-frame{ justify-self: center; align-self: start; height: min(68vh, 640px); }
   .glowvai-root .scan-screen .scan-preview-frame{ height: min(72vh, 680px); }
-  .glowvai-root .scan-screen .scan-camera-body .scan-split{ grid-template-columns: minmax(0, 1fr) minmax(0, 340px); }
-  .glowvai-root .scan-screen .scan-camera-body .scan-split-side{ justify-content: center; min-height: 100%; }
+  .glowvai-root .scan-screen .scan-camera-body .scan-split-side{ justify-content: center; }
   .glowvai-root .scan-screen .scan-dropzone{ padding: 56px 24px; }
   .glowvai-root .scan-screen .scan-concern-list{ gap: 16px; }
 }

@@ -33,10 +33,10 @@ export const SettingsAndSecurityScreen = () => {
 
         <p className="profile-label">Account settings</p>
         <section className="profile-card">
-          <ProfileListItem icon={<User size={16} />} title="Edit profile" onClick={() => navigate('profile-edit')} />
-          <ProfileListItem icon={<MapPin size={16} />} title="Saved addresses" onClick={() => navigate('address-list')} />
-          <ProfileListItem icon={<CreditCard size={16} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
-          <ProfileListItem icon={<Smartphone size={16} />} title="Change phone number" note="A verification code is sent to the new number" onClick={() => navigate('auth-change-phone')} />
+          <ProfileListItem icon={<User size={18} />} title="Edit profile" onClick={() => navigate('profile-edit')} />
+          <ProfileListItem icon={<MapPin size={18} />} title="Saved addresses" onClick={() => navigate('address-list')} />
+          <ProfileListItem icon={<CreditCard size={18} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
+          <ProfileListItem icon={<Smartphone size={18} />} title="Change phone number" note="A verification code is sent to the new number" onClick={() => navigate('auth-change-phone')} />
         </section>
         </div>
 
@@ -44,7 +44,7 @@ export const SettingsAndSecurityScreen = () => {
         <p className="profile-label">Privacy</p>
         <section className="profile-card">
           <button type="button" className="profile-list-item" onClick={() => setPrivacyExpanded(!privacyExpanded)} aria-expanded={privacyExpanded}>
-            <span className="profile-list-icon"><Eye size={16} /></span>
+            <span className="profile-list-icon"><Eye size={18} /></span>
             <span className="profile-list-copy"><span className="profile-list-title">AI scan privacy</span></span>
             {privacyExpanded ? <ChevronUp size={18} className="profile-chevron" /> : <ChevronDown size={18} className="profile-chevron" />}
           </button>
@@ -55,7 +55,7 @@ export const SettingsAndSecurityScreen = () => {
             </p>
           )}
           <ProfileListItem
-            icon={<Sparkles size={16} />}
+            icon={<Sparkles size={18} />}
             title="Skin scan history"
             note={hasReport ? 'Open your latest skin report' : 'No scans yet'}
             onClick={() => navigate(hasReport ? 'scan-report' : 'scan-intro')}

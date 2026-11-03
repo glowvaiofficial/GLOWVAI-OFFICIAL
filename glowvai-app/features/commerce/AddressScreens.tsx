@@ -195,10 +195,10 @@ export const AddAddressScreen: React.FC = () => {
   };
 
   return (
-    <main className="commerce-screen commerce-addresses commerce-address-form">
+    <main className="commerce-screen commerce-addresses commerce-address-form has-aside">
       <FlowHeader title="Add address" subtitle="Complete the details for your delivery partner" onBack={goBack} />
 
-      <form className="commerce-body commerce-split" onSubmit={save} noValidate>
+      <form id="commerce-address-form" className="commerce-body commerce-split" onSubmit={save} noValidate>
         <div className="commerce-main">
           <section className="commerce-card commerce-form" aria-labelledby="addr-where">
             <h2 id="addr-where">Address</h2>
@@ -262,13 +262,17 @@ export const AddAddressScreen: React.FC = () => {
             )}
           </section>
 
-          <div className="commerce-form-footer">
-            <button className="commerce-primary is-wide" type="submit">
-              Save address
-            </button>
-          </div>
+          <button className="commerce-primary is-wide commerce-aside-cta" type="submit">
+            Save address
+          </button>
         </div>
       </form>
+
+      <footer className="commerce-sticky-bar">
+        <button className="commerce-primary is-wide" type="submit" form="commerce-address-form">
+          Save address
+        </button>
+      </footer>
     </main>
   );
 };

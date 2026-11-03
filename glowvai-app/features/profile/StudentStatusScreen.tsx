@@ -10,10 +10,11 @@ export const StudentStatusScreen = () => {
   const { goBack, navigate } = useApp();
 
   return (
-    <main className="profile-screen is-narrow">
+    <main className="profile-screen">
       <ProfileHeader title="Student status" eyebrow="Glow rewards" onBack={goBack} />
 
       <div className="profile-body">
+        <div className="profile-side">
         <section className="profile-card profile-card-body">
           <div className="profile-status-head">
             <span className="profile-status-icon"><GraduationCap size={20} /></span>
@@ -25,7 +26,9 @@ export const StudentStatusScreen = () => {
             </div>
           </div>
         </section>
+        </div>
 
+        <div className="profile-main">
         <section className="profile-card profile-card-body">
           <h2 className="profile-card-title">Check or start verification</h2>
           <p className="profile-card-sub">
@@ -40,6 +43,7 @@ export const StudentStatusScreen = () => {
         <button type="button" className="profile-button is-outline is-block" onClick={() => navigate('profile-referrals')}>
           Back to Glow rewards
         </button>
+        </div>
       </div>
     </main>
   );
