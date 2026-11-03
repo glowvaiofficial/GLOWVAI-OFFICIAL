@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowUpDown, Check, ChevronDown, ChevronUp, Search, ShoppingBag, X } from 'lucide-react';
+import { ArrowLeft, ArrowUpDown, Check, ChevronDown, ChevronUp, LayoutGrid, Search, ShoppingBag, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
@@ -45,6 +45,9 @@ export const ShopCategoryScreen: React.FC = () => {
           </button>
         </header>
         <div className="shop-empty shop-category-pick">
+          <span className="shop-empty-icon">
+            <LayoutGrid size={24} />
+          </span>
           <h3>Pick a category</h3>
           <p>Choose what you'd like to shop.</p>
           <div className="shop-category-pick-list">
@@ -91,7 +94,7 @@ export const ShopCategoryScreen: React.FC = () => {
       </header>
 
       <div className="shop-category-toolbar">
-        <label className="shop-category-search">
+        <label className="shop-input shop-category-search">
           <Search size={18} />
           <input
             type="text"
@@ -100,7 +103,7 @@ export const ShopCategoryScreen: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search">
+            <button type="button" className="shop-input-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
               <X size={16} />
             </button>
           )}
@@ -148,9 +151,16 @@ export const ShopCategoryScreen: React.FC = () => {
       <main className="shop-category-main">
         {products.length === 0 ? (
           <div className="shop-empty">
-            <Search size={48} />
+            <span className="shop-empty-icon">
+              <Search size={24} />
+            </span>
             <h3>No products found</h3>
             <p>{searchQuery ? `Nothing matches "${searchQuery}" in ${categoryLabel}.` : `No products in ${categoryLabel} yet.`}</p>
+            {searchQuery && (
+              <button type="button" className="shop-btn-primary" onClick={() => setSearchQuery('')}>
+                Clear search
+              </button>
+            )}
           </div>
         ) : (
           <div className="shop-product-grid">

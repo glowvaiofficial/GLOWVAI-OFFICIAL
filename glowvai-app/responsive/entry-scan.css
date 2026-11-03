@@ -2,14 +2,24 @@
 
 /* Welcome, onboarding, login and OTP. These screens hide the web header, so they fill the whole window.
    Phone: readability and touch fixes on top of glowvai.css. Tablet: full-window, stacked. Desktop (1024px+): full-window split. */
-.glowvai-root .login-phone-field{ grid-template-columns: 24px auto 1px minmax(0,1fr); }
-.glowvai-root .login-phone-field input{ align-self: stretch; height: 100%; font-size: 16px; }
-.glowvai-root .login-sheet-copy > p{ font-size: 13px; }
-.glowvai-root .login-phone-error{ margin-bottom: -8px; font-size: 12px; }
-.glowvai-root .login-legal-copy{ font-size: 11px; }
-.glowvai-root .login-legal-copy a{ display: inline-block; padding: 4px 0; color: #1460df; font-weight: 700; text-decoration: none; }
+.glowvai-root .login-reference-sheet{ background: var(--ds-pearl); color: var(--ds-ink); }
+.glowvai-root .login-sheet-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .login-phone-field{ height: var(--ds-control); grid-template-columns: 24px auto 1px minmax(0,1fr); padding: 0 14px; border-color: var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); box-shadow: none; }
+.glowvai-root .login-phone-field:focus-within{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); }
+.glowvai-root .login-phone-field.has-error{ border-color: var(--ds-danger); }
+.glowvai-root .login-phone-field strong{ color: var(--ds-ink); font-size: 14px; }
+.glowvai-root .login-country-chevron{ color: var(--ds-brand); }
+.glowvai-root .login-phone-divider{ background: var(--ds-line); }
+.glowvai-root .login-continue-button{ height: var(--ds-control); border-radius: var(--ds-pill); background: var(--ds-brand); box-shadow: none; font-size: 15px; font-weight: 700; }
+.glowvai-root .login-continue-button:hover{ background: var(--ds-brand-dark); }
+.glowvai-root .login-phone-field input{ align-self: stretch; height: 100%; color: var(--ds-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .login-sheet-copy > p{ color: var(--ds-muted); font-size: var(--ds-body); }
+.glowvai-root .login-phone-error{ margin-bottom: -8px; color: var(--ds-danger); font-size: var(--ds-small); }
+.glowvai-root .login-legal-copy{ color: var(--ds-muted); font-size: var(--ds-small); }
+.glowvai-root .login-legal-copy a{ display: inline-block; padding: 4px 0; color: var(--ds-brand); font-weight: 700; text-decoration: none; }
 .glowvai-root .login-legal-copy a:hover{ text-decoration: underline; }
 .glowvai-root .otp-back{ width: 44px; height: 44px; }
+.glowvai-root .otp-cells input{ border-radius: var(--ds-radius-sm); }
 .glowvai-root .otp-copy p{ font-size: 13px; }
 .glowvai-root .otp-edit-number{ min-height: 32px; padding: 0 4px; color: #fff; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
 .glowvai-root .otp-resend{ font-size: 12px; }
@@ -37,11 +47,6 @@
   .glowvai-root .login-benefits{ right: auto; left: 50%; width: min(560px, calc(100% - 44px)); transform: translateX(-50%); }
   .glowvai-root .login-benefit p{ font-size: 11px; }
   .glowvai-root .login-reference-sheet{ flex: 1 0 auto; min-height: 0; padding: 40px max(48px, calc((100% - 520px) / 2)) 48px; }
-  .glowvai-root .login-sheet-copy h1{ font-size: 26px; }
-  .glowvai-root .login-sheet-copy > p{ font-size: 14px; }
-  .glowvai-root .login-phone-field strong{ font-size: 14px; }
-  .glowvai-root .login-continue-button{ height: 52px; font-size: 16px; }
-  .glowvai-root .login-legal-copy{ font-size: 12px; }
   .glowvai-root .login-home-indicator{ display: none; }
 
   .glowvai-root .screen-content:has(.otp-reference-screen){ overflow: visible; }
@@ -63,7 +68,7 @@
 @media (min-width: 1024px){
   .glowvai-root .onboarding-screen{ min-height: 560px; --onb-hero-inset: 0 auto 0 0; --onb-sheet-inset: 0 0 0 auto; --onb-sheet-min: 0px; --onb-sheet-pad: 56px max(56px, calc(25% - 220px)); --onb-sheet-radius: 0; }
   .glowvai-root .onboarding-screen .onboarding-media{ width: 50%; }
-  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 50%; display: flex; flex-direction: column; justify-content: center; box-shadow: none !important; }
+  .glowvai-root .onboarding-screen .onboarding-sheet{ width: 50%; display: flex; flex-direction: column; justify-content: center; background: var(--ds-pearl) !important; box-shadow: none !important; }
   .glowvai-root .onboarding-screen .onboarding-sheet h1{ font-size: 48px !important; }
   .glowvai-root .onboarding-screen .onboarding-sheet p{ font-size: 18px !important; }
   .glowvai-root .onboarding-screen .onboarding-sheet > div[aria-label]{ justify-content: flex-start !important; }
@@ -76,8 +81,6 @@
   .glowvai-root .login-brand-lockup > p{ font-size: 16px; }
   .glowvai-root .login-benefits{ bottom: 48px; }
   .glowvai-root .login-reference-sheet{ display: flex; min-width: 0; flex: 1 1 0; flex-direction: column; justify-content: center; margin-top: 0; padding: 56px max(56px, calc(25% - 220px)); border-radius: 0; box-shadow: none; }
-  .glowvai-root .login-sheet-copy h1{ font-size: 34px; }
-  .glowvai-root .login-sheet-copy > p{ font-size: 15px; }
   .glowvai-root .login-sheet-copy .login-copy-break{ display: none; }
   .glowvai-root .login-reference-form{ margin-top: 32px; }
   .glowvai-root .login-legal-copy{ margin-top: 20px; text-align: left; }
@@ -90,21 +93,21 @@
   .glowvai-root .otp-security-art{ zoom: 1.5; }
   .glowvai-root .otp-hero-tagline{ margin-top: 40px; color: rgba(255,255,255,.86); font-size: 16px; font-weight: 500; line-height: 1.4; }
   .glowvai-root .otp-keypad-sheet{ display: none; }
-  .glowvai-root .otp-entry-panel{ display: flex; min-width: 0; align-items: center; justify-content: center; padding: 56px; background: #f8f9fd; color: #101c36; }
+  .glowvai-root .otp-entry-panel{ display: flex; min-width: 0; align-items: center; justify-content: center; padding: 56px; background: var(--ds-pearl); color: var(--ds-ink); }
   .glowvai-root .otp-entry-inner{ width: 100%; max-width: 440px; }
   .glowvai-root .otp-entry-panel .otp-copy{ margin-top: 0; text-align: left; }
-  .glowvai-root .otp-entry-panel .otp-copy h1{ color: #101c36; font-size: 34px; }
-  .glowvai-root .otp-entry-panel .otp-copy p{ margin-top: 10px; color: #71809b; font-size: 15px; }
-  .glowvai-root .otp-entry-panel .otp-copy strong{ color: #101c36; }
-  .glowvai-root .otp-entry-panel .otp-edit-number{ padding: 0; color: #1459e8; }
+  .glowvai-root .otp-entry-panel .otp-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.02em; }
+  .glowvai-root .otp-entry-panel .otp-copy p{ margin-top: 10px; color: var(--ds-muted); font-size: var(--ds-body); }
+  .glowvai-root .otp-entry-panel .otp-copy strong{ color: var(--ds-ink); }
+  .glowvai-root .otp-entry-panel .otp-edit-number{ padding: 0; color: var(--ds-brand); }
   .glowvai-root .otp-entry-panel .otp-cells{ max-width: none; margin-top: 32px; }
-  .glowvai-root .otp-entry-panel .otp-cells input{ border: 1px solid #d8dfec; background: #fff; color: #101c36; box-shadow: 0 1px 2px rgba(27,57,112,.04); }
-  .glowvai-root .otp-entry-panel .otp-cells input:focus{ border-color: #1459e8; box-shadow: 0 0 0 3px rgba(20,89,232,.14); transform: none; }
-  .glowvai-root .otp-entry-panel .otp-cells input.is-filled{ border-color: #8fb2fa; }
-  .glowvai-root .otp-entry-panel .otp-resend{ justify-content: flex-start; margin-top: 20px; color: #71809b; }
-  .glowvai-root .otp-entry-panel .otp-resend strong, .glowvai-root .otp-entry-panel .otp-resend button{ color: #1459e8; }
-  .glowvai-root .otp-entry-panel .otp-validity{ display: inline-flex; margin-top: 16px; background: #edf2ff; color: #1459e8; }
-  .glowvai-root .otp-entry-panel .otp-error{ color: #c13f4b; }
+  .glowvai-root .otp-entry-panel .otp-cells input{ height: 56px; border: 1px solid var(--ds-line); background: var(--ds-card); color: var(--ds-ink); box-shadow: none; }
+  .glowvai-root .otp-entry-panel .otp-cells input:focus{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); transform: none; }
+  .glowvai-root .otp-entry-panel .otp-cells input.is-filled{ border-color: var(--ds-brand); }
+  .glowvai-root .otp-entry-panel .otp-resend{ justify-content: flex-start; margin-top: 20px; color: var(--ds-muted); }
+  .glowvai-root .otp-entry-panel .otp-resend strong, .glowvai-root .otp-entry-panel .otp-resend button{ color: var(--ds-brand); }
+  .glowvai-root .otp-entry-panel .otp-validity{ display: inline-flex; margin-top: 16px; background: var(--ds-sky); color: var(--ds-brand); }
+  .glowvai-root .otp-entry-panel .otp-error{ color: var(--ds-danger); }
 }
 
 /* Skin scan screens (face-prep, face-capture, face-loading, skin-report) reuse the scan feature layout

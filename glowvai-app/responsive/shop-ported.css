@@ -1,52 +1,12 @@
-/* Shop screens on tablet (720px+) and desktop (1024px+). Phone rules stay in features/shop/styles and shop.css. */
+/* Shop screens on tablet (720px+) and desktop (1024px+).
+   Each screen's own wide layout (columns, side panels, grid counts) lives with its phone rules in features/shop/styles,
+   so this file only holds what every shop screen shares above phone width. */
 
 @media (min-width: 720px){
   .glowvai-root .shop-screen{ padding-bottom: 0; }
-  .glowvai-root .shop-header{ position: static; padding: 10px 24px; }
-  .glowvai-root .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .glowvai-root .shop-header{ padding-top: 20px; }
 }
 
-/* Browse: sidebar filters and product grid */
-@media (min-width: 720px) and (max-width: 1023px){
-  .glowvai-root .shop-browse-category-grid{ grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
 @media (min-width: 1024px){
-  .glowvai-root .shop-browse .shop-browse-products .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-  .glowvai-root .shop-browse-sidebar{ position: sticky; top: 88px; align-self: start; }
-}
-
-/* Category: product grid */
-@media (min-width: 1024px){
-  .glowvai-root .shop-category .shop-category-main .shop-product-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-}
-
-/* Product: gallery left, buy box right */
-@media (min-width: 720px){
-  .glowvai-root .shop-product-layout{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; padding: 24px; align-items: start; }
-  .glowvai-root .shop-product-hero{ max-height: none; }
-  .glowvai-root .shop-product-actions{ display: flex; }
-  .glowvai-root .shop-product-buybar{ display: none; }
-  .glowvai-root .shop-screen .shop-product-buynow{ color: var(--text-inverse); }
-}
-@media (min-width: 1024px){
-  .glowvai-root .shop-product-layout{ max-width: 1120px; margin: 0 auto; padding: 32px; gap: 40px; }
-  .glowvai-root .shop-product-gallery{ position: sticky; top: 88px; }
-  .glowvai-root .shop-product-title{ font-size: 28px; }
-}
-
-/* Reviews: summary and filters left, review list right */
-@media (min-width: 1024px){
-  .glowvai-root .shop-reviews-body{ grid-template-columns: minmax(0, 380px) minmax(0, 1fr); column-gap: 24px; align-items: start; max-width: 1120px; padding: 32px; }
-  .glowvai-root .shop-reviews-side{ position: sticky; top: 88px; }
-  .glowvai-root .shop-reviews-none{ min-height: 320px; align-content: center; }
-}
-
-/* Search and filters */
-@media (min-width: 720px){
-  .glowvai-root .shop-search .shop-search-grid{ grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-}
-
-/* Wishlist */
-@media (min-width: 720px){
-  .glowvai-root .shop-wishlist-main{ padding: 24px 8px 40px; }
+  .glowvai-root .shop-header{ padding-top: 24px; }
 }

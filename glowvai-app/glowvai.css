@@ -23,7 +23,7 @@
   --primary-border: #c7d8ff;
   --accent: #176b5b;
   --accent-light: #eaf6f2;
-  --bg: #f7f8fb;
+  --bg: #f7f9ff; /* matches --ds-pearl so the shell and every screen share one background */
   --surface: #f0f2f6;
   --surface-muted: #e9edf3;
   --surface-elevated: #ffffff;
@@ -1083,3 +1083,20 @@
 /* Empty state and sample-result notice (no invented report data) */
 .glowvai-root .skin-sample-notice{ margin: 10px 0 0; padding: 9px 12px; border-radius: 10px; background: #fff7ed; color: #9a3412; font-size: 11px; font-weight: 650; line-height: 1.45; }
 .glowvai-root .commerce-empty-cta{ margin: 16px 0 0; height: 48px; width: 100%; border-radius: 12px; background: #0f5cf6; color: #fff; font-size: 14px; font-weight: 800; }
+
+/* Shop design system. Every screen uses these so the whole shop matches the home. */
+.glowvai-root{
+  --ds-brand: #0057fb; --ds-brand-dark: #0046cc; --ds-ink: #071b4d; --ds-muted: #53617d; --ds-line: #dce6ff;
+  --ds-pearl: #f7f9ff; --ds-sky: #eef3ff; --ds-card: #ffffff; --ds-success: #16702b; --ds-success-bg: #d7f7d8; --ds-success-soft: #f0faf5; --ds-danger: #c13f4b; --ds-danger-bg: #fdecea;
+  --ds-radius-sm: 12px; --ds-radius: 18px; --ds-radius-lg: 24px; --ds-pill: 999px;
+  --ds-shadow: 0 6px 24px rgba(26, 54, 120, .05); --ds-shadow-hover: 0 14px 32px rgba(26, 54, 120, .1);
+  --ds-gutter: 16px; --ds-gap: 12px; --ds-section: 28px;
+  --ds-h1: 24px; --ds-h2: 19px; --ds-body: 14px; --ds-small: 12px;
+  --ds-control: 48px; --ds-aside: 360px; --ds-sticky-top: 16px; --ds-star: #f59e0b;
+}
+@media (min-width: 720px){
+  .glowvai-root{ --ds-gutter: 24px; --ds-gap: 16px; --ds-section: 36px; --ds-h1: 28px; --ds-h2: 22px; --ds-sticky-top: 88px; }
+}
+@media (min-width: 1024px){
+  .glowvai-root{ --ds-gutter: 32px; --ds-gap: 20px; --ds-section: 44px; --ds-h1: 32px; --ds-h2: 24px; --ds-body: 15px; }
+}

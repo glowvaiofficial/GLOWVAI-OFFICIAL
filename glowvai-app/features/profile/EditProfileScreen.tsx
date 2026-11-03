@@ -137,6 +137,13 @@ export const EditProfileScreen = () => {
 
           {error && <p className="profile-field-error" role="alert">{error}</p>}
         </section>
+
+        {/* Phone: a sticky bar at the bottom of the page. Desktop: the end of the side panel. */}
+        <div className="profile-action-bar">
+          <button type="button" className="profile-button is-primary is-block" onClick={handleSave}>
+            Save profile changes
+          </button>
+        </div>
         </div>
 
         <div className="profile-main">
@@ -161,9 +168,6 @@ export const EditProfileScreen = () => {
           </div>
         </section>
 
-        <button type="button" className="profile-button is-primary is-block" onClick={handleSave}>
-          Save profile changes
-        </button>
         </div>
       </div>
     </main>

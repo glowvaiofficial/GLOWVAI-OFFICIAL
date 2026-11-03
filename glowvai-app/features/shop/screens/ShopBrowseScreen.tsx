@@ -14,15 +14,13 @@ const categoryImage = (id: string) => {
 };
 
 // Category ids match SkincareProduct['category'] exactly.
-const CATEGORY_ITEMS: { id: string; name: string; color: string; imageUri: string; Icon: LucideIcon }[] = [
-  { id: 'Serums', name: 'Serums & Actives', color: '#EBF5FF', imageUri: categoryImage('Serums'), Icon: Sparkles },
-  { id: 'Cleansers', name: 'Cleansers & Washes', color: '#F0FDF4', imageUri: categoryImage('Cleansers'), Icon: Droplet },
-  { id: 'Moisturizers', name: 'Moisturizers & Creams', color: '#FFF7ED', imageUri: categoryImage('Moisturizers'), Icon: Leaf },
-  { id: 'Suncare', name: 'Sunscreen & SPF', color: '#FEF3C7', imageUri: categoryImage('Suncare'), Icon: Sun },
-  { id: 'Treatments', name: 'Spot Treatments', color: '#EFF6FF', imageUri: categoryImage('Treatments'), Icon: Activity },
+const CATEGORY_ITEMS: { id: string; name: string; imageUri: string; Icon: LucideIcon }[] = [
+  { id: 'Serums', name: 'Serums & Actives', imageUri: categoryImage('Serums'), Icon: Sparkles },
+  { id: 'Cleansers', name: 'Cleansers & Washes', imageUri: categoryImage('Cleansers'), Icon: Droplet },
+  { id: 'Moisturizers', name: 'Moisturizers & Creams', imageUri: categoryImage('Moisturizers'), Icon: Leaf },
+  { id: 'Suncare', name: 'Sunscreen & SPF', imageUri: categoryImage('Suncare'), Icon: Sun },
+  { id: 'Treatments', name: 'Spot Treatments', imageUri: categoryImage('Treatments'), Icon: Activity },
 ];
-
-const CATEGORY_TINTS = ['#E8F0FE', '#E8F5E9', '#FFF8E1', '#F3E5F5', '#FCE4EC'];
 
 // Keyword groups matched against product name/description/keyActives.
 const CONCERN_KEYWORDS: Record<string, string[]> = {
@@ -114,7 +112,7 @@ export const ShopBrowseScreen: React.FC = () => {
       </header>
 
       <div className="shop-browse-toolbar">
-        <label className="shop-browse-search">
+        <label className="shop-input shop-browse-search">
           <Search size={18} />
           <input
             type="text"
@@ -123,7 +121,7 @@ export const ShopBrowseScreen: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear search">
+            <button type="button" className="shop-input-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
               <X size={16} />
             </button>
           )}
@@ -152,7 +150,7 @@ export const ShopBrowseScreen: React.FC = () => {
           <h3>Shop by Category</h3>
           {CATEGORY_ITEMS.map((cat) => (
             <button key={cat.id} type="button" className="shop-browse-side-item" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
-              <span className="shop-browse-side-badge" style={{ background: cat.color }}>
+              <span className="shop-browse-side-badge">
                 <cat.Icon size={15} />
               </span>
               <span className="shop-browse-side-name">{cat.name}</span>
@@ -180,7 +178,7 @@ export const ShopBrowseScreen: React.FC = () => {
           })}
 
           {hasActiveFilters && (
-            <button type="button" className="shop-browse-side-clear" onClick={clearFilters}>
+            <button type="button" className="shop-btn-secondary shop-browse-side-clear" onClick={clearFilters}>
               Clear all filters
             </button>
           )}
@@ -201,27 +199,30 @@ export const ShopBrowseScreen: React.FC = () => {
           <section className="shop-browse-directory">
             <h2>Browse Skincare Directory</h2>
             <div className="shop-browse-category-grid">
-              {CATEGORY_ITEMS.map((cat, index) => (
+              {CATEGORY_ITEMS.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
                   className="shop-browse-cat"
-                  style={{ background: CATEGORY_TINTS[index % CATEGORY_TINTS.length] }}
                   onClick={() => navigate('shop-category', { categoryId: cat.id })}
                 >
-                  {cat.imageUri && <img src={cat.imageUri} alt="" width={140} height={140} loading="lazy" decoding="async" />}
                   <span className="shop-browse-cat-icon">
                     <cat.Icon size={16} />
                   </span>
                   <span className="shop-browse-cat-name">{cat.name}</span>
                   <span className="shop-browse-cat-count">{itemsLabel(categoryCounts[cat.id] ?? 0)}</span>
+                  {cat.imageUri && (
+                    <span className="shop-browse-cat-media">
+                      <img src={cat.imageUri} alt="" width={140} height={140} loading="lazy" decoding="async" />
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
           </section>
 
           <section className="shop-browse-products">
-            <div className="shop-browse-products-head">
+            <div className="shop-section-head shop-browse-products-head">
               <h2>{selectedConcern !== 'all' ? concernLabel : 'All products'}</h2>
               <span>
                 {filteredProducts.length} {filteredProducts.length === 1 ? 'result' : 'results'}
@@ -230,10 +231,12 @@ export const ShopBrowseScreen: React.FC = () => {
 
             {filteredProducts.length === 0 ? (
               <div className="shop-empty">
-                <Search size={48} />
+                <span className="shop-empty-icon">
+                  <Search size={24} />
+                </span>
                 <h3>No products found</h3>
                 <p>We couldn't find any products matching "{emptyHint}".</p>
-                <button type="button" className="shop-browse-clear" onClick={clearFilters}>
+                <button type="button" className="shop-btn-primary" onClick={clearFilters}>
                   Clear Filters
                 </button>
               </div>

@@ -1,12 +1,22 @@
 import React from 'react';
 import { ArrowRight, Check, CheckCircle2, Copy, MapPin, PackageCheck, ShoppingBag } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import '../responsive/cart-tracking.css';
+import '../features/commerce/commerce.css';
+import '../responsive/commerce-ported.css';
 
 export const OrderConfirmationScreen: React.FC = () => {
   const { navigate, activeOrder, showToast } = useApp();
   if (!activeOrder) return (
-    <main className="commerce-empty"><div><span><ShoppingBag size={34} /></span><h2>No active order</h2><p>Place an order to see its confirmation and delivery progress.</p><button onClick={() => navigate('home')}>Continue shopping</button></div></main>
+    <main className="commerce-screen">
+      <div className="commerce-body">
+        <section className="commerce-empty-state is-card">
+          <span className="commerce-empty-icon"><ShoppingBag size={26} /></span>
+          <h2>No active order</h2>
+          <p>Place an order to see its confirmation and delivery progress.</p>
+          <button className="commerce-primary" onClick={() => navigate('home')}>Continue shopping</button>
+        </section>
+      </div>
+    </main>
   );
 
   const order = activeOrder;
@@ -23,30 +33,35 @@ export const OrderConfirmationScreen: React.FC = () => {
   ];
 
   return (
-    <main className="order-confirmation receipt-confirmation">
-      <div className="receipt-slot" aria-hidden="true"><span /></div>
-      <article className="order-receipt">
-        <div className="order-check"><Check size={36} strokeWidth={3} /></div>
-        <h1>Order placed!</h1>
-        <p>We’ve received your order and will update you as it moves.</p>
-        <button className="order-id" onClick={copyOrderId}>Order ID #{order.id} <Copy size={15} /></button>
-
-        <div className="order-status-track" aria-label="Order progress">
-          {stages.map((stage, index) => <div key={stage.label} className={`is-${stage.state}`} style={{ '--status-order': index } as React.CSSProperties}><span>{stage.state === 'done' ? <Check size={14} /> : index + 1}</span><b>{stage.label}</b><small>{stage.note}</small></div>)}
+    <main className="commerce-screen commerce-result is-success commerce-order-placed">
+      <div className="commerce-body commerce-result-body">
+        <div className="commerce-result-status">
+          <span className="commerce-result-icon is-success"><Check size={32} strokeWidth={3} /></span>
+          <h1>Order placed!</h1>
+          <p>We’ve received your order and will update you as it moves.</p>
+          <button className="commerce-order-id" onClick={copyOrderId}>Order ID #{order.id} <Copy size={15} /></button>
+          <ol className="commerce-stage-track" aria-label="Order progress">
+            {stages.map((stage, index) => <li key={stage.label} className={`is-${stage.state}`}><span>{stage.state === 'done' ? <Check size={14} /> : index + 1}</span><b>{stage.label}</b><small>{stage.note}</small></li>)}
+          </ol>
         </div>
 
-        <section className="order-receipt-address"><MapPin size={18} /><div><small>Deliver to</small><b>{order.address.street}, {order.address.area}</b><p>{order.address.city} · {order.address.pincode}</p></div></section>
+        <div className="commerce-result-actions">
+          <section className="commerce-card commerce-address-body">
+            <MapPin size={18} />
+            <div><small>Deliver to</small><b>{order.address.street}, {order.address.area}</b><p>{order.address.city} · {order.address.pincode}</p></div>
+          </section>
 
-        <section className="order-receipt-items">
-          <h2>Order summary <span>{order.items.length} items</span></h2>
-          {order.items.map((item) => <div key={`${item.productId}-${item.variantSize}`}><img src={item.imageUrl} alt="" /><span><b>{item.productName}</b><small>{item.variantSize} · Qty {item.quantity}</small></span><strong>₹{item.unitPrice * item.quantity}</strong></div>)}
-        </section>
+          <section className="commerce-card commerce-review">
+            <div className="commerce-card-head"><h2>Order summary</h2><span className="commerce-muted">{order.items.length} items</span></div>
+            {order.items.map((item) => <div className="commerce-review-line" key={`${item.productId}-${item.variantSize}`}><span className="commerce-thumb"><img src={item.imageUrl} alt="" /></span><div><h3>{item.productName}</h3><p>{item.variantSize} · Qty {item.quantity}</p></div><b className="commerce-review-price">₹{item.unitPrice * item.quantity}</b></div>)}
+          </section>
 
-        <section className="order-paid-summary"><div><span>{paid ? <CheckCircle2 size={18} /> : <PackageCheck size={18} />}</span><p><small>Payment status</small><b>{paid ? 'Paid' : 'Pay on delivery'}</b></p></div><strong>₹{order.finalPayable}</strong></section>
+          <section className="commerce-card commerce-order-total"><div>{paid ? <CheckCircle2 size={20} /> : <PackageCheck size={20} />}<p><small>Payment status</small><b>{paid ? 'Paid' : 'Pay on delivery'}</b></p></div><strong>₹{order.finalPayable}</strong></section>
 
-        <button className="order-track-button" onClick={() => navigate('order-tracking', { orderId: order.id })}>Track order <ArrowRight size={19} /></button>
-        <button className="order-home-button" onClick={() => navigate('home')}>Continue shopping</button>
-      </article>
+          <button className="commerce-primary" onClick={() => navigate('order-tracking', { orderId: order.id })}>Track order <ArrowRight size={19} /></button>
+          <button className="commerce-ghost" onClick={() => navigate('home')}>Continue shopping</button>
+        </div>
+      </div>
     </main>
   );
 };

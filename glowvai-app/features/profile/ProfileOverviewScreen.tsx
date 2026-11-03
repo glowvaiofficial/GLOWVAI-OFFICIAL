@@ -34,9 +34,6 @@ export const ProfileOverviewScreen = () => {
           </button>
         </section>
 
-        </div>
-
-        <div className="profile-main">
         <section className="profile-glow-card">
           <div className="profile-glow-top">
             <span className="profile-glow-icon"><Sparkles size={20} /></span>
@@ -67,27 +64,29 @@ export const ProfileOverviewScreen = () => {
         <p className="profile-label">My account hub</p>
         <div className="profile-tiles">
           <button type="button" className="profile-tile" onClick={() => navigate('orders-list')}>
-            <span className="profile-tile-top"><Package size={20} /><ChevronRight size={16} /></span>
+            <span className="profile-tile-top"><span className="profile-tile-icon"><Package size={19} /></span><ChevronRight size={16} /></span>
             <span className="profile-tile-label">My orders</span>
             <span className="profile-tile-note">{orders.length ? countLabel(orders.length, 'order') : 'No orders yet'}</span>
           </button>
           <button type="button" className="profile-tile" onClick={() => navigate('shop-wishlist')}>
-            <span className="profile-tile-top"><Heart size={20} /><ChevronRight size={16} /></span>
+            <span className="profile-tile-top"><span className="profile-tile-icon"><Heart size={19} /></span><ChevronRight size={16} /></span>
             <span className="profile-tile-label">Wishlist</span>
             <span className="profile-tile-note">{wishlist.length} saved</span>
           </button>
           <button type="button" className="profile-tile" onClick={() => navigate(report ? 'scan-report' : 'scan-intro')}>
-            <span className="profile-tile-top"><ScanFace size={20} /><ChevronRight size={16} /></span>
+            <span className="profile-tile-top"><span className="profile-tile-icon"><ScanFace size={19} /></span><ChevronRight size={16} /></span>
             <span className="profile-tile-label">Skin reports</span>
             <span className="profile-tile-note">{skinReports.length ? countLabel(skinReports.length, 'report') : 'Scan to get one'}</span>
           </button>
           <button type="button" className="profile-tile" onClick={() => navigate('profile-referrals')}>
-            <span className="profile-tile-top"><Gift size={20} /><ChevronRight size={16} /></span>
+            <span className="profile-tile-top"><span className="profile-tile-icon"><Gift size={19} /></span><ChevronRight size={16} /></span>
             <span className="profile-tile-label">Refer friends</span>
             <span className="profile-tile-note">Share GlowVai</span>
           </button>
         </div>
+        </div>
 
+        <div className="profile-main">
         <p className="profile-label">Recent order</p>
         <section className="profile-card">
           {recentOrder ? (
@@ -104,20 +103,20 @@ export const ProfileOverviewScreen = () => {
             </button>
           ) : (
             <div className="profile-empty-block">
-              <p className="profile-empty">No orders yet. Your recent order will show up here.</p>
-              <button type="button" className="profile-button is-secondary is-small" onClick={() => navigate('shop-home')}>Start shopping</button>
+              <span className="profile-empty-icon"><Package size={24} /></span>
+              <h3 className="profile-empty-title">No orders yet</h3>
+              <p className="profile-empty">Your recent order will show up here.</p>
+              <button type="button" className="profile-button is-primary" onClick={() => navigate('shop-home')}>Start shopping</button>
             </div>
           )}
         </section>
-        </div>
 
-        <div className="profile-side">
         <p className="profile-label">Account settings</p>
         <section className="profile-card">
-          <ProfileListItem icon={<MapPin size={16} />} title="My addresses" onClick={() => navigate('address-list')} />
-          <ProfileListItem icon={<CreditCard size={16} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
-          <ProfileListItem icon={<Settings size={16} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
-          <ProfileListItem icon={<HelpCircle size={16} />} title="Help & support" onClick={() => navigate('profile-support')} />
+          <ProfileListItem icon={<MapPin size={18} />} title="My addresses" onClick={() => navigate('address-list')} />
+          <ProfileListItem icon={<CreditCard size={18} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
+          <ProfileListItem icon={<Settings size={18} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
+          <ProfileListItem icon={<HelpCircle size={18} />} title="Help & support" onClick={() => navigate('profile-support')} />
         </section>
         </div>
       </div>

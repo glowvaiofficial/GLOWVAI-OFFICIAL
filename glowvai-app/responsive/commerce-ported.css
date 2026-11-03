@@ -1,39 +1,29 @@
 /* Commerce flows (cart, checkout, payment, address and location) on tablet and desktop.
    Every rule sits inside a min-width query, so the phone layout from commerce.css is unchanged.
+   Spacing and type come from the --ds-* tokens, which already step up at 720px and 1024px.
    Screens mark their two columns with .commerce-split > .commerce-main + .commerce-aside. */
 
 /* Tablet and up: header and steps sit on the canvas; content keeps the page gutter. */
 @media (min-width: 720px) {
-  .glowvai-root .commerce-screen > .commerce-head {
-    position: static;
-    padding: 24px 24px 8px;
-    border-bottom: 0;
-    background: transparent;
-  }
-  .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy h1 { font-size: 24px; }
-  .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy p { font-size: 13px; }
-  .glowvai-root .commerce-screen > .commerce-steps {
-    width: 100%;
-    max-width: 520px;
-    padding: 4px 24px 12px;
-    border-bottom: 0;
-    background: transparent;
-  }
-  .glowvai-root .commerce-screen > .commerce-body { gap: 16px; padding: 12px 24px 32px; }
-  .glowvai-root .commerce-main,
-  .glowvai-root .commerce-aside { gap: 16px; }
+  .glowvai-root .commerce-screen > .commerce-head { padding-top: 28px; }
+  .glowvai-root .commerce-screen > .commerce-head .commerce-head-copy p { font-size: 14px; }
+  .glowvai-root .commerce-screen > .commerce-body { padding-bottom: 40px; }
   .glowvai-root .commerce-screen .commerce-card:not(.commerce-address) { padding: 20px; }
-  .glowvai-root .commerce-screen > .commerce-sticky-bar { padding-inline: 24px; }
   .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-primary:not(.is-wide),
   .glowvai-root .commerce-screen > .commerce-sticky-bar .commerce-ghost {
     flex: 0 0 auto;
     min-width: 240px;
   }
   .glowvai-root .commerce-screen :is(button, a, input, textarea):focus-visible {
-    outline: 3px solid var(--primary);
+    outline: 2px solid var(--ds-brand);
     outline-offset: 2px;
   }
-  .glowvai-root .commerce-screen .commerce-pay-option:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+  .glowvai-root .commerce-screen .commerce-pay-option:has(input:focus-visible) { outline: 2px solid var(--ds-brand); outline-offset: 2px; }
+  .glowvai-root .commerce-search input,
+  .glowvai-root .commerce-field input,
+  .glowvai-root .commerce-field textarea,
+  .glowvai-root .commerce-form input,
+  .glowvai-root .commerce-form textarea { font-size: var(--ds-body); }
 
   /* Payment options sit two to a row. */
   .glowvai-root .commerce-pay-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -50,24 +40,30 @@
   .glowvai-root .commerce-address-add-tile { display: flex; }
   .glowvai-root .commerce-screen > .commerce-phone-only { display: none; }
 
-  /* Payment result and processing: one card on the canvas. */
+  /* Payment result, processing and order status screens: one large card on the canvas. */
   .glowvai-root .commerce-screen.commerce-processing,
   .glowvai-root .commerce-screen.commerce-result {
-    width: calc(100% - 48px);
+    width: calc(100% - 2 * var(--ds-gutter));
     max-width: 640px;
     min-height: 0;
     flex: 0 0 auto;
     margin: 32px auto;
     overflow: hidden;
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(22, 26, 34, .04);
+    border: 1px solid var(--ds-line);
+    border-radius: var(--ds-radius-lg);
+    background: var(--ds-card);
+    box-shadow: var(--ds-shadow);
   }
   .glowvai-root .commerce-screen.commerce-processing .commerce-processing-head,
-  .glowvai-root .commerce-screen.commerce-result .commerce-result-head { padding: 20px 24px; border-bottom: 1px solid var(--border-light); }
+  .glowvai-root .commerce-screen.commerce-result .commerce-result-head { padding: 20px 24px; border-bottom: 1px solid var(--ds-line); }
+  .glowvai-root .commerce-screen.commerce-result > .commerce-head { padding: 20px 24px; border-bottom: 1px solid var(--ds-line); }
+  .glowvai-root .commerce-screen.commerce-result > .commerce-head .commerce-head-copy h1 { font-size: 20px; }
   .glowvai-root .commerce-screen.commerce-processing .commerce-processing-body { padding: 24px 32px 32px; }
   .glowvai-root .commerce-screen.commerce-result > .commerce-result-body { padding: 32px; }
+  /* Inside the big card, inner panels are flat. */
+  .glowvai-root .commerce-screen.commerce-processing .commerce-processing-summary,
+  .glowvai-root .commerce-screen.commerce-result .commerce-result-meta,
+  .glowvai-root .commerce-screen.commerce-result .commerce-card { box-shadow: none; }
 
   /* Loading, empty and done states of express checkout stay centred on the page. */
   .glowvai-root .commerce-screen.commerce-express.is-center { min-height: 60dvh; }
@@ -75,13 +71,9 @@
 
 /* Desktop: two columns. The summary column holds the main button, so the phone action bar is hidden. */
 @media (min-width: 1024px) {
-  .glowvai-root .commerce-screen > .commerce-head,
-  .glowvai-root .commerce-screen > .commerce-body { padding-inline: 32px; }
-  .glowvai-root .commerce-screen > .commerce-steps { padding-inline: 32px; }
-
   .glowvai-root .commerce-split {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: minmax(0, 1fr) var(--ds-aside);
     align-items: start;
     gap: 24px;
   }
@@ -118,7 +110,7 @@
   .glowvai-root .commerce-serviceability .commerce-serve { min-height: 100%; align-content: center; padding: 40px 24px; }
   .glowvai-root .commerce-serviceability .commerce-split { align-items: stretch; }
 
-  /* Payment result and processing: status on the left, details and next steps on the right. */
+  /* Payment result, processing and order status: status on the left, details and next steps on the right. */
   .glowvai-root .commerce-screen.commerce-processing,
   .glowvai-root .commerce-screen.commerce-result { max-width: 960px; margin-top: 40px; }
   .glowvai-root .commerce-screen.commerce-processing .commerce-processing-body {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, MessageSquareText, Star } from 'lucide-react';
+import { ArrowLeft, MessageSquareText, PackageSearch, Star } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
@@ -36,9 +36,12 @@ export const ShopProductReviewsScreen: React.FC = () => {
           <h1>Reviews &amp; Ratings</h1>
         </header>
         <div className="shop-empty">
+          <span className="shop-empty-icon">
+            <PackageSearch size={24} />
+          </span>
           <h3>Product not found</h3>
           <p>Open a product from the shop to see its ratings.</p>
-          <button type="button" className="shop-btn-secondary shop-reviews-empty-btn" onClick={() => navigate('shop-browse')}>
+          <button type="button" className="shop-btn-primary" onClick={() => navigate('shop-browse')}>
             Browse products
           </button>
         </div>
@@ -66,12 +69,9 @@ export const ShopProductReviewsScreen: React.FC = () => {
         <button type="button" className="shop-icon-btn" onClick={goBack} aria-label="Go back">
           <ArrowLeft size={18} />
         </button>
-        <div className="shop-reviews-product">
-          {image && <img className="shop-reviews-thumb" src={image} alt="" width={64} height={64} />}
-          <div className="shop-reviews-titles">
-            <h1>Reviews &amp; Ratings</h1>
-            <p>{product.name}</p>
-          </div>
+        <div className="shop-header-titles">
+          <h1>Reviews &amp; Ratings</h1>
+          <p className="shop-header-sub">{product.name}</p>
         </div>
       </header>
 
@@ -97,22 +97,22 @@ export const ShopProductReviewsScreen: React.FC = () => {
                 {product.originalPrice > product.price && <s>{formatRupee(product.originalPrice)}</s>}
               </span>
             </button>
-            <button type="button" className="shop-reviews-add" onClick={handleAddToCart}>
+            <button type="button" className="shop-btn-primary shop-reviews-add" onClick={handleAddToCart}>
               Add to cart
             </button>
           </section>
         </aside>
 
-        <section className="shop-reviews-card shop-reviews-none">
+        <section className="shop-reviews-none">
           <span className="shop-reviews-none-icon">
             <MessageSquareText size={22} />
           </span>
           <h2>No written reviews yet</h2>
           <p>
-            The rating above is the product's catalogue rating. Written reviews from GlowVAI customers will appear here once
+            The rating shown here is the product's catalogue rating. Written reviews from GlowVAI customers will appear here once
             they are available.
           </p>
-          <button type="button" className="shop-btn-secondary shop-reviews-empty-btn" onClick={() => navigate('shop-product', { productId: product.id })}>
+          <button type="button" className="shop-btn-primary shop-reviews-empty-btn" onClick={() => navigate('shop-product', { productId: product.id })}>
             Back to product
           </button>
         </section>

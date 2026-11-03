@@ -114,7 +114,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
 
       <div className="shop-search-body">
         <div className="shop-search-bar-wrap">
-          <div className="shop-search-bar">
+          <div className="shop-input shop-search-bar">
             <Search size={18} />
             <input
               type="text"
@@ -128,7 +128,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
               aria-label="Search products"
             />
             {query.length > 0 && (
-              <button type="button" className="shop-search-clear" onClick={() => setQuery('')} aria-label="Clear search">
+              <button type="button" className="shop-input-clear" onClick={() => setQuery('')} aria-label="Clear search">
                 <X size={16} />
               </button>
             )}
@@ -252,9 +252,12 @@ export const ShopSearchFiltersScreen: React.FC = () => {
               </div>
             ) : (
               <div className="shop-empty">
+                <span className="shop-empty-icon">
+                  <Search size={24} />
+                </span>
                 <h3>No products match these filters</h3>
                 <p>Try another ingredient, brand or price range.</p>
-                <button type="button" className="shop-btn-secondary shop-search-empty-btn" onClick={clearAll}>
+                <button type="button" className="shop-btn-primary" onClick={clearAll}>
                   Clear all filters
                 </button>
               </div>
