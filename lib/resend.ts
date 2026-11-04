@@ -192,9 +192,15 @@ export function generateGlowVaiEmailHTML(
   `;
 }
 
-// The proxy URL and secret live on the server, so the browser always sends mail through /api/admin/email.
-export function isEmailProxyConfigured(): boolean {
-  return true;
+// Whether the server has the email proxy set up. The browser asks /api/admin/email; it never sees the proxy settings.
+export async function fetchEmailProxyStatus(): Promise<boolean> {
+  try {
+    const res = await fetch("/api/admin/email", { cache: "no-store" });
+    const data = (await res.json().catch(() => ({ configured: false }))) as { configured?: boolean };
+    return res.ok && data.configured === true;
+  } catch {
+    return false;
+  }
 }
 
 export async function sendResendEmail(options: SendEmailOptions) {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Lock, Unlock, Search, Download, RefreshCw, ScanLine, ImageIcon, Users, CheckCircle2, AlertCircle, LogOut, Mail, Send, Eye, ExternalLink } from "lucide-react";
 import { AdminLead } from "@/lib/adminData";
 import { fetchLeadsFromSheet } from "@/lib/googleSheet";
-import { generateGlowVaiEmailHTML, sendResendEmail, isEmailProxyConfigured } from "@/lib/resend";
+import { generateGlowVaiEmailHTML, sendResendEmail, fetchEmailProxyStatus } from "@/lib/resend";
 
 export default function AdminDashboardPage() {
   // 1. Authentication state (server-side session)
@@ -222,7 +222,12 @@ export default function AdminDashboardPage() {
   const completedLeads = leads.filter((l) => l.name && l.phone);
   const leadsWithPhoto = leads.filter((l) => l.image_url);
   const uniquePhones = new Set(leads.filter((l) => l.phone).map((l) => l.phone)).size;
-  const emailProxyReady = isEmailProxyConfigured();
+  const [emailProxyReady, setEmailProxyReady] = useState(false);
+
+  // Ask the server whether email is configured, once the admin is signed in.
+  useEffect(() => {
+    if (isAuthenticated) fetchEmailProxyStatus().then(setEmailProxyReady);
+  }, [isAuthenticated]);
 
   const filteredLeads = leads.filter((l) => {
     const q = searchQuery.toLowerCase();
