@@ -68,6 +68,13 @@ const nextConfig = {
             },
           ];
         },
+        // The admin console runs as its own app. Requests for /admin2006/console go to ADMIN_CONSOLE_ORIGIN, and the
+        // middleware checks the admin session before this runs.
+        async rewrites() {
+          const origin = process.env.ADMIN_CONSOLE_ORIGIN;
+          if (!origin) return [];
+          return [{ source: '/admin2006/console/:path*', destination: `${origin.replace(/\/+$/, '')}/admin2006/console/:path*` }];
+        },
         async headers() {
           return [
             {
