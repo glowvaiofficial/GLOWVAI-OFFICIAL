@@ -5,6 +5,7 @@ import { AndroidStatusBar } from './components/common/AndroidStatusBar';
 import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
+import { startProductFeed } from './core/services/productFeed';
 
 // Screens
 import { WelcomeScreen } from './screens/WelcomeScreen';
@@ -40,6 +41,9 @@ const AppContent: React.FC = () => {
     window.scrollTo(0, 0);
     document.querySelector('.glowvai-root .screen-content')?.scrollTo(0, 0);
   }, [currentScreen, activeParams]);
+
+  // Products come from the database. The feed stays open while the app is on screen.
+  React.useEffect(() => startProductFeed(), []);
 
   const renderScreen = () => {
     const PortedScreen = portedRoutes[currentScreen as keyof typeof portedRoutes];

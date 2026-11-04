@@ -3,13 +3,27 @@ import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, 
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { ScreenName } from '../../../context/contextDefinition';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-home.css';
+
+function buildCatalogLists(catalog: SkincareProduct[]) {
+  const FULL_SIZE_PRODUCTS = catalog.filter((p) => !isTrialProduct(p));
+  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount).slice(0, 6);
+  const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500).slice(0, 6);
+
+  // Deals are real catalogue products with a discount from their own MRP.
+  const DEAL_PRODUCTS = FULL_SIZE_PRODUCTS.filter((p) => getDiscountPercent(p) > 0)
+    .sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a))
+    .slice(0, 4);
+
+  const firstProductIn = (category: SkincareProduct['category']) => FULL_SIZE_PRODUCTS.find((p) => p.category === category);
+  return { FULL_SIZE_PRODUCTS, TOP_RATED, UNDER_500, DEAL_PRODUCTS, firstProductIn };
+}
 
 const HERO_IMAGE = '/glowvai/assets/home/glowvai-shopping-hero.png';
 
@@ -47,16 +61,7 @@ const CONCERNS: { id: string; label: string; Icon: LucideIcon }[] = [
 ];
 
 // Catalogue rails: sorted or filtered from the real product data. Trial samples are left out so they don't top the rankings.
-const FULL_SIZE_PRODUCTS = INDIAN_SKINCARE_CATALOG.filter((p) => !isTrialProduct(p));
-const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount).slice(0, 6);
-const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500).slice(0, 6);
-
-// Deals are real catalogue products with a discount from their own MRP.
-const DEAL_PRODUCTS = FULL_SIZE_PRODUCTS.filter((p) => getDiscountPercent(p) > 0)
-  .sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a))
-  .slice(0, 4);
-
-const firstProductIn = (category: SkincareProduct['category']) => FULL_SIZE_PRODUCTS.find((p) => p.category === category);
+// Catalogue rails are built from the live product list (see buildCatalogLists).
 
 function Rail({
   title,
@@ -195,6 +200,8 @@ const FESTIVAL: Record<Mode, FestivalContent> = {
 };
 
 export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
+  const catalog = useLiveCatalog();
+  const { FULL_SIZE_PRODUCTS, TOP_RATED, UNDER_500, DEAL_PRODUCTS, firstProductIn } = buildCatalogLists(catalog);
   const { navigate, setShoppingPreference, shoppingPreference, currentAddress } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
   const mode: Mode = shoppingPreference === 'men' ? 'men' : 'women';

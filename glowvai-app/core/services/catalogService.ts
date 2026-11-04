@@ -7,7 +7,7 @@
 
 import { collection, getDocs, doc, setDoc, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { INDIAN_SKINCARE_CATALOG, SkincareProduct, FALLBACK_PRODUCT_IMAGE } from '../data/indianSkincareCatalog';
+import { getLiveCatalog, SkincareProduct, FALLBACK_PRODUCT_IMAGE } from '../data/indianSkincareCatalog';
 
 export interface CatalogFetchResult {
   products: SkincareProduct[];
@@ -47,12 +47,12 @@ export const fetchLiveProductCatalog = async (
 
     // If Firestore collection is empty, seed with initial catalog
     await seedInitialProductsToFirestore();
-    return INDIAN_SKINCARE_CATALOG;
+    return getLiveCatalog();
   } catch (err: any) {
     console.warn('[CatalogService] Firestore fetch error, using local fallback:', err?.message);
     return categoryFilter === 'all'
-      ? INDIAN_SKINCARE_CATALOG
-      : INDIAN_SKINCARE_CATALOG.filter(p => p.category.toLowerCase() === categoryFilter.toLowerCase());
+      ? getLiveCatalog()
+      : getLiveCatalog().filter(p => p.category.toLowerCase() === categoryFilter.toLowerCase());
   }
 };
 
@@ -61,7 +61,7 @@ export const fetchLiveProductCatalog = async (
  */
 export const seedInitialProductsToFirestore = async (): Promise<void> => {
   try {
-    for (const prod of INDIAN_SKINCARE_CATALOG) {
+    for (const prod of getLiveCatalog()) {
       const prodRef = doc(db, PRODUCTS_COLLECTION, prod.id);
       await setDoc(prodRef, {
         ...prod,

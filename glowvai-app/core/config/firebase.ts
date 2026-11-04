@@ -22,12 +22,12 @@ export interface FirebaseClientConfig {
 }
 
 const getFirebaseConfig = (): FirebaseClientConfig => {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyAaCBg-trPB4Zf72B-2z6dviEUf50gJub0';
-  const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'glowvai-v2.firebaseapp.com';
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'glowvai-v2';
-  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'glowvai-v2.firebasestorage.app';
-  const messagingSenderId = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1094835664474';
-  const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1094835664474:android:c91eca572a758bb30a8a63';
+  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyDlbmN3fUAXTUlPBO5OGASbwIOAraUPBgA';
+  const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'glowvai-38bde.firebaseapp.com';
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'glowvai-38bde';
+  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'glowvai-38bde.firebasestorage.app';
+  const messagingSenderId = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '353135878239';
+  const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:353135878239:web:c51f7954ba875b522ffbea';
   const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || undefined;
 
   return {

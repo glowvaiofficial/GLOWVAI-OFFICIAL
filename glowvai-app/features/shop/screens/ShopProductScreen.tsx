@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, PackageSearch, Plus, Share2, ShoppingBag, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import '../styles/shop-product.css';
@@ -17,10 +17,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 // Everything on this screen comes from the product's own catalogue entry. Sections without data are not shown.
 export const ShopProductScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
   const { navigate, goBack, activeParams, currentAddress, wishlist, toggleWishlist, showToast } = useApp();
   const rawId = activeParams?.productId ?? activeParams?.id;
   const productId = typeof rawId === 'string' ? rawId : undefined;
-  const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === productId);
+  const product = catalog.find((p) => p.id === productId);
 
   const cartTotalCount = useCartStore((state) => state.totalCount);
   const inCartCount = useCartStore((state) => (product ? state.items[product.id]?.quantity ?? 0 : 0));

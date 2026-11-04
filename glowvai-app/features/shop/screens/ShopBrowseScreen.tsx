@@ -2,24 +2,25 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Activity, Check, Droplet, Leaf, Search, ShoppingBag, Sparkles, Sun, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
+import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-browse.css';
 
 // Each tile shows the first full-size catalogue product in that category, as on the shop home.
-const categoryImage = (id: string) => {
-  const sample = INDIAN_SKINCARE_CATALOG.find((p) => p.category === id && !isTrialProduct(p));
+const categoryImage = (catalog: SkincareProduct[], id: string) => {
+  const sample = catalog.find((p) => p.category === id && !isTrialProduct(p));
   return sample ? getProductThumbUrl(sample) : '';
 };
 
 // Category ids match SkincareProduct['category'] exactly.
 const CATEGORY_ITEMS: { id: string; name: string; imageUri: string; Icon: LucideIcon }[] = [
-  { id: 'Serums', name: 'Serums & Actives', imageUri: categoryImage('Serums'), Icon: Sparkles },
-  { id: 'Cleansers', name: 'Cleansers & Washes', imageUri: categoryImage('Cleansers'), Icon: Droplet },
-  { id: 'Moisturizers', name: 'Moisturizers & Creams', imageUri: categoryImage('Moisturizers'), Icon: Leaf },
-  { id: 'Suncare', name: 'Sunscreen & SPF', imageUri: categoryImage('Suncare'), Icon: Sun },
-  { id: 'Treatments', name: 'Spot Treatments', imageUri: categoryImage('Treatments'), Icon: Activity },
+  { id: 'Serums', name: 'Serums & Actives', imageUri: '', Icon: Sparkles },
+  { id: 'Cleansers', name: 'Cleansers & Washes', imageUri: '', Icon: Droplet },
+  { id: 'Moisturizers', name: 'Moisturizers & Creams', imageUri: '', Icon: Leaf },
+  { id: 'Suncare', name: 'Sunscreen & SPF', imageUri: '', Icon: Sun },
+  { id: 'Treatments', name: 'Spot Treatments', imageUri: '', Icon: Activity },
 ];
 
 // Keyword groups matched against product name/description/keyActives.
@@ -44,6 +45,8 @@ const VALID_CATEGORY_IDS = new Set(CATEGORY_ITEMS.map((c) => c.id));
 const VALID_CONCERN_IDS = new Set(SKIN_CONCERNS.map((c) => c.id));
 
 export const ShopBrowseScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
+  const categoryItems = CATEGORY_ITEMS.map((item) => ({ ...item, imageUri: categoryImage(catalog, item.id) }));
   const { navigate, activeParams } = useApp();
   const params: Record<string, string | undefined> = activeParams ?? {};
 
@@ -67,13 +70,13 @@ export const ShopBrowseScreen: React.FC = () => {
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const item of CATEGORY_ITEMS) {
-      counts[item.id] = INDIAN_SKINCARE_CATALOG.filter((p) => p.category === item.id).length;
+    for (const item of categoryItems) {
+      counts[item.id] = catalog.filter((p) => p.category === item.id).length;
     }
     return counts;
   }, []);
 
-  const filteredProducts = INDIAN_SKINCARE_CATALOG.filter((product) => {
+  const filteredProducts = catalog.filter((product) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       searchQuery === '' || product.name.toLowerCase().includes(q) || product.brand.toLowerCase().includes(q);
@@ -148,7 +151,7 @@ export const ShopBrowseScreen: React.FC = () => {
       <div className="shop-browse-body">
         <aside className="shop-browse-sidebar" aria-label="Filters">
           <h3>Shop by Category</h3>
-          {CATEGORY_ITEMS.map((cat) => (
+          {categoryItems.map((cat) => (
             <button key={cat.id} type="button" className="shop-browse-side-item" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
               <span className="shop-browse-side-badge">
                 <cat.Icon size={15} />
@@ -199,7 +202,7 @@ export const ShopBrowseScreen: React.FC = () => {
           <section className="shop-browse-directory">
             <h2>Browse Skincare Directory</h2>
             <div className="shop-browse-category-grid">
-              {CATEGORY_ITEMS.map((cat) => (
+              {categoryItems.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
