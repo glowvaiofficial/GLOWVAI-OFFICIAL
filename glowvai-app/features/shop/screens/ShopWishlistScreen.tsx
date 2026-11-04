@@ -1,19 +1,20 @@
 import React from 'react';
 import { ArrowLeft, Heart, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import '../styles/shop-wishlist.css';
 
 // Shows only the products the shopper saved (app wishlist state), matched to the catalogue for live prices.
 export const ShopWishlistScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
   const { navigate, goBack, wishlist, toggleWishlist } = useApp();
   const cartTotalCount = useCartStore((state) => state.totalCount);
 
   const savedProducts = wishlist
-    .map((id) => INDIAN_SKINCARE_CATALOG.find((p) => p.id === id))
-    .filter((p): p is (typeof INDIAN_SKINCARE_CATALOG)[number] => Boolean(p));
+    .map((id) => catalog.find((p) => p.id === id))
+    .filter((p): p is (typeof catalog)[number] => Boolean(p));
 
   return (
     <div className="shop-screen shop-wishlist">

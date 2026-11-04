@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../core/state/cartStore';
 import { cartLineFor, formatRupee, getProductImageUrl } from '../shop/shared/shopUtils';
 import { RecHeader } from './RecHeader';
@@ -14,9 +14,9 @@ const ROUTINE_STEPS = [
 ];
 
 export const RoutineCheckoutScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
   const { navigate } = useApp();
   const addItem = useCartStore((state) => state.addItem);
-  const catalog = INDIAN_SKINCARE_CATALOG;
   const rows = ROUTINE_STEPS.flatMap(({ id, step }) => {
     const product = catalog.find((p) => p.id === id);
     return product ? [{ product, step }] : [];

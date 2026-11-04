@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG, ALL_SKINCARE_BRANDS } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import '../styles/shop-search-filters.css';
 
 const REAL_CATEGORIES = ['Serums', 'Cleansers', 'Moisturizers', 'Suncare', 'Treatments'];
 const OPTION_LABELS: Record<string, string> = { Suncare: 'Sunscreen' };
 // Only brands with at least one catalogue product, so a brand filter never empties the list on its own.
-const STOCKED_BRANDS = ALL_SKINCARE_BRANDS.filter((brand) => INDIAN_SKINCARE_CATALOG.some((p) => p.brand === brand));
 const PRICE_BUCKETS: Record<string, (price: number) => boolean> = {
   'Under ₹500': (p) => p < 500,
   '₹500–₹1000': (p) => p >= 500 && p <= 1000,
@@ -22,11 +21,15 @@ const EMPTY_FILTERS: ActiveFilters = { category: 'All', brand: 'All', price: 'Al
 
 const FILTER_GROUPS: { title: string; key: FilterKey; options: string[] }[] = [
   { title: 'Category', key: 'category', options: ['All', ...REAL_CATEGORIES] },
-  { title: 'Brand', key: 'brand', options: ['All', ...STOCKED_BRANDS] },
+  { title: 'Brand', key: 'brand', options: ['All'] },
   { title: 'Price', key: 'price', options: ['All', ...Object.keys(PRICE_BUCKETS)] },
 ];
 
 export const ShopSearchFiltersScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
+  const STOCKED_BRANDS = Array.from(new Set(catalog.map((p) => p.brand))).sort();
+  // Brand options come from the live products; the other groups are fixed.
+  const filterGroups = FILTER_GROUPS.map((g) => (g.key === 'brand' ? { ...g, options: ['All', ...STOCKED_BRANDS] } : g));
   const { navigate, goBack } = useApp();
 
   const [query, setQuery] = useState('');
@@ -45,8 +48,8 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
     const source = q
-      ? INDIAN_SKINCARE_CATALOG.filter((p) => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
-      : INDIAN_SKINCARE_CATALOG;
+      ? catalog.filter((p) => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
+      : catalog;
     return source
       .slice(0, 5)
       .map((p) => p.name)
@@ -55,7 +58,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return INDIAN_SKINCARE_CATALOG.filter((p) => {
+    return catalog.filter((p) => {
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -194,7 +197,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                 Reset All
               </button>
             </div>
-            {FILTER_GROUPS.map((group) => (
+            {filterGroups.map((group) => (
               <section key={group.key} className="shop-search-group">
                 <h3>{group.title}</h3>
                 <div className="shop-search-options">

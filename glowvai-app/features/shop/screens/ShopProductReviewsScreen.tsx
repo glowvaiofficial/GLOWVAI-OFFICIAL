@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, MessageSquareText, PackageSearch, Star } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
 import '../styles/shop-product-reviews.css';
@@ -20,11 +20,12 @@ const Stars: React.FC<{ value: number; size: number; className: string }> = ({ v
 
 // There is no review service yet, so this screen shows only the catalogue's rating summary and says so plainly.
 export const ShopProductReviewsScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
   const { goBack, navigate, activeParams } = useApp();
   const addItem = useCartStore((state) => state.addItem);
 
   const rawId = activeParams?.productId ?? activeParams?.id;
-  const product = INDIAN_SKINCARE_CATALOG.find((p) => p.id === rawId);
+  const product = catalog.find((p) => p.id === rawId);
 
   if (!product) {
     return (

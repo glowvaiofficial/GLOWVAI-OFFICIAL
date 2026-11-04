@@ -79,7 +79,11 @@ const productTile = (product: SkincareProduct): string => {
 };
 
 // Cart items store a plain URL string, so this always returns one.
-export const getProductImageUrl = (product: SkincareProduct): string => PRODUCT_PHOTOS[product.id] ?? productTile(product);
+// A product's own photo first; otherwise the built-in photo for that id, otherwise the generated brand tile.
+export const getProductImageUrl = (product: SkincareProduct): string => {
+  const own = typeof product.imageSource?.uri === 'string' ? product.imageSource.uri : product.official_brand_image_url;
+  return own || PRODUCT_PHOTOS[product.id] || productTile(product);
+};
 
 // Smaller image for cards and tiles: Unsplash URLs are asked for a 400px-wide rendition. Local images are returned as they are.
 export const getProductThumbUrl = (product: SkincareProduct, width = 400): string => {

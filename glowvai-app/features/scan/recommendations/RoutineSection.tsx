@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronRight, Package, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG, type SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog, type SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ConcernKey, SkinAnalysisResult } from '../../../core/services/skinModelService';
 import { formatRupee, getProductImageUrl } from '../../shop/shared/shopUtils';
 
@@ -22,8 +22,8 @@ const CONCERN_ACTIVES: Record<ConcernKey, string[]> = {
   visible_blemishes: ['salicylic', 'niacinamide', 'tea tree', 'zinc'],
 };
 
-const pickProduct = (category: SkincareProduct['category'], keywords: string[]): SkincareProduct | undefined => {
-  const candidates = INDIAN_SKINCARE_CATALOG.filter((product) => product.category === category && product.price > 1);
+const pickProduct = (catalog: SkincareProduct[], category: SkincareProduct['category'], keywords: string[]): SkincareProduct | undefined => {
+  const candidates = catalog.filter((product) => product.category === category && product.price > 1);
   let best: SkincareProduct | undefined;
   let bestScore = -1;
   candidates.forEach((product) => {
@@ -57,11 +57,12 @@ interface RoutineSectionProps {
 /** Four-step routine matched to the concerns the scan found, using live shop listings. */
 export const RoutineSection: React.FC<RoutineSectionProps> = ({ result }) => {
   const { navigate } = useApp();
+  const catalog = useLiveCatalog();
   const present = result?.concerns.filter((concern) => concern.present).map((concern) => concern.key) ?? [];
 
   const steps = useMemo(() => {
     const keywords = Array.from(new Set(present.flatMap((key) => CONCERN_ACTIVES[key] ?? [])));
-    return STEPS.map((step) => ({ ...step, product: pickProduct(step.category, keywords) })).filter(
+    return STEPS.map((step) => ({ ...step, product: pickProduct(catalog, step.category, keywords) })).filter(
       (step): step is typeof step & { product: SkincareProduct } => Boolean(step.product)
     );
   }, [present.join('|')]);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowUpDown, Check, ChevronDown, ChevronUp, LayoutGrid, Search, ShoppingBag, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { INDIAN_SKINCARE_CATALOG } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import '../styles/shop-category.css';
 
@@ -21,6 +21,7 @@ const SORT_OPTIONS = [
 ];
 
 export const ShopCategoryScreen: React.FC = () => {
+  const catalog = useLiveCatalog();
   const { navigate, goBack, activeParams } = useApp();
   const categoryId: string = activeParams?.categoryId ?? activeParams?.id ?? '';
 
@@ -63,7 +64,7 @@ export const ShopCategoryScreen: React.FC = () => {
   }
 
   const q = searchQuery.trim().toLowerCase();
-  const products = INDIAN_SKINCARE_CATALOG.filter((p) => {
+  const products = catalog.filter((p) => {
     if (p.category !== categoryId) return false;
     if (!q) return true;
     return p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q);
