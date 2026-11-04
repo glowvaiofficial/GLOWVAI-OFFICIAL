@@ -17,11 +17,21 @@ const json = (body: unknown, status = 200) =>
  * Sends one admin email through the email proxy. The proxy URL and secret are read on the server only, so they are
  * never sent to the browser. Only a valid admin session may call this.
  */
-export async function POST(req: NextRequest) {
+async function isSignedIn(): Promise<boolean> {
   const sessionSecret = process.env.SESSION_SECRET;
   const jar = await cookies();
-  const authed = Boolean(sessionSecret) && verifySession(jar.get(ADMIN_COOKIE)?.value, sessionSecret as string);
-  if (!authed) return json({ ok: false, error: "Sign in to the admin first." }, 401);
+  return Boolean(sessionSecret) && verifySession(jar.get(ADMIN_COOKIE)?.value, sessionSecret as string);
+}
+
+// Reports whether the email proxy is set up on the server. Only a signed-in admin can ask.
+export async function GET() {
+  if (!(await isSignedIn())) return json({ ok: false, error: "Sign in to the admin first." }, 401);
+  const configured = Boolean(process.env.EMAIL_PROXY_URL) && Boolean(process.env.EMAIL_PROXY_SECRET);
+  return json({ ok: true, configured });
+}
+
+export async function POST(req: NextRequest) {
+  if (!(await isSignedIn())) return json({ ok: false, error: "Sign in to the admin first." }, 401);
 
   const limit = rateLimit(`admin-email:${clientIp(req)}`, 30, 60 * 60 * 1000);
   if (!limit.ok) return json({ ok: false, error: "Too many emails. Try again later." }, 429);
