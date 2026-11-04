@@ -2,6 +2,11 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { setLiveCatalog, type SkincareProduct } from '../data/indianSkincareCatalog';
 
+// Splits a comma or line separated list into trimmed items.
+function splitList(value: string): string[] {
+  return value.split(/\n|,/).map((x) => x.trim()).filter(Boolean);
+}
+
 // Turns a product saved by the admin console into the shape the shop screens use. Fields the admin does not capture
 // yet (ratings, delivery time, actives) are left empty, so the shop shows nothing for them rather than made-up values.
 export function toShopProduct(id: string, d: Record<string, unknown>): SkincareProduct {
@@ -26,7 +31,7 @@ export function toShopProduct(id: string, d: Record<string, unknown>): SkincareP
     official_brand_image_url: photo ?? undefined,
     cardBg: '#f4f6fb',
     description: String(d.productDescription ?? ''),
-    keyActives: ingredients.split(/\n|,/).map((x) => x.trim()).filter(Boolean),
+    keyActives: splitList(typeof d.keyActives === 'string' && d.keyActives ? d.keyActives : ingredients),
     metrics: { hydration: '', glow: '', barrier: '' },
     deliveryMinutes: 0,
   };
