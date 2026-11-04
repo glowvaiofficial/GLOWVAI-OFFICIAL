@@ -73,17 +73,17 @@ export function CookieNotice() {
     <div
       role="dialog"
       aria-label="Privacy and analytics choice"
-      className="fixed bottom-24 md:bottom-4 left-4 right-4 sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[24px] p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]"
+      className="fixed bottom-24 md:bottom-4 left-3 right-3 sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[18px] md:rounded-[24px] p-3 md:p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]"
     >
-      <h2 className="font-display font-semibold text-base text-ink">Analytics, your choice</h2>
-      <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+      <h2 className="font-display font-semibold text-sm md:text-base text-ink">Analytics, your choice</h2>
+      <p className="mt-1 md:mt-1.5 text-xs md:text-sm leading-snug md:leading-relaxed text-ink-muted line-clamp-2 md:line-clamp-none">
         We use analytics to see which pages help people. We never send your name, phone, email or photos.{" "}
         <Link href="/privacy#cookies" className="text-brand underline underline-offset-[3px] font-medium">
           Privacy policy
         </Link>
         .
       </p>
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2 md:gap-3">
         <button
           id="btn-accept-analytics"
           onClick={() => updateConsent(true)}

@@ -178,3 +178,8 @@
 .glowvai-root .skin-report-screen{ flex: none; min-height: 100%; }
 .glowvai-root .skin-report-screen .scan-body{ flex: none; overflow: visible; }
 .glowvai-root .skin-report-cue{ display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+
+/* Final pass. Scan screens on phones: the headline is one size smaller so the header does not crowd the content. */
+@media (max-width: 719px){
+  .glowvai-root .scan-screen .scan-headline{ font-size: 20px; line-height: 1.25; }
+}
