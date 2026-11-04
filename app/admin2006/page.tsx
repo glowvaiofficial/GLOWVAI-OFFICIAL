@@ -145,6 +145,13 @@ export default function AdminDashboardPage() {
     document.body.removeChild(link);
   };
 
+  const [emailProxyReady, setEmailProxyReady] = useState(false);
+
+  // Ask the server whether email is configured, once the admin is signed in.
+  useEffect(() => {
+    if (isAuthenticated) fetchEmailProxyStatus().then(setEmailProxyReady);
+  }, [isAuthenticated]);
+
   if (isCheckingAuth) {
     return (
       <div className="min-h-screen bg-paper-deep flex items-center justify-center text-ink-muted">
@@ -222,12 +229,6 @@ export default function AdminDashboardPage() {
   const completedLeads = leads.filter((l) => l.name && l.phone);
   const leadsWithPhoto = leads.filter((l) => l.image_url);
   const uniquePhones = new Set(leads.filter((l) => l.phone).map((l) => l.phone)).size;
-  const [emailProxyReady, setEmailProxyReady] = useState(false);
-
-  // Ask the server whether email is configured, once the admin is signed in.
-  useEffect(() => {
-    if (isAuthenticated) fetchEmailProxyStatus().then(setEmailProxyReady);
-  }, [isAuthenticated]);
 
   const filteredLeads = leads.filter((l) => {
     const q = searchQuery.toLowerCase();
