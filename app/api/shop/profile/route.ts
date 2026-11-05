@@ -1,14 +1,18 @@
 import { NextRequest } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { customerFrom, db, indianMobile, json, text, tooMany } from "@/lib/shop/server";
+import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 
 export const dynamic = "force-dynamic";
 
 // The customer's own profile, stored in users/{uid} with the field names the GlowVai admin panel reads
 // (Customer Management). The phone number is recorded as given; it is not verified until SMS sign-in is connected.
 export async function GET(req: NextRequest) {
+  const ipLimited = limitByIp(req, "profile-get", 60);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const userLimited = limitByUser(customer.uid, "profile-get", 60);
+  if (userLimited) return userLimited;
   const snap = await db().collection("users").doc(customer.uid).get();
   const d = snap.data() ?? {};
   return json({
@@ -26,6 +30,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const ipLimited = limitByIp(req, "profile-post", 20);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   if (tooMany(`profile:${customer.uid}`, 20, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);

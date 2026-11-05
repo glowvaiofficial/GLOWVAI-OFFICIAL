@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { db, json } from "@/lib/shop/server";
+import { db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 // Razorpay server-to-server events. Payment is confirmed here even if the customer closes the browser before verify.
 // Signature is checked against the exact raw body with RAZORPAY_WEBHOOK_SECRET.
 export async function POST(req: NextRequest) {
+  const ipLimited = limitByIp(req, "razorpay-webhook-post", 120);
+  if (ipLimited) return ipLimited;
   const raw = await req.text();
   if (!verifyWebhookSignature(raw, req.headers.get("x-razorpay-signature") ?? "")) return json({ ok: false }, 400);
   const event = JSON.parse(raw) as { event?: string; payload?: { payment?: { entity?: { id?: string; order_id?: string } } } };

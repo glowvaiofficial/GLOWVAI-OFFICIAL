@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
 import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
-import { customerFrom, db, indianMobile, json, text, tooMany } from "@/lib/shop/server";
+import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
 
 export const dynamic = "force-dynamic";
@@ -19,8 +19,12 @@ function customerStatus(shopStatus: string, overlay: Record<string, unknown> | u
 
 // The signed-in customer's orders, newest first, with any admin decision applied.
 export async function GET(req: NextRequest) {
+  const ipLimited = limitByIp(req, "orders-get", 30);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const userLimited = limitByUser(customer.uid, "orders", 60);
+  if (userLimited) return userLimited;
   const snap = await db().collection("orders").where("userId", "==", customer.uid).limit(100).get();
   const ids = snap.docs.map((d) => d.id);
   const overlays = new Map<string, Record<string, unknown>>();
@@ -61,8 +65,12 @@ export async function GET(req: NextRequest) {
 // Places an order. Prices, delivery fee and coupon are worked out here from the published products and the shop's
 // pricing rules, never taken from the browser. Only cash on delivery is offered until online payment is connected.
 export async function POST(req: NextRequest) {
+  const ipLimited = limitByIp(req, "orders-post", 30);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
+  const userLimited = limitByUser(customer.uid, "orders", 60);
+  if (userLimited) return userLimited;
   if (tooMany(`order:${customer.uid}`, 10, 60 * 60 * 1000)) return json({ ok: false, error: "Too many orders in a short time. Try again later." }, 429);
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
