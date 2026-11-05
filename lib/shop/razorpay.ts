@@ -17,6 +17,8 @@ export async function createRazorpayOrder(amountRupees: number, receipt: string)
   const keyId = process.env.RAZORPAY_KEY_ID;
   const secret = process.env.RAZORPAY_KEY_SECRET;
   if (!keyId || !secret) throw new Error("NOT_CONFIGURED");
+  // Razorpay rejects amounts below 100 paise (₹1).
+  if (!Number.isFinite(amountRupees) || Math.round(amountRupees * 100) < 100) throw new Error("AMOUNT_TOO_LOW");
   const res = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
     headers: {
