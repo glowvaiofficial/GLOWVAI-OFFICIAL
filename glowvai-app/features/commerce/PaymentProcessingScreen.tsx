@@ -7,6 +7,8 @@ import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
+import { verifyOnlinePayment } from '../../core/services/shopApi';
+import { openRazorpayCheckout } from './lib/razorpayCheckout';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
 const MIN_DISPLAY_MS = 1200;
@@ -65,13 +67,42 @@ export const PaymentProcessingScreen: React.FC = () => {
         return;
       }
 
+      const method = useCheckoutSession.getState().payMethod;
       const result = await placeCartOrder({
         items: cartItems,
         address,
         couponCode,
         tip: useCheckoutSession.getState().tip,
+        paymentMethod: method === 'online' ? 'ONLINE' : 'COD',
         customer: { name: customer.name, phone: customer.phone },
       });
+
+      // Online: the order exists but is only placed once Razorpay confirms the payment.
+      if (result.ok && result.data?.payment) {
+        try {
+          const paid = await openRazorpayCheckout(result.data.payment, { name: customer.name, contact: customer.phone });
+          const verified = await verifyOnlinePayment(paid);
+          if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
+          useCartStore.getState().clearCart();
+          void useCustomerStore.getState().loadOrders();
+          navigate('checkout-payment-success', {
+            orderId: verified.data.orderId,
+            amount: result.data.payment.amount / 100,
+            method: 'online',
+            confirmed: true,
+          });
+        } catch (err) {
+          const dismissed = err instanceof Error && err.message === 'DISMISSED';
+          navigate('checkout-payment-failed', {
+            error: dismissed
+              ? 'Payment was not completed. Your bag is saved, so you can pay again.'
+              : err instanceof Error ? err.message : 'The payment could not be confirmed.',
+            amount,
+            method: 'online',
+          });
+        }
+        return;
+      }
       setStep(STEPS.length);
 
       const remaining = MIN_DISPLAY_MS - (Date.now() - startedAt);

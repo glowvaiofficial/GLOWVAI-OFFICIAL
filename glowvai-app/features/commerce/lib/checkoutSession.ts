@@ -27,6 +27,9 @@ interface CheckoutSessionState {
   payChoice: PayChoice;
   // The customer has looked at the delivery address on the review step and confirmed it. Reset when the address changes.
   addressConfirmed: boolean;
+  // How the customer pays: cash on delivery, or online through Razorpay (UPI, card, netbanking, wallet).
+  payMethod: 'cod' | 'online';
+  setPayMethod: (method: 'cod' | 'online') => void;
   // Optional tip for the delivery partner, in rupees (0, 10, 20, 30 or a custom amount up to 500).
   tip: number;
   setCouponCode: (code: string | null) => void;
@@ -40,6 +43,8 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   // Only cash on delivery can be placed until online payment is connected on the server.
   payChoice: 'cod',
   addressConfirmed: false,
+  payMethod: 'cod',
+  setPayMethod: (payMethod) => set({ payMethod }),
   tip: 0,
   setCouponCode: (couponCode) => set({ couponCode }),
   setPayChoice: () => set({ payChoice: 'cod' }),

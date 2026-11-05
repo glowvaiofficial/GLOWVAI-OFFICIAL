@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
 import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
 import { customerFrom, db, indianMobile, json, text, tooMany } from "@/lib/shop/server";
+import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
 
 export const dynamic = "force-dynamic";
 
@@ -66,8 +67,10 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
-  if (String(body.paymentMethod ?? "COD") !== "COD") {
-    return json({ ok: false, error: "Online payment is not available yet. Choose cash on delivery." }, 400);
+  const method = String(body.paymentMethod ?? "COD").toUpperCase();
+  if (method !== "COD" && method !== "ONLINE") return json({ ok: false, error: "Choose a payment method." }, 400);
+  if (method === "ONLINE" && !razorpayConfigured()) {
+    return json({ ok: false, error: "Online payment is being set up. Please choose cash on delivery for now." }, 503);
   }
 
   const lines = Array.isArray(body.items) ? body.items : [];
@@ -138,11 +141,22 @@ export async function POST(req: NextRequest) {
   const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
   const orderId = `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
   // Identifiers the customer and GlowVai use to follow the order: transaction (payment) reference and tracking number.
-  const transactionId = `COD-${randomBytes(4).toString("hex").toUpperCase()}`;
+  const online = method === "ONLINE";
+  const transactionId = online ? null : `COD-${randomBytes(4).toString("hex").toUpperCase()}`;
   const trackingId = `TRK-${randomBytes(4).toString("hex").toUpperCase()}`;
+  // Online orders are created first and become PLACED only when Razorpay confirms the payment (see payments/razorpay).
+  let razorpay: { id: string; amount: number; currency: string } | null = null;
+  if (online) {
+    try {
+      razorpay = await createRazorpayOrder(grandTotal, orderId);
+    } catch {
+      return json({ ok: false, error: "The payment could not be started. Please try again." }, 502);
+    }
+  }
   const order = {
     orderId,
     transactionId,
+    razorpayOrderId: razorpay?.id ?? null,
     trackingId,
     userId: customer.uid,
     customerName: recipientName,
@@ -166,13 +180,13 @@ export async function POST(req: NextRequest) {
       isDefault: true,
     },
     pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, tip, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
-    payment: { method: "COD", status: "PENDING", transactionId },
-    status: "PLACED",
+    payment: { method: online ? "ONLINE" : "COD", status: "PENDING", transactionId, paymentId: null },
+    status: online ? "PAYMENT_PENDING" : "PLACED",
     couponCode: discountAmount > 0 ? couponCode : null,
     referralCodeUsed: null,
     referralProcessed: false,
     source: "web_shop",
-    events: [{ at: now, actor: "Customer", event: "Order placed (cash on delivery)" }],
+    events: [{ at: now, actor: "Customer", event: online ? "Payment started (online)" : "Order placed (cash on delivery)" }],
     createdAt: now,
     updatedAt: now,
   };
@@ -184,5 +198,15 @@ export async function POST(req: NextRequest) {
     tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
   });
 
+  if (online && razorpay) {
+    return json({
+      ok: true,
+      orderId,
+      trackingId,
+      pricing: order.pricing,
+      status: order.status,
+      payment: { provider: "razorpay", keyId: razorpayKeyId(), razorpayOrderId: razorpay.id, amount: razorpay.amount, currency: razorpay.currency },
+    });
+  }
   return json({ ok: true, orderId, trackingId, transactionId, pricing: order.pricing, status: order.status });
 }

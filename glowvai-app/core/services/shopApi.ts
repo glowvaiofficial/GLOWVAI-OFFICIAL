@@ -69,6 +69,15 @@ export interface PlaceOrderInput {
   address: { name: string; phone: string; fullAddress: string; city: string; pincode: string; area?: string; landmark?: string };
   couponCode?: string | null;
   tip?: number;
+  paymentMethod?: 'COD' | 'ONLINE';
+}
+
+export interface OnlinePaymentStart {
+  provider: 'razorpay';
+  keyId: string;
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
 }
 
 export const SUPPORT_CATEGORIES = [
@@ -118,8 +127,13 @@ export async function fetchOrders(): Promise<ApiResult<{ orders: ShopOrder[] }>>
   return apiFetch<{ orders: ShopOrder[] }>('/api/shop/orders');
 }
 
-export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; pricing: ShopOrderPricing; status: string }>> {
-  return apiFetch('/api/shop/orders', post({ ...input, paymentMethod: 'COD', couponCode: input.couponCode || undefined }));
+export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; trackingId?: string; pricing: ShopOrderPricing; status: string; payment?: OnlinePaymentStart }>> {
+  return apiFetch('/api/shop/orders', post({ ...input, paymentMethod: input.paymentMethod ?? 'COD', couponCode: input.couponCode || undefined }));
+}
+
+// Confirms a Razorpay payment with the server (signature checked there).
+export async function verifyOnlinePayment(input: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }): Promise<ApiResult<{ orderId: string; trackingId?: string; transactionId: string }>> {
+  return apiFetch('/api/shop/payments/razorpay/verify', post(input));
 }
 
 export async function cancelOrder(orderId: string, reason: string): Promise<ApiResult<unknown>> {

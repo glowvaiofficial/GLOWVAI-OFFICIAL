@@ -1,5 +1,5 @@
 import React from 'react';
-import { Banknote, Clock, CreditCard, MapPin, ShieldCheck, ShoppingBag, Smartphone, UserRound } from 'lucide-react';
+import { Banknote, MapPin, ShieldCheck, ShoppingBag, Smartphone, UserRound } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact } from '../../core/utils/haptics';
@@ -14,6 +14,8 @@ export const PaymentMethodScreen: React.FC = () => {
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const address = useDeliveryAddress();
   const addressConfirmed = useCheckoutSession((s) => s.addressConfirmed);
+  const payMethod = useCheckoutSession((s) => s.payMethod);
+  const setPayMethod = useCheckoutSession((s) => s.setPayMethod);
   const tip = useCheckoutSession((s) => s.tip);
   const setTip = useCheckoutSession((s) => s.setTip);
   const cartItems = Object.values(items);
@@ -63,10 +65,10 @@ export const PaymentMethodScreen: React.FC = () => {
       navigate('login', { returnTo: 'checkout-payment-method', name: address.recipientName, phone: address.phoneNumber });
       return;
     }
-    navigate('checkout-payment-processing', { method: 'cod' });
+    navigate('checkout-payment-processing', { method: payMethod });
   };
   const payable = totals.grandTotal + tip;
-  const ctaLabel = customerDetails ? `Place order · ₹${payable}` : 'Add your details to continue';
+  const ctaLabel = customerDetails ? (payMethod === 'online' ? `Pay ₹${payable} now` : `Place order · ₹${payable}`) : 'Add your details to continue';
 
   return (
     <main className="commerce-screen commerce-payment has-aside">
@@ -77,14 +79,23 @@ export const PaymentMethodScreen: React.FC = () => {
         <div className="commerce-main">
           <fieldset className="commerce-card commerce-pay-group">
             <legend>
-              <Banknote size={15} /> Pay on delivery
+              <Banknote size={15} /> How do you want to pay?
             </legend>
             <div className="commerce-pay-options">
-              <label className="commerce-pay-option is-selected">
-                <input type="radio" name="pay-choice" checked readOnly />
+              <label className={`commerce-pay-option${payMethod === 'cod' ? ' is-selected' : ''}`}>
+                <input type="radio" name="pay-choice" checked={payMethod === 'cod'} onChange={() => setPayMethod('cod')} />
                 <span>
                   <b>Cash on delivery</b>
                   <small>Pay when the order arrives</small>
+                </span>
+              </label>
+              <label className={`commerce-pay-option${payMethod === 'online' ? ' is-selected' : ''}`}>
+                <input type="radio" name="pay-choice" checked={payMethod === 'online'} onChange={() => setPayMethod('online')} />
+                <span>
+                  <b>
+                    <Smartphone size={14} /> Pay now: UPI, card or netbanking
+                  </b>
+                  <small>Secure payment by Razorpay</small>
                 </span>
               </label>
             </div>
@@ -109,34 +120,6 @@ export const PaymentMethodScreen: React.FC = () => {
             </div>
           </section>
 
-          <fieldset className="commerce-card commerce-pay-group" disabled aria-describedby="online-soon">
-            <legend>
-              <Clock size={15} /> Online payment coming soon
-            </legend>
-            <div className="commerce-pay-options">
-              <label className="commerce-pay-option" style={{ opacity: 0.55 }}>
-                <input type="radio" name="pay-choice" disabled />
-                <span>
-                  <b>
-                    <Smartphone size={14} /> UPI apps
-                  </b>
-                  <small>Coming soon</small>
-                </span>
-              </label>
-              <label className="commerce-pay-option" style={{ opacity: 0.55 }}>
-                <input type="radio" name="pay-choice" disabled />
-                <span>
-                  <b>
-                    <CreditCard size={14} /> Credit or debit card
-                  </b>
-                  <small>Coming soon</small>
-                </span>
-              </label>
-            </div>
-            <p id="online-soon" className="commerce-secure-note">
-              Online payment is not available yet. Choose cash on delivery to place your order.
-            </p>
-          </fieldset>
 
           {customerDetails ? (
             <section className="commerce-card commerce-address-card">
@@ -160,7 +143,7 @@ export const PaymentMethodScreen: React.FC = () => {
         <aside className="commerce-aside">
           <section className="commerce-card commerce-bill" aria-labelledby="pay-bill-title">
             <h2 id="pay-bill-title">Order total</h2>
-            <BillRows totals={totals} totalLabel="Pay on delivery" />
+            <BillRows totals={totals} totalLabel={payMethod === 'online' ? 'Total to pay now' : 'Pay on delivery'} />
             {tip > 0 ? (
               <div className="commerce-bill-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Tip for your delivery partner</span>
@@ -180,7 +163,7 @@ export const PaymentMethodScreen: React.FC = () => {
 
       <footer className="commerce-sticky-bar">
         <div>
-          <small>Pay on delivery</small>
+          <small>{payMethod === 'online' ? 'Pay now' : 'Pay on delivery'}</small>
           <b>₹{payable}</b>
         </div>
         <button className="commerce-primary" onClick={placeOrder}>
