@@ -1,12 +1,16 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, text } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop/server";
 
 export const dynamic = "force-dynamic";
 
 // A customer can cancel their own order only before anyone has started on it (status PLACED, not changed by the admin).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const ipLimited = limitByIp(req, "cancel-post", 30);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const userLimited = limitByUser(customer.uid, "cancel", 60);
+  if (userLimited) return userLimited;
   const { id } = await params;
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
   const reason = text(body.reason, 200) || "Cancelled by the customer";

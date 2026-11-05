@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
-import { customerFrom, db, json, text, tooMany } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 
 export const dynamic = "force-dynamic";
 
@@ -27,8 +27,12 @@ const ESCALATE = new Set(["SUSPECTED_COUNTERFEIT", "PRODUCT_SAFETY"]);
 const SLA_HOURS: Record<string, number> = { URGENT: 2, HIGH: 8, NORMAL: 24, LOW: 72 };
 
 export async function GET(req: NextRequest) {
+  const ipLimited = limitByIp(req, "support-get", 30);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const userLimited = limitByUser(customer.uid, "support", 60);
+  if (userLimited) return userLimited;
   const snap = await db().collection("admin_tickets").where("customerId", "==", customer.uid).limit(50).get();
   // Only customer-visible fields: internal notes and staff assignment never leave the server.
   const tickets = snap.docs
@@ -50,8 +54,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const ipLimited = limitByIp(req, "support-post", 30);
+  if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const userLimited = limitByUser(customer.uid, "support", 60);
+  if (userLimited) return userLimited;
   if (tooMany(`ticket:${customer.uid}`, 5, 60 * 60 * 1000)) return json({ ok: false, error: "Too many requests. Try again later." }, 429);
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

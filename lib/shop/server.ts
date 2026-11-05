@@ -62,3 +62,23 @@ export function indianMobile(v: unknown): string {
   const digits = text(v, 20).replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "");
   return /^[6-9]\d{9}$/.test(digits) ? digits : "";
 }
+
+// The visitor's address as the platform reports it. Used to limit anonymous requests.
+export function clientIp(req: NextRequest): string {
+  const forwarded = req.headers.get("x-forwarded-for") ?? "";
+  return forwarded.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
+}
+
+// Refuses a route when one visitor sends too many requests. Checked before anything else, so spam costs nothing.
+export function limitByIp(req: NextRequest, route: string, max: number, windowMs = 60_000): NextResponse | null {
+  return tooMany(`ip:${route}:${clientIp(req)}`, max, windowMs)
+    ? json({ ok: false, error: "Too many requests. Please wait a minute and try again." }, 429)
+    : null;
+}
+
+// Refuses a route when one signed-in customer sends too many requests.
+export function limitByUser(uid: string, route: string, max: number, windowMs = 60_000): NextResponse | null {
+  return tooMany(`user:${route}:${uid}`, max, windowMs)
+    ? json({ ok: false, error: "Too many requests. Please wait a minute and try again." }, 429)
+    : null;
+}
