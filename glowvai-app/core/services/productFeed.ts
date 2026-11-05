@@ -1,4 +1,4 @@
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { setLiveCatalog, type SkincareProduct } from '../data/indianSkincareCatalog';
 
@@ -37,11 +37,34 @@ export function toShopProduct(id: string, d: Record<string, unknown>): SkincareP
   };
 }
 
-// Listens to published products from the database. Returns a function that stops listening.
+// Loads the published products once per device and keeps them for an hour. A live listener re-read all products on
+// every visit and reconnect, which used up the free database quota. Product changes appear within the hour.
+const CACHE_KEY = 'glowvai_products_v1';
+const CACHE_MS = 60 * 60 * 1000;
+
 export function startProductFeed(): () => void {
-  return onSnapshot(
-    query(collection(db, 'products'), where('status', '==', 'PUBLISHED')),
-    (snap) => setLiveCatalog(snap.docs.map((doc) => toShopProduct(doc.id, doc.data()))),
-    () => setLiveCatalog([]),
-  );
+  let cancelled = false;
+  const apply = (rows: SkincareProduct[]) => {
+    if (!cancelled) setLiveCatalog(rows);
+  };
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(CACHE_KEY) ?? 'null') as { at: number; rows: SkincareProduct[] } | null;
+    if (cached && Date.now() - cached.at < CACHE_MS && cached.rows.length > 0) apply(cached.rows);
+  } catch {
+    // Storage blocked: fetch every time.
+  }
+  void getDocs(query(collection(db, 'products'), where('status', '==', 'PUBLISHED')))
+    .then((snap) => {
+      const rows = snap.docs.map((doc) => toShopProduct(doc.id, doc.data()));
+      apply(rows);
+      try {
+        window.localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), rows }));
+      } catch {
+        // Storage full or blocked: nothing to cache.
+      }
+    })
+    .catch(() => apply([]));
+  return () => {
+    cancelled = true;
+  };
 }
