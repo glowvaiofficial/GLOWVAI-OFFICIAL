@@ -30,7 +30,7 @@ import { PaymentSuccessScreen } from './features/commerce/PaymentResultScreens';
 import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen';
 
 const AppContent: React.FC = () => {
-  const { currentScreen, activeParams, toastMessage } = useApp();
+  const { currentScreen, activeParams, toastMessage, navigate } = useApp();
 
   // Each screen opens at the top, rather than keeping the previous screen's scroll position.
   React.useEffect(() => {
@@ -40,6 +40,16 @@ const AppContent: React.FC = () => {
 
   // Products come from the database. The feed stays open while the app is on screen.
   React.useEffect(() => startProductFeed(), []);
+
+  // A shared product link (/shop?product=ID) opens that product once the app starts.
+  React.useEffect(() => {
+    try {
+      const productId = new URLSearchParams(window.location.search).get('product');
+      if (productId && /^[A-Za-z0-9_-]{1,140}$/.test(productId)) navigate('shop-product', { productId });
+    } catch {
+      // Unreadable address: open the normal start screen.
+    }
+  }, []);
 
   const renderScreen = () => {
     const PortedScreen = portedRoutes[currentScreen as keyof typeof portedRoutes];
