@@ -8,16 +8,11 @@ interface PaymentResultParams {
   amount?: number;
   method?: string;
   confirmed?: boolean;
+  error?: string;
 }
 
-const METHOD_LABEL: Record<string, string> = {
-  gpay: 'UPI (Google Pay)',
-  phonepe: 'UPI (PhonePe)',
-  paytm: 'UPI (Paytm)',
-  bhim: 'UPI (BHIM)',
-  card: 'Credit or debit card',
-  cod: 'Cash on delivery',
-};
+// Only cash on delivery can be placed today.
+const METHOD_LABEL: Record<string, string> = { cod: 'Cash on delivery' };
 
 const ResultHeader: React.FC<{ right?: React.ReactNode }> = ({ right }) => (
   <header className="commerce-result-head">
@@ -61,15 +56,14 @@ export const PaymentSuccessScreen: React.FC = () => {
   const params = (activeParams || {}) as PaymentResultParams;
   const address = useDeliveryAddress();
 
-  // Fail closed: success is shown only when the processing step confirmed this order.
+  // Fail closed: success is shown only when the server confirmed this order and returned its id.
   if (params.confirmed !== true || !params.orderId) return <NoResult />;
 
   const orderId = params.orderId;
-  const isCod = params.method === 'cod';
 
   return (
     <main className="commerce-screen commerce-result is-success">
-      <ResultHeader right={<span className="commerce-chip-static">{isCod ? 'Order placed' : 'Payment verified'}</span>} />
+      <ResultHeader right={<span className="commerce-chip-static">Order placed</span>} />
 
       <div className="commerce-body commerce-result-body">
         <div className="commerce-result-status">
@@ -77,7 +71,7 @@ export const PaymentSuccessScreen: React.FC = () => {
             <CheckCircle2 size={34} />
           </span>
           <h1>Order placed</h1>
-          <p>{isCod ? 'Keep the amount ready. You pay when the order arrives.' : 'Your payment is verified and the order is placed.'}</p>
+          <p>Keep the amount ready. You pay when the order arrives.</p>
 
           <dl className="commerce-result-meta">
             <div>
@@ -86,13 +80,13 @@ export const PaymentSuccessScreen: React.FC = () => {
             </div>
             {typeof params.amount === 'number' && (
               <div>
-                <dt>{isCod ? 'Amount to pay on delivery' : 'Amount paid'}</dt>
+                <dt>Amount to pay on delivery</dt>
                 <dd>₹{params.amount}</dd>
               </div>
             )}
             <div>
               <dt>Payment</dt>
-              <dd>{METHOD_LABEL[params.method || ''] || 'Online payment'}</dd>
+              <dd>{METHOD_LABEL[params.method || ''] || 'Cash on delivery'}</dd>
             </div>
           </dl>
         </div>
@@ -100,15 +94,15 @@ export const PaymentSuccessScreen: React.FC = () => {
         <div className="commerce-result-actions">
           {address && (
             <section className="commerce-card commerce-arrival">
-              <b>{address.etaMinutes ? `Delivery in about ${address.etaMinutes} minutes` : 'Delivery details'}</b>
+              <b>Delivering to</b>
               <p>
                 <MapPin size={13} /> {address.fullAddress}
               </p>
             </section>
           )}
-          <p className="commerce-notice">Order tracking shows each update and your delivery OTP for the handover.</p>
-          <button className="commerce-primary" onClick={() => navigate('orders-tracking', { orderId })}>
-            Track order
+          <p className="commerce-notice">My orders shows the latest status from the GlowVai team. You can cancel there until the order is being prepared.</p>
+          <button className="commerce-primary" onClick={() => navigate('orders-detail', { orderId })}>
+            View order
           </button>
           <button className="commerce-ghost" onClick={() => navigate('home')}>
             Continue shopping
@@ -123,8 +117,7 @@ export const PaymentFailedScreen: React.FC = () => {
   const { activeParams, navigate } = useApp();
   const params = (activeParams || {}) as PaymentResultParams;
 
-  if (!params.orderId) return <NoResult />;
-  const isCod = params.method === 'cod';
+  if (!params.error && !params.orderId) return <NoResult />;
 
   return (
     <main className="commerce-screen commerce-result is-failed">
@@ -141,18 +134,10 @@ export const PaymentFailedScreen: React.FC = () => {
           <span className="commerce-result-icon is-failed">
             <AlertTriangle size={34} />
           </span>
-          <h1>{isCod ? 'Order not placed' : 'Payment not confirmed'}</h1>
-          <p>
-            {isCod
-              ? 'We could not place this order. Your cart is unchanged, so you can try again.'
-              : 'We could not verify a payment for this order, so it is not confirmed. Your cart is unchanged. If money left your account, your bank or Razorpay returns it.'}
-          </p>
+          <h1>Order not placed</h1>
+          <p>{params.error || 'We could not place this order.'} Your cart is unchanged, so you can try again.</p>
 
           <dl className="commerce-result-meta">
-            <div>
-              <dt>Order ID</dt>
-              <dd>{params.orderId}</dd>
-            </div>
             {typeof params.amount === 'number' && (
               <div>
                 <dt>Amount</dt>
@@ -162,7 +147,7 @@ export const PaymentFailedScreen: React.FC = () => {
             {params.method && (
               <div>
                 <dt>Payment</dt>
-                <dd>{METHOD_LABEL[params.method] || 'Online payment'}</dd>
+                <dd>{METHOD_LABEL[params.method] || 'Cash on delivery'}</dd>
               </div>
             )}
           </dl>

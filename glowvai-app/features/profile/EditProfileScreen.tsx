@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Mail, Phone, ShieldCheck, User } from 'lucide-react';
+import { Info, Mail, Phone, User } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { storage } from '../../core/utils/storage';
 import { getInitials, ProfileHeader } from './ProfileShared';
@@ -17,14 +17,22 @@ interface Demographics {
 }
 
 export const EditProfileScreen = () => {
-  const { user, customerDetails, saveCustomerDetails, showToast, goBack, navigate } = useApp();
-  const [name, setName] = useState(customerDetails?.fullName ?? user?.name ?? '');
-  const [email, setEmail] = useState(customerDetails?.email ?? user?.email ?? '');
-  const phone = customerDetails?.phoneNumber || user?.phoneNumber || '';
-  // Only a number that came through the sign-in code is shown as verified.
-  const phoneVerified = Boolean(user?.phoneNumber) && phone === user?.phoneNumber;
+  const { customerDetails, saveCustomerDetails, goBack } = useApp();
+  // Details are saved on the server (users/{uid}), where the GlowVai team sees them in Customer Management.
+  const [name, setName] = useState(customerDetails?.fullName ?? '');
+  const [email, setEmail] = useState(customerDetails?.email ?? '');
+  const [phone, setPhone] = useState(customerDetails?.phoneNumber ?? '');
+  const [saving, setSaving] = useState(false);
   const [demographics, setDemographics] = useState<Demographics>({ gender: null, ageGroup: null, skinType: null });
   const [error, setError] = useState<string | null>(null);
+
+  // The saved details can arrive from the server after the screen opened.
+  useEffect(() => {
+    if (!customerDetails) return;
+    setName((v) => v || customerDetails.fullName);
+    setEmail((v) => v || customerDetails.email);
+    setPhone((v) => v || customerDetails.phoneNumber);
+  }, [customerDetails]);
 
   useEffect(() => {
     storage.getItem(DEMOGRAPHICS_KEY).then((raw) => {
@@ -48,11 +56,15 @@ export const EditProfileScreen = () => {
     storage.setItem(DEMOGRAPHICS_KEY, JSON.stringify(next));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     if (trimmedName.length < 2) {
       setError('Enter your full name to save.');
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setError('Enter a valid 10-digit Indian mobile number.');
       return;
     }
     if (trimmedEmail && !EMAIL_PATTERN.test(trimmedEmail)) {
@@ -60,13 +72,13 @@ export const EditProfileScreen = () => {
       return;
     }
     setError(null);
-    saveCustomerDetails({
-      fullName: trimmedName,
-      phoneNumber: phone,
-      email: trimmedEmail,
-      deliveryNote: customerDetails?.deliveryNote,
-    });
-    showToast('Profile updated');
+    setSaving(true);
+    const result = await saveCustomerDetails({ fullName: trimmedName, phoneNumber: phone, email: trimmedEmail });
+    setSaving(false);
+    if (!result.ok) {
+      setError(result.error || 'We could not save your details. Try again.');
+      return;
+    }
     goBack();
   };
 
@@ -101,7 +113,7 @@ export const EditProfileScreen = () => {
           <span className="profile-hero-avatar profile-hero-avatar-lg">{getInitials(name)}</span>
           <span className="profile-user-copy">
             <span className="profile-user-name">{name.trim() || 'Add your name'}</span>
-            <span className="profile-user-phone">{phone || 'Phone number not added'}</span>
+            <span className="profile-user-phone">{phone ? `+91 ${phone}` : 'Phone number not added'}</span>
           </span>
         </section>
 
@@ -123,31 +135,30 @@ export const EditProfileScreen = () => {
             </span>
           </label>
 
-          <div className="profile-field">
-            <div className="profile-field-head">
-              <span className="profile-field-label">Phone number</span>
-              <button type="button" className="profile-text-link" onClick={() => navigate('auth-change-phone')}>Change phone →</button>
-            </div>
+          <label className="profile-field">
+            <span className="profile-field-head"><span className="profile-field-label">Mobile number (+91)</span></span>
             <span className="profile-input-wrap">
               <Phone size={18} />
-              <input className="profile-input" value={phone || 'Not added'} disabled readOnly aria-label="Phone number" />
-              {phoneVerified && <span className="profile-pill is-success"><ShieldCheck size={12} />Verified</span>}
+              <input className="profile-input" type="tel" inputMode="numeric" maxLength={10} value={phone} onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="10-digit mobile number" autoComplete="tel-national" />
             </span>
-          </div>
+          </label>
+          <p className="profile-field-hint">
+            <Info size={14} /> We will verify your number by SMS once SMS sign-in is available.
+          </p>
 
           {error && <p className="profile-field-error" role="alert">{error}</p>}
         </section>
 
         {/* Phone: a sticky bar at the bottom of the page. Desktop: the end of the side panel. */}
         <div className="profile-action-bar">
-          <button type="button" className="profile-button is-primary is-block" onClick={handleSave}>
-            Save profile changes
+          <button type="button" className="profile-button is-primary is-block" onClick={() => void handleSave()} disabled={saving}>
+            {saving ? 'Saving…' : 'Save profile changes'}
           </button>
         </div>
         </div>
 
         <div className="profile-main">
-        <p className="profile-label">Demographics</p>
+        <p className="profile-label">Demographics (kept on this device)</p>
         <section className="profile-card profile-card-body">
           <div className="profile-field">
             <span className="profile-field-label">Gender</span>

@@ -1,22 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Address,
   CartItem,
   CustomerDetails,
-  Order,
-  PaymentMethodType,
-  PaymentVerification,
   Product,
   ShoppingPreference,
   SkinReport,
   BeautyInsuranceStreak,
-  SupportTicket,
   UserProfile,
 } from '../types';
 import { NO_ADDRESS } from '../data/serviceability';
 import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
 import { ApiService } from '../services/api';
+import { auth } from '../core/config/firebase';
+import { ensureCustomerSession } from '../core/services/customerSession';
+import { createSupportTicket, type ShopProfileAddress } from '../core/services/shopApi';
+import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
 
@@ -52,20 +52,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [screenHistory, setScreenHistory] = useState<ScreenName[]>([]);
   const [activeParams, setActiveParams] = useState<any>(null);
 
-  // User state
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loginPhonePending, setLoginPhonePending] = useState<string>('');
-  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(() => {
-    try {
-      const saved = window.localStorage.getItem('glowvai:customer-details');
-      return saved ? JSON.parse(saved) as CustomerDetails : null;
-    } catch { return null; }
-  });
-
+  // Customer: a Firebase session for this device (anonymous until SMS sign-in exists) and the details the customer
+  // saved on the server (users/{uid}). Nothing is treated as signed in or verified on the device alone.
+  const profile = useCustomerStore((s) => s.profile);
+  const profileStatus = useCustomerStore((s) => s.profileStatus);
   useEffect(() => {
-    if (customerDetails) window.localStorage.setItem('glowvai:customer-details', JSON.stringify(customerDetails));
-    else window.localStorage.removeItem('glowvai:customer-details');
-  }, [customerDetails]);
+    // Details used to be kept only in this browser; they now live on the server.
+    try { window.localStorage.removeItem('glowvai:customer-details'); } catch { /* storage blocked */ }
+    ensureCustomerSession()
+      .then(() => useCustomerStore.getState().loadProfile())
+      .catch(() => undefined);
+  }, []);
+
+  const customerDetails: CustomerDetails | null = profile
+    ? { fullName: profile.name, phoneNumber: profile.phone, email: profile.email }
+    : null;
+  const [skinFlags, setSkinFlags] = useState({ facialAnalysisCompleted: false, consentGiven: false });
+  const user: UserProfile | null = profile
+    ? {
+        id: auth?.currentUser?.uid ?? '',
+        phoneNumber: profile.phone,
+        name: profile.name,
+        email: profile.email,
+        shoppingPreference: 'all',
+        onboardingCompleted: true,
+        ...skinFlags,
+      }
+    : null;
 
   // Location
   // Start from the address the customer picked last time (kept by the checkout address store), or none.
@@ -94,23 +107,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Wishlist
   const [wishlist, setWishlist] = useState<string[]>([]);
-
-  // Orders
-  const [orders, setOrders] = useState<Order[]>(() => {
-    try { return JSON.parse(window.localStorage.getItem('glowvai:orders') || '[]') as Order[]; } catch { return []; }
-  });
-  const [activeOrder, setActiveOrder] = useState<Order | null>(() => {
-    try { return JSON.parse(window.localStorage.getItem('glowvai:active-order') || 'null') as Order | null; } catch { return null; }
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem('glowvai:orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    if (activeOrder) window.localStorage.setItem('glowvai:active-order', JSON.stringify(activeOrder));
-    else window.localStorage.removeItem('glowvai:active-order');
-  }, [activeOrder]);
 
   // Face Analysis
   const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null);
@@ -145,22 +141,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   ] : []);
   const [activeStreak, setActiveStreak] = useState<BeautyInsuranceStreak | null>(null);
 
-  // Support
-  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(() => (process.env.NODE_ENV !== 'production') ? [
-    {
-      id: 'TCK-89210',
-      createdAt: 'Yesterday, 4:12 PM',
-      orderId: 'GLOW-729481',
-      category: 'Delivery issue',
-      subject: 'ETA query regarding Benz Circle drop-off',
-      status: 'Resolved',
-      messages: [
-        { sender: 'user', text: 'Hi, what is the exact delivery time for Benz Circle?', timestamp: '4:12 PM' },
-        { sender: 'agent', text: 'Delivered in 14 minutes by rider K. Ramesh Babu.', timestamp: '4:26 PM' },
-      ],
-    },
-  ] : []);
-
   // Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const showToast = (msg: string) => {
@@ -185,40 +165,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentScreen(prev);
   };
 
-  // Auth actions
-  const loginUser = async (phone: string) => {
-    setLoginPhonePending(phone);
-    await ApiService.requestOtp(phone);
-  };
-
-  const verifyUserOtp = async (otp: string) => {
-    if (!loginPhonePending) throw new Error('Your session expired. Enter your mobile number again.');
-    const res = await ApiService.verifyOtp(loginPhonePending, otp);
-    setUser(res.user);
-    showToast('Login successful!');
-  };
-
-  const logout = () => {
-    setUser(null);
-    navigate('welcome');
-    showToast('Logged out of session');
-  };
-
-  const deleteAccount = () => {
-    setUser(null);
-    setCart([]);
-    setOrders([]);
-    setStreaks([]);
-    setSkinReports([]);
-    setCustomerDetails(null);
-    navigate('welcome');
-    showToast('Your data has been removed from this device.');
-  };
-
-  const saveCustomerDetails = (details: CustomerDetails) => {
-    setCustomerDetails(details);
-    setUser((current) => current ? { ...current, name: details.fullName, email: details.email, phoneNumber: details.phoneNumber } : current);
-    showToast('Contact details saved');
+  // Saves the customer's details on the server (users/{uid}). The saved address is kept unless a new one is given.
+  const saveCustomerDetails = async (details: CustomerDetails, address?: ShopProfileAddress): Promise<ActionResult> => {
+    const { addresses, selectedId } = useAddressStore.getState();
+    const selected = addresses.find((a) => a.id === selectedId);
+    const fallback: ShopProfileAddress = selected
+      ? {
+          fullAddress: [selected.houseNo, selected.buildingName, selected.areaAddress].filter(Boolean).join(', '),
+          city: selected.city,
+          pincode: selected.pincode,
+          landmark: selected.landmark ?? '',
+        }
+      : { fullAddress: '', city: '', pincode: '' };
+    const result = await useCustomerStore.getState().saveProfile({
+      name: details.fullName,
+      phone: details.phoneNumber,
+      email: details.email,
+      address: address ?? profile?.address ?? fallback,
+      marketingOptIn: profile?.marketingOptIn ?? false,
+    });
+    if (result.ok) showToast('Your details are saved');
+    return result;
   };
 
   // Address
@@ -303,47 +270,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(exists ? 'Removed from saved wishlist' : 'Saved to wishlist');
   };
 
-  // Place Order. One key per checkout attempt, so a retry after a network failure cannot create a second order.
-  const pendingCheckoutKey = useRef<string | null>(null);
-  const placeOrder = async (paymentMethod: PaymentMethodType, checkoutDiscount = 0, verification?: PaymentVerification): Promise<Order> => {
-    pendingCheckoutKey.current ??= `idemp-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    const newOrder = await ApiService.createOrder(pendingCheckoutKey.current, cart, currentAddress, paymentMethod, checkoutDiscount, verification);
-    pendingCheckoutKey.current = null;
-    setOrders((prev) => [newOrder, ...prev]);
-    setActiveOrder(newOrder);
-
-    // If order has insured items, generate tracking streaks
-    const newStreaks = ApiService.createStreakFromOrder(newOrder);
-    if (newStreaks.length > 0) {
-      setStreaks((prev) => [...newStreaks, ...prev]);
-    }
-
-    clearCart();
-    return newOrder;
-  };
-
-  const cancelOrder = (orderId: string, reason: string): Order | null => {
-    const source = activeOrder?.id === orderId ? activeOrder : orders.find((order) => order.id === orderId);
-    if (!source || ['on_the_way', 'delivered', 'cancelled'].includes(source.status)) return null;
-    const cancelled: Order = {
-      ...source,
-      status: 'cancelled',
-      paymentStatus: source.paymentStatus === 'successful' ? 'processing' : 'cancelled',
-      splitDeliveryNote: `Cancellation requested: ${reason}`,
-    };
-    setOrders((previous) => previous.map((order) => order.id === orderId ? cancelled : order));
-    if (activeOrder?.id === orderId) setActiveOrder(cancelled);
-    return cancelled;
-  };
-
   // Facial Analysis
   const runAnalysis = async (image: string, retain: boolean): Promise<SkinReport> => {
     const res = await ApiService.analyzeFaceImage(image, retain);
     setSkinReports((prev) => [res.report, ...prev]);
     setActiveReport(res.report);
-    if (user) {
-      setUser({ ...user, facialAnalysisCompleted: true, consentGiven: true });
-    }
+    setSkinFlags({ facialAnalysisCompleted: true, consentGiven: true });
     return res.report;
   };
 
@@ -382,12 +314,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setStreaks((prev) =>
       prev.map((s) => (s.trackingId === trackingId ? { ...s, status: 'adverse_reaction_reported' } : s))
     );
-    await ApiService.submitSupportTicket(
-      'Skin-related adverse reaction',
-      `Adverse Reaction on Tracking #${trackingId}`,
-      description
-    );
-    showToast('Saved on this device. Message support on WhatsApp to report a reaction.');
+    const streak = streaks.find((s) => s.trackingId === trackingId);
+    const product = streak?.productName ?? 'a product';
+    const res = await createSupportTicket({
+      category: 'PRODUCT_SAFETY',
+      subject: `Skin reaction: ${product}`.slice(0, 120),
+      description: `Skin reaction reported for ${product}. ${description}`.trim(),
+      orderId: null,
+    });
+    showToast(res.ok ? 'Reported to the GlowVai team. They will contact you.' : res.error ?? 'We could not send the report. Try Help & support.');
   };
 
   // A claim is only recorded for review. No refund or decision is made on the device.
@@ -396,37 +331,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       prev.map((s) => (s.trackingId === trackingId ? { ...s, status: 'claim_submitted', claimFeedback: feedback } : s))
     );
     showToast('Saved on this device. Message support on WhatsApp to make a claim.');
-  };
-
-  // Support
-  // Adds the customer's reply to the ticket. Replies are queued for the support team; no automatic answer is generated.
-  const replyToTicket = (ticketId: string, message: string) => {
-    const text = message.trim();
-    if (!text) return;
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setSupportTickets((prev) =>
-      prev.map((ticket) =>
-        ticket.id === ticketId
-          ? {
-              ...ticket,
-              status: ticket.status === 'Resolved' || ticket.status === 'Closed' ? 'Open' : ticket.status,
-              messages: [...ticket.messages, { sender: 'user', text, timestamp }],
-            }
-          : ticket
-      )
-    );
-  };
-
-  const createTicket = async (
-    category: SupportTicket['category'],
-    subject: string,
-    message: string,
-    orderId?: string
-  ): Promise<SupportTicket> => {
-    const t = await ApiService.submitSupportTicket(category, subject, message, orderId);
-    setSupportTickets((prev) => [t, ...prev]);
-    showToast('Saved on this device. Message support on WhatsApp for a reply.');
-    return t;
   };
 
   return (
@@ -439,11 +343,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         activeParams,
         user,
         customerDetails,
+        profileStatus,
         saveCustomerDetails,
-        loginUser,
-        verifyUserOtp,
-        logout,
-        deleteAccount,
         currentAddress,
         savedAddresses,
         selectAddress,
@@ -460,11 +361,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cartAuthoritative,
         wishlist,
         toggleWishlist,
-        orders,
-        activeOrder,
-        setActiveOrder,
-        placeOrder,
-        cancelOrder,
         capturedFaceImage,
         setCapturedFaceImage,
         skinReports,
@@ -476,9 +372,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         logStreakEvidence,
         reportAdverseReaction,
         submitClaim,
-        supportTickets,
-        createTicket,
-        replyToTicket,
         toastMessage,
         showToast,
       }}

@@ -11,7 +11,6 @@ import { startProductFeed } from './core/services/productFeed';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { LoginScreen } from './screens/LoginScreen';
-import { OtpScreen } from './screens/OtpScreen';
 import { FaceAnalysisPrepScreen } from './screens/FaceAnalysisPrepScreen';
 import { FaceAnalysisCameraScreen } from './screens/FaceAnalysisCameraScreen';
 import { FaceAnalysisLoadingScreen } from './screens/FaceAnalysisLoadingScreen';
@@ -21,17 +20,14 @@ import { CategoryScreen } from './screens/CategoryScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { ProductDetailScreen } from './screens/ProductDetailScreen';
 import { CartScreen } from './screens/CartScreen';
-import { CheckoutScreen } from './screens/CheckoutScreen';
-import { CustomerDetailsScreen } from './screens/CustomerDetailsScreen';
-import { PaymentStatusScreen } from './screens/PaymentStatusScreen';
-import { OrderConfirmationScreen } from './screens/OrderConfirmationScreen';
-import { OrderCancelledScreen } from './screens/OrderCancelledScreen';
-import { OrderTrackingScreen } from './screens/OrderTrackingScreen';
 import { StreakTrackingScreen } from './screens/StreakTrackingScreen';
-import { OrderHistoryScreen } from './screens/OrderHistoryScreen';
-import { ProfileScreen } from './screens/ProfileScreen';
 import { SupportScreen } from './screens/SupportScreen';
 import { StudentReferralScreen } from './screens/StudentReferralScreen';
+import { OrdersListScreen } from './features/orders/OrdersListScreen';
+import { OrderDetailsScreen } from './features/orders/OrderDetailsScreen';
+import { LiveRiderTrackingScreen } from './features/orders/LiveRiderTrackingScreen';
+import { PaymentSuccessScreen } from './features/commerce/PaymentResultScreens';
+import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage } = useApp();
@@ -54,10 +50,11 @@ const AppContent: React.FC = () => {
         return <WelcomeScreen />;
       case 'onboarding':
         return <OnboardingScreen />;
+      // There is no sign-in code yet: these older names open the "Your details" step.
       case 'login':
-        return <LoginScreen />;
       case 'otp':
-        return <OtpScreen />;
+      case 'customer-details':
+        return <LoginScreen />;
       case 'face-prep':
         return <FaceAnalysisPrepScreen />;
       case 'face-capture':
@@ -76,24 +73,20 @@ const AppContent: React.FC = () => {
         return <ProductDetailScreen />;
       case 'cart':
         return <CartScreen />;
-      case 'checkout':
-        return <CheckoutScreen />;
-      case 'customer-details':
-        return <CustomerDetailsScreen />;
+      // Older order screen names open the screens that read orders from the server.
       case 'payment-status':
-        return <PaymentStatusScreen />;
       case 'order-confirmation':
-        return <OrderConfirmationScreen />;
+        return <PaymentSuccessScreen />;
       case 'order-cancelled':
-        return <OrderCancelledScreen />;
+        return <OrderDetailsScreen />;
       case 'order-tracking':
-        return <OrderTrackingScreen />;
+        return <LiveRiderTrackingScreen />;
       case 'streak-tracking':
         return <StreakTrackingScreen />;
       case 'order-history':
-        return <OrderHistoryScreen />;
+        return <OrdersListScreen />;
       case 'profile':
-        return <ProfileScreen />;
+        return <ProfileOverviewScreen />;
       case 'support':
         return <SupportScreen />;
       case 'student-referral':

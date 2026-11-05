@@ -2,30 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Lock, Shield } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
-import { initiateRazorpayOrder, type InitiatePaymentParams } from '../../core/services/paymentService';
-import { verifyOrderPayment } from '../../core/services/orderService';
+import { useCustomerStore } from '../../core/state/customerStore';
 import { computeCartTotals } from './lib/pricing';
-import { newOrderId, payChoiceMeta, useCheckoutSession } from './lib/checkoutSession';
+import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
-const MIN_DISPLAY_MS = 2800;
+const MIN_DISPLAY_MS = 1200;
+// One request does all of this on the server; the list is marked done only when the server has answered.
+const STEPS = ['Checking prices and availability', 'Saving your cash-on-delivery order'];
 
-const ONLINE_STEPS = ['Saving your order', 'Starting secure payment', 'Verifying the payment'];
-const COD_STEPS = ['Saving your order', 'Confirming cash on delivery', 'Finishing up'];
-
+// Places the order on the GlowVai server (cash on delivery only). The server checks every product, works out the
+// total and creates the order id; this screen only shows the result.
 export const PaymentProcessingScreen: React.FC = () => {
-  const { navigate, showToast } = useApp();
+  const { navigate, showToast, customerDetails } = useApp();
   const couponCode = useCheckoutSession((s) => s.couponCode);
-  const payChoice = useCheckoutSession((s) => s.payChoice);
   const address = useDeliveryAddress();
   const customer = useCustomer();
   const [step, setStep] = useState(0);
-  const [orderId] = useState(() => newOrderId());
   const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress).grandTotal);
   const started = useRef(false);
-  const isCodChoice = payChoice === 'cod';
-  const steps = isCodChoice ? COD_STEPS : ONLINE_STEPS;
 
   useEffect(() => {
     // Runs once per mount, even under React strict-mode double effects.
@@ -43,50 +39,35 @@ export const PaymentProcessingScreen: React.FC = () => {
         navigate('checkout-review');
         return;
       }
-      const meta = payChoiceMeta(payChoice);
-      const totals = computeCartTotals(cartItems, couponCode, address.fullAddress);
-      const isCod = payChoice === 'cod';
-
-      let ok = false;
-      try {
-        // Order is written first so a UPI handoff (which leaves the page) cannot lose it.
-        await placeCartOrder({
-          orderId,
-          items: cartItems,
-          totals,
-          pay: payChoice,
-          paid: false,
-          deliveryType: 'STANDARD_ECOMMERCE',
-          address,
-          customer: { userId: customer.userId, name: customer.name, phone: customer.phone },
-        });
-        setStep(1);
-
-        const session = await initiateRazorpayOrder({
-          orderId,
-          orderAmount: totals.grandTotal,
-          customerName: customer.name,
-          customerPhone: customer.phone,
-          customerEmail: customer.email,
-          paymentMethod: meta.method as InitiatePaymentParams['paymentMethod'],
-        });
-
-        // Fail closed: an online payment counts only when the server verified it. COD needs no payment.
-        ok = session.success === true && (isCod || (await verifyOrderPayment(orderId, totals.grandTotal)) === true);
-        setStep(2);
-      } catch {
-        ok = false;
+      if (!customerDetails) {
+        navigate('login', { returnTo: 'checkout-payment-method' });
+        return;
       }
+
+      const result = await placeCartOrder({
+        items: cartItems,
+        address,
+        couponCode,
+        customer: { name: customer.name, phone: customer.phone },
+      });
+      setStep(STEPS.length);
 
       const remaining = MIN_DISPLAY_MS - (Date.now() - startedAt);
       if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 
-      if (ok) {
+      if (result.ok && result.data?.orderId) {
         useCartStore.getState().clearCart();
-        navigate('checkout-payment-success', { orderId, amount: totals.grandTotal, method: payChoice, confirmed: true });
+        void useCustomerStore.getState().loadOrders();
+        navigate('checkout-payment-success', {
+          orderId: result.data.orderId,
+          amount: result.data.pricing?.grandTotal ?? amount,
+          method: 'cod',
+          confirmed: true,
+        });
       } else {
-        showToast(isCod ? 'The order could not be placed' : 'Payment could not be confirmed');
-        navigate('checkout-payment-failed', { orderId, amount: totals.grandTotal, method: payChoice });
+        const message = result.error || 'The order could not be placed. Try again.';
+        showToast('The order could not be placed');
+        navigate('checkout-payment-failed', { error: message, amount, method: 'cod' });
       }
     };
 
@@ -112,55 +93,32 @@ export const PaymentProcessingScreen: React.FC = () => {
               <Lock size={24} />
             </span>
           </div>
-          <h1>{isCodChoice ? 'Placing your order' : 'Processing your payment'}</h1>
+          <h1>Placing your order</h1>
           <p>Please don’t close this screen or press back.</p>
         </div>
 
         <div className="commerce-processing-detail" role="status" aria-live="polite">
           <dl className="commerce-processing-summary">
             <div>
-              <dt>Order total</dt>
+              <dt>Order total (shown in your bag)</dt>
               <dd>₹{amount}</dd>
             </div>
             <div>
               <dt>Payment method</dt>
-              <dd>{payMethodLabel(payChoice)}</dd>
-            </div>
-            <div>
-              <dt>Order ID</dt>
-              <dd className="is-muted">{orderId}</dd>
+              <dd>Cash on delivery</dd>
             </div>
           </dl>
 
           <ol className="commerce-processing-steps">
-            {steps.map((label, index) => (
+            {STEPS.map((label, index) => (
               <li key={label} className={index < step ? 'is-done' : index === step ? 'is-active' : ''}>
                 {index < step ? <CheckCircle2 size={18} /> : <span className="commerce-step-dot" />}
                 {label}
               </li>
             ))}
           </ol>
-
-          {!isCodChoice && <p className="commerce-processing-foot">Online payments are processed by Razorpay</p>}
         </div>
       </div>
     </main>
   );
-};
-
-const payMethodLabel = (id: string) => {
-  switch (id) {
-    case 'gpay':
-      return 'UPI (Google Pay)';
-    case 'phonepe':
-      return 'UPI (PhonePe)';
-    case 'paytm':
-      return 'UPI (Paytm)';
-    case 'bhim':
-      return 'UPI (BHIM)';
-    case 'card':
-      return 'Credit or debit card';
-    default:
-      return 'Cash on delivery';
-  }
 };

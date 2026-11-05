@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Check, ChevronRight, Coins, Copy, ExternalLink, GraduationCap, MessageSquare, Share2, Users } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { copyText, getReferralCode, openExternal, ProfileHeader } from './ProfileShared';
+import { copyText, openExternal, ProfileHeader } from './ProfileShared';
 
 const SHOP_URL = 'https://glowvai.in/shop';
 // The partner and campus referral programme runs on the glowvai.in referral page, which has its own sign-up and terms.
@@ -9,10 +9,11 @@ const REFERRAL_PAGE_URL = '/referral';
 const SHARE_MESSAGE = `I shop my skincare on GlowVai. Have a look: ${SHOP_URL}`;
 
 export const ReferralHubScreen = () => {
-  const { user, goBack, navigate, showToast } = useApp();
+  const { goBack, navigate, showToast } = useApp();
   const [copied, setCopied] = useState<'link' | 'code' | null>(null);
-  // Glow Coins and referral rewards are not wired to an account yet, so no balance or reward amount is shown.
-  const referralCode = user?.id ? getReferralCode(user.id) : null;
+  // Glow Coins and referral rewards are not wired to an account yet, so no balance, reward or code is shown. A code
+  // made up on the device would not be recognised anywhere, so none is offered until the server issues them.
+  const referralCode: string | null = null;
 
   useEffect(() => {
     if (!copied) return;
@@ -102,7 +103,7 @@ export const ReferralHubScreen = () => {
               </div>
             </>
           ) : (
-            <p className="profile-field-hint">Sign in to see your referral code.</p>
+            <p className="profile-field-hint">Personal referral codes are not available yet. Share the shop link above.</p>
           )}
         </section>
 
