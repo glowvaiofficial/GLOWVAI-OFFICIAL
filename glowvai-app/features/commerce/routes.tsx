@@ -4,7 +4,6 @@ import './commerce.css';
 import '../../responsive/commerce-ported.css';
 import { CartScreen } from './CartScreen';
 import { CheckoutReviewScreen } from './CheckoutReviewScreen';
-import { ExpressCheckoutScreen } from './ExpressCheckoutScreen';
 import { PaymentMethodScreen } from './PaymentMethodScreen';
 import { PaymentProcessingScreen } from './PaymentProcessingScreen';
 import { PaymentSuccessScreen, PaymentFailedScreen } from './PaymentResultScreens';
@@ -15,7 +14,6 @@ export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'cart-tab': CartScreen,
   checkout: CheckoutReviewScreen,
   'checkout-review': CheckoutReviewScreen,
-  'checkout-express': ExpressCheckoutScreen,
   'checkout-payment-method': PaymentMethodScreen,
   'checkout-payment-processing': PaymentProcessingScreen,
   'checkout-payment-success': PaymentSuccessScreen,

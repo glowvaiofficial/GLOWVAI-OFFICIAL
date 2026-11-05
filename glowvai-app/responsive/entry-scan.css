@@ -116,3 +116,12 @@
 @media (min-width: 720px){
   .glowvai-root .skin-report-screen .commerce-reveal{ margin-top: 24px; border-radius: 24px 24px 0 0; }
 }
+
+/* "Your details" (login route): several fields, so the page scrolls instead of clipping the sheet. */
+.glowvai-root .login-reference-screen.is-details{ height: auto; min-height: 100%; overflow: visible; }
+.glowvai-root .login-field-label{ display: block; margin: 14px 2px 6px; color: var(--ds-ink); font-size: var(--ds-small, 12px); font-weight: 700; }
+.glowvai-root .login-reference-form .login-field-label:first-child{ margin-top: 0; }
+.glowvai-root .login-phone-field.is-plain{ grid-template-columns: minmax(0,1fr); }
+.glowvai-root .login-details-note{ display: flex; align-items: flex-start; gap: 8px; margin: 14px 2px 0; padding: 10px 12px; border-radius: var(--ds-radius-sm, 9px); background: var(--ds-sky, #eef4ff); color: var(--ds-ink, #101c36); font-size: 12px; line-height: 1.45; }
+.glowvai-root .login-details-note svg{ width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: var(--ds-brand, #1459e8); }
+.glowvai-root .login-details-note + .login-phone-error{ margin-top: 10px; }

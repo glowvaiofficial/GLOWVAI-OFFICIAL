@@ -1,19 +1,16 @@
-import { ChevronRight, CreditCard, Gift, Heart, HelpCircle, MapPin, Package, ScanFace, Settings, Sparkles } from 'lucide-react';
+import { ChevronRight, Gift, Heart, HelpCircle, MapPin, Package, ScanFace, Settings, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getInitials, ProfileHeader, ProfileListItem } from './ProfileShared';
-
-const statusLabel = (status: string): string => {
-  const text = status.replace(/_/g, ' ');
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
+import { formatRupee, orderTotal, statusLabel as orderStatusLabel, useShopOrders } from '../orders/orderUtils';
 
 const countLabel = (count: number, singular: string, plural = `${singular}s`): string =>
   `${count} ${count === 1 ? singular : plural}`;
 
 export const ProfileOverviewScreen = () => {
-  const { user, customerDetails, orders, skinReports, activeReport, wishlist, navigate } = useApp();
-  const name = customerDetails?.fullName || user?.name || 'Add your name';
-  const phone = customerDetails?.phoneNumber || user?.phoneNumber || 'Contact details not added';
+  const { user, customerDetails, skinReports, activeReport, wishlist, navigate } = useApp();
+  const { orders } = useShopOrders();
+  const name = customerDetails?.fullName || user?.name || 'Add your details';
+  const phone = customerDetails?.phoneNumber ? `+91 ${customerDetails.phoneNumber} · not verified yet` : 'Name and mobile number not added';
   const report = activeReport ?? skinReports[0] ?? null;
   const recentOrder = orders[0] ?? null;
 
@@ -24,7 +21,7 @@ export const ProfileOverviewScreen = () => {
       <div className="profile-body">
         <div className="profile-side">
         <section className="profile-card">
-          <button type="button" className="profile-user-button" onClick={() => navigate('profile-edit')}>
+          <button type="button" className="profile-user-button" onClick={() => navigate(customerDetails ? 'profile-edit' : 'login', customerDetails ? undefined : { returnTo: 'profile-tab' })}>
             <span className="profile-hero-avatar">{getInitials(customerDetails?.fullName || user?.name)}</span>
             <span className="profile-user-copy">
               <span className="profile-user-name">{name}</span>
@@ -90,13 +87,13 @@ export const ProfileOverviewScreen = () => {
         <p className="profile-label">Recent order</p>
         <section className="profile-card">
           {recentOrder ? (
-            <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-detail', { orderId: recentOrder.id })}>
+            <button type="button" className="profile-ticket-button" onClick={() => navigate('orders-detail', { orderId: recentOrder.orderId })}>
               <span className="profile-ticket-top">
-                <span className="profile-pill">{statusLabel(recentOrder.status)}</span>
-                <span className="profile-ticket-meta">₹{recentOrder.finalPayable.toLocaleString('en-IN')}</span>
+                <span className="profile-pill">{orderStatusLabel(recentOrder.status)}</span>
+                <span className="profile-ticket-meta">{formatRupee(orderTotal(recentOrder))}</span>
               </span>
               <span className="profile-ticket-title">
-                {recentOrder.items[0]?.productName ?? 'Order'}
+                {recentOrder.items[0]?.title ?? 'Order'}
                 {recentOrder.items.length > 1 ? ` + ${recentOrder.items.length - 1} more` : ''}
               </span>
               <span className="profile-text-link">View order →</span>
@@ -114,7 +111,6 @@ export const ProfileOverviewScreen = () => {
         <p className="profile-label">Account settings</p>
         <section className="profile-card">
           <ProfileListItem icon={<MapPin size={18} />} title="My addresses" onClick={() => navigate('address-list')} />
-          <ProfileListItem icon={<CreditCard size={18} />} title="Payment methods" onClick={() => navigate('checkout-payment-method')} />
           <ProfileListItem icon={<Settings size={18} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
           <ProfileListItem icon={<HelpCircle size={18} />} title="Help & support" onClick={() => navigate('profile-support')} />
         </section>

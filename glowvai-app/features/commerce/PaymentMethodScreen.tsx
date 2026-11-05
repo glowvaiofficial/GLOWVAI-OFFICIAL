@@ -1,32 +1,20 @@
 import React from 'react';
-import { Banknote, CreditCard, MapPin, ShieldCheck, ShoppingBag, Smartphone } from 'lucide-react';
+import { Banknote, Clock, CreditCard, MapPin, ShieldCheck, ShoppingBag, Smartphone, UserRound } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
-import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics';
+import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals } from './lib/pricing';
-import { PAY_CHOICES, useCheckoutSession, type PayChoice } from './lib/checkoutSession';
+import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, FlowHeader, useDeliveryAddress } from './components/shared';
 
-const GROUP_META = {
-  upi: { title: 'UPI apps', icon: Smartphone },
-  card: { title: 'Cards', icon: CreditCard },
-  cod: { title: 'Pay on delivery', icon: Banknote },
-} as const;
-
+// Cash on delivery is the only way to pay for now. Online methods are listed as coming soon and cannot be chosen.
 export const PaymentMethodScreen: React.FC = () => {
-  const { goBack, navigate } = useApp();
+  const { goBack, navigate, customerDetails } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
-  const payChoice = useCheckoutSession((s) => s.payChoice);
-  const setPayChoice = useCheckoutSession((s) => s.setPayChoice);
   const address = useDeliveryAddress();
   const cartItems = Object.values(items);
   const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress);
-
-  const select = (id: PayChoice) => {
-    safeHapticSelection();
-    setPayChoice(id);
-  };
 
   // Payment needs a cart and a deliverable address; otherwise send the customer back to the step that is missing.
   if (cartItems.length === 0 || !address?.serviceable) {
@@ -48,12 +36,16 @@ export const PaymentMethodScreen: React.FC = () => {
     );
   }
 
-  const isCod = payChoice === 'cod';
-  const pay = () => {
+  const placeOrder = () => {
     safeHapticImpact();
-    navigate('checkout-payment-processing', { method: payChoice });
+    // The order is linked to the customer's saved details, so ask for them first.
+    if (!customerDetails) {
+      navigate('login', { returnTo: 'checkout-payment-method', name: address.recipientName, phone: address.phoneNumber });
+      return;
+    }
+    navigate('checkout-payment-processing', { method: 'cod' });
   };
-  const ctaLabel = isCod ? `Place order · ₹${totals.grandTotal}` : `Pay ₹${totals.grandTotal}`;
+  const ctaLabel = customerDetails ? `Place order · ₹${totals.grandTotal}` : 'Add your details to continue';
 
   return (
     <main className="commerce-screen commerce-payment has-aside">
@@ -62,40 +54,79 @@ export const PaymentMethodScreen: React.FC = () => {
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">
-          {(Object.keys(GROUP_META) as Array<keyof typeof GROUP_META>).map((group) => {
-            const Icon = GROUP_META[group].icon;
-            const options = PAY_CHOICES.filter((c) => c.group === group);
-            return (
-              <fieldset className="commerce-card commerce-pay-group" key={group}>
-                <legend>
-                  <Icon size={15} /> {GROUP_META[group].title}
-                </legend>
-                <div className="commerce-pay-options">
-                  {options.map((option) => (
-                    <label className={option.id === payChoice ? 'commerce-pay-option is-selected' : 'commerce-pay-option'} key={option.id}>
-                      <input type="radio" name="pay-choice" checked={option.id === payChoice} onChange={() => select(option.id)} />
-                      <span>
-                        <b>{option.label}</b>
-                        <small>{option.sub}</small>
-                      </span>
-                    </label>
-                  ))}
+          <fieldset className="commerce-card commerce-pay-group">
+            <legend>
+              <Banknote size={15} /> Pay on delivery
+            </legend>
+            <div className="commerce-pay-options">
+              <label className="commerce-pay-option is-selected">
+                <input type="radio" name="pay-choice" checked readOnly />
+                <span>
+                  <b>Cash on delivery</b>
+                  <small>Pay when the order arrives</small>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="commerce-card commerce-pay-group" disabled aria-describedby="online-soon">
+            <legend>
+              <Clock size={15} /> Online payment coming soon
+            </legend>
+            <div className="commerce-pay-options">
+              <label className="commerce-pay-option" style={{ opacity: 0.55 }}>
+                <input type="radio" name="pay-choice" disabled />
+                <span>
+                  <b>
+                    <Smartphone size={14} /> UPI apps
+                  </b>
+                  <small>Coming soon</small>
+                </span>
+              </label>
+              <label className="commerce-pay-option" style={{ opacity: 0.55 }}>
+                <input type="radio" name="pay-choice" disabled />
+                <span>
+                  <b>
+                    <CreditCard size={14} /> Credit or debit card
+                  </b>
+                  <small>Coming soon</small>
+                </span>
+              </label>
+            </div>
+            <p id="online-soon" className="commerce-secure-note">
+              Online payment is not available yet. Choose cash on delivery to place your order.
+            </p>
+          </fieldset>
+
+          {customerDetails ? (
+            <section className="commerce-card commerce-address-card">
+              <div className="commerce-card-head">
+                <h2>Your details</h2>
+                <button className="commerce-link" onClick={() => navigate('login', { returnTo: 'checkout-payment-method' })}>
+                  Edit
+                </button>
+              </div>
+              <div className="commerce-address-body">
+                <UserRound size={18} />
+                <div>
+                  <b>{customerDetails.fullName}</b>
+                  <p>+91 {customerDetails.phoneNumber}</p>
                 </div>
-              </fieldset>
-            );
-          })}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <aside className="commerce-aside">
           <section className="commerce-card commerce-bill" aria-labelledby="pay-bill-title">
             <h2 id="pay-bill-title">Order total</h2>
-            <BillRows totals={totals} totalLabel={isCod ? 'Pay on delivery' : 'To pay now'} />
-            <button className="commerce-primary is-wide commerce-aside-cta" onClick={pay}>
+            <BillRows totals={totals} totalLabel="Pay on delivery" />
+            <button className="commerce-primary is-wide commerce-aside-cta" onClick={placeOrder}>
               {ctaLabel}
             </button>
             <p className="commerce-secure-note">
               <ShieldCheck size={16} />
-              {isCod ? 'You pay the delivery partner when the order arrives.' : 'Online payments are processed by Razorpay. The order is confirmed only after the payment is verified.'}
+              You pay the delivery partner when the order arrives. GlowVai confirms the final price when the order is placed.
             </p>
           </section>
         </aside>
@@ -103,11 +134,11 @@ export const PaymentMethodScreen: React.FC = () => {
 
       <footer className="commerce-sticky-bar">
         <div>
-          <small>{isCod ? 'Pay on delivery' : 'Payable amount'}</small>
+          <small>Pay on delivery</small>
           <b>₹{totals.grandTotal}</b>
         </div>
-        <button className="commerce-primary" onClick={pay}>
-          {isCod ? 'Place order' : `Pay ₹${totals.grandTotal}`}
+        <button className="commerce-primary" onClick={placeOrder}>
+          {customerDetails ? 'Place order' : 'Add your details'}
         </button>
       </footer>
     </main>

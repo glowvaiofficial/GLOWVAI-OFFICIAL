@@ -79,7 +79,7 @@ export const RateOrderDeliveryScreen: React.FC = () => {
 
   const sendFeedback = () => {
     const lines = [
-      `Feedback for GlowVai order #${order.id}`,
+      `Feedback for GlowVai order #${order.orderId}`,
       deliveryRating ? `Delivery: ${deliveryRating}/5${deliveryTags.length ? ` (${deliveryTags.join(', ')})` : ''}` : '',
       productRating ? `Products: ${productRating}/5${productTags.length ? ` (${productTags.join(', ')})` : ''}` : '',
       comment.trim() ? `Comments: ${comment.trim()}` : '',
@@ -90,17 +90,17 @@ export const RateOrderDeliveryScreen: React.FC = () => {
 
   return (
     <main className="orders-screen is-rate">
-      <OrdersHeader title="Rate your order" subtitle={`#${order.id}`} onBack={goBack} />
+      <OrdersHeader title="Rate your order" subtitle={`#${order.orderId}`} onBack={goBack} />
 
       <div className="orders-body">
         <section className="orders-card orders-summary-card">
           <div className="orders-thumbs">
-            {order.items.slice(0, 3).map((item) => (
-              <OrderThumb key={`${item.productId}-${item.variantSize}`} item={item} />
+            {order.items.slice(0, 3).map((item, index) => (
+              <OrderThumb key={`${item.productId}-${index}`} item={item} />
             ))}
           </div>
           <div>
-            <strong>#{order.id}</strong>
+            <strong>#{order.orderId}</strong>
             <span>
               {itemCountLabel(order)}
               {placed ? ` · Placed ${placed}` : ''}

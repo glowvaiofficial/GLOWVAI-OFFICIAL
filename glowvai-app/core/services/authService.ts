@@ -16,9 +16,6 @@ import {
 import { auth } from '../config/firebase';
 import { initializeCustomerProfile, getUserProfile } from './userService';
 import { BaseUserDocument, CustomerUserDocument } from '../types';
-import { DEMO_OTP } from '../../services/api';
-
-let pendingPhoneNumber: string | null = null;
 
 /**
  * Creates a safe fallback profile in memory if Firestore rules prevent initial write
@@ -46,81 +43,8 @@ const createFallbackProfile = (user: Partial<FirebaseUser>, phone?: string | nul
   };
 };
 
-/**
- * Initiates Phone Sign-In (SMS OTP)
- */
-export const sendPhoneOtp = async (
-  phoneNumber: string
-): Promise<{ success: boolean; verificationId?: string; error?: string }> => {
-  try {
-    pendingPhoneNumber = phoneNumber;
-    return { success: true, verificationId: `vid_${Date.now()}` };
-  } catch (err: unknown) {
-    return { success: true, verificationId: `vid_${Date.now()}` };
-  }
-};
-
-/**
- * Confirms OTP code against Firebase Authentication with instant dev fallback
- */
-export const verifyPhoneOtp = async (
-  verificationCode: string
-): Promise<{
-  success: boolean;
-  user?: Partial<FirebaseUser>;
-  profile?: BaseUserDocument | CustomerUserDocument | null;
-  error?: string;
-}> => {
-  try {
-    // No SMS provider is connected yet, so only the published test code signs in.
-    if (verificationCode.trim() !== DEMO_OTP) {
-      return { success: false, error: 'Incorrect code. Use the test code shown on screen.' };
-    }
-    if (!pendingPhoneNumber && !auth?.currentUser) {
-      return { success: false, error: 'Your session expired. Enter your mobile number again.' };
-    }
-    const cleanPhone = pendingPhoneNumber || auth?.currentUser?.phoneNumber || '';
-    const user: Partial<FirebaseUser> = auth?.currentUser || {
-      uid: 'user_' + cleanPhone.replace(/[^\d]/g, ''),
-      phoneNumber: cleanPhone,
-      displayName: null,
-      email: null,
-      isAnonymous: false,
-      emailVerified: true,
-    };
-
-    let profile: BaseUserDocument | CustomerUserDocument | null = null;
-    try {
-      if (user.uid) {
-        profile = await getUserProfile(user.uid);
-      }
-      if (!profile && user.uid) {
-        profile = await initializeCustomerProfile({
-          uid: user.uid,
-          phoneNumber: user.phoneNumber || pendingPhoneNumber || '',
-          consents: {
-            cameraAndScanConsent: false,
-            termsAcceptedAt: Date.now(),
-            privacyAcceptedAt: Date.now(),
-            medicalDisclaimerAcceptedAt: 0,
-          },
-        });
-      }
-    } catch {
-      profile = createFallbackProfile(user, pendingPhoneNumber);
-    }
-
-    pendingPhoneNumber = null;
-
-    return {
-      success: true,
-      user,
-      profile: profile || createFallbackProfile(user),
-    };
-  } catch {
-    return { success: false, error: 'We could not verify the code. Try again.' };
-  }
-};
+// Phone sign-in is not offered: there is no SMS provider yet, and no code is accepted on the device. The shop keeps
+// an anonymous session per device (core/services/customerSession.ts) and the customer's details on the server.
 
 /**
  * Real Firebase Email/Password Sign-In
@@ -307,7 +231,6 @@ export const getCurrentUser = (): FirebaseUser | null => {
  * Signs out the current user
  */
 export const logoutUser = async (): Promise<void> => {
-  pendingPhoneNumber = null;
   try {
     if (auth && auth.app) {
       await firebaseSignOut(auth);

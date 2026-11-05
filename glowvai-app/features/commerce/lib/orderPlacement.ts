@@ -1,120 +1,39 @@
-import { createOrder, newDeliveryOtp } from '../../../core/services/orderService';
-import { triggerWhatsAppDispatchAlert } from '../../../core/utils/whatsapp';
 import type { CartItem } from '../../../core/state/cartStore';
-import type { OrderDeliveryType, OrderItem, OrderPricing, PaymentStatus, UserAddress } from '../../../core/types';
-import type { CartTotals } from './pricing';
+import { placeOrder } from '../../../core/services/shopApi';
+import { AREA_DELIVERY_FEES } from '../../../shared/pricing-rules.mjs';
 import type { DeliveryAddress } from './addressStore';
-import { payChoiceMeta, type PayChoice } from './checkoutSession';
 
 export interface PlaceOrderInput {
-  orderId: string;
   items: CartItem[];
-  totals: CartTotals;
-  pay: PayChoice;
-  paid: boolean;
-  deliveryType: OrderDeliveryType;
   address: DeliveryAddress;
-  customer: { userId: string; name: string; phone: string };
-  tipAmount?: number;
-  pricing?: Partial<OrderPricing>;
+  couponCode: string | null;
+  // Used when the delivery address has no recipient name or phone of its own.
+  customer: { name: string; phone: string };
 }
 
-const toOrderItems = (items: CartItem[]): OrderItem[] =>
-  items.map((item) => ({
-    productId: item.productId,
-    sku: item.productId,
-    title: item.name,
-    productName: item.name,
-    brand: item.brand,
-    unitPrice: item.price,
-    quantity: item.quantity,
-    totalPrice: item.price * item.quantity,
-    imageUrl: item.image,
-    hasBeautyProtection: false,
-    beautyProtectionFee: 0,
-  }));
-
-const toShippingAddress = (address: DeliveryAddress): UserAddress => ({
-  addressId: address.id,
-  label: address.label as UserAddress['label'],
-  recipientName: address.recipientName,
-  phoneNumber: address.phoneNumber,
-  streetAddress: address.fullAddress,
-  landmark: address.landmark,
-  city: address.city,
-  pincode: address.pincode,
-  postalCode: address.pincode,
-  country: 'India',
-  fullAddress: address.fullAddress,
-  deliveryInstructions: address.deliveryInstructions,
-  latitude: address.latitude,
-  longitude: address.longitude,
-  isDefault: false,
-  isQuickCommerceServiceable: address.serviceable,
-});
-
-// One delivery OTP per order, so the order record and the rider's dispatch alert carry the same code.
-const deliveryOtps = new Map<string, string>();
-export const deliveryOtpFor = (orderId: string): string => {
-  let code = deliveryOtps.get(orderId);
-  if (!code) {
-    code = newDeliveryOtp();
-    deliveryOtps.set(orderId, code);
-  }
-  return code;
+// The service area named in the address, so the server works out the same delivery fee the bill showed.
+const areaIn = (text: string): string | undefined => {
+  const haystack = text.toLowerCase();
+  const match = [...AREA_DELIVERY_FEES]
+    .sort((a, b) => String(b[0]).length - String(a[0]).length)
+    .find(([name]) => haystack.includes(String(name).toLowerCase()));
+  return match ? String(match[0]) : undefined;
 };
 
-// Writes the order through the shared orderService, the same call the mobile checkout used.
-export const placeCartOrder = async (input: PlaceOrderInput) => {
-  const { totals, items, pay, paid, address, customer } = input;
-  const meta = payChoiceMeta(pay);
-  const status: PaymentStatus = paid ? 'PAID' : 'PENDING';
-
-  return createOrder({
-    orderId: input.orderId,
-    deliveryOtp: deliveryOtpFor(input.orderId),
-    userId: customer.userId,
-    customerName: customer.name,
-    customerPhone: customer.phone,
-    deliveryType: input.deliveryType,
-    items: toOrderItems(items),
-    shippingAddress: toShippingAddress(address),
-    pricing: {
-      subtotal: totals.discountedTotal,
-      deliveryFee: totals.deliveryFee,
-      discountAmount: totals.catalogSavings + totals.couponDiscount,
-      coinsRedeemed: 0,
-      beautyProtectionTotal: 0,
-      itemTotal: totals.itemTotal,
-      discountTotal: totals.catalogSavings + totals.couponDiscount,
-      handlingFee: 0,
-      tax: 0,
-      tipAmount: input.tipAmount ?? 0,
-      grandTotal: totals.grandTotal + (input.tipAmount ?? 0),
-      ...input.pricing,
+// Places a cash-on-delivery order through the shop server (POST /api/shop/orders). Only product ids and quantities
+// are sent: the server prices every item from the published catalogue, applies the coupon and delivery fee, and
+// creates the order id. The result carries the server's message when the order is refused.
+export const placeCartOrder = async ({ items, address, couponCode, customer }: PlaceOrderInput) =>
+  placeOrder({
+    items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+    address: {
+      name: address.recipientName || customer.name,
+      phone: address.phoneNumber || customer.phone,
+      fullAddress: address.fullAddress,
+      city: address.city,
+      pincode: address.pincode,
+      area: areaIn(address.fullAddress),
+      landmark: address.landmark,
     },
-    payment: {
-      method: meta.method,
-      status,
-      transactionId: `TXN_${Date.now()}`,
-      paidAt: paid ? Date.now() : undefined,
-    },
-    referralCodeUsed: null,
+    couponCode,
   });
-};
-
-// Fire-and-forget WhatsApp dispatch alert used by the express flow.
-export const sendDispatchAlert = (input: PlaceOrderInput) => {
-  const meta = payChoiceMeta(input.pay);
-  triggerWhatsAppDispatchAlert({
-    orderId: input.orderId,
-    customerName: input.customer.name,
-    customerPhone: input.customer.phone,
-    deliveryAddress: input.address.fullAddress,
-    darkStoreName: 'Glowway Darkstore Payikapuram (DS-VIJ-01)',
-    items: input.items.map((item) => ({ name: item.name, qty: item.quantity, price: item.price })),
-    totalAmount: input.totals.grandTotal + (input.tipAmount ?? 0),
-    paymentMethod: meta.group === 'cod' ? 'CASH ON DELIVERY' : `ONLINE (${meta.method})`,
-    deliveryOtp: deliveryOtpFor(input.orderId),
-  }).catch(() => null);
-};

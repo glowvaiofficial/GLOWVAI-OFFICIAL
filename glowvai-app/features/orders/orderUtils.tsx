@@ -1,95 +1,132 @@
-import React, { useState } from 'react';
-import { ArrowRight, Package, PackageOpen } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AlertTriangle, ArrowRight, Package, PackageOpen } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { PRODUCTS } from '../../data/products';
-import type { Order, OrderItem } from '../../types';
+import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
+import { useCartStore } from '../../core/state/cartStore';
+import { useCustomerStore } from '../../core/state/customerStore';
+import type { ShopOrder, ShopOrderItem } from '../../core/services/shopApi';
 
-// Helpers shared by the order screens. Everything shown comes from the saved order; nothing is invented.
+// Helpers shared by the order screens. Orders come from the GlowVai server (GET /api/shop/orders), with any update
+// the GlowVai team made applied. Nothing is invented on the device: no rider, no ETA, no map.
 
 export type OrderTone = 'active' | 'delivered' | 'cancelled';
 
-export const STATUS_LABEL: Record<Order['status'], string> = {
-  order_placed: 'Order placed',
-  confirmed: 'Confirmed',
-  preparing: 'Being packed',
-  rider_assigned: 'Rider assigned',
-  on_the_way: 'On the way',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
+const KNOWN_STATUS: Record<string, string> = {
+  PLACED: 'Order placed',
+  CONFIRMED: 'Confirmed',
+  ACCEPTED: 'Confirmed',
+  PACKED: 'Packed',
+  DISPATCHED: 'On the way',
+  OUT_FOR_DELIVERY: 'Out for delivery',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+  VENDOR_REJECTED: 'Cancelled by the store',
 };
 
-export const PAYMENT_LABEL: Record<Order['paymentMethod'], string> = {
-  upi: 'UPI',
-  card: 'Card',
-  cod: 'Cash on delivery',
-  netbanking: 'Net banking',
+export const statusLabel = (status: string): string => {
+  const key = String(status || '').toUpperCase();
+  if (KNOWN_STATUS[key]) return KNOWN_STATUS[key];
+  const text = key.replace(/_/g, ' ').toLowerCase();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : 'Status not available';
 };
 
-export const DELIVERY_STAGES = ['Confirmed', 'Packed', 'On the way', 'Delivered'] as const;
-
-export const orderTone = (order: Order): OrderTone =>
-  order.status === 'cancelled' ? 'cancelled' : order.status === 'delivered' ? 'delivered' : 'active';
-
-export const isActiveOrder = (order: Order) => orderTone(order) === 'active';
-
-/** Index into DELIVERY_STAGES for the order's current status. */
-export const stageIndex = (order: Order): number => {
-  if (order.status === 'delivered') return 3;
-  if (order.status === 'rider_assigned' || order.status === 'on_the_way') return 2;
-  if (order.status === 'preparing') return 1;
-  return 0;
-};
-
-export const formatRupee = (amount: number) => `₹${Math.round(amount).toLocaleString('en-IN')}`;
-
-/** Orders store either an ISO timestamp or a short display string such as "02:15 PM". */
-export const formatOrderDate = (value: string): string => {
-  if (!value) return '';
-  if (/^\d{4}-\d{2}-\d{2}T/.test(value)) {
-    const date = new Date(value);
-    if (!Number.isNaN(date.getTime())) {
-      return date.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
-    }
+// What each status means for the customer, in plain words.
+export const statusNote = (order: ShopOrder): string => {
+  switch (String(order.status).toUpperCase()) {
+    case 'PLACED':
+      return 'We have your order. The GlowVai team will confirm it and prepare it for delivery. You can still cancel it.';
+    case 'DELIVERED':
+      return 'This order was delivered.';
+    case 'CANCELLED':
+    case 'VENDOR_REJECTED':
+      return order.cancellationReason ? `Cancelled: ${order.cancellationReason}` : 'This order was cancelled and will not be delivered.';
+    default:
+      return 'The GlowVai team is working on this order. This page shows each update they record.';
   }
-  return value;
 };
 
-export const itemCountLabel = (order: Order) => {
-  const count = order.items.reduce((sum, item) => sum + item.quantity, 0);
+export const orderTone = (order: ShopOrder): OrderTone => {
+  const status = String(order.status).toUpperCase();
+  if (status === 'CANCELLED' || status === 'VENDOR_REJECTED') return 'cancelled';
+  if (status === 'DELIVERED') return 'delivered';
+  return 'active';
+};
+
+export const isActiveOrder = (order: ShopOrder) => orderTone(order) === 'active';
+
+// Only an order the team has not started on can be cancelled from the shop; the server checks this again.
+export const canCancel = (order: ShopOrder) => String(order.status).toUpperCase() === 'PLACED';
+
+export const formatRupee = (amount: number) => `₹${Math.round(Number(amount) || 0).toLocaleString('en-IN')}`;
+
+export const formatOrderDate = (value: number | string | null | undefined): string => {
+  if (value === null || value === undefined || value === '') return '';
+  const date = new Date(typeof value === 'number' ? value : Number(value) || String(value));
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+};
+
+export const itemCountLabel = (order: ShopOrder) => {
+  const count = order.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
   return `${count} item${count === 1 ? '' : 's'}`;
 };
 
-export const paymentSummary = (order: Order): string => {
-  if (order.paymentStatus === 'successful') return `Paid by ${PAYMENT_LABEL[order.paymentMethod]}`;
-  if (order.paymentMethod === 'cod' && order.status !== 'cancelled') return 'Pay on delivery';
-  if (order.paymentStatus === 'processing') return 'Refund in progress';
-  if (order.paymentStatus === 'failed') return 'Payment failed';
-  if (order.paymentStatus === 'cancelled') return 'Payment cancelled';
-  return `Payment ${order.paymentStatus}`;
+export const orderTotal = (order: ShopOrder): number => Number(order.pricing?.grandTotal) || 0;
+
+export const paymentSummary = (order: ShopOrder): string => {
+  const method = String(order.payment?.method || 'COD').toUpperCase();
+  const status = String(order.payment?.status || 'PENDING').toUpperCase();
+  if (status === 'PAID' || status === 'COMPLETED') return method === 'COD' ? 'Paid on delivery' : 'Paid';
+  if (orderTone(order) === 'cancelled') return method === 'COD' ? 'Cash on delivery (nothing to pay)' : 'Payment cancelled';
+  return method === 'COD' ? 'Pay on delivery' : `Payment ${status.toLowerCase()}`;
 };
 
-/** Finds the order named in the route params, or falls back to the active order. */
-export const useRequestedOrder = (): { order: Order | null; requestedId: string | null } => {
-  const { activeParams, activeOrder, orders } = useApp();
+export const addressLine = (order: ShopOrder): string => {
+  const a = order.shippingAddress;
+  if (!a) return '';
+  return [a.fullAddress, a.city, a.pincode].filter(Boolean).join(', ');
+};
+
+// Loads the customer's orders from the server when a screen opens.
+export const useShopOrders = () => {
+  const orders = useCustomerStore((s) => s.orders);
+  const status = useCustomerStore((s) => s.ordersStatus);
+  const error = useCustomerStore((s) => s.ordersError);
+  const load = useCustomerStore((s) => s.loadOrders);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  return { orders, status, error, reload: load };
+};
+
+/** Finds the order named in the route params, or the most recent order. */
+export const useRequestedOrder = () => {
+  const { activeParams } = useApp();
+  const { orders, status, error, reload } = useShopOrders();
   const requestedId: string | null = activeParams?.orderId || activeParams?.id || null;
-  if (requestedId) {
-    const match = orders.find((entry) => entry.id === requestedId) ?? (activeOrder?.id === requestedId ? activeOrder : null);
-    return { order: match ?? null, requestedId };
-  }
-  return { order: activeOrder ?? orders[0] ?? null, requestedId: null };
+  const order = requestedId ? orders.find((entry) => entry.orderId === requestedId) ?? null : orders[0] ?? null;
+  return { order, requestedId, status, error, reload };
 };
 
-/** Adds the same products (and sizes) back to the bag, then opens the cart. */
+/** Adds the products that are still on sale back to the bag, at today's price, then opens the cart. */
 export const useBuyAgain = () => {
-  const { addToCart, navigate, showToast } = useApp();
-  return (order: Order) => {
+  const { navigate, showToast } = useApp();
+  return (order: ShopOrder) => {
+    const catalog = getLiveCatalog();
+    const { addItem, incrementItem } = useCartStore.getState();
     let added = 0;
     order.items.forEach((item) => {
-      const product = PRODUCTS.find((entry) => entry.id === item.productId);
-      if (!product) return;
-      const variant = product.variants.find((entry) => entry.size === item.variantSize) ?? product.variants.find((entry) => entry.id === product.currentVariantId);
-      if (!variant || !variant.inStock) return;
-      addToCart(product, variant.id, item.insuranceSelected);
+      const product = catalog.find((entry) => entry.id === item.productId);
+      if (!product || !(product.price > 0)) return;
+      addItem({
+        productId: product.id,
+        name: product.name,
+        brand: product.brand,
+        price: product.price,
+        mrp: product.originalPrice,
+        image: product.official_brand_image_url || item.imageUrl || '',
+      });
+      for (let i = 1; i < (Number(item.quantity) || 1); i += 1) incrementItem(product.id);
       added += 1;
     });
     if (added === 0) {
@@ -97,21 +134,21 @@ export const useBuyAgain = () => {
       return;
     }
     showToast(added === order.items.length ? 'Items added to your bag' : 'Available items added to your bag');
-    navigate('cart');
+    navigate('cart-tab');
   };
 };
 
 /** Product photo with a neutral tile when the image is missing or fails to load. */
-export const OrderThumb: React.FC<{ item: OrderItem; className?: string }> = ({ item, className }) => {
+export const OrderThumb: React.FC<{ item: ShopOrderItem; className?: string }> = ({ item, className }) => {
   const [failed, setFailed] = useState(false);
   if (!item.imageUrl || failed) {
     return (
-      <span className={`orders-thumb is-fallback${className ? ` ${className}` : ''}`} role="img" aria-label={item.productName}>
+      <span className={`orders-thumb is-fallback${className ? ` ${className}` : ''}`} role="img" aria-label={item.title}>
         <Package size={20} />
       </span>
     );
   }
-  return <img className={`orders-thumb${className ? ` ${className}` : ''}`} src={item.imageUrl} alt={item.productName} loading="lazy" onError={() => setFailed(true)} />;
+  return <img className={`orders-thumb${className ? ` ${className}` : ''}`} src={item.imageUrl} alt={item.title} loading="lazy" onError={() => setFailed(true)} />;
 };
 
 interface OrdersEmptyProps {
@@ -135,4 +172,35 @@ export const OrdersEmpty: React.FC<OrdersEmptyProps> = ({ title, body, actionLab
       </button>
     </section>
   );
+};
+
+/** Loading and error states while the orders come from the server. Returns null once they are ready. */
+export const OrdersLoadState: React.FC<{ status: string; error: string | null; onRetry: () => void; hasOrders: boolean }> = ({ status, error, onRetry, hasOrders }) => {
+  if (hasOrders && status !== 'error') return null;
+  if (status === 'error') {
+    return (
+      <section className="orders-empty-state" role="alert">
+        <span className="orders-empty-icon">
+          <AlertTriangle size={30} />
+        </span>
+        <h2>Orders could not be loaded</h2>
+        <p>{error || 'Check your connection and try again.'}</p>
+        <button type="button" className="orders-primary-button" onClick={onRetry}>
+          Try again <ArrowRight size={16} />
+        </button>
+      </section>
+    );
+  }
+  if (status === 'idle' || status === 'loading') {
+    return (
+      <section className="orders-empty-state" role="status">
+        <span className="orders-empty-icon">
+          <PackageOpen size={30} />
+        </span>
+        <h2>Loading your orders…</h2>
+        <p>Getting the latest status from GlowVai.</p>
+      </section>
+    );
+  }
+  return null;
 };

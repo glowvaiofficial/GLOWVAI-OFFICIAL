@@ -1,78 +1,65 @@
-import React, { useState } from 'react';
-import { CheckCircle2, ChevronRight, Clock, HelpCircle, MapPin, RotateCcw, Star, Truck, XCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { CheckCircle2, ChevronRight, Clock, HelpCircle, MapPin, RefreshCw, RotateCcw, Star, XCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import type { Order } from '../../types';
+import type { ShopOrder } from '../../core/services/shopApi';
 import { OrdersHeader } from './components/OrdersHeader';
 import {
-  DELIVERY_STAGES,
   OrderThumb,
   OrdersEmpty,
-  STATUS_LABEL,
+  OrdersLoadState,
+  addressLine,
   formatOrderDate,
   formatRupee,
   isActiveOrder,
   itemCountLabel,
   orderTone,
-  stageIndex,
+  orderTotal,
+  statusLabel,
   useBuyAgain,
+  useShopOrders,
 } from './orderUtils';
 
 const MAX_THUMBS = 4;
 
-const StatusBadge: React.FC<{ order: Order }> = ({ order }) => {
+const StatusBadge: React.FC<{ order: ShopOrder }> = ({ order }) => {
   const tone = orderTone(order);
   const Icon = tone === 'delivered' ? CheckCircle2 : tone === 'cancelled' ? XCircle : Clock;
   return (
     <span className={`orders-badge is-${tone}`}>
-      <Icon size={13} /> {STATUS_LABEL[order.status]}
+      <Icon size={13} /> {statusLabel(order.status)}
     </span>
   );
 };
 
-const Thumbs: React.FC<{ order: Order }> = ({ order }) => {
+const Thumbs: React.FC<{ order: ShopOrder }> = ({ order }) => {
   const extra = order.items.length - MAX_THUMBS;
   return (
     <div className="orders-thumbs">
-      {order.items.slice(0, MAX_THUMBS).map((item) => (
-        <OrderThumb key={`${item.productId}-${item.variantSize}`} item={item} />
+      {order.items.slice(0, MAX_THUMBS).map((item, index) => (
+        <OrderThumb key={`${item.productId}-${index}`} item={item} />
       ))}
       {extra > 0 && <span className="orders-more-items">+{extra} more</span>}
     </div>
   );
 };
 
-const Progress: React.FC<{ order: Order }> = ({ order }) => {
-  const current = stageIndex(order);
-  return (
-    <ol className="orders-progress" aria-label={`Delivery progress: ${STATUS_LABEL[order.status]}`}>
-      {DELIVERY_STAGES.map((label, index) => (
-        <li key={label} className={index < current ? 'is-done' : index === current ? 'is-current' : ''}>
-          <span className="orders-progress-dot">{index < current ? <CheckCircle2 size={14} /> : index === current ? <Truck size={13} /> : null}</span>
-          <small>{label}</small>
-        </li>
-      ))}
-    </ol>
-  );
-};
-
 interface OrderCardProps {
-  order: Order;
-  onOpen: (order: Order) => void;
-  onTrack: (order: Order) => void;
-  onRate: (order: Order) => void;
-  onBuyAgain: (order: Order) => void;
-  onCancelled: (order: Order) => void;
+  order: ShopOrder;
+  onOpen: (order: ShopOrder) => void;
+  onRate: (order: ShopOrder) => void;
+  onBuyAgain: (order: ShopOrder) => void;
 }
 
-const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, onBuyAgain, onCancelled }) => {
+const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onRate, onBuyAgain }) => {
   const tone = orderTone(order);
   const placed = formatOrderDate(order.createdAt);
+  const where = order.shippingAddress?.city || addressLine(order);
   return (
     <article className={`orders-order-card is-${tone}`}>
-      <button type="button" className="orders-card-open" onClick={() => onOpen(order)} aria-label={`View details of order ${order.id}`}>
+      <button type="button" className="orders-card-open" onClick={() => onOpen(order)} aria-label={`View details of order ${order.orderId}`}>
         <div className="orders-card-head">
           <div>
-            <strong>#{order.id}</strong>
+            <strong>#{order.orderId}</strong>
             <span>{placed ? `Placed ${placed}` : 'Placed recently'}</span>
           </div>
           <StatusBadge order={order} />
@@ -80,21 +67,20 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, o
         <Thumbs order={order} />
         <div className="orders-summary-row">
           <div>
-            <strong>{formatRupee(order.finalPayable)}</strong>
+            <strong>{formatRupee(orderTotal(order))}</strong>
             <span className="orders-address-line">
-              <MapPin size={12} /> {itemCountLabel(order)} · {order.address.label}, {order.address.area}
+              <MapPin size={12} /> {itemCountLabel(order)}
+              {where ? ` · ${where}` : ''}
             </span>
           </div>
           <ChevronRight size={18} />
         </div>
       </button>
 
-      {tone === 'active' && <Progress order={order} />}
-
       <div className="orders-card-actions">
         {tone === 'active' && (
-          <button type="button" className="orders-primary-button" onClick={() => onTrack(order)}>
-            <Truck size={16} /> Track order
+          <button type="button" className="orders-primary-button" onClick={() => onOpen(order)}>
+            <Clock size={16} /> View status
           </button>
         )}
         {tone === 'delivered' && (
@@ -109,7 +95,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, o
         )}
         {tone === 'cancelled' && (
           <>
-            <button type="button" className="orders-secondary-button" onClick={() => onCancelled(order)}>
+            <button type="button" className="orders-secondary-button" onClick={() => onOpen(order)}>
               View details
             </button>
             <button type="button" className="orders-primary-button" onClick={() => onBuyAgain(order)}>
@@ -123,26 +109,20 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onRate, o
 };
 
 export const OrdersListScreen: React.FC = () => {
-  const { goBack, navigate, orders, setActiveOrder } = useApp();
+  const { goBack, navigate } = useApp();
+  const { orders, status, error, reload } = useShopOrders();
   const buyAgain = useBuyAgain();
   const activeOrders = orders.filter(isActiveOrder);
   const pastOrders = orders.filter((order) => !isActiveOrder(order));
-  const [activeTab, setActiveTab] = useState<'active' | 'past'>(activeOrders.length ? 'active' : 'past');
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
-  const select = (order: Order) => setActiveOrder(order);
-  const handleOpen = (order: Order) => {
-    select(order);
-    navigate('orders-detail', { orderId: order.id });
-  };
-  const handleTrack = (order: Order) => {
-    select(order);
-    navigate('orders-tracking', { orderId: order.id });
-  };
-  const handleRate = (order: Order) => navigate('orders-rate', { orderId: order.id });
-  const handleCancelled = (order: Order) => {
-    select(order);
-    navigate('order-cancelled', { orderId: order.id });
-  };
+  // Open on the past tab when there is nothing active.
+  useEffect(() => {
+    if (status === 'ready' && activeOrders.length === 0 && pastOrders.length > 0) setActiveTab('past');
+  }, [status]);
+
+  const handleOpen = (order: ShopOrder) => navigate('orders-detail', { orderId: order.orderId });
+  const handleRate = (order: ShopOrder) => navigate('orders-rate', { orderId: order.orderId });
 
   const visible = activeTab === 'active' ? activeOrders : pastOrders;
 
@@ -150,19 +130,25 @@ export const OrdersListScreen: React.FC = () => {
     <main className="orders-screen is-list">
       <OrdersHeader
         title="My orders"
-        subtitle="Track, reorder or get help"
+        subtitle="Status from the GlowVai team"
         onBack={goBack}
         right={
-          <button type="button" className="orders-icon-button" aria-label="Help with an order" onClick={() => navigate('support')}>
-            <HelpCircle size={18} />
-          </button>
+          <>
+            <button type="button" className="orders-icon-button" aria-label="Refresh orders" onClick={() => void reload()}>
+              <RefreshCw size={18} />
+            </button>
+            <button type="button" className="orders-icon-button" aria-label="Help with an order" onClick={() => navigate('profile-support')}>
+              <HelpCircle size={18} />
+            </button>
+          </>
         }
       />
 
       <div className="orders-body">
-        {orders.length === 0 ? (
-          <OrdersEmpty title="No orders yet" body="When you place an order, you can track it, reorder and get help from here." actionLabel="Shop now" />
-        ) : (
+        <OrdersLoadState status={status} error={error} onRetry={() => void reload()} hasOrders={orders.length > 0} />
+        {status === 'ready' && orders.length === 0 ? (
+          <OrdersEmpty title="No orders yet" body="When you place an order, you can follow its status, cancel it or get help from here." actionLabel="Shop now" />
+        ) : orders.length > 0 ? (
           <>
             <div className="orders-segment" role="tablist" aria-label="Order status">
               <button type="button" role="tab" aria-selected={activeTab === 'active'} className={activeTab === 'active' ? 'is-active' : ''} onClick={() => setActiveTab('active')}>
@@ -176,27 +162,19 @@ export const OrdersListScreen: React.FC = () => {
             {visible.length === 0 ? (
               <OrdersEmpty
                 title={activeTab === 'active' ? 'No active orders' : 'No past orders'}
-                body={activeTab === 'active' ? 'Orders on their way to you will show up here.' : 'Delivered and cancelled orders will show up here.'}
+                body={activeTab === 'active' ? 'Orders that are not yet delivered show up here.' : 'Delivered and cancelled orders show up here.'}
                 actionLabel={activeTab === 'active' ? 'Shop now' : 'See active orders'}
                 onAction={activeTab === 'active' ? undefined : () => setActiveTab('active')}
               />
             ) : (
               <div className="orders-grid">
                 {visible.map((order) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    onOpen={handleOpen}
-                    onTrack={handleTrack}
-                    onRate={handleRate}
-                    onBuyAgain={buyAgain}
-                    onCancelled={handleCancelled}
-                  />
+                  <OrderCard key={order.orderId} order={order} onOpen={handleOpen} onRate={handleRate} onBuyAgain={buyAgain} />
                 ))}
               </div>
             )}
           </>
-        )}
+        ) : null}
       </div>
     </main>
   );

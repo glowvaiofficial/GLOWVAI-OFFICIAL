@@ -1,0 +1,176 @@
+import { NextRequest } from "next/server";
+import { randomBytes } from "node:crypto";
+import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
+import { customerFrom, db, indianMobile, json, text, tooMany } from "@/lib/shop/server";
+
+export const dynamic = "force-dynamic";
+
+const MAX_LINES = 20;
+const MAX_QTY = 10;
+
+// Customer-facing status from the shop status, with any admin decision (saved in admin_orders) applied on top.
+function customerStatus(shopStatus: string, overlay: Record<string, unknown> | undefined): string {
+  const fulfilment = String(overlay?.fulfilment ?? "");
+  if (fulfilment === "CANCELLED") return "CANCELLED";
+  if (fulfilment === "DELIVERED") return "DELIVERED";
+  return shopStatus || "PLACED";
+}
+
+// The signed-in customer's orders, newest first, with any admin decision applied.
+export async function GET(req: NextRequest) {
+  const customer = await customerFrom(req);
+  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const snap = await db().collection("orders").where("userId", "==", customer.uid).limit(100).get();
+  const ids = snap.docs.map((d) => d.id);
+  const overlays = new Map<string, Record<string, unknown>>();
+  if (ids.length) {
+    const refs = ids.map((id) => db().collection("admin_orders").doc(id));
+    for (const s of await db().getAll(...refs)) if (s.exists) overlays.set(s.id, s.data() as Record<string, unknown>);
+  }
+  const orders = snap.docs
+    .map((d) => {
+      const o = d.data();
+      const overlay = overlays.get(d.id);
+      return {
+        orderId: o.orderId ?? d.id,
+        status: customerStatus(String(o.status ?? ""), overlay),
+        cancellationReason: (overlay?.cancellationReason as string | undefined) ?? o.cancellationReason ?? null,
+        items: (o.items ?? []).map((it: Record<string, unknown>) => ({
+          productId: it.productId,
+          title: it.productName ?? it.title,
+          brand: it.brand ?? "",
+          quantity: it.quantity,
+          unitPrice: it.unitPrice,
+          imageUrl: it.imageUrl ?? "",
+        })),
+        pricing: o.pricing ?? null,
+        payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
+        shippingAddress: o.shippingAddress ?? null,
+        createdAt: o.createdAt ?? null,
+        updatedAt: o.updatedAt ?? null,
+      };
+    })
+    .sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
+  return json({ ok: true, orders });
+}
+
+// Places an order. Prices, delivery fee and coupon are worked out here from the published products and the shop's
+// pricing rules, never taken from the browser. Only cash on delivery is offered until online payment is connected.
+export async function POST(req: NextRequest) {
+  const customer = await customerFrom(req);
+  if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
+  if (tooMany(`order:${customer.uid}`, 10, 60 * 60 * 1000)) return json({ ok: false, error: "Too many orders in a short time. Try again later." }, 429);
+
+  const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!body) return json({ ok: false, error: "Invalid request." }, 400);
+  if (String(body.paymentMethod ?? "COD") !== "COD") {
+    return json({ ok: false, error: "Online payment is not available yet. Choose cash on delivery." }, 400);
+  }
+
+  const lines = Array.isArray(body.items) ? body.items : [];
+  if (lines.length === 0) return json({ ok: false, error: "Your bag is empty." }, 400);
+  if (lines.length > MAX_LINES) return json({ ok: false, error: `Up to ${MAX_LINES} different products per order.` }, 400);
+  const wanted = new Map<string, number>();
+  for (const raw of lines) {
+    const l = (raw ?? {}) as Record<string, unknown>;
+    const id = text(l.productId, 140);
+    const qty = Math.floor(Number(l.quantity));
+    if (!id || !Number.isFinite(qty) || qty < 1) return json({ ok: false, error: "Each item needs a product and a quantity." }, 400);
+    wanted.set(id, Math.min(MAX_QTY, (wanted.get(id) ?? 0) + qty));
+  }
+
+  const addr = (body.address ?? {}) as Record<string, unknown>;
+  const recipientName = text(addr.name, 80);
+  const phone = indianMobile(addr.phone);
+  const fullAddress = text(addr.fullAddress, 300);
+  const city = text(addr.city, 60);
+  const pincode = text(addr.pincode, 6);
+  const area = text(addr.area, 80);
+  if (recipientName.length < 2) return json({ ok: false, error: "Enter the name for delivery." }, 400);
+  if (!phone) return json({ ok: false, error: "Enter a 10-digit Indian mobile number for delivery." }, 400);
+  if (fullAddress.length < 8) return json({ ok: false, error: "Enter the full delivery address." }, 400);
+  if (!city) return json({ ok: false, error: "Enter the city." }, 400);
+  if (!/^\d{6}$/.test(pincode)) return json({ ok: false, error: "Enter a 6-digit pincode." }, 400);
+
+  const store = db();
+  const productRefs = [...wanted.keys()].map((id) => store.collection("products").doc(id));
+  const productSnaps = await store.getAll(...productRefs);
+  const items: Record<string, unknown>[] = [];
+  for (const snap of productSnaps) {
+    const p = snap.data();
+    if (!snap.exists || !p || p.status !== "PUBLISHED") {
+      return json({ ok: false, error: "One of the products is no longer available. Remove it from your bag and try again." }, 409);
+    }
+    const unitPrice = Math.round(Number(p.brandPrice) || 0);
+    if (unitPrice <= 0) return json({ ok: false, error: `${p.productName ?? "A product"} has no price yet.` }, 409);
+    const quantity = wanted.get(snap.id) ?? 1;
+    items.push({
+      productId: snap.id,
+      sku: snap.id,
+      title: String(p.productName ?? ""),
+      productName: String(p.productName ?? ""),
+      brand: String(p.brandName ?? ""),
+      unitPrice,
+      quantity,
+      totalPrice: unitPrice * quantity,
+      imageUrl: Array.isArray(p.pictures) && p.pictures[0] ? String(p.pictures[0]) : "",
+      hasBeautyProtection: false,
+      beautyProtectionFee: 0,
+    });
+  }
+
+  const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
+  const couponCode = text(body.couponCode, 20).toUpperCase();
+  const couponValue = couponCode ? (COUPON_VALUES as Record<string, number>)[couponCode] : undefined;
+  if (couponCode && couponValue === undefined) return json({ ok: false, error: "That coupon code is not valid." }, 400);
+  const discountAmount = Math.min(couponValue ?? 0, subtotal);
+  const deliveryFee = deliveryFeeFor({ itemTotal: subtotal, area: area || city });
+  const grandTotal = subtotal - discountAmount + deliveryFee;
+
+  const now = Date.now();
+  const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
+  const orderId = `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
+  const order = {
+    orderId,
+    userId: customer.uid,
+    customerName: recipientName,
+    customerPhone: phone,
+    deliveryType: "STANDARD",
+    vendorId: null,
+    vendorName: null,
+    vendorStatus: "PENDING",
+    zoneId: null,
+    items,
+    shippingAddress: {
+      label: "Home",
+      recipientName,
+      phoneNumber: phone,
+      streetAddress: fullAddress,
+      fullAddress,
+      city,
+      pincode,
+      landmark: text(addr.landmark, 120),
+      area,
+      isDefault: true,
+    },
+    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
+    payment: { method: "COD", status: "PENDING" },
+    status: "PLACED",
+    couponCode: discountAmount > 0 ? couponCode : null,
+    referralCodeUsed: null,
+    referralProcessed: false,
+    source: "web_shop",
+    events: [{ at: now, actor: "Customer", event: "Order placed (cash on delivery)" }],
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await store.runTransaction(async (tx) => {
+    const ref = store.collection("orders").doc(orderId);
+    if ((await tx.get(ref)).exists) throw new Error("Order id clash, please retry.");
+    tx.create(ref, order);
+    tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
+  });
+
+  return json({ ok: true, orderId, pricing: order.pricing, status: order.status });
+}

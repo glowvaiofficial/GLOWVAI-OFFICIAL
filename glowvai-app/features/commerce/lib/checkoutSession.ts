@@ -15,7 +15,7 @@ export const PAY_CHOICES: Array<{
   { id: 'paytm', label: 'Paytm UPI', sub: 'Pay with the Paytm app', group: 'upi', method: 'PAYTM' },
   { id: 'bhim', label: 'BHIM / Other UPI', sub: 'Any UPI handle or QR', group: 'upi', method: 'BHIM' },
   { id: 'card', label: 'Credit or debit card', sub: 'Visa, Mastercard, RuPay', group: 'card', method: 'CARD' },
-  { id: 'cod', label: 'Cash on delivery', sub: 'Pay the rider at your doorstep', group: 'cod', method: 'COD' },
+  { id: 'cod', label: 'Cash on delivery', sub: 'Pay when the order arrives', group: 'cod', method: 'COD' },
 ];
 
 export const payChoiceMeta = (id: PayChoice) => PAY_CHOICES.find((c) => c.id === id) ?? PAY_CHOICES[0];
@@ -31,9 +31,8 @@ interface CheckoutSessionState {
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   couponCode: null,
-  payChoice: 'gpay',
+  // Only cash on delivery can be placed until online payment is connected on the server.
+  payChoice: 'cod',
   setCouponCode: (couponCode) => set({ couponCode }),
-  setPayChoice: (payChoice) => set({ payChoice }),
+  setPayChoice: () => set({ payChoice: 'cod' }),
 }));
-
-export const newOrderId = (): string => `ORD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;

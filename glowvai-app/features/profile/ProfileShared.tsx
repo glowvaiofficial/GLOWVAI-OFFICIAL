@@ -7,9 +7,6 @@ export const getInitials = (name?: string | null): string => {
   return parts.slice(0, 2).map((part) => part[0].toUpperCase()).join('');
 };
 
-export const getReferralCode = (userId?: string | null): string =>
-  userId ? `GLOW-${userId.slice(0, 6).toUpperCase()}` : 'GLOW-GUEST';
-
 export const openExternal = (url: string): void => {
   window.open(url, '_blank', 'noopener,noreferrer');
 };

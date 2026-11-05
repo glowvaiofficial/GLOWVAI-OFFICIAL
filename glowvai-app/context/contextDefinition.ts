@@ -1,17 +1,14 @@
 import type { PortedScreenName } from '../core/routes/names';
 import { createContext } from 'react';
+import type { ShopProfileAddress } from '../core/services/shopApi';
 import {
   Address,
   CartItem,
   CustomerDetails,
-  Order,
-  PaymentMethodType,
-  PaymentVerification,
   Product,
   ShoppingPreference,
   SkinReport,
   BeautyInsuranceStreak,
-  SupportTicket,
   UserProfile,
 } from '../types';
 
@@ -52,11 +49,9 @@ export interface AppContextType {
   // User state
   user: UserProfile | null;
   customerDetails: CustomerDetails | null;
-  saveCustomerDetails: (details: CustomerDetails) => void;
-  loginUser: (phone: string) => Promise<void>;
-  verifyUserOtp: (otp: string) => Promise<void>;
-  logout: () => void;
-  deleteAccount: () => void;
+  // 'ready' once the server answered whether this device has saved details (customerDetails is null if not).
+  profileStatus: 'idle' | 'loading' | 'ready' | 'error';
+  saveCustomerDetails: (details: CustomerDetails, address?: ShopProfileAddress) => Promise<{ ok: boolean; error: string | null }>;
 
   // Address
   currentAddress: Address;
@@ -90,13 +85,6 @@ export interface AppContextType {
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
 
-  // Orders
-  orders: Order[];
-  activeOrder: Order | null;
-  setActiveOrder: (order: Order | null) => void;
-  placeOrder: (paymentMethod: PaymentMethodType, checkoutDiscount?: number, verification?: PaymentVerification) => Promise<Order>;
-  cancelOrder: (orderId: string, reason: string) => Order | null;
-
   // Facial diagnostics & Skin reports
   capturedFaceImage: string | null;
   setCapturedFaceImage: (img: string | null) => void;
@@ -111,11 +99,6 @@ export interface AppContextType {
   logStreakEvidence: (trackingId: string, evidenceType: 'photo' | 'video', evidenceUrl: string) => void;
   reportAdverseReaction: (trackingId: string, description: string) => Promise<void>;
   submitClaim: (trackingId: string, feedback: string) => Promise<void>;
-
-  // Support tickets
-  supportTickets: SupportTicket[];
-  createTicket: (category: SupportTicket['category'], subject: string, message: string, orderId?: string) => Promise<SupportTicket>;
-  replyToTicket: (ticketId: string, message: string) => void;
 
   // Toast / System Notification
   toastMessage: string | null;

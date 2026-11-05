@@ -68,11 +68,11 @@ export const useDeliveryAddress = (): DeliveryAddress | null => {
   );
 };
 
+// The customer's saved details. The account itself is the Firebase session the server reads from the ID token.
 export const useCustomer = () => {
   const { customerDetails, user } = useApp();
   return {
-    userId: user?.id || customerDetails?.phoneNumber || 'guest',
-    name: customerDetails?.fullName || user?.name || 'GlowVAI customer',
+    name: customerDetails?.fullName || user?.name || '',
     phone: customerDetails?.phoneNumber || user?.phoneNumber || '',
     email: customerDetails?.email || user?.email || '',
   };

@@ -3,18 +3,7 @@
  * Implements authoritative backend contract rules defined in PRD Section 27
  */
 
-import {
-  Address,
-  CartItem,
-  Order,
-  PaymentMethodType,
-  PaymentVerification,
-  Product,
-  SkinReport,
-  BeautyInsuranceStreak,
-  SupportTicket,
-  UserProfile,
-} from '../types';
+import { Address, CartItem, Product, SkinReport } from '../types';
 import { PRODUCTS } from '../data/products';
 import { VIJAYAWADA_AREAS } from '../data/serviceability';
 import { deliveryFeeFor } from '../shared/pricing-rules.mjs';
@@ -22,48 +11,9 @@ import { deliveryFeeFor } from '../shared/pricing-rules.mjs';
 // Simulated delay helper for realistic network response
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Demo OTP for the prototype backend. Real verification happens server-side once the auth service is connected.
-export const DEMO_OTP = '123456';
-
-// Orders already created for an idempotency key, so a retried checkout never creates a second order.
-const ordersByIdempotencyKey = new Map<string, Order>();
-
+// Sign-in, orders and support tickets are not simulated here. They go to the shop's server routes
+// (core/services/shopApi.ts).
 export const ApiService = {
-  // ── 1. AUTHENTICATION (PRD Section 6 & 27.1)
-  async requestOtp(phoneNumber: string): Promise<{ success: boolean; message: string; cooldownSeconds: number }> {
-    await delay(600);
-    const cleaned = phoneNumber.replace(/\D/g, '');
-    if (!/^[6-9]\d{9}$/.test(cleaned)) {
-      throw new Error('Please enter a valid 10-digit Indian mobile number.');
-    }
-    // Rate limit check simulation
-    return {
-      success: true,
-      message: `OTP sent successfully to +91 ${cleaned}`,
-      cooldownSeconds: 30,
-    };
-  },
-
-  async verifyOtp(phoneNumber: string, otp: string): Promise<{ success: boolean; user: UserProfile; token: string }> {
-    await delay(800);
-    if (otp !== DEMO_OTP) {
-      throw new Error('Invalid OTP. Please check the code or request a new one.');
-    }
-    const user: UserProfile = {
-      id: `usr-${Date.now()}`,
-      phoneNumber: `+91 ${phoneNumber}`,
-      shoppingPreference: 'all',
-      onboardingCompleted: true,
-      facialAnalysisCompleted: false,
-      consentGiven: false,
-    };
-    return {
-      success: true,
-      user,
-      token: `glowvai_jwt_${Date.now()}`,
-    };
-  },
-
   // ── 2. SERVICEABILITY REVALIDATION (PRD Section 9 & 27.4)
   async checkServiceability(address: Address): Promise<{
     serviceable: boolean;
@@ -171,71 +121,6 @@ export const ApiService = {
     };
   },
 
-  // ── 5. CHECKOUT & ORDER CREATION (PRD Section 15, 16 & 27.7)
-  async createOrder(
-    idempotencyKey: string,
-    items: CartItem[],
-    address: Address,
-    paymentMethod: PaymentMethodType,
-    checkoutDiscount = 0,
-    verification?: PaymentVerification
-  ): Promise<Order> {
-    if (paymentMethod !== 'cod' && !verification) {
-      throw new Error('Online payment must be verified before the order is created.');
-    }
-    const existing = ordersByIdempotencyKey.get(idempotencyKey);
-    if (existing) return existing;
-    await delay(1200); // Simulate network & payment verification
-
-    const pricing = this.validateCartPricing(items, address);
-
-    const orderId = `GLOW-${Date.now().toString().slice(-6)}${Math.floor(10 + Math.random() * 90)}`;
-    const newOrder: Order = {
-      id: orderId,
-      createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      items: items.map((i) => {
-        const v = i.product.variants.find((v) => v.id === i.variantId) || i.product.variants[0];
-        return {
-          productId: i.product.id,
-          productName: i.product.name,
-          brand: i.product.brand,
-          variantSize: v.size,
-          quantity: i.quantity,
-          unitPrice: v.price,
-          insuranceSelected: i.withInsurance,
-          insuranceFee: i.withInsurance ? i.product.insuranceFee || 29 : 0,
-          imageUrl: i.product.images[0],
-        };
-      }),
-      address,
-      itemSubtotal: pricing.itemSubtotal,
-      discount: pricing.discountTotal + checkoutDiscount,
-      deliveryFee: pricing.deliveryFee,
-      insuranceTotal: pricing.insuranceTotal,
-      finalPayable: Math.max(0, pricing.finalPayable - checkoutDiscount),
-      paymentMethod,
-      paymentStatus: paymentMethod === 'cod' ? 'pending' : 'successful',
-      paymentProvider: verification?.provider,
-      paymentReference: verification?.paymentId,
-      status: 'confirmed',
-      estimatedDeliveryMinutes: pricing.isSplitDelivery ? 45 : address.deliveryMinutes || 15,
-      isSplitDelivery: pricing.isSplitDelivery,
-      splitDeliveryNote: pricing.sourcingNotice,
-      // No rider is assigned until the fulfilment service reports one, so no rider name is shown.
-      fulfilmentTasks: [
-        {
-          taskId: `task-fulfil-${orderId}-1`,
-          sourceType: 'dark_store',
-          status: 'assigned',
-          etaMinutes: address.deliveryMinutes || 15,
-        },
-      ],
-    };
-
-    ordersByIdempotencyKey.set(idempotencyKey, newOrder);
-    return newOrder;
-  },
-
   // ── 6. ML FACIAL ANALYSIS (PRD Section 7, 8 & 27.10)
   async analyzeFaceImage(
     imageDataUrl: string,
@@ -300,56 +185,4 @@ export const ApiService = {
     };
   },
 
-  // ── 7. BEAUTY INSURANCE & STREAKS (PRD Section 20 & 27.11)
-  createStreakFromOrder(order: Order): BeautyInsuranceStreak[] {
-    const insuredItems = order.items.filter((item) => item.insuranceSelected);
-    return insuredItems.map((item, idx) => ({
-      trackingId: `strk-${order.id}-${idx}`,
-      orderId: order.id,
-      productId: item.productId,
-      productName: item.productName,
-      productImage: item.imageUrl,
-      policyVersion: 'Glowvai-Suitability-v1.2',
-      startDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
-      endDate: new Date(Date.now() + 14 * 86400000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
-      totalDaysRequired: 14,
-      completedDays: 1,
-      missedDays: 0,
-      status: 'active',
-      days: Array.from({ length: 14 }, (_, i) => ({
-        day: i + 1,
-        date: new Date(Date.now() + i * 86400000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
-        completed: i === 0,
-        missed: false,
-        evidenceType: i === 0 ? 'photo' : undefined,
-        timestamp: i === 0 ? 'Day 1 Check-in completed' : undefined,
-      })),
-    }));
-  },
-
-  // ── 8. SUPPORT TICKETS (PRD Section 24 & 27.13)
-  async submitSupportTicket(
-    category: SupportTicket['category'],
-    subject: string,
-    initialMessage: string,
-    orderId?: string
-  ): Promise<SupportTicket> {
-    await delay(700);
-    const newTicket: SupportTicket = {
-      id: `TCK-${Date.now().toString().slice(-5)}`,
-      createdAt: 'Just now',
-      orderId,
-      category,
-      subject,
-      status: 'Open',
-      messages: [
-        {
-          sender: 'user',
-          text: initialMessage,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
-      ],
-    };
-    return newTicket;
-  },
 };
