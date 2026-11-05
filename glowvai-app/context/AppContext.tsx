@@ -106,7 +106,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [cart]);
 
   // Wishlist
-  const [wishlist, setWishlist] = useState<string[]>([]);
+  // Saved products stay on this device (kept in browser storage, read safely: a blocked storage is simply empty).
+  const [wishlist, setWishlist] = useState<string[]>(() => {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem('glowvai_wishlist_v1') ?? '[]');
+      return Array.isArray(saved) ? saved.filter((id) => typeof id === 'string').slice(0, 200) : [];
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('glowvai_wishlist_v1', JSON.stringify(wishlist.slice(0, 200)));
+    } catch {
+      // Storage blocked: the list works for this visit only.
+    }
+  }, [wishlist]);
 
   // Face Analysis
   const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null);

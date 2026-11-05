@@ -67,7 +67,8 @@ export const ShopProductScreen: React.FC = () => {
   const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category;
 
   const handleShare = async () => {
-    const url = typeof window !== 'undefined' ? window.location.href : '';
+    // A link to this product itself, so anyone who opens it lands on the same product.
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/shop?product=${encodeURIComponent(product.id)}` : '';
     const text = `${product.brand} ${product.name} on GlowVAI`;
     try {
       if (navigator.share) {
