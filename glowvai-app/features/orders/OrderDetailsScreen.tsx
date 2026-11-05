@@ -206,7 +206,7 @@ export const OrderDetailsScreen: React.FC = () => {
               <XCircle size={24} />
             </span>
             <h2 id="orders-cancel-title">Cancel this order?</h2>
-            <p>You can cancel until the GlowVai team starts preparing it.</p>
+            <p>You can cancel until your order is packed.</p>
             <label className="orders-field">
               Reason
               <select value={reason} onChange={(event) => setReason(event.target.value)} disabled={cancelling}>
