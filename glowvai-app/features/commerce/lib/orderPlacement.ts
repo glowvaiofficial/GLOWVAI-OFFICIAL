@@ -8,6 +8,7 @@ export interface PlaceOrderInput {
   address: DeliveryAddress;
   couponCode: string | null;
   tip?: number;
+  paymentMethod?: 'COD' | 'ONLINE';
   // Used when the delivery address has no recipient name or phone of its own.
   customer: { name: string; phone: string };
 }
@@ -24,7 +25,7 @@ const areaIn = (text: string): string | undefined => {
 // Places a cash-on-delivery order through the shop server (POST /api/shop/orders). Only product ids and quantities
 // are sent: the server prices every item from the published catalogue, applies the coupon and delivery fee, and
 // creates the order id. The result carries the server's message when the order is refused.
-export const placeCartOrder = async ({ items, address, couponCode, tip = 0, customer }: PlaceOrderInput) =>
+export const placeCartOrder = async ({ items, address, couponCode, tip = 0, paymentMethod = 'COD', customer }: PlaceOrderInput) =>
   placeOrder({
     items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
     address: {
@@ -38,4 +39,5 @@ export const placeCartOrder = async ({ items, address, couponCode, tip = 0, cust
     },
     couponCode,
     tip,
+    paymentMethod,
   });
