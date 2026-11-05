@@ -43,9 +43,9 @@ export const OnboardingScreen: React.FC = () => {
       setStep((value) => value + 1);
       return;
     }
-    // After the phone number, the last step continues to the verification code. Without a number, the old login screen opens.
-    if (activeParams?.phoneNumber) navigate('auth-otp', activeParams);
-    else navigate('login');
+    // Last carousel step: skin survey, then "Your details", then the shop (no sign-in code is offered yet).
+    if (activeParams?.phoneNumber) navigate('auth-login', { returnTo: 'auth-onboarding-success' });
+    else navigate('auth-skin-survey');
   };
 
   return (

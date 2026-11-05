@@ -269,3 +269,6 @@
   .glowvai-root .app-viewport:has(.mini-cart-bar) .auth-login-sheet{ padding-bottom: 80px; }
   .glowvai-root .app-viewport:has(.mini-cart-bar) .auth-success-footer{ bottom: 80px; }
 }
+
+/* "Your details" follows onboarding on the light page: no blue brand panel on this step. */
+.glowvai-root .login-reference-screen.is-details .login-reference-hero { display: none; }
