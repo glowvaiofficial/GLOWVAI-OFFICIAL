@@ -6,6 +6,7 @@ import { useCustomerStore } from '../../core/state/customerStore';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
+import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
 const MIN_DISPLAY_MS = 1200;
@@ -30,11 +31,31 @@ export const PaymentProcessingScreen: React.FC = () => {
 
     const run = async () => {
       const startedAt = Date.now();
-      const cartItems = Object.values(useCartStore.getState().items);
-      if (cartItems.length === 0) {
+      const allItems = Object.values(useCartStore.getState().items);
+      if (allItems.length === 0) {
         navigate('cart-tab');
         return;
       }
+      // Only products the shop sells right now can be ordered. Anything else (old saved items) is removed from the bag,
+      // and the customer is told which items, instead of the order failing with a vague message.
+      const live = getLiveCatalog();
+      if (live.length === 0) {
+        navigate('checkout-payment-failed', { error: 'Products are still loading. Check your connection and try again.', amount, method: 'cod' });
+        return;
+      }
+      const liveIds = new Set(live.map((p) => p.id));
+      const unavailable = allItems.filter((item) => !liveIds.has(item.productId));
+      if (unavailable.length > 0) {
+        unavailable.forEach((item) => useCartStore.getState().removeItem(item.productId));
+        const names = unavailable.map((item) => item.name || item.productId).slice(0, 3).join(', ');
+        navigate('checkout-payment-failed', {
+          error: `We removed ${unavailable.length} item${unavailable.length === 1 ? '' : 's'} that ${unavailable.length === 1 ? 'is' : 'are'} no longer sold (${names}). Review your bag and place the order again.`,
+          amount,
+          method: 'cod',
+        });
+        return;
+      }
+      const cartItems = allItems;
       if (!address?.serviceable) {
         navigate('checkout-review');
         return;
@@ -48,6 +69,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         items: cartItems,
         address,
         couponCode,
+        tip: useCheckoutSession.getState().tip,
         customer: { name: customer.name, phone: customer.phone },
       });
       setStep(STEPS.length);

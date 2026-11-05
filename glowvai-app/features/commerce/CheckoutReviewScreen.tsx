@@ -39,10 +39,15 @@ export const CheckoutReviewScreen: React.FC = () => {
 
   const next = () => {
     safeHapticImpact();
-    if (!address) navigate('location-setup', { returnTo: 'checkout-review' });
-    else navigate('checkout-payment-method');
+    if (!address) {
+      navigate('location-setup', { returnTo: 'checkout-review' });
+      return;
+    }
+    // The customer confirms the delivery address shown above before paying.
+    useCheckoutSession.getState().setAddressConfirmed(true);
+    navigate('checkout-payment-method');
   };
-  const ctaLabel = address ? 'Continue to payment' : 'Add delivery address';
+  const ctaLabel = address ? 'Confirm address and continue' : 'Add delivery address';
 
   return (
     <main className="commerce-screen commerce-review has-aside">

@@ -125,7 +125,11 @@ export async function POST(req: NextRequest) {
   if (couponCode && couponValue === undefined) return json({ ok: false, error: "That coupon code is not valid." }, 400);
   const discountAmount = Math.min(couponValue ?? 0, subtotal);
   const deliveryFee = deliveryFeeFor({ itemTotal: subtotal, area: area || city });
-  const grandTotal = subtotal - discountAmount + deliveryFee;
+  // Optional tip for the delivery partner: a whole-rupee amount from 0 to 500, added to the bill.
+  const tipRaw = body.tip === undefined || body.tip === null || body.tip === "" ? 0 : Number(body.tip);
+  if (!Number.isFinite(tipRaw) || tipRaw < 0 || tipRaw > 500) return json({ ok: false, error: "The tip must be between ₹0 and ₹500." }, 400);
+  const tip = Math.round(tipRaw);
+  const grandTotal = subtotal - discountAmount + deliveryFee + tip;
 
   const now = Date.now();
   const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
@@ -153,7 +157,7 @@ export async function POST(req: NextRequest) {
       area,
       isDefault: true,
     },
-    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
+    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, tip, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
     payment: { method: "COD", status: "PENDING" },
     status: "PLACED",
     couponCode: discountAmount > 0 ? couponCode : null,
