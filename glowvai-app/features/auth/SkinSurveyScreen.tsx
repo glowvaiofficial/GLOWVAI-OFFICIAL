@@ -40,7 +40,8 @@ export const SkinSurveyScreen: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-    navigate('auth-onboarding-success');
+    // Details come right after the skin survey, so orders can be delivered from the first visit.
+    navigate('auth-login', { returnTo: 'auth-onboarding-success' });
   };
 
   return (

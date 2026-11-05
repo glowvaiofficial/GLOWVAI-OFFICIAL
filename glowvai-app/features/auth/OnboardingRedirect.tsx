@@ -1,12 +1,12 @@
 import { useEffect, type FC } from 'react';
 import { useApp } from '../../context/useApp';
 
-// The USER app's onboarding carousel was retired; this step forwards to login.
+// Onboarding order: welcome, skin survey, then "Your details", then the shop.
 export const OnboardingRedirect: FC = () => {
   const { navigate } = useApp();
 
   useEffect(() => {
-    navigate('auth-login');
+    navigate('auth-skin-survey');
   }, []);
 
   return null;
