@@ -3,7 +3,7 @@
 // who they are (Firebase ID token), validate the input and write with the Admin SDK in the exact shape the admin reads.
 import "server-only";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+import { getAuth, type Auth } from "firebase-admin/auth";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -22,6 +22,11 @@ function adminApp(): App {
 
 export function db(): Firestore {
   return getFirestore(adminApp());
+}
+
+// Firebase Auth (Admin SDK) on the same app, for the vendor API's token checks.
+export function adminAuth(): Auth {
+  return getAuth(adminApp());
 }
 
 export const json = (body: unknown, status = 200) =>
@@ -55,13 +60,8 @@ export function tooMany(key: string, max: number, windowMs: number): boolean {
   return false;
 }
 
-export const text = (v: unknown, max = 200): string => (typeof v === "string" ? v.trim().slice(0, max) : "");
-
-// Indian mobile number as 10 digits, or "" when it is not one.
-export function indianMobile(v: unknown): string {
-  const digits = text(v, 20).replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "");
-  return /^[6-9]\d{9}$/.test(digits) ? digits : "";
-}
+// Input helpers live in ./text (no server imports) so the vendor API's pure modules and tests can use them too.
+export { indianMobile, text } from "./text";
 
 // The visitor's address as the platform reports it. Used to limit anonymous requests.
 export function clientIp(req: NextRequest): string {

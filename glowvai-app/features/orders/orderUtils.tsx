@@ -15,7 +15,8 @@ const KNOWN_STATUS: Record<string, string> = {
   PLACED: 'Order placed',
   CONFIRMED: 'Confirmed',
   ACCEPTED: 'Confirmed',
-  PACKED: 'Packed',
+  VENDOR_ACCEPTED: 'Store accepted your order',
+  PACKED: 'Packed, waiting for pickup',
   DISPATCHED: 'On the way',
   OUT_FOR_DELIVERY: 'Out for delivery',
   DELIVERED: 'Delivered',
@@ -35,6 +36,10 @@ export const statusNote = (order: ShopOrder): string => {
   switch (String(order.status).toUpperCase()) {
     case 'PLACED':
       return 'We have your order. The GlowVai team will confirm it and prepare it for delivery. You can still cancel it.';
+    case 'VENDOR_ACCEPTED':
+      return 'A GlowVai partner store accepted your order and is getting it ready. You can still cancel it until it is packed.';
+    case 'PACKED':
+      return 'Your order is packed at the store and waiting for pickup.';
     case 'DELIVERED':
       return 'This order was delivered.';
     case 'CANCELLED':
@@ -54,8 +59,8 @@ export const orderTone = (order: ShopOrder): OrderTone => {
 
 export const isActiveOrder = (order: ShopOrder) => orderTone(order) === 'active';
 
-// Only an order the team has not started on can be cancelled from the shop; the server checks this again.
-export const canCancel = (order: ShopOrder) => String(order.status).toUpperCase() === 'PLACED';
+// An order can be cancelled from the shop until it is packed; the server checks this again.
+export const canCancel = (order: ShopOrder) => ['PLACED', 'VENDOR_ACCEPTED'].includes(String(order.status).toUpperCase());
 
 export const formatRupee = (amount: number) => `₹${Math.round(Number(amount) || 0).toLocaleString('en-IN')}`;
 
