@@ -13,10 +13,30 @@ export const PaymentMethodScreen: React.FC = () => {
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const address = useDeliveryAddress();
+  const addressConfirmed = useCheckoutSession((s) => s.addressConfirmed);
+  const tip = useCheckoutSession((s) => s.tip);
+  const setTip = useCheckoutSession((s) => s.setTip);
   const cartItems = Object.values(items);
   const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress);
 
   // Payment needs a cart and a deliverable address; otherwise send the customer back to the step that is missing.
+  // The address must be confirmed on the review step first, so the customer always sees where the order goes.
+  if (cartItems.length > 0 && address?.serviceable && !addressConfirmed) {
+    return (
+      <main className="commerce-screen commerce-payment is-empty">
+        <FlowHeader title="Confirm delivery address" onBack={goBack} />
+        <div className="commerce-body">
+          <div className="commerce-empty-state is-card">
+            <span className="commerce-empty-icon"><MapPin size={34} /></span>
+            <h2>Check your delivery address</h2>
+            <p>Make sure the address is exact, with flat or floor and building name, before you pay.</p>
+            <button className="commerce-primary" onClick={() => navigate('checkout-review')}>Review address</button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (cartItems.length === 0 || !address?.serviceable) {
     const noItems = cartItems.length === 0;
     return (
@@ -45,7 +65,8 @@ export const PaymentMethodScreen: React.FC = () => {
     }
     navigate('checkout-payment-processing', { method: 'cod' });
   };
-  const ctaLabel = customerDetails ? `Place order · ₹${totals.grandTotal}` : 'Add your details to continue';
+  const payable = totals.grandTotal + tip;
+  const ctaLabel = customerDetails ? `Place order · ₹${payable}` : 'Add your details to continue';
 
   return (
     <main className="commerce-screen commerce-payment has-aside">
@@ -68,6 +89,25 @@ export const PaymentMethodScreen: React.FC = () => {
               </label>
             </div>
           </fieldset>
+
+          <section className="commerce-card commerce-tip" aria-labelledby="tip-title">
+            <h2 id="tip-title">Tip your delivery partner</h2>
+            <p className="commerce-muted">Optional. 100% goes to the delivery partner who brings your order.</p>
+            <div className="commerce-tip-options" role="radiogroup" aria-label="Tip amount">
+              {[0, 10, 20, 30].map((amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  role="radio"
+                  aria-checked={tip === amount}
+                  className={`commerce-chip${tip === amount ? ' is-selected' : ''}`}
+                  onClick={() => setTip(amount)}
+                >
+                  {amount === 0 ? 'No tip' : `₹${amount}`}
+                </button>
+              ))}
+            </div>
+          </section>
 
           <fieldset className="commerce-card commerce-pay-group" disabled aria-describedby="online-soon">
             <legend>
@@ -121,6 +161,12 @@ export const PaymentMethodScreen: React.FC = () => {
           <section className="commerce-card commerce-bill" aria-labelledby="pay-bill-title">
             <h2 id="pay-bill-title">Order total</h2>
             <BillRows totals={totals} totalLabel="Pay on delivery" />
+            {tip > 0 ? (
+              <div className="commerce-bill-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Tip for your delivery partner</span>
+                <b>₹{tip}</b>
+              </div>
+            ) : null}
             <button className="commerce-primary is-wide commerce-aside-cta" onClick={placeOrder}>
               {ctaLabel}
             </button>
@@ -135,7 +181,7 @@ export const PaymentMethodScreen: React.FC = () => {
       <footer className="commerce-sticky-bar">
         <div>
           <small>Pay on delivery</small>
-          <b>₹{totals.grandTotal}</b>
+          <b>₹{payable}</b>
         </div>
         <button className="commerce-primary" onClick={placeOrder}>
           {customerDetails ? 'Place order' : 'Add your details'}

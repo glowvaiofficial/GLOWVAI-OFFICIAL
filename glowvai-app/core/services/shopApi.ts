@@ -68,6 +68,7 @@ export interface PlaceOrderInput {
   items: Array<{ productId: string; quantity: number }>;
   address: { name: string; phone: string; fullAddress: string; city: string; pincode: string; area?: string; landmark?: string };
   couponCode?: string | null;
+  tip?: number;
 }
 
 export const SUPPORT_CATEGORIES = [
@@ -117,7 +118,7 @@ export async function fetchOrders(): Promise<ApiResult<{ orders: ShopOrder[] }>>
   return apiFetch<{ orders: ShopOrder[] }>('/api/shop/orders');
 }
 
-export async function placeOrder(input: PlaceOrderInput): Promise<ApiResult<{ orderId: string; pricing: ShopOrderPricing; status: string }>> {
+export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; pricing: ShopOrderPricing; status: string }>> {
   return apiFetch('/api/shop/orders', post({ ...input, paymentMethod: 'COD', couponCode: input.couponCode || undefined }));
 }
 

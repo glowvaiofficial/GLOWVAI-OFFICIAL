@@ -33,6 +33,9 @@ export async function GET(req: NextRequest) {
       const overlay = overlays.get(d.id);
       return {
         orderId: o.orderId ?? d.id,
+        trackingId: o.trackingId ?? null,
+        transactionId: o.transactionId ?? o.payment?.transactionId ?? null,
+        vendorId: o.vendorId ?? null,
         status: customerStatus(String(o.status ?? ""), overlay),
         cancellationReason: (overlay?.cancellationReason as string | undefined) ?? o.cancellationReason ?? null,
         items: (o.items ?? []).map((it: Record<string, unknown>) => ({
@@ -125,13 +128,22 @@ export async function POST(req: NextRequest) {
   if (couponCode && couponValue === undefined) return json({ ok: false, error: "That coupon code is not valid." }, 400);
   const discountAmount = Math.min(couponValue ?? 0, subtotal);
   const deliveryFee = deliveryFeeFor({ itemTotal: subtotal, area: area || city });
-  const grandTotal = subtotal - discountAmount + deliveryFee;
+  // Optional tip for the delivery partner: a whole-rupee amount from 0 to 500, added to the bill.
+  const tipRaw = body.tip === undefined || body.tip === null || body.tip === "" ? 0 : Number(body.tip);
+  if (!Number.isFinite(tipRaw) || tipRaw < 0 || tipRaw > 500) return json({ ok: false, error: "The tip must be between ₹0 and ₹500." }, 400);
+  const tip = Math.round(tipRaw);
+  const grandTotal = subtotal - discountAmount + deliveryFee + tip;
 
   const now = Date.now();
   const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
   const orderId = `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
+  // Identifiers the customer and GlowVai use to follow the order: transaction (payment) reference and tracking number.
+  const transactionId = `COD-${randomBytes(4).toString("hex").toUpperCase()}`;
+  const trackingId = `TRK-${randomBytes(4).toString("hex").toUpperCase()}`;
   const order = {
     orderId,
+    transactionId,
+    trackingId,
     userId: customer.uid,
     customerName: recipientName,
     customerPhone: phone,
@@ -153,8 +165,8 @@ export async function POST(req: NextRequest) {
       area,
       isDefault: true,
     },
-    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
-    payment: { method: "COD", status: "PENDING" },
+    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, tip, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
+    payment: { method: "COD", status: "PENDING", transactionId },
     status: "PLACED",
     couponCode: discountAmount > 0 ? couponCode : null,
     referralCodeUsed: null,
@@ -172,5 +184,5 @@ export async function POST(req: NextRequest) {
     tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
   });
 
-  return json({ ok: true, orderId, pricing: order.pricing, status: order.status });
+  return json({ ok: true, orderId, trackingId, transactionId, pricing: order.pricing, status: order.status });
 }

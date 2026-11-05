@@ -53,8 +53,15 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
   let token: string;
   try {
     token = await getIdToken();
-  } catch {
-    return { ok: false, status: 0, data: null, error: 'We could not start a secure session. Check your connection and try again.' };
+  } catch (err) {
+    const code = (err as { code?: string })?.code ?? '';
+    // Anonymous sign-in is switched off for the project: the owner enables it in the Firebase console.
+    const error = code === 'auth/operation-not-allowed' || code === 'auth/admin-restricted-operation'
+      ? 'Customer sign-in is being set up. Please try again later.'
+      : code === 'auth/network-request-failed'
+        ? 'Check your internet connection and try again.'
+        : 'We could not start your session. Please try again.';
+    return { ok: false, status: 0, data: null, error };
   }
 
   const send = async (bearer: string) => {
