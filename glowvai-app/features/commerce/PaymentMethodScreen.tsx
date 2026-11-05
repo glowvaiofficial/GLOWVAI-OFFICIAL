@@ -58,6 +58,8 @@ export const PaymentMethodScreen: React.FC = () => {
     );
   }
 
+  const [confirming, setConfirming] = React.useState(false);
+  // Asks for a final confirmation with the order details before anything is sent.
   const placeOrder = () => {
     safeHapticImpact();
     // The order is linked to the customer's saved details, so ask for them first.
@@ -65,6 +67,10 @@ export const PaymentMethodScreen: React.FC = () => {
       navigate('login', { returnTo: 'checkout-payment-method', name: address.recipientName, phone: address.phoneNumber });
       return;
     }
+    setConfirming(true);
+  };
+  const confirmPlace = () => {
+    setConfirming(false);
     navigate('checkout-payment-processing', { method: payMethod });
   };
   const payable = totals.grandTotal + tip;
@@ -170,6 +176,25 @@ export const PaymentMethodScreen: React.FC = () => {
           {customerDetails ? 'Place order' : 'Add your details'}
         </button>
       </footer>
-    </main>
+          {confirming ? (
+        <div role="dialog" aria-modal="true" aria-labelledby="confirm-order-title" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, zIndex: 1000 }}>
+          <div className="commerce-card" style={{ background: '#fff', borderRadius: 16, padding: 20, maxWidth: 420, width: '100%' }}>
+            <h2 id="confirm-order-title" style={{ margin: '0 0 8px', fontSize: 18 }}>Confirm your order</h2>
+            <p style={{ margin: '0 0 12px', color: '#475569', fontSize: 14 }}>
+              {totals.itemCount} item{totals.itemCount === 1 ? '' : 's'} to {address.fullAddress}, {address.city} {address.pincode}
+            </p>
+            <p style={{ margin: '0 0 12px', fontSize: 14 }}>
+              {payMethod === 'online' ? 'You pay now by UPI, card or netbanking.' : 'You pay the delivery partner when the order arrives.'}
+              {tip > 0 ? ` Includes a ₹${tip} tip for your delivery partner.` : ''}
+            </p>
+            <p style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 700 }}>Total ₹{payable}</p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="commerce-secondary" style={{ flex: 1 }} onClick={() => setConfirming(false)}>Edit order</button>
+              <button type="button" className="commerce-primary" style={{ flex: 1 }} onClick={confirmPlace}>Confirm and place</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+</main>
   );
 };
