@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
 import { customerFrom, db, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
+import { customerTicket } from "@/lib/shop/support";
 
 export const dynamic = "force-dynamic";
 
@@ -33,23 +34,12 @@ export async function GET(req: NextRequest) {
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   const userLimited = limitByUser(customer.uid, "support", 60);
   if (userLimited) return userLimited;
+  // One query, at most 50 requests. Only customer-visible fields and messages leave the server (see lib/shop/support.ts):
+  // internal notes, the owner, history and priority never do.
   const snap = await db().collection("admin_tickets").where("customerId", "==", customer.uid).limit(50).get();
-  // Only customer-visible fields: internal notes and staff assignment never leave the server.
   const tickets = snap.docs
-    .map((d) => {
-      const t = d.data();
-      return {
-        id: t.id ?? d.id,
-        subject: t.subject,
-        category: t.category,
-        status: t.status,
-        orderId: t.orderId ?? null,
-        createdAt: t.createdAt,
-        resolution: t.resolution ?? null,
-        messages: (t.messages ?? []).map((m: Record<string, unknown>) => ({ at: m.at, kind: m.kind, text: m.text })),
-      };
-    })
-    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    .map((d) => customerTicket(d.data(), d.id))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return json({ ok: true, tickets });
 }
 

@@ -240,3 +240,5 @@
 
 /* Wrapper columns only change layout on tablet and desktop (see responsive/profile-admin.css). */
 .glowvai-root .profile-side, .glowvai-root .profile-main{ display:contents; }
+.glowvai-root .profile-action-row{ display:flex; justify-content:flex-end; margin-bottom:8px; }
+.glowvai-root .profile-reply{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }

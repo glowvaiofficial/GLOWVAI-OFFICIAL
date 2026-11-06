@@ -5,6 +5,7 @@ import {
   SUPPORT_CATEGORIES,
   createSupportTicket,
   fetchSupportTickets,
+  replySupportTicket,
   supportCategoryLabel,
   type SupportCategory,
   type SupportTicketView,
@@ -46,16 +47,18 @@ const HELP_PAGES = [
   { href: '/faq', title: 'All questions', icon: <FileText size={18} /> },
 ];
 
+// Status codes as the admin panel writes them (WAITING_CUSTOMER is "waiting for you").
 const STATUS_TEXT: Record<string, string> = {
   OPEN: 'Open',
   IN_PROGRESS: 'In progress',
-  WAITING_ON_CUSTOMER: 'Waiting for you',
-  ESCALATED: 'Escalated',
+  WAITING_CUSTOMER: 'Waiting for you',
   RESOLVED: 'Resolved',
   CLOSED: 'Closed',
 };
 const statusText = (status: string) => STATUS_TEXT[status] ?? (status ? status.replace(/_/g, ' ').toLowerCase() : 'Open');
-const statusTone = (status: string) => (status === 'RESOLVED' || status === 'CLOSED' ? 'profile-pill is-success' : status === 'WAITING_ON_CUSTOMER' ? 'profile-pill is-warning' : 'profile-pill');
+const statusTone = (status: string) => (status === 'RESOLVED' || status === 'CLOSED' ? 'profile-pill is-success' : status === 'WAITING_CUSTOMER' ? 'profile-pill is-warning' : 'profile-pill');
+// A customer can reply while the team has the request open. Resolved and closed requests take no more replies.
+const canReply = (status: string) => status === 'OPEN' || status === 'IN_PROGRESS' || status === 'WAITING_CUSTOMER';
 
 const formatWhen = (iso: string) => {
   const date = new Date(iso);
@@ -80,7 +83,10 @@ export const HelpAndSupportScreen = () => {
   const [tickets, setTickets] = useState<SupportTicketView[]>([]);
   const [ticketsState, setTicketsState] = useState<{ status: 'loading' | 'ready' | 'error'; error: string | null }>({ status: 'loading', error: null });
   const [openTicket, setOpenTicket] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<Record<string, string>>({});
+  const [replyState, setReplyState] = useState<{ id: string | null; error: string | null }>({ id: null, error: null });
 
+  // Loads the customer's requests once when the screen opens, and again on "Refresh". There is no background polling.
   const loadTickets = async () => {
     setTicketsState((s) => ({ status: tickets.length ? s.status : 'loading', error: null }));
     const res = await fetchSupportTickets();
@@ -96,6 +102,18 @@ export const HelpAndSupportScreen = () => {
     void loadOrders();
     void loadTickets();
   }, []);
+
+  // Sends a reply to one of the customer's own requests, then reloads the list so the thread matches the server.
+  const handleReply = async (ticketId: string) => {
+    const body = (replyText[ticketId] ?? '').trim();
+    if (!body) return setReplyState({ id: ticketId, error: 'Write your reply first.' });
+    setReplyState({ id: ticketId, error: null });
+    const res = await replySupportTicket(ticketId, body);
+    if (!res.ok) return setReplyState({ id: ticketId, error: res.error || 'Your reply could not be sent. Try again.' });
+    setReplyText((r) => ({ ...r, [ticketId]: '' }));
+    setReplyState({ id: null, error: null });
+    void loadTickets();
+  };
 
   const handleSend = async () => {
     if (subject.trim().length < 3) return setFormError('Add a short subject.');
@@ -133,6 +151,11 @@ export const HelpAndSupportScreen = () => {
         <div className="profile-side">
         <p className="profile-label">My requests</p>
         <section className="profile-card">
+          <div className="profile-action-row">
+            <button type="button" className="profile-button is-outline" onClick={() => void loadTickets()} disabled={ticketsState.status === 'loading'}>
+              <RefreshCw size={16} /> Refresh
+            </button>
+          </div>
           {ticketsState.status === 'loading' && <p className="profile-empty" role="status">Loading your requests…</p>}
           {ticketsState.status === 'error' && (
             <div className="profile-empty-block" role="alert">
@@ -169,8 +192,11 @@ export const HelpAndSupportScreen = () => {
                       <p className="profile-field-hint">No reply yet. The GlowVai team will respond here.</p>
                     )}
                     {ticket.messages.map((message, index) => (
-                      <p key={index} className="profile-bubble">
-                        <small>GlowVai team · {formatWhen(message.at)}</small>
+                      <p key={index} className={message.kind === 'CUSTOMER' ? 'profile-bubble is-user' : 'profile-bubble'}>
+                        <small>
+                          {message.kind === 'CUSTOMER' ? 'You' : 'GlowVai team'} · {formatWhen(message.at)}
+                          {message.evidenceRequest ? ' · Evidence requested' : ''}
+                        </small>
                         {message.text}
                       </p>
                     ))}
@@ -179,6 +205,26 @@ export const HelpAndSupportScreen = () => {
                         <small>Resolution</small>
                         {ticket.resolution}
                       </p>
+                    )}
+                    {canReply(ticket.status) ? (
+                      <div className="profile-reply">
+                        <label className="profile-field">
+                          <span className="profile-field-label">Reply to GlowVai</span>
+                          <textarea
+                            className="profile-input is-textarea"
+                            value={replyText[ticket.id] ?? ''}
+                            maxLength={2000}
+                            onChange={(e) => setReplyText((r) => ({ ...r, [ticket.id]: e.target.value }))}
+                            placeholder="Add details or answer the team's question"
+                          />
+                        </label>
+                        {replyState.id === ticket.id && replyState.error && <p className="profile-field-error" role="alert">{replyState.error}</p>}
+                        <button type="button" className="profile-button is-primary" onClick={() => void handleReply(ticket.id)}>
+                          <Send size={16} /> Send reply
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="profile-field-hint">This request is {statusText(ticket.status).toLowerCase()}. Start a new request if you still need help.</p>
                     )}
                   </div>
                 )}
