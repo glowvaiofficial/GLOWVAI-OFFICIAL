@@ -12,6 +12,7 @@ import {
 } from '../../core/services/shopTracking';
 import { OrdersHeader } from './components/OrdersHeader';
 import { OrdersEmpty, OrdersLoadState, formatOrderDate, statusLabel, useRequestedOrder } from './orderUtils';
+import { fullArrivalWindow } from '../../../lib/shop/subscribable';
 
 const timeText = (ms: number | null | undefined) => formatOrderDate(ms ?? null);
 
@@ -22,6 +23,8 @@ export const OrderTrackingScreen: React.FC = () => {
   const { order, requestedId, status: listStatus, error: listError, reload: reloadList } = useRequestedOrder();
   const orderId = order?.orderId ?? null;
   const [tracking, setTracking] = useState<OrderTracking | null>(null);
+  // Shown only with both ends of the window; one end on its own is not an estimate.
+  const arrival = fullArrivalWindow(tracking?.expectedWindow ?? null);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [choice, setChoice] = useState<SubstitutionPreference | null>(null);
@@ -129,9 +132,7 @@ export const OrderTrackingScreen: React.FC = () => {
           <div className="orders-meta-row">
             <span>Expected delivery</span>
             <b>
-              {tracking?.expectedWindow
-                ? `${timeText(tracking.expectedWindow.from)} to ${timeText(tracking.expectedWindow.to)}`
-                : 'No estimate yet'}
+              {arrival ? `${timeText(arrival.from)} to ${timeText(arrival.to)}` : 'No estimate yet'}
             </b>
           </div>
         </section>

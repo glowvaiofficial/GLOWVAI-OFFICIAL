@@ -323,7 +323,9 @@ export const ShopProductScreen: React.FC = () => {
           </button>
         </section>
 
-        {canBuy && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
+        {canBuy && product.subscribable === true && (
+          <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />
+        )}
       </div>
 
       <div className="shop-product-buybar">

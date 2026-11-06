@@ -723,3 +723,23 @@
 
 /* Size, shade or pack of a cart or checkout line. */
 .commerce-variant { display: inline-block; color: var(--ds-muted, #667085); font-size: 12px; font-weight: 600; }
+
+/* Glow Coins card at checkout: the same card, hairline border and type as the other checkout cards. */
+.glowvai-root .commerce-coins { margin: 12px 0; }
+.glowvai-root .commerce-coins.is-note { padding: 12px 16px; }
+.glowvai-root .commerce-coins.is-note p { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--ds-muted); font-size: 13px; line-height: 1.45; }
+.glowvai-root .commerce-coins-row { display: flex; align-items: flex-start; gap: 12px; min-height: 44px; cursor: pointer; }
+.glowvai-root .commerce-coins-row input { width: 20px; height: 20px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--ds-brand); cursor: pointer; }
+.glowvai-root .commerce-coins-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ds-brand);
+  background: var(--ds-brand-soft, #EEF4FF);
+}
+.glowvai-root .commerce-coins-text { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.glowvai-root .commerce-coins-text b { display: block; color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .commerce-coins-text small { display: block; color: var(--ds-muted); font-size: 12px; line-height: 1.45; }

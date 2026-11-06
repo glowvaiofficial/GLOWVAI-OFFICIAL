@@ -21,7 +21,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
   return (
     <article className={`commerce-product-card${compact ? ' is-compact' : ''}${className ? ` ${className}` : ''}`}>
       <div className="commerce-product-media">
-        <button className="commerce-product-open" onClick={() => navigate('product-detail', { productId: product.id })} aria-label={`View ${product.name}`}>
+        <button className="commerce-product-open" onClick={() => navigate('shop-product', { productId: product.id })} aria-label={`View ${product.name}`}>
           {imageFailed ? <span className="commerce-product-fallback"><PackageOpen size={28} /><b>{product.brand}</b></span> : <img src={product.images[0]} alt={product.name} loading="lazy" onError={() => setImageFailed(true)} />}
         </button>
         {variant.discountPercent > 0 && <span className="commerce-product-discount">{variant.discountPercent}% OFF</span>}
@@ -43,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
 
       <div className="commerce-product-copy">
         {product.deliveryMinutes !== null && <small className="commerce-product-delivery"><Zap size={11} fill="currentColor" /> {product.deliveryMinutes} mins</small>}
-        <button className="commerce-product-name" onClick={() => navigate('product-detail', { productId: product.id })}>
+        <button className="commerce-product-name" onClick={() => navigate('shop-product', { productId: product.id })}>
           <b className="line-clamp-2">{product.name}</b>
           <span>{variant.size}</span>
         </button>

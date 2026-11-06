@@ -37,26 +37,35 @@ export const CoinsRedeemCard = ({ items }: { items: Array<{ productId: string; q
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bagKey]);
 
-  if (loading && !preview) return <p style={{ margin: '12px 0' }}>Checking your Glow Coins...</p>;
+  if (loading && !preview) {
+    return (
+      <section className="commerce-card commerce-coins is-note" aria-label="Glow Coins">
+        <p role="status">Checking your Glow Coins...</p>
+      </section>
+    );
+  }
   if (!preview || preview.balance === 0) return null;
   if (preview.maxCoins === 0) {
     return (
-      <p style={{ margin: '12px 0' }}>
-        <Coins size={14} /> You have {preview.balance} Glow Coins. They can be used on items up to {preview.capPercent}% of the item total.
-      </p>
+      <section className="commerce-card commerce-coins is-note" aria-label="Glow Coins">
+        <p>
+          <Coins size={14} /> You have {preview.balance} Glow Coins. They can be used on items up to {preview.capPercent}% of the item total.
+        </p>
+      </section>
     );
   }
 
   const using = coinsToRedeem > 0;
   return (
-    <section style={{ margin: '12px 0' }} aria-label="Glow Coins">
-      <label style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+    <section className="commerce-card commerce-coins" aria-label="Glow Coins">
+      <label className="commerce-coins-row">
         <input type="checkbox" checked={using} onChange={(e) => setCoinsToRedeem(e.target.checked ? preview.maxCoins : 0)} />
-        <span>
-          <b>
-            <Coins size={14} /> Use {preview.maxCoins} Glow Coins (₹{preview.maxDiscount} off)
-          </b>
-          <small style={{ display: 'block' }}>
+        <span className="commerce-coins-icon" aria-hidden="true">
+          <Coins size={16} />
+        </span>
+        <span className="commerce-coins-text">
+          <b>Use {preview.maxCoins} Glow Coins (₹{preview.maxDiscount} off)</b>
+          <small>
             You have {preview.balance} Glow Coins. Up to {preview.capPercent}% of the item total. Your final total is confirmed when the order is placed.
           </small>
         </span>

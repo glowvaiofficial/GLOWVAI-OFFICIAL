@@ -30,6 +30,8 @@ export interface SkincareProduct {
   deliveryMinutes: number | null;
   // Sizes, shades or packs with their own price and stock. Empty or missing: the product is sold as one item.
   variants?: Variant[];
+  // Set by the admin on the product. False unless the admin marks it subscribable: the product page offers Subscribe only then.
+  subscribable: boolean;
 }
 
 // Live product list, filled from the database (collection "products", status PUBLISHED). Starts empty.

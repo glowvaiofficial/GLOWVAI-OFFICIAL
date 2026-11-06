@@ -6,6 +6,7 @@ import { readProductVariants, resolveVariant } from "@/lib/shop/variants";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { firstRunAt, validateSubscriptionInput } from "@/lib/shop/growth/subscriptions";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
+import { canSubscribeTo } from "@/lib/shop/subscribable";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,10 @@ export async function POST(req: NextRequest) {
   const product = await store.collection("products").doc(input.value.productId).get();
   const p = product.data();
   if (!product.exists || !p || p.status !== "PUBLISHED") {
+    return json({ ok: false, error: "That product is not available to subscribe to." }, 409);
+  }
+  // Only products the admin has marked subscribable (default: none).
+  if (!canSubscribeTo(p)) {
     return json({ ok: false, error: "That product is not available to subscribe to." }, 409);
   }
   // A product sold in sizes or shades needs the one the customer picked; it is priced and checked on that variant at each run.
