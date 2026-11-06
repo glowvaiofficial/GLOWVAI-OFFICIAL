@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
+import { releaseStockTx, retakeStockTx } from "@/lib/shop/platformStockTx";
 
 export const dynamic = "force-dynamic";
 
@@ -41,24 +42,37 @@ export async function POST(req: NextRequest) {
   const found = await db().collection("orders").where("razorpayOrderId", "==", entity.order_id).limit(1).get();
   const doc = found.docs[0];
   if (!doc) return json({ ok: true, ignored: true });
-  const o = doc.data();
   const now = Date.now();
-  if (event.event === "payment.captured" && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
-    await doc.ref.update({
-      status: "PLACED",
-      "payment.status": "PAID",
-      "payment.paymentId": entity.id ?? null,
-      transactionId: entity.id ?? null,
-      updatedAt: now,
-      events: [...(Array.isArray(o.events) ? o.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }],
-    });
-  } else if (event.event === "payment.failed" && o.payment?.status === "PENDING") {
-    await doc.ref.update({
-      "payment.status": "FAILED",
-      updatedAt: now,
-      events: [...(Array.isArray(o.events) ? o.events : []), { at: now, actor: "Payment provider", event: "Payment failed" }],
-    });
-  }
+  const store = db();
+  // The order and its platform stock change together: a failed payment gives the stock back (once), and a payment
+  // confirmed after that takes it again. The order is read inside the transaction before anything is written.
+  await store.runTransaction(async (tx) => {
+    const snap = await tx.get(doc.ref);
+    const o = snap.data();
+    if (!snap.exists || !o) return;
+    const history = Array.isArray(o.events) ? o.events : [];
+    if (event.event === "payment.captured" && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
+      const retake = await retakeStockTx(tx, store, o.stockReservation, now);
+      const notes = retake.shortNote ? [{ at: now, actor: "Stock", event: retake.shortNote }] : [];
+      tx.update(doc.ref, {
+        status: "PLACED",
+        "payment.status": "PAID",
+        "payment.paymentId": entity.id ?? null,
+        transactionId: entity.id ?? null,
+        ...retake.patch,
+        updatedAt: now,
+        events: [...history, { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
+      });
+    } else if (event.event === "payment.failed" && o.payment?.status === "PENDING") {
+      const release = await releaseStockTx(tx, store, o.stockReservation, now);
+      tx.update(doc.ref, {
+        "payment.status": "FAILED",
+        ...release.patch,
+        updatedAt: now,
+        events: [...history, { at: now, actor: "Payment provider", event: "Payment failed" }],
+      });
+    }
+  });
   return json({ ok: true });
 }
 

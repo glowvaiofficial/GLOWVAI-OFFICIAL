@@ -18,7 +18,8 @@
     "test:vendor": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/vendor/*.test.ts\"",
     "test:refunds": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/refunds/*.test.ts\"",
     "test": "npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
-    "seo:test": "npx tsx scripts/check-sitemap.ts && npx tsx scripts/check-links.ts && npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts"
+    "seo:test": "npx tsx scripts/check-sitemap.ts && npx tsx scripts/check-links.ts && npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
+    "test:stock": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/stock/*.test.ts\""
   },
   "keywords": [],
   "author": "",

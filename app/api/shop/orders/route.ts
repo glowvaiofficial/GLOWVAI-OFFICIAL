@@ -3,6 +3,15 @@ import { randomBytes } from "node:crypto";
 import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
 import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
+import { planReservation, reservationFor, stockProblemMessage, type ProductStock } from "@/lib/shop/platformStock";
+import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
+
+// Thrown inside the order transaction to stop it with a customer message and an HTTP status.
+class OrderBlocked extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+  }
+}
 
 export const dynamic = "force-dynamic";
 
@@ -133,6 +142,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Quick check on the snapshot read above. The transaction below checks again on fresh reads before anything is written.
+  const snapshotStock = new Map<string, ProductStock | undefined>(productSnaps.map((s) => [s.id, s.exists ? (s.data() as ProductStock) : undefined]));
+  const pre = planReservation(
+    items.map((it) => ({ productId: String(it.productId), quantity: Number(it.quantity) })),
+    snapshotStock,
+  );
+  if (!pre.ok) return json({ ok: false, error: stockProblemMessage(pre) }, 409);
+
   const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
   const couponCode = text(body.couponCode, 20).toUpperCase();
   const couponValue = couponCode ? (COUPON_VALUES as Record<string, number>)[couponCode] : undefined;
@@ -199,12 +216,31 @@ export async function POST(req: NextRequest) {
     updatedAt: now,
   };
 
-  await store.runTransaction(async (tx) => {
-    const ref = store.collection("orders").doc(orderId);
-    if ((await tx.get(ref)).exists) throw new Error("Order id clash, please retry.");
-    tx.create(ref, order);
-    tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
-  });
+  // One transaction: the products are read fresh, every tracked line is checked (all or nothing), platform stock is
+  // decremented and the order is created with its stockReservation. Nothing is written if any check fails.
+  try {
+    await store.runTransaction(async (tx) => {
+      const ref = store.collection("orders").doc(orderId);
+      if ((await tx.get(ref)).exists) throw new Error("Order id clash, please retry.");
+      const fresh = await readProductStock(tx, store, items.map((it) => String(it.productId)));
+      for (const it of items) {
+        const p = fresh.get(String(it.productId));
+        if (!p || p.status !== "PUBLISHED") throw new OrderBlocked(409, "One of the products is no longer available. Remove it from your bag and try again.");
+        if (Math.round(Number(p.brandPrice) || 0) !== Number(it.unitPrice)) throw new OrderBlocked(409, "The price of an item has changed. Refresh your bag and try again.");
+      }
+      const plan = planReservation(
+        items.map((it) => ({ productId: String(it.productId), quantity: Number(it.quantity) })),
+        fresh,
+      );
+      if (!plan.ok) throw new OrderBlocked(409, stockProblemMessage(plan));
+      writeStockChanges(tx, store, plan.decrements, now);
+      tx.create(ref, { ...order, stockReservation: reservationFor(plan.decrements) });
+      tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
+    });
+  } catch (err) {
+    if (err instanceof OrderBlocked) return json({ ok: false, error: err.message }, err.status);
+    throw err;
+  }
 
   if (online && razorpay) {
     return json({

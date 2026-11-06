@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
+import { retakeStockTx } from "@/lib/shop/platformStockTx";
 
 export const dynamic = "force-dynamic";
 
@@ -27,17 +28,25 @@ export async function POST(req: NextRequest) {
   const o = doc.data();
   const now = Date.now();
   // Only an unsettled payment is confirmed here. A repeat after a refund must not flip the order back to PAID.
-  const settled = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(String(o.payment?.status ?? ""));
-  if (!settled) {
-    await doc.ref.update({
+  // The check, the stock retake and the update happen in one transaction on the order as it is now.
+  await store.runTransaction(async (tx) => {
+    const snap = await tx.get(doc.ref);
+    const cur = snap.data();
+    if (!snap.exists || !cur) return;
+    const settled = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(String(cur.payment?.status ?? ""));
+    if (settled) return;
+    const retake = await retakeStockTx(tx, store, cur.stockReservation, now);
+    const notes = retake.shortNote ? [{ at: now, actor: "Stock", event: retake.shortNote }] : [];
+    tx.update(doc.ref, {
       status: "PLACED",
       "payment.status": "PAID",
       "payment.paymentId": paymentId,
       transactionId: paymentId,
       "payment.transactionId": paymentId,
+      ...retake.patch,
       updatedAt: now,
-      events: [...(Array.isArray(o.events) ? o.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }],
+      events: [...(Array.isArray(cur.events) ? cur.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
     });
-  }
+  });
   return json({ ok: true, orderId: o.orderId, trackingId: o.trackingId, transactionId: paymentId });
 }
