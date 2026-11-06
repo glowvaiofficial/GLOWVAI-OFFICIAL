@@ -260,5 +260,3 @@ export const ShopBrowseScreen: React.FC = () => {
     </div>
   );
 };
-
-export default ShopBrowseScreen;

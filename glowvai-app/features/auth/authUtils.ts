@@ -1,6 +1,5 @@
-/** Reads a user-facing message from an unknown thrown value. */
-export const errorMessageOf = (err: unknown, fallback: string): string =>
-  (err as { message?: string } | null)?.message || fallback;
+// Onboarding answers kept on this device only (name, age range, gender).
+export const PROFILE_ANSWERS_KEY = 'glowvai_profile_answers';
 
 /** Web equivalents of the native permission prompts used during onboarding. */
 

@@ -58,5 +58,3 @@ export const ChangePhoneNumberScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default ChangePhoneNumberScreen;

@@ -19,6 +19,8 @@ const csp = [
 
 // The glowvai app shell under /shop talks to Firebase, Razorpay and the scan backend, so it gets its own policy.
 const devEval = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'";
+// Local backends (scan API on :4000, the CNN server on :10000) are reachable only from development builds.
+const devConnect = process.env.NODE_ENV === 'production' ? '' : ' http://localhost:4000 http://localhost:10000';
 
 const shopCsp = [
   "default-src 'self'",
@@ -26,7 +28,7 @@ const shopCsp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://*.gstatic.com https://*.nykaa.com https://*.cureka.com https://*.apollo247.in https://*.gumlet.io https://thedermaco.com https://beminimalist.co https://*.speedsize.com https://m.media-amazon.com https://cdn.shopify.com https://*.ppl-media.com https://rukminim2.flixcart.com https://*.flixcart.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://glowvai-backend-r7u2.onrender.com https://api.razorpay.com https://lumberjack.razorpay.com https://script.google.com https://script.googleusercontent.com https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com http://localhost:4000 http://localhost:10000",
+  `connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://glowvai-backend-r7u2.onrender.com https://api.razorpay.com https://lumberjack.razorpay.com https://script.google.com https://script.googleusercontent.com https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com${devConnect}`,
   "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.firebaseapp.com",
   "worker-src 'self' blob:",
   "media-src 'self' blob:",
@@ -38,6 +40,14 @@ const shopCsp = [
 
 // Static files that load their own third-party scripts keep their own rules. The shop has its own policy above.
 const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop).*';
+
+// The shop's Firebase web config is written into the browser bundle at build time, so a production build without it
+// would ship a shop that cannot start. Fail the Vercel production build instead (see .env.example).
+const SHOP_FIREBASE_ENV = ['NEXT_PUBLIC_FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 'NEXT_PUBLIC_FIREBASE_PROJECT_ID', 'NEXT_PUBLIC_FIREBASE_APP_ID'];
+const missingShopEnv = SHOP_FIREBASE_ENV.filter((name) => !process.env[name]);
+if (process.env.VERCEL_ENV === 'production' && missingShopEnv.length > 0) {
+  throw new Error(`Missing shop Firebase settings: ${missingShopEnv.join(', ')}. Add them to the Vercel project's Production environment.`);
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { UserRound } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getCurrentUser } from '../../core/services/authService';
-import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
+import { PROFILE_ANSWERS_KEY } from './authUtils';
 
 const AGE_RANGES = ['Under 18', '18-24', '25-34', '35-44', '45+'];
 const GENDERS = ['Female', 'Male', 'Non-Binary', 'Prefer not to say'];
@@ -29,15 +29,11 @@ export const ProfileSetupScreen: React.FC = () => {
 
     safeHapticImpact();
     setIsLoading(true);
-    try {
-      // Age range and gender are not part of the account sync yet, so they are kept on this device.
-      await storage.setItem('glowvai_profile_answers', JSON.stringify({ ageRange: selectedAge, gender: selectedGender }));
-      await syncUserOnboardingData({ name: fullName.trim() });
-    } catch {
-      // continue even if sync fails, as in the mobile app
-    } finally {
-      setIsLoading(false);
-    }
+    // These answers stay on this device and are not sent anywhere: the shop's profile route (POST /api/shop/profile)
+    // takes only name, mobile, email and address. The name is offered again on the "Your details" step, which
+    // saves it to the account together with the mobile number.
+    await storage.setItem(PROFILE_ANSWERS_KEY, JSON.stringify({ name: fullName.trim(), ageRange: selectedAge, gender: selectedGender }));
+    setIsLoading(false);
     navigate('auth-skin-survey');
   };
 
@@ -112,5 +108,3 @@ export const ProfileSetupScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default ProfileSetupScreen;

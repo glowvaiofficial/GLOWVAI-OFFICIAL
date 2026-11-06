@@ -42,10 +42,6 @@ export async function getIdToken(forceRefresh = false): Promise<string> {
   return user.getIdToken(forceRefresh);
 }
 
-export function currentCustomerId(): string | null {
-  return auth?.currentUser?.uid ?? null;
-}
-
 const NETWORK_ERROR = 'We could not reach GlowVai. Check your connection and try again.';
 
 // Calls a shop server route with the customer's ID token. Never throws: the result carries the server's message.

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getCurrentUser } from '../../core/services/authService';
-import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { storage } from '../../core/utils/storage';
 
@@ -13,8 +12,8 @@ export const OnboardingSuccessScreen: React.FC = () => {
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
+    // Kept on this device only. The account is marked as onboarded on the server when the "Your details" step saves.
     void storage.setItem('glowvai_onboarding_completed', 'true');
-    syncUserOnboardingData({ onboardingCompleted: true }).catch(() => {});
 
     const user = getCurrentUser();
     if (user?.displayName) {
@@ -52,5 +51,3 @@ export const OnboardingSuccessScreen: React.FC = () => {
     </section>
   );
 };
-
-export default OnboardingSuccessScreen;

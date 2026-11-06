@@ -1,104 +1,60 @@
 /**
- * Firebase App & Cloud Firestore Initialization
- * 
- * Configuration:
- * - Uses EXPO_PUBLIC_FIREBASE_* environment variables.
- * - Defaults to calibrated glowvai-v2 production project credentials from google-services.json.
- * - Never throws invalid-api-key runtime crashes on app boot (Web or Mobile Expo Go).
+ * Firebase app, Auth and Firestore for the shop (project glowvai-38bde).
+ *
+ * The web config comes only from NEXT_PUBLIC_FIREBASE_* environment variables, which Next.js writes into the
+ * browser bundle at build time. There is no built-in fallback: if a required value is missing the shop stops with
+ * an error naming it (next.config.js also refuses a Vercel production build without them).
  */
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, FirebaseStorage, connectStorageEmulator } from 'firebase/storage';
-
-export interface FirebaseClientConfig {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-  measurementId?: string;
-}
-
-const getFirebaseConfig = (): FirebaseClientConfig => {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyDlbmN3fUAXTUlPBO5OGASbwIOAraUPBgA';
-  const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'glowvai-38bde.firebaseapp.com';
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'glowvai-38bde';
-  const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'glowvai-38bde.firebasestorage.app';
-  const messagingSenderId = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '353135878239';
-  const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:353135878239:web:c51f7954ba875b522ffbea';
-  const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || undefined;
-
-  return {
-    apiKey,
-    authDomain,
-    projectId,
-    storageBucket,
-    messagingSenderId,
-    appId,
-    measurementId,
-  };
-};
-
-const firebaseConfig = getFirebaseConfig();
-
-// Initialize Firebase App singleton safely
-let appInstance: FirebaseApp;
-try {
-  appInstance = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-} catch (e) {
-  console.warn('[Firebase Config] App init fallback:', e);
-  appInstance = (getApps()[0] || {}) as FirebaseApp;
-}
-export const app: FirebaseApp = appInstance;
-
-// @ts-ignore
 import { initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, getAuth, Auth } from 'firebase/auth';
 
+// Each variable is read by its full name so Next.js can inline it into the client bundle.
+const required = {
+  NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
 
-// Initialize Firebase Auth singleton safely with browser persistence
+const missing = Object.entries(required)
+  .filter(([, value]) => !value)
+  .map(([name]) => name);
+if (missing.length > 0) {
+  throw new Error(`The shop's Firebase settings are missing: ${missing.join(', ')}. Set them in the environment and rebuild.`);
+}
+
+const firebaseConfig = {
+  apiKey: required.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: required.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: required.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  appId: required.NEXT_PUBLIC_FIREBASE_APP_ID,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || undefined,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || undefined,
+};
+
+export const app: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+// Auth with browser persistence, so the anonymous shop session survives a reload. initializeAuth throws if Auth was
+// already set up for this app (e.g. after a hot reload), in which case the existing instance is used.
 let authInstance: Auth;
 try {
   authInstance = initializeAuth(app, {
     persistence: [indexedDBLocalPersistence, browserLocalPersistence],
   });
-} catch (e) {
-  try {
-    authInstance = getAuth(app);
-  } catch {
-    authInstance = {} as Auth;
-  }
+} catch {
+  authInstance = getAuth(app);
 }
 export const auth: Auth = authInstance;
 
-// Initialize Cloud Firestore safely
-let dbInstance: Firestore;
-try {
-  dbInstance = getFirestore(app);
-} catch (e) {
-  console.warn('[Firebase Config] Firestore init fallback:', e);
-  dbInstance = {} as Firestore;
-}
-export const db: Firestore = dbInstance;
+export const db: Firestore = getFirestore(app);
 
-// Initialize Firebase Storage safely
-let storageInstance: FirebaseStorage;
-try {
-  storageInstance = getStorage(app);
-} catch (e) {
-  console.warn('[Firebase Config] Storage init fallback:', e);
-  storageInstance = {} as FirebaseStorage;
-}
-export const storage: FirebaseStorage = storageInstance;
-
-// Optional: Connect to local Firebase Emulators if configured in .env
-if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true' && dbInstance && dbInstance.type) {
+// Optional: connect to a local Firestore emulator when configured in .env.
+if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
   const host = process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST || '10.0.2.2';
   try {
     connectFirestoreEmulator(db, host, 8080);
-    connectStorageEmulator(storage, host, 9199);
-    console.log(`[Firebase Emulators] Connected to ${host} (Firestore: 8080, Storage: 9199)`);
   } catch (emulatorErr) {
     console.warn('[Firebase Emulators] Failed to connect emulator:', emulatorErr);
   }

@@ -113,5 +113,3 @@ export const PermissionsScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default PermissionsScreen;

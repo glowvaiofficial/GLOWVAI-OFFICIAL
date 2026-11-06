@@ -7,8 +7,6 @@
 
 
 
-export const DISPATCH_PHONE_PRIMARY = '8977855998';
-export const DISPATCH_PHONE_SECONDARY = '9505225379';
 export const SUPPORT_HOTLINE = '8977855998';
 
 /**
@@ -30,13 +28,4 @@ export const openWhatsAppSupport = (customMessage?: string): void => {
   const msg = encodeURIComponent(customMessage || 'Hi, I need assistance with my GlowVAI account.');
   const url = `https://wa.me/${phone}?text=${msg}`;
   window.open(url, '_blank', 'noopener');
-};
-
-/**
- * Creates direct WhatsApp deep links
- */
-export const createWhatsAppOrderLink = (phone: string, message: string): string => {
-  const normalizedPhone = normalizeWhatsAppPhone(phone);
-  const encodedMessage = encodeURIComponent(message);
-  return `https://wa.me/${normalizedPhone}?text=${encodedMessage}`;
 };

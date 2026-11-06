@@ -74,76 +74,11 @@ export interface CartItem {
   insuranceFee: number;
 }
 
-export type PaymentMethodType = 'upi' | 'card' | 'cod' | 'netbanking';
-
-export interface PaymentVerification {
-  provider: 'razorpay';
-  paymentId: string;
-  providerOrderId: string;
-}
-
 export interface CustomerDetails {
   fullName: string;
   phoneNumber: string;
   email: string;
   deliveryNote?: string;
-}
-
-export type PaymentStatus =
-  | 'pending'
-  | 'processing'
-  | 'successful'
-  | 'failed'
-  | 'cancelled';
-
-export interface OrderItem {
-  productId: string;
-  productName: string;
-  brand: string;
-  variantSize: string;
-  quantity: number;
-  unitPrice: number;
-  insuranceSelected: boolean;
-  insuranceFee: number;
-  imageUrl: string;
-}
-
-export interface DeliveryTask {
-  taskId: string;
-  sourceType: 'dark_store' | 'partner_retailer' | 'distributor';
-  sourceName?: string; // Internal only, hidden from client or generalized
-  status: 'assigned' | 'collected' | 'in_transit' | 'delivered';
-  etaMinutes: number;
-  riderName?: string;
-  riderPhoneMasked?: string;
-}
-
-export interface Order {
-  id: string;
-  createdAt: string;
-  items: OrderItem[];
-  address: Address;
-  itemSubtotal: number;
-  discount: number;
-  deliveryFee: number;
-  insuranceTotal: number;
-  finalPayable: number;
-  paymentMethod: PaymentMethodType;
-  paymentStatus: PaymentStatus;
-  paymentProvider?: 'razorpay';
-  paymentReference?: string;
-  status:
-    | 'order_placed'
-    | 'confirmed'
-    | 'preparing'
-    | 'rider_assigned'
-    | 'on_the_way'
-    | 'delivered'
-    | 'cancelled';
-  estimatedDeliveryMinutes: number;
-  isSplitDelivery: boolean;
-  splitDeliveryNote?: string;
-  fulfilmentTasks: DeliveryTask[];
 }
 
 export interface SkinConcernObservation {
@@ -200,28 +135,6 @@ export interface BeautyInsuranceStreak {
     decisionDate: string;
     reason: string;
   };
-}
-
-export interface SupportTicket {
-  id: string;
-  createdAt: string;
-  orderId?: string;
-  category:
-    | 'Order issue'
-    | 'Delivery issue'
-    | 'Payment issue'
-    | 'Refund issue'
-    | 'Damaged product'
-    | 'Beauty Insurance claim'
-    | 'Skin-related adverse reaction'
-    | 'Other';
-  subject: string;
-  status: 'Open' | 'In progress' | 'Waiting for customer' | 'Resolved' | 'Closed';
-  messages: {
-    sender: 'user' | 'agent';
-    text: string;
-    timestamp: string;
-  }[];
 }
 
 export interface UserProfile {

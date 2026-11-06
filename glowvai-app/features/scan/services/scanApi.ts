@@ -108,7 +108,7 @@ export async function analyzeFaceImage(
   signal?: AbortSignal
 ): Promise<SkinAnalysisResult> {
   const startMs = Date.now();
-  const bases = Array.from(new Set([getBackendBaseUrl(), getCloudBackendUrl()]));
+  const bases = Array.from(new Set([getBackendBaseUrl(), getCloudBackendUrl()].filter((base): base is string => Boolean(base))));
   let lastError: unknown = null;
 
   for (const base of bases) {
