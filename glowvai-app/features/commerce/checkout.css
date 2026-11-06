@@ -1,0 +1,128 @@
+/* Checkout polish: tip chips, the summary address, the order dialog, and full-viewport placement and result screens.
+   Loaded after commerce.css and responsive/commerce-ported.css, so these rules win at equal specificity. */
+
+/* Tip: four equal, full-width tap targets (44px minimum) on phones; the same row sits in the summary panel on PC. */
+.glowvai-root .commerce-tip-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.glowvai-root .commerce-tip-chip {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Summary panel: the delivery address under the bill. */
+.glowvai-root .commerce-summary-address {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ds-line);
+  color: var(--ds-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.glowvai-root .commerce-summary-address > svg { flex: 0 0 auto; margin-top: 2px; color: var(--ds-brand); }
+.glowvai-root .commerce-summary-address b { display: block; color: var(--ds-ink); font-size: 13px; }
+.glowvai-root .commerce-summary-address p { margin-top: 2px; overflow-wrap: anywhere; }
+
+/* Payment options: the icon stays on the same line as the option title. */
+.glowvai-root .commerce-pay-option b svg { display: inline-block; flex: 0 0 auto; margin: 0 4px 0 0; vertical-align: -2px; }
+
+/* Payment step: address still to confirm (inline notice instead of an extra screen). */
+.glowvai-root .commerce-confirm-address { display: flex; align-items: center; gap: 12px; border-color: var(--ds-brand); }
+.glowvai-root .commerce-confirm-address > svg { flex: 0 0 auto; color: var(--ds-brand); }
+.glowvai-root .commerce-confirm-address > div { min-width: 0; flex: 1; }
+.glowvai-root .commerce-confirm-address b { display: block; color: var(--ds-ink); font-size: 14px; }
+.glowvai-root .commerce-confirm-address p { margin-top: 2px; color: var(--ds-muted); font-size: 13px; overflow-wrap: anywhere; }
+.glowvai-root .commerce-confirm-address .commerce-link { min-height: 44px; flex: 0 0 auto; }
+
+/* Order confirmation dialog (kept before any order is placed). */
+.glowvai-root .commerce-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, .55);
+}
+.glowvai-root .commerce-confirm-sheet {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-lg);
+  background: #fff;
+  box-shadow: var(--ds-shadow);
+  color: var(--ds-ink);
+}
+.glowvai-root .commerce-confirm-sheet h2 { margin: 0 0 8px; color: var(--ds-ink); font-size: 18px; font-weight: 800; }
+.glowvai-root .commerce-confirm-sheet p { margin: 0 0 12px; color: #475569; font-size: 14px; line-height: 1.45; }
+.glowvai-root .commerce-confirm-sheet .commerce-confirm-total { color: var(--ds-ink); font-size: 18px; font-weight: 800; }
+.glowvai-root .commerce-confirm-actions { display: flex; gap: 8px; margin-top: 16px; }
+.glowvai-root .commerce-confirm-actions > button { flex: 1; }
+
+/* Placing (processing) and result screens: a full-viewport overlay on every width, with no card frame. */
+.glowvai-root .commerce-screen.commerce-processing,
+.glowvai-root .commerce-screen.commerce-result {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  width: auto;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  flex: none;
+  flex-direction: column;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0;
+  background: var(--ds-pearl);
+  box-shadow: none;
+}
+.glowvai-root .commerce-result-head,
+.glowvai-root .commerce-processing-head {
+  padding: 16px var(--ds-gutter);
+  border-bottom: 1px solid var(--ds-line);
+  background: #fff;
+}
+.glowvai-root .commerce-result-head-start { display: inline-flex; align-items: center; gap: 12px; }
+.glowvai-root .commerce-result-head .commerce-icon-btn { width: 44px; height: 44px; }
+.glowvai-root .commerce-screen.commerce-processing .commerce-processing-body,
+.glowvai-root .commerce-screen.commerce-result > .commerce-result-body {
+  display: flex;
+  width: 100%;
+  max-width: 960px;
+  flex: 1 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 32px var(--ds-gutter) 48px;
+}
+.glowvai-root .commerce-screen.commerce-processing .commerce-processing-detail,
+.glowvai-root .commerce-screen.commerce-result .commerce-result-actions { width: 100%; max-width: 440px; }
+.glowvai-root .commerce-screen.commerce-processing .commerce-processing-summary { margin-top: 0; }
+
+@media (min-width: 1024px) {
+  .glowvai-root .commerce-screen.commerce-processing .commerce-processing-body,
+  .glowvai-root .commerce-screen.commerce-result > .commerce-result-body {
+    display: grid;
+    max-width: 960px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 56px;
+    padding: 48px 40px;
+  }
+  .glowvai-root .commerce-screen.commerce-processing .commerce-processing-detail,
+  .glowvai-root .commerce-screen.commerce-result .commerce-result-actions { max-width: none; }
+  .glowvai-root .commerce-result-head,
+  .glowvai-root .commerce-processing-head { padding: 20px 40px; }
+}

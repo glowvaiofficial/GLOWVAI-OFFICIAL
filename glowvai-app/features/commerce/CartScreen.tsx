@@ -5,7 +5,7 @@ import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics';
 import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
-import { BillRows, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
+import { BillRows, CheckoutSteps, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
 
 export const CartScreen: React.FC = () => {
   const { goBack, navigate, showToast } = useApp();
@@ -73,6 +73,7 @@ export const CartScreen: React.FC = () => {
         onBack={goBack}
         right={<DeliveryPill minutes={address?.etaMinutes} />}
       />
+      <CheckoutSteps step={1} />
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">

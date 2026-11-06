@@ -1,7 +1,9 @@
 import React from 'react';
-import { AlertTriangle, CheckCircle2, HelpCircle, MapPin, ReceiptText, Sparkles } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, HelpCircle, MapPin, ReceiptText, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useDeliveryAddress } from './components/shared';
+import { PAY_METHOD_LABEL, parsePayMethod } from './lib/paymentMethod';
+import { formatAddressForDisplay } from './lib/displayText';
 
 interface PaymentResultParams {
   orderId?: string;
@@ -11,14 +13,24 @@ interface PaymentResultParams {
   error?: string;
 }
 
-// Only cash on delivery can be placed today.
-const METHOD_LABEL: Record<string, string> = { cod: 'Cash on delivery' };
+interface ResultHeaderProps {
+  right?: React.ReactNode;
+  onBack?: () => void;
+  backLabel?: string;
+}
 
-const ResultHeader: React.FC<{ right?: React.ReactNode }> = ({ right }) => (
+const ResultHeader: React.FC<ResultHeaderProps> = ({ right, onBack, backLabel }) => (
   <header className="commerce-result-head">
-    <span className="commerce-brand">
-      <Sparkles size={16} />
-      glowvai
+    <span className="commerce-result-head-start">
+      {onBack && (
+        <button className="commerce-icon-btn" onClick={onBack} aria-label={backLabel ?? 'Go back'}>
+          <ArrowLeft size={20} />
+        </button>
+      )}
+      <span className="commerce-brand">
+        <Sparkles size={16} />
+        glowvai
+      </span>
     </span>
     {right}
   </header>
@@ -29,7 +41,7 @@ const NoResult: React.FC = () => {
   const { navigate } = useApp();
   return (
     <main className="commerce-screen commerce-result is-none">
-      <ResultHeader />
+      <ResultHeader onBack={() => navigate('home')} backLabel="Back to shop" />
       <div className="commerce-body commerce-result-body">
         <div className="commerce-result-status">
           <span className="commerce-result-icon is-neutral">
@@ -51,6 +63,7 @@ const NoResult: React.FC = () => {
   );
 };
 
+// Order placed (confirmation). Shown only when the server confirmed the order; the method is the one the customer chose.
 export const PaymentSuccessScreen: React.FC = () => {
   const { activeParams, navigate } = useApp();
   const params = (activeParams || {}) as PaymentResultParams;
@@ -60,10 +73,12 @@ export const PaymentSuccessScreen: React.FC = () => {
   if (params.confirmed !== true || !params.orderId) return <NoResult />;
 
   const orderId = params.orderId;
+  const method = parsePayMethod(params.method);
+  const paidOnline = method === 'online';
 
   return (
     <main className="commerce-screen commerce-result is-success">
-      <ResultHeader right={<span className="commerce-chip-static">Order placed</span>} />
+      <ResultHeader onBack={() => navigate('home')} backLabel="Back to shop" right={<span className="commerce-chip-static">Order placed</span>} />
 
       <div className="commerce-body commerce-result-body">
         <div className="commerce-result-status">
@@ -71,7 +86,7 @@ export const PaymentSuccessScreen: React.FC = () => {
             <CheckCircle2 size={34} />
           </span>
           <h1>Order placed</h1>
-          <p>Keep the amount ready. You pay when the order arrives.</p>
+          <p>{paidOnline ? 'Payment received. Your order is placed and the GlowVai team will confirm it shortly.' : 'Keep the amount ready. You pay when the order arrives.'}</p>
 
           <dl className="commerce-result-meta">
             <div>
@@ -80,14 +95,16 @@ export const PaymentSuccessScreen: React.FC = () => {
             </div>
             {typeof params.amount === 'number' && (
               <div>
-                <dt>Amount to pay on delivery</dt>
+                <dt>{paidOnline ? 'Amount paid' : 'Amount to pay on delivery'}</dt>
                 <dd>₹{params.amount}</dd>
               </div>
             )}
-            <div>
-              <dt>Payment</dt>
-              <dd>{METHOD_LABEL[params.method || ''] || 'Cash on delivery'}</dd>
-            </div>
+            {method && (
+              <div>
+                <dt>Payment</dt>
+                <dd>{PAY_METHOD_LABEL[method]}</dd>
+              </div>
+            )}
           </dl>
         </div>
 
@@ -96,7 +113,7 @@ export const PaymentSuccessScreen: React.FC = () => {
             <section className="commerce-card commerce-arrival">
               <b>Delivering to</b>
               <p>
-                <MapPin size={13} /> {address.fullAddress}
+                <MapPin size={13} /> {formatAddressForDisplay(address.fullAddress)}
               </p>
             </section>
           )}
@@ -113,15 +130,19 @@ export const PaymentSuccessScreen: React.FC = () => {
   );
 };
 
+// Order not placed. Back goes to the payment step; the bag is unchanged so the customer can try again.
 export const PaymentFailedScreen: React.FC = () => {
   const { activeParams, navigate } = useApp();
   const params = (activeParams || {}) as PaymentResultParams;
+  const method = parsePayMethod(params.method);
 
   if (!params.error && !params.orderId) return <NoResult />;
 
   return (
     <main className="commerce-screen commerce-result is-failed">
       <ResultHeader
+        onBack={() => navigate('checkout-payment-method')}
+        backLabel="Back to payment"
         right={
           <button className="commerce-icon-btn" onClick={() => navigate('profile-support')} aria-label="Get help">
             <HelpCircle size={18} />
@@ -144,10 +165,10 @@ export const PaymentFailedScreen: React.FC = () => {
                 <dd>₹{params.amount}</dd>
               </div>
             )}
-            {params.method && (
+            {method && (
               <div>
                 <dt>Payment</dt>
-                <dd>{METHOD_LABEL[params.method] || 'Cash on delivery'}</dd>
+                <dd>{PAY_METHOD_LABEL[method]}</dd>
               </div>
             )}
           </dl>

@@ -6,43 +6,72 @@ import { useCustomerStore } from '../../core/state/customerStore';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
+import { PAY_METHOD_LABEL, decidePlacement, parsePayMethod, toApiPaymentMethod, type PayMethod } from './lib/paymentMethod';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
+import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
 const MIN_DISPLAY_MS = 1200;
-// One request does all of this on the server; the list is marked done only when the server has answered.
-const STEPS = ['Checking prices and availability', 'Saving your cash-on-delivery order'];
 
-// Places the order on the GlowVai server (cash on delivery only). The server checks every product, works out the
-// total and creates the order id; this screen only shows the result.
+// The steps shown while the order is placed. A step is marked done only when the server has answered.
+const STEPS: Record<PayMethod, string[]> = {
+  cod: ['Checking prices and availability', 'Saving your cash-on-delivery order'],
+  online: ['Checking prices and availability', 'Starting secure payment with Razorpay'],
+};
+
+// Places the order on the GlowVai server. The method is read from the checkout store (the source of truth); the
+// route param only has to agree with it. Cash on delivery is placed by the server. An online order is placed only
+// after Razorpay confirms the payment; an online reply without a payment is a failure, never a cash-on-delivery success.
+// This screen is a full-viewport overlay with no back control: it stays until the placement has ended.
 export const PaymentProcessingScreen: React.FC = () => {
-  const { navigate, showToast, customerDetails } = useApp();
+  const { navigate, showToast, customerDetails, activeParams } = useApp();
   const couponCode = useCheckoutSession((s) => s.couponCode);
+  const payMethod = useCheckoutSession((s) => s.payMethod);
+  const tip = useCheckoutSession((s) => s.tip);
   const address = useDeliveryAddress();
   const customer = useCustomer();
+  const method = parsePayMethod(payMethod);
   const [step, setStep] = useState(0);
-  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress).grandTotal);
+  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress).grandTotal + tip);
   const started = useRef(false);
+  const steps = STEPS[method ?? 'cod'];
 
   useEffect(() => {
     // Runs once per mount, even under React strict-mode double effects.
     if (started.current) return;
     started.current = true;
 
+    // Placement already ran in this session (for example the customer went back to this screen): never run it again.
+    if (useCheckoutSession.getState().placement !== 'idle') {
+      navigate('cart-tab');
+      return;
+    }
+    useCheckoutSession.getState().setPlacement('running');
+
+    const leave = (screen: 'checkout-review' | 'cart-tab' | 'login', params?: Record<string, unknown>) => {
+      useCheckoutSession.getState().setPlacement('finished');
+      navigate(screen, params);
+    };
+    // A failure keeps the bag, so the customer can try again from the payment step.
+    const fail = (error: string, failedMethod: PayMethod | null) => {
+      useCheckoutSession.getState().setPlacement('finished');
+      navigate('checkout-payment-failed', { error, amount, ...(failedMethod ? { method: failedMethod } : {}) });
+    };
+
     const run = async () => {
       const startedAt = Date.now();
       const allItems = Object.values(useCartStore.getState().items);
       if (allItems.length === 0) {
-        navigate('cart-tab');
+        leave('cart-tab');
         return;
       }
       // Only products the shop sells right now can be ordered. Anything else (old saved items) is removed from the bag,
       // and the customer is told which items, instead of the order failing with a vague message.
       const live = getLiveCatalog();
       if (live.length === 0) {
-        navigate('checkout-payment-failed', { error: 'Products are still loading. Check your connection and try again.', amount, method: 'cod' });
+        fail('Products are still loading. Check your connection and try again.', method);
         return;
       }
       const liveIds = new Set(live.map((p) => p.id));
@@ -50,77 +79,85 @@ export const PaymentProcessingScreen: React.FC = () => {
       if (unavailable.length > 0) {
         unavailable.forEach((item) => useCartStore.getState().removeItem(item.productId));
         const names = unavailable.map((item) => item.name || item.productId).slice(0, 3).join(', ');
-        navigate('checkout-payment-failed', {
-          error: `We removed ${unavailable.length} item${unavailable.length === 1 ? '' : 's'} that ${unavailable.length === 1 ? 'is' : 'are'} no longer sold (${names}). Review your bag and place the order again.`,
-          amount,
-          method: 'cod',
-        });
+        fail(
+          `We removed ${unavailable.length} item${unavailable.length === 1 ? '' : 's'} that ${unavailable.length === 1 ? 'is' : 'are'} no longer sold (${names}). Review your bag and place the order again.`,
+          method
+        );
         return;
       }
-      const cartItems = allItems;
       if (!address?.serviceable) {
-        navigate('checkout-review');
+        leave('checkout-review');
         return;
       }
       if (!customerDetails) {
-        navigate('login', { returnTo: 'checkout-payment-method' });
+        leave('login', { returnTo: 'checkout-payment-method' });
         return;
       }
 
-      const method = useCheckoutSession.getState().payMethod;
+      // The method the customer chose. A route param that disagrees with the stored choice is refused.
+      const requested = parsePayMethod((activeParams as { method?: unknown } | null)?.method);
+      if (!method || (requested && requested !== method)) {
+        fail('Your payment choice changed. Review your order and choose how to pay again.', null);
+        return;
+      }
+
       const result = await placeCartOrder({
-        items: cartItems,
+        items: allItems,
         address,
         couponCode,
         tip: useCheckoutSession.getState().tip,
-        paymentMethod: method === 'online' ? 'ONLINE' : 'COD',
+        paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
       });
+      const decision = decidePlacement(method, result);
 
-      // Online: the order exists but is only placed once Razorpay confirms the payment.
-      if (result.ok && result.data?.payment) {
+      if (decision.kind === 'razorpay') {
         try {
-          const paid = await openRazorpayCheckout(result.data.payment, { name: customer.name, contact: customer.phone });
+          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone });
           const verified = await verifyOnlinePayment(paid);
           if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
           useCartStore.getState().clearCart();
+          useCheckoutSession.getState().setPlacement('finished');
+          // The confirmation screen shows this order, so the order-status popup must not announce it again.
+          markOrderSeen(verified.data.orderId, 'PLACED');
           void useCustomerStore.getState().loadOrders();
           navigate('checkout-payment-success', {
             orderId: verified.data.orderId,
-            amount: result.data.payment.amount / 100,
+            amount: decision.payment.amount / 100,
             method: 'online',
             confirmed: true,
           });
         } catch (err) {
           const dismissed = err instanceof Error && err.message === 'DISMISSED';
-          navigate('checkout-payment-failed', {
-            error: dismissed
+          fail(
+            dismissed
               ? 'Payment was not completed. Your bag is saved, so you can pay again.'
               : err instanceof Error ? err.message : 'The payment could not be confirmed.',
-            amount,
-            method: 'online',
-          });
+            'online'
+          );
         }
         return;
       }
-      setStep(STEPS.length);
 
+      setStep(steps.length);
       const remaining = MIN_DISPLAY_MS - (Date.now() - startedAt);
       if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 
-      if (result.ok && result.data?.orderId) {
+      if (decision.kind === 'placed') {
         useCartStore.getState().clearCart();
+        useCheckoutSession.getState().setPlacement('finished');
+        // The confirmation screen shows this order, so the order-status popup must not announce it again.
+        markOrderSeen(decision.orderId, 'PLACED');
         void useCustomerStore.getState().loadOrders();
         navigate('checkout-payment-success', {
-          orderId: result.data.orderId,
-          amount: result.data.pricing?.grandTotal ?? amount,
+          orderId: decision.orderId,
+          amount: decision.total ?? amount,
           method: 'cod',
           confirmed: true,
         });
       } else {
-        const message = result.error || 'The order could not be placed. Try again.';
         showToast('The order could not be placed');
-        navigate('checkout-payment-failed', { error: message, amount, method: 'cod' });
+        fail(decision.error, method);
       }
     };
 
@@ -128,7 +165,7 @@ export const PaymentProcessingScreen: React.FC = () => {
   }, []);
 
   return (
-    <main className="commerce-screen commerce-processing">
+    <main className="commerce-screen commerce-processing" aria-busy="true">
       <header className="commerce-processing-head">
         <span className="commerce-brand">
           <Shield size={17} />
@@ -153,17 +190,17 @@ export const PaymentProcessingScreen: React.FC = () => {
         <div className="commerce-processing-detail" role="status" aria-live="polite">
           <dl className="commerce-processing-summary">
             <div>
-              <dt>Order total (shown in your bag)</dt>
+              <dt>Order total</dt>
               <dd>₹{amount}</dd>
             </div>
             <div>
               <dt>Payment method</dt>
-              <dd>Cash on delivery</dd>
+              <dd>{method ? PAY_METHOD_LABEL[method] : 'Not chosen'}</dd>
             </div>
           </dl>
 
           <ol className="commerce-processing-steps">
-            {STEPS.map((label, index) => (
+            {steps.map((label, index) => (
               <li key={label} className={index < step ? 'is-done' : index === step ? 'is-active' : ''}>
                 {index < step ? <CheckCircle2 size={18} /> : <span className="commerce-step-dot" />}
                 {label}
