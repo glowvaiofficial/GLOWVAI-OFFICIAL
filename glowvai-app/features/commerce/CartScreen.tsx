@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Minus, Plus, ShieldCheck, ShoppingBag, Tag, Trash2, Truck, X } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf } from '../../../lib/shop/variants';
 import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics';
 import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
@@ -120,13 +121,14 @@ export const CartScreen: React.FC = () => {
               )}
             </div>
             {cartItems.map((item) => (
-              <article className="commerce-line" key={item.productId}>
+              <article className="commerce-line" key={lineKeyOf(item.productId, item.variantId)}>
                 <div className="commerce-thumb">
                   {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={22} />}
                 </div>
                 <div className="commerce-line-copy">
                   <small>{item.brand}</small>
                   <h3>{item.name}</h3>
+                  {item.variantLabel && <small className="commerce-variant">{item.variantLabel}</small>}
                   <p>
                     <b>₹{item.price * item.quantity}</b>
                     {item.mrp && item.mrp > item.price && <s>₹{item.mrp * item.quantity}</s>}
@@ -138,7 +140,7 @@ export const CartScreen: React.FC = () => {
                     <button
                       onClick={() => {
                         safeHapticSelection();
-                        decrementItem(item.productId);
+                        decrementItem(lineKeyOf(item.productId, item.variantId));
                       }}
                       aria-label={item.quantity === 1 ? `Remove ${item.name}` : `Remove one ${item.name}`}
                     >
@@ -148,14 +150,14 @@ export const CartScreen: React.FC = () => {
                     <button
                       onClick={() => {
                         safeHapticSelection();
-                        incrementItem(item.productId);
+                        incrementItem(lineKeyOf(item.productId, item.variantId));
                       }}
                       aria-label={`Add one ${item.name}`}
                     >
                       <Plus size={14} />
                     </button>
                   </div>
-                  <button className="commerce-remove" onClick={() => removeItem(item.productId)} aria-label={`Remove ${item.name} from cart`}>
+                  <button className="commerce-remove" onClick={() => removeItem(lineKeyOf(item.productId, item.variantId))} aria-label={`Remove ${item.name} from cart`}>
                     <Trash2 size={14} /> Remove
                   </button>
                 </div>

@@ -1,4 +1,5 @@
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { defaultVariant } from '../../../../lib/shop/variants';
 
 export const formatRupee = (amount: number) => `₹${Math.round(amount).toLocaleString('en-IN')}`;
 
@@ -100,12 +101,21 @@ export const getDiscountPercent = (product: SkincareProduct): number => {
   if (product.originalPrice <= product.price) return 0;
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 };
-// The cart line a catalogue product adds, the same shape the shop screens use.
-export const cartLineFor = (product: SkincareProduct) => ({
-  productId: product.id,
-  name: product.name,
-  brand: product.brand,
-  image: getProductImageUrl(product),
-  price: product.price,
-  mrp: product.originalPrice,
-});
+// The cart line a catalogue product adds, the same shape the shop screens use. A product with variants adds its
+// default variant; screens that let the customer choose send them to the product page instead.
+export const cartLineFor = (product: SkincareProduct) => {
+  const variant = product.variants?.length ? defaultVariant(product.variants) : null;
+  return {
+    productId: product.id,
+    variantId: variant?.id ?? null,
+    variantLabel: variant?.label ?? null,
+    name: product.name,
+    brand: product.brand,
+    image: getProductImageUrl(product),
+    price: variant?.price ?? product.price,
+    mrp: variant?.mrp ?? product.originalPrice,
+  };
+};
+
+// Products with sizes, shades or packs are chosen on the product page, not added from a card or a rail.
+export const hasVariantOptions = (product: SkincareProduct): boolean => (product.variants?.length ?? 0) > 0;

@@ -88,3 +88,24 @@
   .glowvai-root .shop-product-panel{ padding: 24px; }
   .glowvai-root .shop-product-title{ font-size: 26px; }
 }
+
+/* Size, shade or pack choice: a labelled radio group. */
+.shop-product-variants { border: 0; margin: 14px 0 0; padding: 0; min-width: 0; }
+.shop-variants-legend { font-size: 13px; font-weight: 700; color: var(--ds-ink); padding: 0; margin-bottom: 8px; }
+.shop-variants-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.shop-variant {
+  position: relative; display: inline-flex; flex-direction: column; gap: 2px; min-width: 96px;
+  padding: 9px 12px; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-card);
+  cursor: pointer; font-size: 13px; color: var(--ds-ink);
+}
+.shop-variant input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.shop-variant:focus-within { outline: 2px solid var(--ds-brand); outline-offset: 2px; }
+.shop-variant.is-selected { border-color: var(--ds-brand); box-shadow: inset 0 0 0 1px var(--ds-brand); }
+.shop-variant-label { font-weight: 700; }
+.shop-variant-price { color: var(--ds-muted); font-size: 12px; }
+.shop-variant-out { color: #b42318; font-size: 11px; font-weight: 700; }
+.shop-variant.is-out { cursor: not-allowed; opacity: 0.6; }
+.shop-product-stock { margin: 6px 0 0; font-size: 13px; font-weight: 700; }
+.shop-product-stock.is-in { color: var(--ds-success); }
+.shop-product-stock.is-low { color: #b54708; }
+.shop-product-stock.is-out { color: #b42318; }

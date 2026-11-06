@@ -1,9 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { lineKeyOf, migrateCartLines, type Variant } from '../../../lib/shop/variants';
 
-
+// A cart line is one product in one variant. Items are keyed by lineKeyOf(productId, variantId): the product id alone
+// for a product without variants, "productId::variantId" otherwise. Prices here are for display; the server re-prices.
 export interface CartItem {
   productId: string;
+  variantId?: string | null;
+  variantLabel?: string | null;
   name: string;
   brand: string;
   image: string;
@@ -20,10 +24,13 @@ interface CartState {
   savings: number;
 
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  incrementItem: (productId: string) => void;
-  decrementItem: (productId: string) => void;
-  removeItem: (productId: string) => void;
+  // The key arguments are line keys (see lineKeyOf); for a product without variants the key is the product id.
+  incrementItem: (key: string) => void;
+  decrementItem: (key: string) => void;
+  removeItem: (key: string) => void;
   clearCart: () => void;
+  // Brings saved lines up to date with the published catalogue (default variant for old lines, current variant prices).
+  reconcileWithCatalog: (products: { id: string; variants?: Variant[] }[]) => void;
 }
 
 function recompute(items: Record<string, CartItem>) {
@@ -50,8 +57,9 @@ export const useCartStore = create<CartState>()(
 
       addItem: (item) => {
         const items = { ...get().items };
-        const existing = items[item.productId];
-        items[item.productId] = {
+        const key = lineKeyOf(item.productId, item.variantId);
+        const existing = items[key];
+        items[key] = {
           ...item,
           quantity: (existing?.quantity ?? 0) + 1,
         };
@@ -85,6 +93,12 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ items: {}, totalCount: 0, totalPrice: 0, mrpTotal: 0, savings: 0 }),
+
+      reconcileWithCatalog: (products) => {
+        const catalog = new Map(products.map((p) => [p.id, p.variants ?? null]));
+        const items = migrateCartLines(get().items, catalog);
+        set({ items, ...recompute(items) });
+      },
     }),
     {
       name: 'glowvai_cart_v1',
@@ -92,6 +106,8 @@ export const useCartStore = create<CartState>()(
       partialize: (state) => ({ items: state.items }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // Lines saved before variants existed keep their key and price until the catalogue is loaded.
+          state.items = migrateCartLines(state.items);
           Object.assign(state, recompute(state.items));
         }
       },

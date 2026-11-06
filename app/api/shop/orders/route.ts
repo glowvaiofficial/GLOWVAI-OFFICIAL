@@ -3,8 +3,10 @@ import { randomBytes } from "node:crypto";
 import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
 import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
-import { planReservation, reservationFor, stockProblemMessage, type ProductStock } from "@/lib/shop/platformStock";
+import type { ProductStock } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
+import { orderItemFor, orderReservationFor, parseCartLines, planOrderStock, currentUnitPrice } from "@/lib/shop/variants";
+import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 class OrderBlocked extends Error {
@@ -59,6 +61,8 @@ export async function GET(req: NextRequest) {
           quantity: it.quantity,
           unitPrice: it.unitPrice,
           imageUrl: it.imageUrl ?? "",
+          variantId: it.variantId ?? null,
+          variantLabel: it.variantLabel ?? null,
         })),
         pricing: o.pricing ?? null,
         payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
@@ -93,14 +97,8 @@ export async function POST(req: NextRequest) {
   const lines = Array.isArray(body.items) ? body.items : [];
   if (lines.length === 0) return json({ ok: false, error: "Your bag is empty." }, 400);
   if (lines.length > MAX_LINES) return json({ ok: false, error: `Up to ${MAX_LINES} different products per order.` }, 400);
-  const wanted = new Map<string, number>();
-  for (const raw of lines) {
-    const l = (raw ?? {}) as Record<string, unknown>;
-    const id = text(l.productId, 140);
-    const qty = Math.floor(Number(l.quantity));
-    if (!id || !Number.isFinite(qty) || qty < 1) return json({ ok: false, error: "Each item needs a product and a quantity." }, 400);
-    wanted.set(id, Math.min(MAX_QTY, (wanted.get(id) ?? 0) + qty));
-  }
+  const cart = parseCartLines(lines, MAX_QTY);
+  if (!cart.ok) return json({ ok: false, error: cart.error }, 400);
 
   const addr = (body.address ?? {}) as Record<string, unknown>;
   const recipientName = text(addr.name, 80);
@@ -116,39 +114,19 @@ export async function POST(req: NextRequest) {
   if (!/^\d{6}$/.test(pincode)) return json({ ok: false, error: "Enter a 6-digit pincode." }, 400);
 
   const store = db();
-  const productRefs = [...wanted.keys()].map((id) => store.collection("products").doc(id));
+  const productRefs = [...new Set(cart.lines.map((l) => l.productId))].map((id) => store.collection("products").doc(id));
   const productSnaps = await store.getAll(...productRefs);
   const items: Record<string, unknown>[] = [];
-  for (const snap of productSnaps) {
-    const p = snap.data();
-    if (!snap.exists || !p || p.status !== "PUBLISHED") {
-      return json({ ok: false, error: "One of the products is no longer available. Remove it from your bag and try again." }, 409);
-    }
-    const unitPrice = Math.round(Number(p.brandPrice) || 0);
-    if (unitPrice <= 0) return json({ ok: false, error: `${p.productName ?? "A product"} has no price yet.` }, 409);
-    const quantity = wanted.get(snap.id) ?? 1;
-    items.push({
-      productId: snap.id,
-      sku: snap.id,
-      title: String(p.productName ?? ""),
-      productName: String(p.productName ?? ""),
-      brand: String(p.brandName ?? ""),
-      unitPrice,
-      quantity,
-      totalPrice: unitPrice * quantity,
-      imageUrl: Array.isArray(p.pictures) && p.pictures[0] ? String(p.pictures[0]) : "",
-      hasBeautyProtection: false,
-      beautyProtectionFee: 0,
-    });
+  for (const line of cart.lines) {
+    const built = orderItemFor(productSnaps.find((s) => s.id === line.productId)?.data(), line);
+    if (!built.ok) return json({ ok: false, error: built.error }, built.status);
+    items.push(built.item);
   }
 
   // Quick check on the snapshot read above. The transaction below checks again on fresh reads before anything is written.
   const snapshotStock = new Map<string, ProductStock | undefined>(productSnaps.map((s) => [s.id, s.exists ? (s.data() as ProductStock) : undefined]));
-  const pre = planReservation(
-    items.map((it) => ({ productId: String(it.productId), quantity: Number(it.quantity) })),
-    snapshotStock,
-  );
-  if (!pre.ok) return json({ ok: false, error: stockProblemMessage(pre) }, 409);
+  const pre = planOrderStock(cart.lines, snapshotStock);
+  if (!pre.ok) return json({ ok: false, error: pre.message }, 409);
 
   const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
   const couponCode = text(body.couponCode, 20).toUpperCase();
@@ -226,15 +204,13 @@ export async function POST(req: NextRequest) {
       for (const it of items) {
         const p = fresh.get(String(it.productId));
         if (!p || p.status !== "PUBLISHED") throw new OrderBlocked(409, "One of the products is no longer available. Remove it from your bag and try again.");
-        if (Math.round(Number(p.brandPrice) || 0) !== Number(it.unitPrice)) throw new OrderBlocked(409, "The price of an item has changed. Refresh your bag and try again.");
+        if (currentUnitPrice(p, (it.variantId as string | null) ?? null) !== Number(it.unitPrice)) throw new OrderBlocked(409, "The price of an item has changed. Refresh your bag and try again.");
       }
-      const plan = planReservation(
-        items.map((it) => ({ productId: String(it.productId), quantity: Number(it.quantity) })),
-        fresh,
-      );
-      if (!plan.ok) throw new OrderBlocked(409, stockProblemMessage(plan));
+      const plan = planOrderStock(cart.lines, fresh);
+      if (!plan.ok) throw new OrderBlocked(409, plan.message);
       writeStockChanges(tx, store, plan.decrements, now);
-      tx.create(ref, { ...order, stockReservation: reservationFor(plan.decrements) });
+      writeVariantStockChanges(tx, store, plan.variantWrites, now);
+      tx.create(ref, { ...order, stockReservation: orderReservationFor(plan) });
       tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
     });
   } catch (err) {

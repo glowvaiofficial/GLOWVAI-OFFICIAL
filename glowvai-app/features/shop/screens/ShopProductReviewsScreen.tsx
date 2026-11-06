@@ -54,6 +54,10 @@ export const ShopProductReviewsScreen: React.FC = () => {
   const reviewCount = product.reviewCount.toLocaleString('en-IN');
 
   const handleAddToCart = () => {
+    if (product.variants?.length) {
+      navigate('shop-product', { productId: product.id });
+      return;
+    }
     addItem({
       productId: product.id,
       name: product.name,

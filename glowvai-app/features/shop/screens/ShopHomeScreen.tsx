@@ -150,7 +150,12 @@ function DealCard({ product }: { product: SkincareProduct }) {
       <button
         type="button"
         className="shop-home-deal-add"
-        onClick={() =>
+        onClick={() => {
+          // Products with sizes or shades are chosen on their page.
+          if (product.variants?.length) {
+            navigate('shop-product', { productId: product.id });
+            return;
+          }
           addItem({
             productId: product.id,
             name: product.name,
@@ -158,10 +163,10 @@ function DealCard({ product }: { product: SkincareProduct }) {
             image: getProductImageUrl(product),
             price: product.price,
             mrp: product.originalPrice,
-          })
-        }
+          });
+        }}
       >
-        {quantity > 0 ? `In cart · ${quantity}` : 'Add +'}
+        {product.variants?.length ? 'Choose +' : quantity > 0 ? `In cart · ${quantity}` : 'Add +'}
       </button>
     </article>
   );

@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop/server";
-import { planRelease, platformLinesOf } from "@/lib/shop/platformStock";
+import { planRelease } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
+import { planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
+import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 
 export const dynamic = "force-dynamic";
 
@@ -48,12 +50,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
 
       // Platform stock reserved at checkout goes back once (planRelease is empty after the first release).
-      const platformStock = await readProductStock(tx, store, platformLinesOf(reservation).map((l) => l.productId));
+      const platformStock = await readProductStock(tx, store, reservedProductIds(reservation));
       const platformChanges = planRelease(reservation, platformStock);
+      const variantChanges = planVariantRelease(reservation, platformStock);
 
       const now = Date.now();
       for (const r of releases) tx.update(r.ref, { stock: FieldValue.increment(r.quantity), updatedAt: now });
       writeStockChanges(tx, store, platformChanges, now);
+      writeVariantStockChanges(tx, store, variantChanges, now);
       tx.update(ref, {
         status: "CANCELLED",
         cancellationReason: reason,

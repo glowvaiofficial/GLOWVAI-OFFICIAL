@@ -27,7 +27,8 @@ const areaIn = (text: string): string | undefined => {
 // creates the order id. The result carries the server's message when the order is refused.
 export const placeCartOrder = async ({ items, address, couponCode, tip = 0, paymentMethod = 'COD', customer }: PlaceOrderInput) =>
   placeOrder({
-    items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+    // Only the product, the chosen variant and the quantity: the server prices every line itself.
+    items: items.map((item) => ({ productId: item.productId, ...(item.variantId ? { variantId: item.variantId } : {}), quantity: item.quantity })),
     address: {
       name: address.recipientName || customer.name,
       phone: address.phoneNumber || customer.phone,
