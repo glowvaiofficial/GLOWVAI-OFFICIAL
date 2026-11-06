@@ -3,6 +3,9 @@ import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/s
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
 import { parseOrderRequest } from "@/lib/shop/orderRequest";
+import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
+import { AFFILIATE_CONFIG } from "@/lib/shop/affiliate/config";
+import { affiliateCodeForOrder } from "@/lib/shop/affiliate/store";
 
 export const dynamic = "force-dynamic";
 
@@ -79,9 +82,12 @@ export async function POST(req: NextRequest) {
   if (!parsed.ok) return json({ ok: false, error: parsed.error }, parsed.status);
 
   const online = parsed.value.paymentMethod === "ONLINE";
+  // Affiliate attribution from the signed cookie set on the affiliate link visit. A failure here never blocks the order.
+  const affiliateCode = await affiliateCodeForOrder(firestoreRepo(db()), { uid: customer.uid, cookie: req.cookies.get(AFFILIATE_CONFIG.cookies.attribution)?.value, secret: process.env.AFFILIATE_COOKIE_SECRET, now: Date.now() }).catch(() => null);
   const result = await placeOrderCore(db(), {
     uid: customer.uid,
     ...parsed.value,
+    affiliateCode,
     startPayment: online ? (amount, orderId) => createRazorpayOrder(amount, orderId) : undefined,
   });
   if (!result.ok) return json({ ok: false, error: result.error }, result.status);
