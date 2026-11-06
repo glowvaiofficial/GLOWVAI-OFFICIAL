@@ -1,22 +1,32 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Clock, FileText, MapPin, Phone, RotateCcw, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import {
   RETURN_STATUS_LABEL,
   SUBSTITUTION_OPTIONS,
+  fetchDeliveryCode,
+  fetchLiveTracking,
   fetchOrderTracking,
   openInvoice,
   setSubstitutionPreference,
+  type DeliveryCodeState,
+  type LiveTracking,
   type OrderTracking,
   type SubstitutionPreference,
 } from '../../core/services/shopTracking';
+import { delayBanner, stageCopy } from '../../../lib/shop/tracking';
+import './tracking.css';
 import { OrdersHeader } from './components/OrdersHeader';
+import { TrackingMap } from './components/TrackingMap';
+import { TrackingStepper } from './components/TrackingStepper';
 import { OrdersEmpty, OrdersLoadState, formatOrderDate, statusLabel, useRequestedOrder } from './orderUtils';
+import { RIDER_REFRESH_MS, riderRefreshDue, shouldFollowRider } from './trackingMapRules';
 
 const timeText = (ms: number | null | undefined) => formatOrderDate(ms ?? null);
 
-// The order's journey as the GlowVai server records it. There is no live map, rider position or ETA here: when the
-// order does not carry an expected window, none is shown.
+// Dialling a store number: digits and a leading plus only.
+const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+
 export const OrderTrackingScreen: React.FC = () => {
   const { goBack, navigate, showToast } = useApp();
   const { order, requestedId, status: listStatus, error: listError, reload: reloadList } = useRequestedOrder();
@@ -24,10 +34,17 @@ export const OrderTrackingScreen: React.FC = () => {
   const [tracking, setTracking] = useState<OrderTracking | null>(null);
   const [loadState, setLoadState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [live, setLive] = useState<LiveTracking | null>(null);
+  const [liveState, setLiveState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [code, setCode] = useState<Extract<DeliveryCodeState, { available: true }> | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const [codeAttempt, setCodeAttempt] = useState(0);
   const [choice, setChoice] = useState<SubstitutionPreference | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
+  const lastRiderRefresh = useRef(0);
 
   const load = useCallback(async () => {
     if (!orderId) return;
@@ -44,9 +61,74 @@ export const OrderTrackingScreen: React.FC = () => {
     setLoadState('ready');
   }, [orderId]);
 
+  const loadLive = useCallback(async () => {
+    if (!orderId) return;
+    setLiveState((s) => (s === 'ready' ? s : 'loading'));
+    const result = await fetchLiveTracking(orderId);
+    lastRiderRefresh.current = Date.now();
+    if (!result.ok || !result.data?.tracking) {
+      setLiveState('error');
+      setLiveError(result.error || 'We could not load your delivery update. Try again.');
+      return;
+    }
+    setLive(result.data.tracking);
+    setLiveError(null);
+    setLiveState('ready');
+  }, [orderId]);
+
   useEffect(() => {
     void load();
-  }, [load]);
+    void loadLive();
+  }, [load, loadLive]);
+
+  // While the order is out, the rider's point is refreshed at most every 30 seconds. The timer stops when the tab is hidden.
+  const status = live?.status ?? null;
+  useEffect(() => {
+    if (!orderId || !shouldFollowRider(status)) return;
+    let timer: number | undefined;
+    const stop = () => {
+      if (timer !== undefined) window.clearInterval(timer);
+      timer = undefined;
+    };
+    const start = () => {
+      stop();
+      timer = window.setInterval(() => {
+        if (riderRefreshDue(lastRiderRefresh.current, Date.now())) void loadLive();
+      }, RIDER_REFRESH_MS);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        if (riderRefreshDue(lastRiderRefresh.current, Date.now())) void loadLive();
+        start();
+      } else {
+        stop();
+      }
+    };
+    if (document.visibilityState === 'visible') start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [orderId, status, loadLive]);
+
+  // The delivery code is requested only at stage 8, and only then.
+  const atDoor = live?.stage === 8;
+  useEffect(() => {
+    if (!orderId || !atDoor) return;
+    let cancelled = false;
+    setCodeError(null);
+    void fetchDeliveryCode(orderId).then((result) => {
+      if (cancelled) return;
+      const state = result.ok ? result.data?.deliveryCode : null;
+      if (state?.available) setCode(state);
+      else if (result.ok) setCodeError(null);
+      else setCodeError(result.error || 'The delivery code could not be loaded. Try again.');
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [orderId, atDoor, codeAttempt]);
 
   if (!order) {
     const loading = listStatus === 'idle' || listStatus === 'loading' || listStatus === 'error';
@@ -74,6 +156,15 @@ export const OrderTrackingScreen: React.FC = () => {
   const returnOpen = !!tracking && !cancelled && tracking.returnWindowEndsAt !== null && Date.now() <= tracking.returnWindowEndsAt;
   const preferenceDirty = !!tracking && choice !== tracking.substitutionPreference.value;
 
+  // At stage 8 the server's subtitle has no code yet; fill it in once the code is known.
+  const heroTitle = live?.title ?? '';
+  const heroSubtitle =
+    live?.stage === 8 && code
+      ? stageCopy(8, { riderFirstName: live.riderFirstName, deliveryCode: code.code }).subtitle
+      : live?.subtitle ?? '';
+  const storePhone = live?.storePhone ?? null;
+  const banner = live?.delay ? delayBanner(live.delay, live.riderFirstName) : null;
+
   const savePreference = async () => {
     if (!choice || !tracking) return;
     setSaving(true);
@@ -95,7 +186,7 @@ export const OrderTrackingScreen: React.FC = () => {
   };
 
   return (
-    <main className="orders-screen is-detail">
+    <main className="orders-screen is-detail trk-screen">
       <OrdersHeader title="Track order" subtitle={`#${order.orderId}`} onBack={goBack} />
 
       <div className="orders-body">
@@ -106,14 +197,70 @@ export const OrderTrackingScreen: React.FC = () => {
           </div>
         )}
 
-        <section className="orders-card orders-status-card" aria-live="polite">
+        {liveState === 'error' && !live && (
+          <section className="trk-card" aria-live="polite">
+            <p className="trk-note is-error">{liveError}</p>
+            <button type="button" className="trk-button" onClick={() => void loadLive()}>Retry</button>
+          </section>
+        )}
+
+        {liveState === 'loading' && !live && <p className="trk-note" role="status">Loading the latest update...</p>}
+
+        {banner && (
+          <section className="trk-delay" role="status" aria-label="Delivery delay">
+            <b>{banner.title}</b>
+            <p>{banner.body}</p>
+          </section>
+        )}
+
+        {live && (
+          <section className="trk-card trk-hero" aria-live="polite" aria-labelledby="trk-hero-title">
+            <p className="trk-eyebrow">
+              <Clock size={14} aria-hidden="true" /> {live.cancelled ? 'Cancelled' : live.stage === 9 ? 'Delivered' : 'Live update'}
+            </p>
+            <h2 className="trk-title" id="trk-hero-title">{heroTitle}</h2>
+            {heroSubtitle && <p className="trk-subtitle">{heroSubtitle}</p>}
+            {live.estimateMinutes !== null && <p className="trk-estimate">Delivery in about {live.estimateMinutes} min</p>}
+
+            {atDoor && (
+              <div className="trk-otp" aria-label="Delivery OTP">
+                <span className="trk-otp-label">Delivery OTP</span>
+                {code ? (
+                  <strong className="trk-otp-code">{code.code}</strong>
+                ) : (
+                  <span className="trk-note">Your code will show here. {codeError ?? ''}</span>
+                )}
+                {code?.locked && <span className="trk-note is-error">Code locked after wrong attempts. Try again in {code.lockedMinutes} min.</span>}
+                {!code && codeError && (
+                  <button type="button" className="trk-button" onClick={() => setCodeAttempt((n) => n + 1)}>Retry</button>
+                )}
+              </div>
+            )}
+          </section>
+        )}
+
+        {live && live.steps.length > 0 && (
+          <section className="trk-card" aria-labelledby="trk-progress-title">
+            <h2 className="trk-section-title" id="trk-progress-title">Progress</h2>
+            <TrackingStepper steps={live.steps} />
+          </section>
+        )}
+
+        {live && <TrackingMap map={live.map} />}
+
+        {storePhone && (
+          <a className="trk-button is-block" href={telHref(storePhone)}>
+            <Phone size={16} aria-hidden="true" /> Call store
+          </a>
+        )}
+
+        <section className="orders-card orders-status-card" aria-label="Order details">
           <div className="orders-status-head">
             <span className={`orders-badge is-${cancelled ? 'cancelled' : delivered ? 'delivered' : 'active'}`}>
               <Clock size={14} /> {statusLabel(tracking?.status ?? order.status)}
             </span>
             <strong>#{order.orderId}</strong>
           </div>
-          <p className="orders-note">{loadState === 'loading' && !tracking ? 'Loading the latest update...' : tracking?.statusText ?? ''}</p>
           {tracking?.placedAt && (
             <div className="orders-meta-row">
               <span>Placed</span>
@@ -126,19 +273,12 @@ export const OrderTrackingScreen: React.FC = () => {
               <b>{timeText(tracking.deliveredAt)}</b>
             </div>
           )}
-          <div className="orders-meta-row">
-            <span>Expected delivery</span>
-            <b>
-              {tracking?.expectedWindow
-                ? `${timeText(tracking.expectedWindow.from)} to ${timeText(tracking.expectedWindow.to)}`
-                : 'No estimate yet'}
-            </b>
-          </div>
-        </section>
-
-        <section className="orders-card" aria-label="Live location">
-          <h2 className="orders-card-title"><MapPin size={16} /> Live location</h2>
-          <p className="orders-note">{tracking?.liveLocation.note ?? 'Live location is not available yet.'}</p>
+          {tracking?.expectedWindow && (
+            <div className="orders-meta-row">
+              <span>Expected delivery</span>
+              <b>{`${timeText(tracking.expectedWindow.from)} to ${timeText(tracking.expectedWindow.to)}`}</b>
+            </div>
+          )}
         </section>
 
         {tracking?.rider && (

@@ -118,6 +118,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         coinsToRedeem: useCheckoutSession.getState().coinsToRedeem,
         tip: useCheckoutSession.getState().tip,
         deliverySlot: useCheckoutSession.getState().slotId,
+        customerLocation: useCheckoutSession.getState().customerLocation,
         paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
       });
