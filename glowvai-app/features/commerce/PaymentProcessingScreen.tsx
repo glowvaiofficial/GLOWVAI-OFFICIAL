@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Lock, Shield } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf, lineStillSold } from '../../../lib/shop/variants';
 import { useCustomerStore } from '../../core/state/customerStore';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
@@ -74,10 +75,13 @@ export const PaymentProcessingScreen: React.FC = () => {
         fail('Products are still loading. Check your connection and try again.', method);
         return;
       }
-      const liveIds = new Set(live.map((p) => p.id));
-      const unavailable = allItems.filter((item) => !liveIds.has(item.productId));
+      // Old lines move to their default variant, and lines already in the bag take the current variant prices.
+      useCartStore.getState().reconcileWithCatalog(live);
+      const liveById = new Map(live.map((p) => [p.id, p]));
+      // A line is kept only when its product, and its variant when it has one, is still sold.
+      const unavailable = Object.values(useCartStore.getState().items).filter((item) => !lineStillSold(item, liveById.get(item.productId)));
       if (unavailable.length > 0) {
-        unavailable.forEach((item) => useCartStore.getState().removeItem(item.productId));
+        unavailable.forEach((item) => useCartStore.getState().removeItem(lineKeyOf(item.productId, item.variantId)));
         const names = unavailable.map((item) => item.name || item.productId).slice(0, 3).join(', ');
         fail(
           `We removed ${unavailable.length} item${unavailable.length === 1 ? '' : 's'} that ${unavailable.length === 1 ? 'is' : 'are'} no longer sold (${names}). Review your bag and place the order again.`,

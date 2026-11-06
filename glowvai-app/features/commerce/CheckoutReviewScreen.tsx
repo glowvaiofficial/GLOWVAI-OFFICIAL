@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf } from '../../../lib/shop/variants';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
@@ -78,14 +79,17 @@ export const CheckoutReviewScreen: React.FC = () => {
               </button>
             </div>
             {cartItems.map((item) => (
-              <div className="commerce-review-line" key={item.productId}>
+              <div className="commerce-review-line" key={lineKeyOf(item.productId, item.variantId)}>
                 <div className="commerce-thumb">
                   {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={20} />}
                 </div>
                 <div>
                   <small>{item.brand}</small>
                   <h3>{item.name}</h3>
-                  <p>Qty {item.quantity}</p>
+                  <p>
+                    {item.variantLabel && <span className="commerce-variant">{item.variantLabel} · </span>}
+                    Qty {item.quantity}
+                  </p>
                 </div>
                 <b className="commerce-review-price">₹{item.price * item.quantity}</b>
               </div>

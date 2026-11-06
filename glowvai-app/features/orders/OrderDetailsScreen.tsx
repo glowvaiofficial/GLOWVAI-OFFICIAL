@@ -133,6 +133,7 @@ export const OrderDetailsScreen: React.FC = () => {
                 <div className="orders-item-copy">
                   {item.brand && <span className="orders-category">{item.brand}</span>}
                   <b>{item.title}</b>
+                  {item.variantLabel && <small>{item.variantLabel}</small>}
                   <small>
                     Qty {item.quantity} · {formatRupee(item.unitPrice)} each
                   </small>

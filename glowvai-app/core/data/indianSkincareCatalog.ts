@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { LOCAL_PRODUCT_IMAGES } from '../assets/productImages';
+import type { Variant } from '../../../lib/shop/variants';
 
 export interface SkincareProduct {
   id: string;
@@ -25,6 +26,8 @@ export interface SkincareProduct {
     barrier: string;
   };
   deliveryMinutes: number;
+  // Sizes, shades or packs with their own price and stock. Empty or missing: the product is sold as one item.
+  variants?: Variant[];
 }
 
 // Live product list, filled from the database (collection "products", status PUBLISHED). Starts empty.

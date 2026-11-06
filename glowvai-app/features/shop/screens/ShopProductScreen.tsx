@@ -4,6 +4,10 @@ import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
+import { defaultVariant, isSellable, variantStockState, type Variant } from '../../../../lib/shop/variants';
+
+// Most units one customer can add in one go (the server enforces the same cap).
+const MAX_QTY = 10;
 import '../styles/shop-product.css';
 
 // Shop category ids mapped to the names used on the browse screen.
@@ -24,10 +28,12 @@ export const ShopProductScreen: React.FC = () => {
   const product = catalog.find((p) => p.id === productId);
 
   const cartTotalCount = useCartStore((state) => state.totalCount);
-  const inCartCount = useCartStore((state) => (product ? state.items[product.id]?.quantity ?? 0 : 0));
+  // Units of this product in the bag, across its sizes or shades.
+  const inCartCount = useCartStore((state) => (product ? Object.values(state.items).filter((i) => i.productId === product.id).reduce((n, i) => n + i.quantity, 0) : 0));
   const addItem = useCartStore((state) => state.addItem);
 
   const [quantity, setQuantity] = useState(1);
+  const [variantId, setVariantId] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
 
   // Open each product at the top, not at the scroll position of the list it was opened from.
@@ -35,6 +41,7 @@ export const ShopProductScreen: React.FC = () => {
     document.querySelector('.glowvai-root .screen-content')?.scrollTo?.(0, 0);
     window.scrollTo(0, 0);
     setQuantity(1);
+    setVariantId(null);
     setImageFailed(false);
   }, [productId]);
 
@@ -60,8 +67,19 @@ export const ShopProductScreen: React.FC = () => {
     );
   }
 
+  // Products with sizes, shades or packs: the selected option drives price, MRP, stock and the cart line.
+  const options: Variant[] | null = product.variants && product.variants.length > 0 ? product.variants : null;
+  const selected: Variant | null = options ? options.find((v) => v.id === variantId) ?? defaultVariant(options) : null;
+  const price = selected ? selected.price : product.price;
+  const mrp = selected ? selected.mrp : product.originalPrice;
+  const discount = selected ? (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0) : getDiscountPercent(product);
+  const stockState = selected ? variantStockState(selected) : null;
+  const canBuy = selected ? isSellable(selected) : true;
+  const maxQty = selected && selected.stock !== null ? Math.max(1, Math.min(MAX_QTY, selected.stock)) : MAX_QTY;
+  const qty = Math.min(quantity, maxQty);
+  const optionNoun = selected ? selected.label : product.volume;
+
   const heroImage = getProductImageUrl(product);
-  const discount = getDiscountPercent(product);
   const isWishlisted = wishlist.includes(product.id);
   const deliverTo = [currentAddress?.area, currentAddress?.city].filter(Boolean).join(', ');
   const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category;
@@ -85,15 +103,12 @@ export const ShopProductScreen: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
-        productId: product.id,
-        name: product.name,
-        brand: product.brand,
-        price: product.price,
-        mrp: product.originalPrice,
-        image: heroImage,
-      });
+    if (!canBuy) return;
+    const line = selected
+      ? { productId: product.id, variantId: selected.id, variantLabel: selected.label, price: selected.price, mrp: selected.mrp }
+      : { productId: product.id, price: product.price, mrp: product.originalPrice };
+    for (let i = 0; i < qty; i++) {
+      addItem({ name: product.name, brand: product.brand, image: heroImage, ...line });
     }
   };
 
@@ -167,39 +182,69 @@ export const ShopProductScreen: React.FC = () => {
               </button>
             </div>
 
+            {options && selected && (
+              <fieldset className="shop-product-variants">
+                <legend className="shop-variants-legend">Choose an option</legend>
+                <div className="shop-variants-grid">
+                  {options.map((v) => {
+                    const sellable = isSellable(v);
+                    const checked = v.id === selected.id;
+                    return (
+                      <label key={v.id} className={`shop-variant${checked ? ' is-selected' : ''}${sellable ? '' : ' is-out'}`}>
+                        <input
+                          type="radio"
+                          name={`variant-${product.id}`}
+                          value={v.id}
+                          checked={checked}
+                          disabled={!sellable}
+                          onChange={() => setVariantId(v.id)}
+                        />
+                        <span className="shop-variant-label">{v.label}</span>
+                        <span className="shop-variant-price">{formatRupee(v.price)}</span>
+                        {!sellable && <span className="shop-variant-out">Out of stock</span>}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+
             <div className="shop-product-pricebar">
-              <span className="shop-product-price-now">{formatRupee(product.price)}</span>
-              {product.originalPrice > product.price && (
-                <span className="shop-product-price-mrp">MRP {formatRupee(product.originalPrice)}</span>
-              )}
+              <span className="shop-product-price-now">{formatRupee(price)}</span>
+              {mrp > price && <span className="shop-product-price-mrp">MRP {formatRupee(mrp)}</span>}
               {discount > 0 && <span className="shop-product-off">{discount}% OFF</span>}
             </div>
-            <p className="shop-product-tax">Inclusive of all taxes · {product.volume}</p>
+            <p className="shop-product-tax">Inclusive of all taxes · {optionNoun}</p>
+            {stockState && (
+              <p className={`shop-product-stock is-${stockState.state}`} role="status" aria-live="polite">
+                {stockState.state === 'out' ? 'Out of stock' : stockState.state === 'low' ? `Only ${stockState.count} left` : 'In stock'}
+              </p>
+            )}
 
             <div className="shop-product-qty-row">
               <span className="shop-product-qty-label">Quantity</span>
               <div className="shop-product-qty">
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={quantity <= 1}
+                  onClick={() => setQuantity((q) => Math.max(1, Math.min(q, maxQty) - 1))}
+                  disabled={qty <= 1}
                   aria-label="Decrease quantity"
                 >
                   <Minus size={14} />
                 </button>
-                <span aria-live="polite">{quantity}</span>
-                <button type="button" onClick={() => setQuantity((q) => q + 1)} aria-label="Increase quantity">
+                <span aria-live="polite">{qty}</span>
+                <button type="button" onClick={() => setQuantity((q) => Math.min(q, maxQty) + 1)} disabled={qty >= maxQty} aria-label="Increase quantity">
                   <Plus size={14} />
                 </button>
               </div>
             </div>
 
             <div className="shop-product-actions">
-              <button type="button" className="shop-btn-primary shop-product-add-btn" onClick={handleAddToCart}>
+              <button type="button" className="shop-btn-primary shop-product-add-btn" onClick={handleAddToCart} disabled={!canBuy}>
                 <ShoppingBag size={18} />
-                Add to cart · {formatRupee(product.price * quantity)}
+                {canBuy ? `Add to cart · ${formatRupee(price * qty)}` : 'Out of stock'}
               </button>
-              <button type="button" className="shop-btn-secondary shop-product-buynow" onClick={handleBuyNow}>
+              <button type="button" className="shop-btn-secondary shop-product-buynow" onClick={handleBuyNow} disabled={!canBuy}>
                 Buy now
               </button>
             </div>
@@ -256,8 +301,8 @@ export const ShopProductScreen: React.FC = () => {
               </dd>
             </div>
             <div>
-              <dt>Size</dt>
-              <dd>{product.volume}</dd>
+              <dt>{options ? 'Option' : 'Size'}</dt>
+              <dd>{optionNoun}</dd>
             </div>
           </dl>
           <div className="shop-product-acc-divider" />
@@ -271,10 +316,8 @@ export const ShopProductScreen: React.FC = () => {
       <div className="shop-product-buybar">
         <div className="shop-product-buybar-price">
           <div>
-            <span className="shop-product-price-now">{formatRupee(product.price)}</span>
-            {product.originalPrice > product.price && (
-              <span className="shop-product-price-mrp">{formatRupee(product.originalPrice)}</span>
-            )}
+            <span className="shop-product-price-now">{formatRupee(price)}</span>
+            {mrp > price && <span className="shop-product-price-mrp">{formatRupee(mrp)}</span>}
           </div>
           <small>
             {inCartCount > 0
@@ -282,8 +325,8 @@ export const ShopProductScreen: React.FC = () => {
               : `${discount > 0 ? `${discount}% OFF · ` : ''}Delivered in ${product.deliveryMinutes} mins`}
           </small>
         </div>
-        <button type="button" className="shop-btn-primary shop-product-buybar-btn" onClick={handleAddToCart}>
-          Add to cart
+        <button type="button" className="shop-btn-primary shop-product-buybar-btn" onClick={handleAddToCart} disabled={!canBuy}>
+          {canBuy ? 'Add to cart' : 'Out of stock'}
         </button>
       </div>
     </div>

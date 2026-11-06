@@ -30,6 +30,8 @@ export type ShopOrderStatus = 'PLACED' | 'CANCELLED' | 'DELIVERED' | string;
 
 export interface ShopOrderItem {
   productId: string;
+  variantId?: string | null;
+  variantLabel?: string | null;
   title: string;
   brand: string;
   quantity: number;
@@ -65,7 +67,7 @@ export interface ShopOrder {
 }
 
 export interface PlaceOrderInput {
-  items: Array<{ productId: string; quantity: number }>;
+  items: Array<{ productId: string; variantId?: string; quantity: number }>;
   address: { name: string; phone: string; fullAddress: string; city: string; pincode: string; area?: string; landmark?: string };
   couponCode?: string | null;
   tip?: number;

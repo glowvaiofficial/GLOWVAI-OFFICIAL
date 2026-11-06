@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowRight, Package, PackageOpen } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../core/state/cartStore';
+import { defaultVariant, lineKeyOf } from '../../../lib/shop/variants';
 import { useCustomerStore } from '../../core/state/customerStore';
 import type { ShopOrder, ShopOrderItem } from '../../core/services/shopApi';
 
@@ -123,15 +124,18 @@ export const useBuyAgain = () => {
     order.items.forEach((item) => {
       const product = catalog.find((entry) => entry.id === item.productId);
       if (!product || !(product.price > 0)) return;
+      // The size or shade bought last time, when the product still has it; otherwise the default one.
+      const picked = product.variants?.find((v) => v.id === item.variantId) ?? (product.variants?.length ? defaultVariant(product.variants) : null);
+      const line = picked
+        ? { productId: product.id, variantId: picked.id, variantLabel: picked.label, price: picked.price, mrp: picked.mrp }
+        : { productId: product.id, price: product.price, mrp: product.originalPrice };
       addItem({
-        productId: product.id,
         name: product.name,
         brand: product.brand,
-        price: product.price,
-        mrp: product.originalPrice,
         image: product.official_brand_image_url || item.imageUrl || '',
+        ...line,
       });
-      for (let i = 1; i < (Number(item.quantity) || 1); i += 1) incrementItem(product.id);
+      for (let i = 1; i < (Number(item.quantity) || 1); i += 1) incrementItem(lineKeyOf(product.id, line.variantId));
       added += 1;
     });
     if (added === 0) {
