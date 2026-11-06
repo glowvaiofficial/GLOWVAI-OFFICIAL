@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import { generateOrderRef, createWhatsAppOrderUrl, WhatsAppOrderItem } from "../lib/whatsapp";
-import { getRecommendedProducts, EXCEL_DATABASE_PRODUCTS, ExcelProduct } from "../lib/recommend";
+import { generateOrderRef, createWhatsAppOrderUrl, type WhatsAppOrderItem } from "../lib/whatsapp";
+import { getRecommendedProducts, EXCEL_DATABASE_PRODUCTS, type ExcelProduct } from "../lib/recommend";
 import { leadFormSchema } from "../lib/schemas";
+import test from "node:test";
 
 /**
  * GLOW VAI Engine Contract & Utility Test Suite
@@ -91,10 +92,7 @@ export async function runGlowVaiTestSuite() {
   console.log("\n🎉 ALL 3 TEST SUITES PASSED CLEANLY!");
 }
 
-// Auto-run if executed directly via Node
-if (typeof process !== "undefined" && require.main === module) {
-  runGlowVaiTestSuite().catch((err) => {
-    console.error("❌ Test suite failed:", err);
-    process.exit(1);
-  });
-}
+// Runs under the node test runner (npm test: node --test). A failing assertion fails this test.
+test("GLOW VAI engine and contract suites pass", async () => {
+  await runGlowVaiTestSuite();
+});

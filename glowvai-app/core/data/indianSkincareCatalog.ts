@@ -13,8 +13,9 @@ export interface SkincareProduct {
   discountPercent?: number;
   volume: string;
   matchScore: number;
-  rating: number;
-  reviewCount: number;
+  // null until the product has approved reviews (from the reviews totals). Never a made-up number.
+  rating: number | null;
+  reviewCount: number | null;
   imageSource: any;
   official_brand_image_url?: string;
   cardBg: string;
@@ -25,7 +26,8 @@ export interface SkincareProduct {
     glow: string;
     barrier: string;
   };
-  deliveryMinutes: number;
+  // null when the product carries no delivery time. The screens show nothing for it.
+  deliveryMinutes: number | null;
   // Sizes, shades or packs with their own price and stock. Empty or missing: the product is sold as one item.
   variants?: Variant[];
 }

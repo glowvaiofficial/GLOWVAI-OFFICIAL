@@ -4,7 +4,7 @@
  * All sample products carry INCI lists and Indian cosmetics labelling fields.
  */
 
-import { Product, ProductVariant } from "@/types/product";
+import type { Product, ProductVariant } from "@/types/product";
 export type { Product, ProductVariant };
 
 export const sampleProducts: Product[] = [

@@ -6,6 +6,7 @@ import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import { defaultVariant, isSellable, variantStockState, type Variant } from '../../../../lib/shop/variants';
 import { rememberProductViewed } from '../lib/recentlyViewed';
+import { SubscribePanel } from '../../profile/SubscriptionsScreen';
 
 // Most units one customer can add in one go (the server enforces the same cap).
 const MAX_QTY = 10;
@@ -177,16 +178,18 @@ export const ShopProductScreen: React.FC = () => {
             <h1 className="shop-product-title">{product.name}</h1>
             <p className="shop-product-desc">{product.description}</p>
 
-            <div className="shop-product-rating-row">
-              <span className="shop-product-rating">
-                <Star size={12} fill="currentColor" />
-                {product.rating.toFixed(1)}
-              </span>
-              <button type="button" className="shop-product-reviews-link" onClick={openReviews}>
-                {product.reviewCount.toLocaleString('en-IN')} reviews
-                <ChevronRight size={14} />
-              </button>
-            </div>
+            {product.rating !== null && product.reviewCount !== null && (
+              <div className="shop-product-rating-row">
+                <span className="shop-product-rating">
+                  <Star size={12} fill="currentColor" />
+                  {product.rating.toFixed(1)}
+                </span>
+                <button type="button" className="shop-product-reviews-link" onClick={openReviews}>
+                  {product.reviewCount.toLocaleString('en-IN')} reviews
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
 
             {options && selected && (
               <fieldset className="shop-product-variants">
@@ -266,15 +269,17 @@ export const ShopProductScreen: React.FC = () => {
             )}
           </div>
 
-          <div className="shop-product-eta">
-            <span className="shop-product-eta-icon">
-              <Zap size={18} fill="currentColor" />
-            </span>
-            <div>
-              <p className="shop-product-eta-title">Delivered in {product.deliveryMinutes} minutes</p>
-              {deliverTo && <p className="shop-product-eta-sub">to {deliverTo}</p>}
+          {product.deliveryMinutes !== null && (
+            <div className="shop-product-eta">
+              <span className="shop-product-eta-icon">
+                <Zap size={18} fill="currentColor" />
+              </span>
+              <div>
+                <p className="shop-product-eta-title">Delivered in {product.deliveryMinutes} minutes</p>
+                {deliverTo && <p className="shop-product-eta-sub">to {deliverTo}</p>}
+              </div>
             </div>
-          </div>
+          )}
         </aside>
 
         {product.keyActives.length > 0 && (
@@ -313,10 +318,12 @@ export const ShopProductScreen: React.FC = () => {
           </dl>
           <div className="shop-product-acc-divider" />
           <button type="button" className="shop-product-acc-btn" onClick={openReviews}>
-            <span>Ratings &amp; reviews ({product.reviewCount.toLocaleString('en-IN')})</span>
+            <span>Ratings &amp; reviews{product.reviewCount ? ` (${product.reviewCount.toLocaleString('en-IN')})` : ''}</span>
             <ChevronRight size={18} />
           </button>
         </section>
+
+        {canBuy && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
       </div>
 
       <div className="shop-product-buybar">

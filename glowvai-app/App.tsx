@@ -6,6 +6,7 @@ import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
 import { startProductFeed } from './core/services/productFeed';
+import { ProductFeedNotice } from './components/common/ProductFeedNotice';
 import { OrderNotifications } from './core/notifications/OrderNotifications';
 import { InboxBridge } from './core/notifications/InboxBridge';
 
@@ -116,6 +117,7 @@ const AppContent: React.FC = () => {
     <div className="app-viewport">
       <AndroidStatusBar tone={['welcome', 'onboarding', 'login', 'otp'].includes(currentScreen) ? 'brand' : 'light'} />
       <WebHeader />
+      <ProductFeedNotice />
       <div className="screen-content">{renderScreen()}</div>
       <BottomNavBar />
       {toastMessage && (

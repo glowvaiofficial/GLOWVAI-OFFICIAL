@@ -130,13 +130,15 @@ export const useBuyAgain = () => {
     for (const item of available) {
       addItem({
         productId: item.productId,
+        variantId: item.variantId,
+        variantLabel: item.variantLabel,
         name: item.name || titleOf(item.productId, ''),
         brand: item.brand,
         price: item.unitPrice,
         mrp: item.originalPrice,
         image: item.imageUrl || order.items.find((i) => i.productId === item.productId)?.imageUrl || '',
       });
-      for (let i = 1; i < item.quantity; i += 1) incrementItem(item.productId);
+      for (let i = 1; i < item.quantity; i += 1) incrementItem(lineKeyOf(item.productId, item.variantId));
     }
     if (available.length === 0 && unavailable.length === 0) {
       showToast('This order has no items to add');

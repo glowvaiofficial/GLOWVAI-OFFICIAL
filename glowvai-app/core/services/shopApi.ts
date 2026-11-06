@@ -126,6 +126,8 @@ export interface DeliverySlotView {
 
 export interface ReorderAvailableItem {
   productId: string;
+  variantId: string | null;
+  variantLabel: string | null;
   name: string;
   brand: string;
   imageUrl: string;
@@ -139,6 +141,7 @@ export interface ReorderAvailableItem {
 
 export interface ReorderUnavailableItem {
   productId: string;
+  variantId: string | null;
   name: string;
   requested: number;
   reason: 'NOT_AVAILABLE' | 'OUT_OF_STOCK' | 'NO_PRICE';
@@ -397,6 +400,8 @@ export async function fetchSubscriptions(): Promise<ApiResult<{ subscriptions: S
 
 export async function createSubscription(input: {
   productId: string;
+  // The size or shade picked on the product page (required for a product sold in options).
+  variantId?: string | null;
   quantity: number;
   intervalWeeks: number;
   address: SubscriptionAddressInput;

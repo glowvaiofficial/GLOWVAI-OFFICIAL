@@ -75,10 +75,10 @@ export const ShopCategoryScreen: React.FC = () => {
       case 'price_high':
         return b.price - a.price;
       case 'rating':
-        return b.rating - a.rating;
+        return (b.rating ?? 0) - (a.rating ?? 0);
       default:
         // Popularity: the products with the most catalogue reviews first.
-        return b.reviewCount - a.reviewCount;
+        return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
     }
   });
 

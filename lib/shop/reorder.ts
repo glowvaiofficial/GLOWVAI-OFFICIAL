@@ -1,12 +1,15 @@
 // "Buy it again": splits the lines of a past order into what can be bought now and what cannot. Pure: the reorder route
 // reads the order and the products, builds CatalogView rows and calls splitReorder. Nothing is silently dropped.
 import { trackedStock } from "./platformStock";
+import { lineKeyOf } from "./variants";
 
 export const REORDER_MAX_LINES = 20;
 export const REORDER_MAX_QTY = 10;
 
 export interface ReorderLine {
   productId: string;
+  // The size or shade of the line (null for a product sold without variants).
+  variantId?: string | null;
   quantity: number;
 }
 
@@ -21,10 +24,15 @@ export interface CatalogView {
   originalPrice: number;
   // null when the product is not stock-tracked (sold without a stock limit).
   stock: number | null;
+  // Set when the line is one variant of the product (its own price, MRP and stock).
+  variantId?: string | null;
+  variantLabel?: string | null;
 }
 
 export interface ReorderAvailable {
   productId: string;
+  variantId: string | null;
+  variantLabel: string | null;
   name: string;
   brand: string;
   imageUrl: string;
@@ -39,6 +47,7 @@ export interface ReorderAvailable {
 
 export interface ReorderUnavailable {
   productId: string;
+  variantId: string | null;
   name: string;
   requested: number;
   reason: "NOT_AVAILABLE" | "OUT_OF_STOCK" | "NO_PRICE";
@@ -67,15 +76,18 @@ export function catalogViewOf(productId: string, data: Record<string, unknown> |
 
 // Sums repeated lines for one product and keeps only lines with a usable id and quantity.
 export function mergeReorderLines(lines: ReorderLine[]): ReorderLine[] {
-  const totals = new Map<string, number>();
+  const totals = new Map<string, ReorderLine>();
   for (const l of lines) {
     if (!/^[A-Za-z0-9_-]{1,140}$/.test(l.productId) || !Number.isInteger(l.quantity) || l.quantity < 1) continue;
-    totals.set(l.productId, (totals.get(l.productId) ?? 0) + l.quantity);
+    const variantId = l.variantId ?? null;
+    const key = lineKeyOf(l.productId, variantId);
+    const prev = totals.get(key);
+    totals.set(key, { productId: l.productId, variantId, quantity: (prev?.quantity ?? 0) + l.quantity });
   }
-  return [...totals].map(([productId, quantity]) => ({ productId, quantity }));
+  return [...totals.values()];
 }
 
-// `previousPrices` is the unit price the customer paid in the past order, so a price change can be shown.
+// `previousPrices` is the unit price the customer paid in the past order (keyed by line), so a price change can be shown.
 export function splitReorder(
   lines: ReorderLine[],
   catalog: Map<string, CatalogView | null | undefined>,
@@ -85,30 +97,34 @@ export function splitReorder(
   const available: ReorderAvailable[] = [];
   const unavailable: ReorderUnavailable[] = [];
   for (const line of mergeReorderLines(lines)) {
-    const p = catalog.get(line.productId);
+    const key = lineKeyOf(line.productId, line.variantId);
+    const variantId = line.variantId ?? null;
+    const p = catalog.get(key);
     const name = p?.name ?? "";
     if (!p || !p.published) {
-      unavailable.push({ productId: line.productId, name, requested: line.quantity, reason: "NOT_AVAILABLE" });
+      unavailable.push({ productId: line.productId, variantId, name, requested: line.quantity, reason: "NOT_AVAILABLE" });
       continue;
     }
     if (!(p.unitPrice > 0)) {
-      unavailable.push({ productId: line.productId, name, requested: line.quantity, reason: "NO_PRICE" });
+      unavailable.push({ productId: line.productId, variantId, name, requested: line.quantity, reason: "NO_PRICE" });
       continue;
     }
     if (p.stock !== null && p.stock <= 0) {
-      unavailable.push({ productId: line.productId, name, requested: line.quantity, reason: "OUT_OF_STOCK" });
+      unavailable.push({ productId: line.productId, variantId, name, requested: line.quantity, reason: "OUT_OF_STOCK" });
       continue;
     }
     const cap = Math.min(maxQty, p.stock ?? Number.POSITIVE_INFINITY);
     const quantity = Math.min(line.quantity, cap);
     available.push({
       productId: p.productId,
+      variantId,
+      variantLabel: p.variantLabel ?? null,
       name: p.name,
       brand: p.brand,
       imageUrl: p.imageUrl,
       unitPrice: p.unitPrice,
       originalPrice: p.originalPrice,
-      previousUnitPrice: previousPrices.get(line.productId) ?? p.unitPrice,
+      previousUnitPrice: previousPrices.get(key) ?? p.unitPrice,
       requested: line.quantity,
       quantity,
       limitedBy: quantity < line.quantity && p.stock !== null ? p.stock : null,

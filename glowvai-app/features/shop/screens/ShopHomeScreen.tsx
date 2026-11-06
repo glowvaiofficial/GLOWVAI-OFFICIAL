@@ -14,7 +14,7 @@ import '../styles/shop-home.css';
 
 function buildCatalogLists(catalog: SkincareProduct[]) {
   const FULL_SIZE_PRODUCTS = catalog.filter((p) => !isTrialProduct(p));
-  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount).slice(0, 6);
+  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0)).slice(0, 6);
   const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500).slice(0, 6);
 
   // Deals are real catalogue products with a discount from their own MRP.

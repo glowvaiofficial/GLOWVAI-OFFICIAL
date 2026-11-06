@@ -29,7 +29,7 @@ const dateLabel = (ms: number | null) =>
   ms ? new Date(ms).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }) : '';
 
 // Subscribe from the product page: interval, quantity and the delivery address the customer already gave.
-export const SubscribePanel = ({ productId, productName }: { productId: string; productName: string }) => {
+export const SubscribePanel = ({ productId, productName, variantId = null }: { productId: string; productName: string; variantId?: string | null }) => {
   const { navigate, showToast } = useApp();
   const address = useDeliveryAddress();
   const [weeks, setWeeks] = useState<number>(4);
@@ -48,6 +48,7 @@ export const SubscribePanel = ({ productId, productName }: { productId: string; 
     setBusy(true);
     const result = await createSubscription({
       productId,
+      variantId,
       quantity,
       intervalWeeks: weeks,
       address: {
