@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { SubstitutionPreference } from '../../../core/services/shopTracking';
 
 export type PayChoice = 'gpay' | 'phonepe' | 'paytm' | 'bhim' | 'card' | 'cod';
 
@@ -25,6 +26,9 @@ interface CheckoutSessionState {
   setPayChoice: (choice: PayChoice) => void;
   setAddressConfirmed: (confirmed: boolean) => void;
   setTip: (tip: number) => void;
+  // What to do if an item cannot be supplied. Saved on the order after it is placed (see PaymentProcessingScreen).
+  substitutionPreference: SubstitutionPreference;
+  setSubstitutionPreference: (preference: SubstitutionPreference) => void;
 }
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
@@ -41,4 +45,6 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   setPayChoice: () => set({ payChoice: 'cod' }),
   setAddressConfirmed: (addressConfirmed) => set({ addressConfirmed }),
   setTip: (tip) => set({ tip: Math.max(0, Math.min(500, Math.round(tip) || 0)) }),
+  substitutionPreference: 'CALL_ME',
+  setSubstitutionPreference: (substitutionPreference) => set({ substitutionPreference }),
 }));

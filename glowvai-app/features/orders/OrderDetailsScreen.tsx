@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, HelpCircle, MessageSquare, Phone, RefreshCw, RotateCcw, Star, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, FileText, HelpCircle, MessageSquare, Phone, RefreshCw, RotateCcw, Star, Truck, XCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCustomerStore } from '../../core/state/customerStore';
 import { SUPPORT_HOTLINE } from '../../core/utils/whatsapp';
+import { openInvoice } from '../../core/services/shopTracking';
 import { OrdersHeader } from './components/OrdersHeader';
 import {
   OrderThumb,
@@ -174,6 +175,9 @@ export const OrderDetailsScreen: React.FC = () => {
           <section className="orders-card orders-actions-card">
             <h2 className="orders-card-title">Need anything else?</h2>
             <div className="orders-action-grid">
+              <button type="button" className="orders-action-tile" onClick={() => navigate('orders-tracking', { orderId: order.orderId })}>
+                <Truck size={18} /> Track order
+              </button>
               <button type="button" className="orders-action-tile" onClick={() => buyAgain(order)}>
                 <RotateCcw size={18} /> Buy again
               </button>
@@ -181,6 +185,16 @@ export const OrderDetailsScreen: React.FC = () => {
                 <button type="button" className="orders-action-tile" onClick={() => navigate('orders-rate', { orderId: order.orderId })}>
                   <Star size={18} /> Rate order
                 </button>
+              )}
+              {tone === 'delivered' && (
+                <>
+                  <button type="button" className="orders-action-tile" onClick={() => void openInvoice(order.orderId).then((problem) => problem && showToast(problem))}>
+                    <FileText size={18} /> Invoice
+                  </button>
+                  <button type="button" className="orders-action-tile" onClick={() => navigate('returns-request', { orderId: order.orderId })}>
+                    <RotateCcw size={18} /> Return or replace
+                  </button>
+                </>
               )}
               <button type="button" className="orders-action-tile" onClick={openSupport}>
                 <MessageSquare size={18} /> Report a problem

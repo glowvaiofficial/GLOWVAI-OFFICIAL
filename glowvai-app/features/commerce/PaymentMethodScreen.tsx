@@ -5,6 +5,7 @@ import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
+import { SUBSTITUTION_OPTIONS } from '../../core/services/shopTracking';
 import { formatAddressForDisplay } from './lib/displayText';
 import { BillRows, CheckoutSteps, FlowHeader, useDeliveryAddress } from './components/shared';
 
@@ -22,6 +23,8 @@ export const PaymentMethodScreen: React.FC = () => {
   const setPayMethod = useCheckoutSession((s) => s.setPayMethod);
   const tip = useCheckoutSession((s) => s.tip);
   const setTip = useCheckoutSession((s) => s.setTip);
+  const substitutionPreference = useCheckoutSession((s) => s.substitutionPreference);
+  const setSubstitutionPreference = useCheckoutSession((s) => s.setSubstitutionPreference);
   const [confirming, setConfirming] = useState(false);
 
   const cartItems = Object.values(items);
@@ -123,6 +126,22 @@ export const PaymentMethodScreen: React.FC = () => {
                 </span>
               </label>
             </div>
+          </fieldset>
+
+          <fieldset className="commerce-card commerce-pay-group">
+            <legend>If an item is unavailable</legend>
+            <div className="commerce-pay-options">
+              {SUBSTITUTION_OPTIONS.map((option) => (
+                <label key={option.id} className={`commerce-pay-option${substitutionPreference === option.id ? ' is-selected' : ''}`}>
+                  <input type="radio" name="substitution-choice" checked={substitutionPreference === option.id} onChange={() => setSubstitutionPreference(option.id)} />
+                  <span>
+                    <b>{option.label}</b>
+                    <small>{option.hint}</small>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <small className="commerce-muted">You can change this on the order page until the order is packed.</small>
           </fieldset>
 
           {customerDetails ? (
