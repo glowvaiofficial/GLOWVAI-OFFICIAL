@@ -8,6 +8,7 @@ import {
   sanitizeReason,
   serverDelay,
   snapshotOrder,
+  withOrderMarked,
   type OrderSnapshot,
   type SeenOrders,
 } from './orderEvents';
@@ -171,5 +172,27 @@ describe('snapshot and copy', () => {
       const text = `${copy.title} ${copy.body}`;
       assert.doesNotMatch(text, /[A-Z]{4,}_[A-Z_]+/, `${kind} copy leaks a code`);
     }
+  });
+});
+
+describe('withOrderMarked', () => {
+  test('creates a record with the current time as baseline when none exists', () => {
+    const next = withOrderMarked(null, 'GV-9', 'placed', NOW);
+    assert.equal(next.baselineAt, NOW);
+    assert.deepEqual(next.orders['GV-9'], { s: 'PLACED', p: '', m: '', d: false });
+  });
+
+  test('keeps the existing baseline and other orders', () => {
+    const base = seenWith({ 'GV-1': { s: 'PACKED', p: 'PENDING', m: 'COD', d: false } }, NOW - 500);
+    const next = withOrderMarked(base, 'GV-2', 'PLACED', NOW);
+    assert.equal(next.baselineAt, NOW - 500);
+    assert.equal(next.orders['GV-1'].s, 'PACKED');
+    assert.equal(next.orders['GV-2'].s, 'PLACED');
+  });
+
+  test('a marked order is not announced again on the next poll', () => {
+    const marked = withOrderMarked(seenWith({}), 'GV-260101-0002', 'PLACED', NOW);
+    const { events } = collectOrderEvents([order({ orderId: 'GV-260101-0002', createdAt: NOW })], marked);
+    assert.deepEqual(events, []);
   });
 });

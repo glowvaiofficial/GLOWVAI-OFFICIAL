@@ -237,3 +237,17 @@ export const messageFor = (event: OrderEvent): OrderMessageCopy => {
       return { ...base, tone: 'warning', title: 'Your order is running late', body: 'We are on it. Thanks for your patience.', amountText: null };
   }
 };
+
+// Records one order as already seen, without any message. Used when the customer placed the order in this browser,
+// so the notifier does not announce it again. Creates the record (with the current time as its baseline) when none
+// exists yet. Payment fields are unknown here, so they are stored empty and the next poll fills them in.
+export const withOrderMarked = (seen: SeenOrders | null, orderId: string, status: string, now: number): SeenOrders => {
+  const current: SeenOrders = seen ?? { baselineAt: now, orders: {} };
+  return {
+    baselineAt: current.baselineAt,
+    orders: {
+      ...current.orders,
+      [orderId]: { s: String(status || '').toUpperCase(), p: '', m: '', d: false },
+    },
+  };
+};
