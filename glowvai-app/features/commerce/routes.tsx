@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import type { PortedScreenName } from '../../core/routes/names';
 import './commerce.css';
 import '../../responsive/commerce-ported.css';
+import './checkout.css';
 import { CartScreen } from './CartScreen';
 import { CheckoutReviewScreen } from './CheckoutReviewScreen';
 import { PaymentMethodScreen } from './PaymentMethodScreen';

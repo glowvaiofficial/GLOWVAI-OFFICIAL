@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, MapPin, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
+import { ArrowRight, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact } from '../../core/utils/haptics';
@@ -7,8 +7,9 @@ import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
 
+// Step 2 of checkout: the items and the delivery address. Back goes to the cart.
 export const CheckoutReviewScreen: React.FC = () => {
-  const { goBack, navigate } = useApp();
+  const { navigate } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const address = useDeliveryAddress();
@@ -20,7 +21,7 @@ export const CheckoutReviewScreen: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <main className="commerce-screen commerce-review is-empty">
-        <FlowHeader title="Review order" onBack={goBack} />
+        <FlowHeader title="Review order" onBack={() => navigate('cart-tab')} />
         <div className="commerce-body">
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
@@ -51,7 +52,7 @@ export const CheckoutReviewScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-review has-aside">
-      <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={goBack} />
+      <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={() => navigate('cart-tab')} />
       <CheckoutSteps step={2} />
 
       <div className="commerce-body commerce-split">
@@ -63,9 +64,6 @@ export const CheckoutReviewScreen: React.FC = () => {
               </span>
               <div>
                 <b>{address.etaMinutes ? `Delivery in about ${address.etaMinutes} minutes` : 'Fast delivery to your area'}</b>
-                <p>
-                  <MapPin size={12} /> {address.city} {address.pincode}
-                </p>
               </div>
             </section>
           )}

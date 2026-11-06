@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, Check, MapPin, Plus, Zap } from 'lucide-react
 import { useApp } from '../../../context/useApp';
 import { useAddressStore, toDeliveryAddress, novAddressToDelivery, type DeliveryAddress } from '../lib/addressStore';
 import type { CartTotals } from '../lib/pricing';
+import { formatAddressForDisplay } from '../lib/displayText';
 
 interface FlowHeaderProps {
   title: string;
@@ -111,7 +112,7 @@ export const DeliveryAddressCard: React.FC<{ address: DeliveryAddress | null; on
         <div>
           <span className="commerce-tag">{address.label}</span>
           {address.recipientName && <b>{address.recipientName}</b>}
-          <p>{address.fullAddress}</p>
+          <p>{formatAddressForDisplay(address.fullAddress)}</p>
           {address.landmark && <small>Landmark: {address.landmark}</small>}
         </div>
       </div>
