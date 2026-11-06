@@ -1,17 +1,41 @@
 import { NextRequest } from "next/server";
-import { db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { db, json, limitByIp } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
+import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
 
 export const dynamic = "force-dynamic";
 
+// Payment states an earlier event or verify already settled. A late or repeated payment.captured must not undo them
+// (for example, flip a refunded order back to PAID).
+const UNSETTLED = new Set(["PENDING", "FAILED"]);
+
+interface RazorpayEvent {
+  event?: string;
+  payload?: {
+    payment?: { entity?: { id?: string; order_id?: string } };
+    refund?: { entity?: RazorpayRefundEntity };
+  };
+}
+
 // Razorpay server-to-server events. Payment is confirmed here even if the customer closes the browser before verify.
+// Refund events (refund.processed, refund.failed) update the matching entry in orders/{id}.refunds.
 // Signature is checked against the exact raw body with RAZORPAY_WEBHOOK_SECRET.
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "razorpay-webhook-post", 120);
   if (ipLimited) return ipLimited;
   const raw = await req.text();
   if (!verifyWebhookSignature(raw, req.headers.get("x-razorpay-signature") ?? "")) return json({ ok: false }, 400);
-  const event = JSON.parse(raw) as { event?: string; payload?: { payment?: { entity?: { id?: string; order_id?: string } } } };
+  let event: RazorpayEvent;
+  try {
+    event = JSON.parse(raw) as RazorpayEvent;
+  } catch {
+    return json({ ok: false }, 400);
+  }
+
+  if (event.event === "refund.processed" || event.event === "refund.failed") {
+    return handleRefund(event.event, event.payload?.refund?.entity);
+  }
+
   const entity = event.payload?.payment?.entity;
   if (!entity?.order_id) return json({ ok: true, ignored: true });
   const found = await db().collection("orders").where("razorpayOrderId", "==", entity.order_id).limit(1).get();
@@ -19,7 +43,7 @@ export async function POST(req: NextRequest) {
   if (!doc) return json({ ok: true, ignored: true });
   const o = doc.data();
   const now = Date.now();
-  if (event.event === "payment.captured" && o.payment?.status !== "PAID") {
+  if (event.event === "payment.captured" && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
     await doc.ref.update({
       status: "PLACED",
       "payment.status": "PAID",
@@ -35,5 +59,31 @@ export async function POST(req: NextRequest) {
       events: [...(Array.isArray(o.events) ? o.events : []), { at: now, actor: "Payment provider", event: "Payment failed" }],
     });
   }
+  return json({ ok: true });
+}
+
+// Finds the order by the refund's notes.orderId (set when the shop asks for the refund), or else by the payment id
+// (a refund made from the Razorpay dashboard), and updates its refund entry in a transaction.
+async function handleRefund(eventName: string, entity: RazorpayRefundEntity | undefined) {
+  if (!entity?.id) return json({ ok: true, ignored: true });
+  const store = db();
+  const { orderId } = refundNotes(entity);
+  let ref = /^[A-Za-z0-9_-]{1,140}$/.test(orderId) ? store.collection("orders").doc(orderId) : null;
+  if (ref && !(await ref.get()).exists) ref = null;
+  if (!ref && entity.payment_id) {
+    const found = await store.collection("orders").where("payment.paymentId", "==", entity.payment_id).limit(1).get();
+    ref = found.docs[0]?.ref ?? null;
+  }
+  if (!ref) return json({ ok: true, ignored: true });
+  const target = ref;
+  await store.runTransaction(async (tx) => {
+    const snap = await tx.get(target);
+    const order = snap.data();
+    if (!snap.exists || !order) return;
+    // The payment must be the one refunded, so a refund event can never touch another order.
+    if (entity.payment_id && order.payment?.paymentId && order.payment.paymentId !== entity.payment_id) return;
+    const patch = applyRefundEvent(order, eventName, entity, Date.now());
+    if (patch) tx.update(target, patch);
+  });
   return json({ ok: true });
 }

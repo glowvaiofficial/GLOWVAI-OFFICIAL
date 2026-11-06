@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
   if (!doc || doc.data().userId !== customer.uid) return json({ ok: false, error: "Order not found." }, 404);
   const o = doc.data();
   const now = Date.now();
-  if (o.payment?.status !== "PAID") {
+  // Only an unsettled payment is confirmed here. A repeat after a refund must not flip the order back to PAID.
+  const settled = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(String(o.payment?.status ?? ""));
+  if (!settled) {
     await doc.ref.update({
       status: "PLACED",
       "payment.status": "PAID",
