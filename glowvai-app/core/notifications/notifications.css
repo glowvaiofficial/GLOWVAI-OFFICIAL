@@ -1,0 +1,232 @@
+/* Order messages: top toasts and centred dialogs, drawn inside the app frame (.app-viewport is the positioned parent). */
+
+.glowvai-root .order-notify-stack {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.glowvai-root .order-notify-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 6px 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e3e9f6;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px -10px rgba(7, 27, 77, 0.28);
+  color: #071b4d;
+  font-family: inherit;
+}
+
+.glowvai-root .order-notify-toast--info .order-notify-icon,
+.glowvai-root .order-notify-badge--info { background: #e5efff; color: #0057fb; }
+.glowvai-root .order-notify-toast--success .order-notify-icon,
+.glowvai-root .order-notify-badge--success { background: #e8f7ee; color: #067647; }
+.glowvai-root .order-notify-toast--warning .order-notify-icon,
+.glowvai-root .order-notify-badge--warning { background: #fffaeb; color: #b54708; }
+.glowvai-root .order-notify-toast--danger .order-notify-icon,
+.glowvai-root .order-notify-badge--danger { background: #fef3f2; color: #b42318; }
+
+.glowvai-root .order-notify-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.glowvai-root .order-notify-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.glowvai-root .order-notify-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.glowvai-root .order-notify-body {
+  font-size: 12px;
+  color: #53617d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.glowvai-root .order-notify-link,
+.glowvai-root .order-notify-secondary {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0057fb;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.glowvai-root .order-notify-dismiss {
+  appearance: none;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: #53617d;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.glowvai-root .order-notify-link:focus-visible,
+.glowvai-root .order-notify-dismiss:focus-visible,
+.glowvai-root .order-notify-primary:focus-visible,
+.glowvai-root .order-notify-secondary:focus-visible {
+  outline: 2px solid #0057fb;
+  outline-offset: 2px;
+}
+
+.glowvai-root .order-notify-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 410;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(7, 27, 77, 0.45);
+}
+
+.glowvai-root .order-notify-dialog {
+  width: 100%;
+  max-width: 360px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  padding: 24px 22px 20px;
+  background: #ffffff;
+  border: 1px solid #e3e9f6;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px -18px rgba(7, 27, 77, 0.45);
+  color: #071b4d;
+  font-family: inherit;
+  text-align: left;
+}
+
+.glowvai-root .order-notify-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.glowvai-root .order-notify-heading {
+  margin: 14px 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #071b4d;
+}
+
+.glowvai-root .order-notify-message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #53617d;
+  overflow-wrap: anywhere;
+}
+
+.glowvai-root .order-notify-facts {
+  margin: 16px 0 0;
+  border-top: 1px solid #e3e9f6;
+}
+
+.glowvai-root .order-notify-facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e3e9f6;
+  font-size: 14px;
+}
+
+.glowvai-root .order-notify-facts dt {
+  color: #53617d;
+}
+
+.glowvai-root .order-notify-facts dd {
+  margin: 0;
+  font-weight: 700;
+  color: #071b4d;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.glowvai-root .order-notify-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 18px;
+}
+
+.glowvai-root .order-notify-primary {
+  appearance: none;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: #0057fb;
+  color: #ffffff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.glowvai-root .order-notify-secondary {
+  width: 100%;
+  color: #53617d;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glowvai-root .order-notify-toast {
+    animation: order-notify-drop 220ms ease-out both;
+  }
+
+  .glowvai-root .order-notify-dialog {
+    animation: order-notify-rise 220ms ease-out both;
+  }
+}
+
+@keyframes order-notify-drop {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes order-notify-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

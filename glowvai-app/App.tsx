@@ -6,6 +6,7 @@ import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
 import { startProductFeed } from './core/services/productFeed';
+import { OrderNotifications } from './core/notifications/OrderNotifications';
 
 // Screens
 import { WelcomeScreen } from './screens/WelcomeScreen';
@@ -133,6 +134,7 @@ const AppContent: React.FC = () => {
           {toastMessage}
         </div>
       )}
+      <OrderNotifications />
     </div>
   );
 };
