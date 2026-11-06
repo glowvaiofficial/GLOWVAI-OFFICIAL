@@ -1,4 +1,6 @@
-/** Reads a user-facing message from an unknown thrown value. */
+// Onboarding answers kept on this device only (name, age range, gender).
+export const PROFILE_ANSWERS_KEY = 'glowvai_profile_answers';
+
 /** Web equivalents of the native permission prompts used during onboarding. */
 
 // Triggers the browser location prompt. Resolves false when unsupported or denied.

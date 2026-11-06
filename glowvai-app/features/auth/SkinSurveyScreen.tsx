@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Check, CircleDot, Droplets, Flame, Palette, Sparkles, Waves } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { syncUserOnboardingData } from '../../core/services/userSyncService';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { storage } from '../../core/utils/storage';
 import { AuthShell } from './components/AuthShell';
+import { PROFILE_ANSWERS_KEY } from './authUtils';
 
 const SKIN_CONCERNS = [
   { id: 'ACNE', label: 'Acne & Blemishes', icon: <CircleDot /> },
@@ -14,6 +14,16 @@ const SKIN_CONCERNS = [
   { id: 'SENSITIVITY', label: 'Sensitivity & Redness', icon: <Flame /> },
   { id: 'FINE_LINES', label: 'Fine Lines & Aging', icon: <Waves /> },
 ];
+
+// The name typed on the profile step (kept on this device), used to pre-fill the "Your details" step.
+const savedProfileName = async (): Promise<string> => {
+  try {
+    const saved = JSON.parse((await storage.getItem(PROFILE_ANSWERS_KEY)) ?? '{}') as { name?: unknown };
+    return typeof saved.name === 'string' ? saved.name.slice(0, 80) : '';
+  } catch {
+    return '';
+  }
+};
 
 export const SkinSurveyScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
@@ -27,21 +37,18 @@ export const SkinSurveyScreen: React.FC = () => {
     );
   };
 
-  // Concerns are not part of the account sync yet, so they are kept on this device; only the consent time is synced.
+  // Skin concerns stay on this device and are not sent anywhere: the shop's profile route (POST /api/shop/profile)
+  // has no field for them.
   const handleSaveAndContinue = async (saveAnswers = true) => {
     if (isLoading) return;
     safeHapticImpact();
     setIsLoading(true);
-    try {
-      if (saveAnswers) await storage.setItem('glowvai_skin_concerns', JSON.stringify(selectedConcerns));
-      await syncUserOnboardingData({ consentTimestamp: Date.now() });
-    } catch {
-      // continue even if sync fails, as in the mobile app
-    } finally {
-      setIsLoading(false);
-    }
-    // Details come right after the skin survey, so orders can be delivered from the first visit.
-    navigate('auth-login', { returnTo: 'auth-onboarding-success' });
+    if (saveAnswers) await storage.setItem('glowvai_skin_concerns', JSON.stringify(selectedConcerns));
+    const name = await savedProfileName();
+    setIsLoading(false);
+    // Details come right after the skin survey, so orders can be delivered from the first visit. That step saves the
+    // name, mobile and email to the account (POST /api/shop/profile) and shows the server's error if saving fails.
+    navigate('auth-login', { returnTo: 'auth-onboarding-success', ...(name ? { name } : {}) });
   };
 
   return (
