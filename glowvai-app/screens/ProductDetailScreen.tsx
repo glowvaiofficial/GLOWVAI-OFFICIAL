@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Heart, ShieldCheck, Zap, AlertCircle, CheckCircle2, ChevronRight, Share2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PRODUCTS } from '../data/products';
+import { SubscribePanel } from '../features/profile/SubscriptionsScreen';
 import '../responsive/home-products.css';
 
 export const ProductDetailScreen: React.FC = () => {
@@ -376,6 +377,11 @@ export const ProductDetailScreen: React.FC = () => {
             {product.usageInstructions}
           </p>
         </div>
+      </div>
+
+      {/* Subscribe and save for this product */}
+      <div className="product-subscribe-slot" style={{ padding: '0 16px 16px' }}>
+        <SubscribePanel productId={product.id} productName={product.name} />
       </div>
 
       {/* Persistent Bottom Add to Cart Bar */}

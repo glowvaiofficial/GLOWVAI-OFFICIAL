@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Banknote, MapPin, ShieldCheck, ShoppingBag, Smartphone, UserRound } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { fetchShopConfig } from '../../core/services/shopApi';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { formatAddressForDisplay } from './lib/displayText';
@@ -23,6 +24,17 @@ export const PaymentMethodScreen: React.FC = () => {
   const tip = useCheckoutSession((s) => s.tip);
   const setTip = useCheckoutSession((s) => s.setTip);
   const [confirming, setConfirming] = useState(false);
+  // EMI is shown only when the server reports it on (RAZORPAY_EMI_ENABLED). Until then, or if the check fails, it is not claimed.
+  const [emiAvailable, setEmiAvailable] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void fetchShopConfig().then((r) => {
+      if (!cancelled) setEmiAvailable(r.ok && r.data?.payments?.emi?.available === true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const cartItems = Object.values(items);
 
@@ -120,6 +132,7 @@ export const PaymentMethodScreen: React.FC = () => {
                     <Smartphone size={14} /> Pay now: UPI, card or netbanking
                   </b>
                   <small>Secure payment by Razorpay</small>
+                  {emiAvailable && <small>EMI available on eligible cards</small>}
                 </span>
               </label>
             </div>

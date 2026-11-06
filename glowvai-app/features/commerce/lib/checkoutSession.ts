@@ -25,6 +25,9 @@ interface CheckoutSessionState {
   setPayChoice: (choice: PayChoice) => void;
   setAddressConfirmed: (confirmed: boolean) => void;
   setTip: (tip: number) => void;
+  // Glow coins the customer chose to use on this order (0 when none). The server caps and debits them.
+  coinsToRedeem: number;
+  setCoinsToRedeem: (coins: number) => void;
 }
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
@@ -41,4 +44,6 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   setPayChoice: () => set({ payChoice: 'cod' }),
   setAddressConfirmed: (addressConfirmed) => set({ addressConfirmed }),
   setTip: (tip) => set({ tip: Math.max(0, Math.min(500, Math.round(tip) || 0)) }),
+  coinsToRedeem: 0,
+  setCoinsToRedeem: (coinsToRedeem) => set({ coinsToRedeem: Math.max(0, Math.floor(coinsToRedeem) || 0) }),
 }));

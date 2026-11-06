@@ -8,7 +8,7 @@ import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
 import { PAY_METHOD_LABEL, decidePlacement, parsePayMethod, toApiPaymentMethod, type PayMethod } from './lib/paymentMethod';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
-import { verifyOnlinePayment } from '../../core/services/shopApi';
+import { fetchShopConfig, verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
 import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
@@ -105,6 +105,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         items: allItems,
         address,
         couponCode,
+        coinsToRedeem: useCheckoutSession.getState().coinsToRedeem,
         tip: useCheckoutSession.getState().tip,
         paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
@@ -113,7 +114,9 @@ export const PaymentProcessingScreen: React.FC = () => {
 
       if (decision.kind === 'razorpay') {
         try {
-          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone });
+          const config = await fetchShopConfig();
+          const emi = config.ok && config.data?.payments?.emi?.available === true;
+          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone }, { emi });
           const verified = await verifyOnlinePayment(paid);
           if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
           useCartStore.getState().clearCart();

@@ -1,6 +1,7 @@
 // Opens Razorpay Checkout (UPI, cards, netbanking, wallets) for an order the server has created.
 // The script comes from Razorpay's own host (allowed in the shop's script policy). Payment is confirmed on the server.
 import type { OnlinePaymentStart } from '../../../core/services/shopApi';
+import { checkoutMethodOptions } from '../../../shared/payment-options.mjs';
 
 export interface RazorpaySuccess {
   razorpay_order_id: string;
@@ -35,6 +36,8 @@ function loadScript(): Promise<void> {
 export async function openRazorpayCheckout(
   payment: OnlinePaymentStart,
   prefill: { name: string; contact: string },
+  // EMI is requested from Razorpay only when the server says it is available (RAZORPAY_EMI_ENABLED).
+  options: { emi: boolean } = { emi: false },
 ): Promise<RazorpaySuccess> {
   await loadScript();
   return new Promise<RazorpaySuccess>((resolve, reject) => {
@@ -49,6 +52,7 @@ export async function openRazorpayCheckout(
       theme: { color: '#0057FB' },
       handler: (response: RazorpaySuccess) => resolve(response),
       modal: { ondismiss: () => reject(new Error('DISMISSED')) },
+      ...checkoutMethodOptions(options.emi),
     });
     rzp.open();
   });
