@@ -8,6 +8,8 @@ import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx"
 import { orderItemFor, orderReservationFor, parseCartLines, planOrderStock, currentUnitPrice } from "@/lib/shop/variants";
 import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
+import { savedAddressForOrder } from "@/lib/shop/addressRepo";
+import { findOfferedSlot } from "@/lib/shop/slots";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 class OrderBlocked extends Error {
@@ -68,6 +70,7 @@ export async function GET(req: NextRequest) {
         pricing: o.pricing ?? null,
         payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
         shippingAddress: o.shippingAddress ?? null,
+        deliverySlot: o.deliverySlot ?? null,
         createdAt: o.createdAt ?? null,
         updatedAt: o.updatedAt ?? null,
       };
@@ -101,7 +104,17 @@ export async function POST(req: NextRequest) {
   const cart = parseCartLines(lines, MAX_QTY);
   if (!cart.ok) return json({ ok: false, error: cart.error }, 400);
 
-  const addr = (body.address ?? {}) as Record<string, unknown>;
+  // A saved address is read from the customer's own addresses and checked again here; the typed address is used only
+  // when no saved address is chosen. An address that was deleted meanwhile is refused, so the bag is not lost.
+  const addressId = typeof body.addressId === "string" && body.addressId ? body.addressId : null;
+  let addr = (body.address ?? {}) as Record<string, unknown>;
+  let savedLabel: string | null = null;
+  if (addressId !== null) {
+    const saved = /^adr_[a-f0-9]{16}$/.test(addressId) ? await savedAddressForOrder(customer.uid, addressId) : { ok: false as const };
+    if (!saved.ok) return json({ ok: false, error: "That address is no longer saved. Choose a delivery address again." }, 409);
+    addr = { name: saved.name, phone: saved.phone, fullAddress: saved.fullAddress, city: saved.city, pincode: saved.pincode, landmark: saved.landmark, area: saved.area };
+    savedLabel = saved.label;
+  }
   const recipientName = text(addr.name, 80);
   const phone = indianMobile(addr.phone);
   const fullAddress = text(addr.fullAddress, 300);
@@ -141,6 +154,11 @@ export async function POST(req: NextRequest) {
   const tip = Math.round(tipRaw);
   const grandTotal = subtotal - discountAmount + deliveryFee + tip;
 
+  // The delivery time: optional for older clients, but when it is sent it must be a slot offered right now.
+  const slotRaw = body.deliverySlot === undefined || body.deliverySlot === null || body.deliverySlot === "" ? null : text(body.deliverySlot, 60);
+  const deliverySlot = slotRaw === null ? null : findOfferedSlot(slotRaw, Date.now());
+  if (slotRaw !== null && !deliverySlot) return json({ ok: false, error: "That delivery time is no longer available. Choose another time." }, 409);
+
   const now = Date.now();
   const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
   const orderId = `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
@@ -171,8 +189,12 @@ export async function POST(req: NextRequest) {
     vendorStatus: "PENDING",
     zoneId: null,
     items,
+    deliverySlot: deliverySlot
+      ? { id: deliverySlot.id, kind: deliverySlot.kind, day: deliverySlot.day, label: deliverySlot.label, estimate: deliverySlot.estimate, startsAt: deliverySlot.startsAt, endsAt: deliverySlot.endsAt }
+      : null,
     shippingAddress: {
-      label: "Home",
+      label: savedLabel ?? "Home",
+      addressId,
       recipientName,
       phoneNumber: phone,
       streetAddress: fullAddress,

@@ -5,6 +5,7 @@ import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import { defaultVariant, isSellable, variantStockState, type Variant } from '../../../../lib/shop/variants';
+import { rememberProductViewed } from '../lib/recentlyViewed';
 
 // Most units one customer can add in one go (the server enforces the same cap).
 const MAX_QTY = 10;
@@ -44,6 +45,11 @@ export const ShopProductScreen: React.FC = () => {
     setVariantId(null);
     setImageFailed(false);
   }, [productId]);
+
+  // Remembered for "Continue browsing" (ids only, on this device).
+  useEffect(() => {
+    if (product) rememberProductViewed(product.id);
+  }, [product?.id]);
 
   if (!product) {
     return (

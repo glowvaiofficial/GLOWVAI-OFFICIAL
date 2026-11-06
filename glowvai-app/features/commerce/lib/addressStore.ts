@@ -2,28 +2,17 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Address } from '../../../types';
 import { VIJAYAWADA_AREAS } from '../../../data/serviceability';
+import type { SavedAddressView } from '../../../core/services/shopApi';
 
-// Full address details (recipient, phone, coordinates) that the NOV Address model does not carry.
-export interface SavedAddress {
-  id: string;
-  label: 'Home' | 'Work' | 'Other';
-  recipientName: string;
-  phoneNumber: string;
-  houseNo: string;
-  buildingName?: string;
-  landmark?: string;
-  areaAddress: string;
-  city: string;
-  pincode: string;
-  latitude?: number;
-  longitude?: number;
-  deliveryInstructions?: string;
-  isDefault: boolean;
-}
+// Saved delivery addresses are the server's list (users/{uid}/addresses, at most five, one default). This store keeps a
+// copy for instant display and remembers which one the customer picked on this device.
+export type SavedAddress = SavedAddressView;
 
 // What checkout, express and order placement read from, whichever source the address came from.
 export interface DeliveryAddress {
   id: string;
+  // The server id of a saved address. Only saved addresses are re-checked by the order route through this id.
+  savedId?: string;
   label: string;
   recipientName: string;
   phoneNumber: string;
@@ -31,8 +20,6 @@ export interface DeliveryAddress {
   landmark?: string;
   city: string;
   pincode: string;
-  latitude?: number;
-  longitude?: number;
   deliveryInstructions?: string;
   serviceable: boolean;
   // Delivery estimate for the matched service area, when the address falls in one. Unknown otherwise.
@@ -52,18 +39,16 @@ export const etaMinutesFor = (text: string): number | undefined => {
 
 export const toDeliveryAddress = (a: SavedAddress): DeliveryAddress => ({
   id: a.id,
+  savedId: a.id,
   label: a.label,
   recipientName: a.recipientName,
-  phoneNumber: a.phoneNumber,
-  fullAddress: [a.houseNo, a.buildingName, a.areaAddress, a.city, a.pincode].filter(Boolean).join(', '),
-  landmark: a.landmark,
+  phoneNumber: a.phone,
+  fullAddress: [a.fullAddress, a.city, a.pincode].filter(Boolean).join(', '),
+  landmark: a.landmark || undefined,
   city: a.city,
   pincode: a.pincode,
-  latitude: a.latitude,
-  longitude: a.longitude,
-  deliveryInstructions: a.deliveryInstructions,
   serviceable: isServiceablePincode(a.pincode),
-  etaMinutes: etaMinutesFor(a.areaAddress),
+  etaMinutes: etaMinutesFor(a.fullAddress),
 });
 
 export const novAddressToDelivery = (a: Address, phoneNumber = '', recipientName = ''): DeliveryAddress => ({
@@ -84,22 +69,23 @@ export const novAddressToDelivery = (a: Address, phoneNumber = '', recipientName
 export const toNovAddress = (a: SavedAddress): Address => ({
   id: a.id,
   label: a.label,
-  street: [a.houseNo, a.buildingName].filter(Boolean).join(', '),
-  landmark: a.landmark,
-  area: a.areaAddress,
+  street: a.fullAddress,
+  landmark: a.landmark || undefined,
+  area: a.fullAddress,
   city: a.city,
   pincode: a.pincode,
   serviceable: isServiceablePincode(a.pincode),
-  deliveryMinutes: etaMinutesFor(a.areaAddress) ?? 12,
+  deliveryMinutes: etaMinutesFor(a.fullAddress) ?? 12,
   isDefault: a.isDefault,
-  deliveryInstructions: a.deliveryInstructions,
 });
 
 interface AddressState {
   addresses: SavedAddress[];
   selectedId: string | null;
-  saveAddress: (address: SavedAddress) => void;
-  removeAddress: (id: string) => void;
+  // True once the server list has been read on this device (false while only the cached copy is shown).
+  loaded: boolean;
+  // Replaces the list with the server's. The selection moves to the default when the chosen address is gone.
+  setAddresses: (addresses: SavedAddress[]) => void;
   selectAddress: (id: string) => void;
 }
 
@@ -108,24 +94,21 @@ export const useAddressStore = create<AddressState>()(
     (set, get) => ({
       addresses: [],
       selectedId: null,
+      loaded: false,
 
-      saveAddress: (address) => {
-        const others = get().addresses.filter((a) => a.id !== address.id);
-        const normalized = address.isDefault ? others.map((a) => ({ ...a, isDefault: false })) : others;
-        set({ addresses: [address, ...normalized], selectedId: address.id });
-      },
-
-      removeAddress: (id) => {
-        const addresses = get().addresses.filter((a) => a.id !== id);
-        const selectedId = get().selectedId === id ? addresses[0]?.id ?? null : get().selectedId;
-        set({ addresses, selectedId });
+      setAddresses: (addresses) => {
+        const current = get().selectedId;
+        const keep = addresses.some((a) => a.id === current);
+        const fallback = addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id ?? null;
+        set({ addresses, selectedId: keep ? current : fallback, loaded: true });
       },
 
       selectAddress: (id) => set({ selectedId: id }),
     }),
     {
-      name: 'glowvai_commerce_addresses_v1',
+      name: 'glowvai_saved_addresses_v2',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ addresses: state.addresses, selectedId: state.selectedId }),
     }
   )
 );

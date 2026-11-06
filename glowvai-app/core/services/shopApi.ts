@@ -72,6 +72,10 @@ export interface PlaceOrderInput {
   couponCode?: string | null;
   tip?: number;
   paymentMethod?: 'COD' | 'ONLINE';
+  // A saved address (its id), re-checked by the server. When set, the typed address above is not used.
+  addressId?: string | null;
+  // The delivery time chosen from the offered slots (its id). Refused by the server when no longer offered.
+  deliverySlot?: string | null;
 }
 
 export interface OnlinePaymentStart {
@@ -80,6 +84,62 @@ export interface OnlinePaymentStart {
   razorpayOrderId: string;
   amount: number;
   currency: string;
+}
+
+export type SavedAddressLabel = 'Home' | 'Work' | 'Other';
+
+// A saved delivery address as the server returns it (users/{uid}/addresses). At most five, exactly one is the default.
+export interface SavedAddressView {
+  id: string;
+  label: SavedAddressLabel;
+  recipientName: string;
+  phone: string;
+  fullAddress: string;
+  city: string;
+  pincode: string;
+  landmark: string;
+  isDefault: boolean;
+}
+
+export interface SavedAddressInput {
+  label: SavedAddressLabel;
+  recipientName: string;
+  phone: string;
+  fullAddress: string;
+  city: string;
+  pincode: string;
+  landmark?: string;
+  makeDefault?: boolean;
+}
+
+export interface DeliverySlotView {
+  id: string;
+  kind: 'express' | 'window';
+  day: 'today' | 'tomorrow';
+  label: string;
+  estimate: string;
+  startsAt: number;
+  endsAt: number;
+}
+
+export interface ReorderAvailableItem {
+  productId: string;
+  name: string;
+  brand: string;
+  imageUrl: string;
+  unitPrice: number;
+  originalPrice: number;
+  previousUnitPrice: number;
+  requested: number;
+  quantity: number;
+  limitedBy: number | null;
+}
+
+export interface ReorderUnavailableItem {
+  productId: string;
+  name: string;
+  requested: number;
+  reason: 'NOT_AVAILABLE' | 'OUT_OF_STOCK' | 'NO_PRICE';
 }
 
 export const SUPPORT_CATEGORIES = [
@@ -209,4 +269,44 @@ export async function createSupportTicket(input: {
 // Adds the customer's reply to one of their own requests. Replies are refused once a request is resolved or closed.
 export async function replySupportTicket(ticketId: string, text: string): Promise<ApiResult<{ message: { at: string; kind: 'CUSTOMER'; text: string } }>> {
   return apiFetch('/api/shop/support/reply', post({ ticketId, text }));
+}
+
+// Saved addresses. Every call returns the full list after the change.
+export async function fetchAddresses(): Promise<ApiResult<{ addresses: SavedAddressView[]; max: number }>> {
+  return apiFetch('/api/shop/addresses');
+}
+
+export async function createAddress(input: SavedAddressInput): Promise<ApiResult<{ addresses: SavedAddressView[] }>> {
+  return apiFetch('/api/shop/addresses', post(input));
+}
+
+export async function updateAddress(id: string, input: Partial<SavedAddressInput>): Promise<ApiResult<{ addresses: SavedAddressView[] }>> {
+  return apiFetch('/api/shop/addresses', { method: 'PATCH', body: JSON.stringify({ ...input, id }) });
+}
+
+export async function deleteAddress(id: string): Promise<ApiResult<{ addresses: SavedAddressView[] }>> {
+  return apiFetch('/api/shop/addresses', { method: 'DELETE', body: JSON.stringify({ id }) });
+}
+
+// Delivery times offered right now (server clock, IST). A chosen slot is checked again when the order is placed.
+export async function fetchDeliverySlots(): Promise<ApiResult<{ shopOpen: boolean; slots: DeliverySlotView[]; serverTime: number }>> {
+  return apiFetch('/api/shop/slots');
+}
+
+// Buy it again: what can be bought now (live price and stock) and what cannot, for one of the customer's orders.
+export async function fetchReorder(orderId: string): Promise<ApiResult<{ available: ReorderAvailableItem[]; unavailable: ReorderUnavailableItem[] }>> {
+  return apiFetch(`/api/shop/orders/${encodeURIComponent(orderId)}/reorder`);
+}
+
+// Account wishlist (at most 200 product ids).
+export async function fetchWishlist(): Promise<ApiResult<{ items: string[]; max: number }>> {
+  return apiFetch('/api/shop/wishlist');
+}
+
+export async function addToWishlistRequest(productIds: string[]): Promise<ApiResult<{ items: string[]; full: string[] }>> {
+  return apiFetch('/api/shop/wishlist', { method: 'PUT', body: JSON.stringify({ productIds }) });
+}
+
+export async function removeFromWishlistRequest(productId: string): Promise<ApiResult<{ items: string[] }>> {
+  return apiFetch('/api/shop/wishlist', { method: 'DELETE', body: JSON.stringify({ productId }) });
 }

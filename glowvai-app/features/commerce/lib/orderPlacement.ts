@@ -11,6 +11,8 @@ export interface PlaceOrderInput {
   paymentMethod?: 'COD' | 'ONLINE';
   // Used when the delivery address has no recipient name or phone of its own.
   customer: { name: string; phone: string };
+  // The delivery time chosen at checkout (a slot id the server offered).
+  deliverySlot?: string | null;
 }
 
 // The service area named in the address, so the server works out the same delivery fee the bill showed.
@@ -25,10 +27,13 @@ const areaIn = (text: string): string | undefined => {
 // Places a cash-on-delivery order through the shop server (POST /api/shop/orders). Only product ids and quantities
 // are sent: the server prices every item from the published catalogue, applies the coupon and delivery fee, and
 // creates the order id. The result carries the server's message when the order is refused.
-export const placeCartOrder = async ({ items, address, couponCode, tip = 0, paymentMethod = 'COD', customer }: PlaceOrderInput) =>
+export const placeCartOrder = async ({ items, address, couponCode, tip = 0, paymentMethod = 'COD', customer, deliverySlot = null }: PlaceOrderInput) =>
   placeOrder({
     // Only the product, the chosen variant and the quantity: the server prices every line itself.
     items: items.map((item) => ({ productId: item.productId, ...(item.variantId ? { variantId: item.variantId } : {}), quantity: item.quantity })),
+    // A saved address is sent by id: the server reads it again and uses its own copy of the details.
+    addressId: address.savedId ?? null,
+    deliverySlot,
     address: {
       name: address.recipientName || customer.name,
       phone: address.phoneNumber || customer.phone,

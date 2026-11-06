@@ -59,3 +59,7 @@
   .glowvai-root .shop-search .shop-search-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .glowvai-root .shop-search-bottom{ display: none; }
 }
+
+/* Search suggestions: a listbox of products (features/shop/screens/ShopSearchFiltersScreen.tsx) */
+.glowvai-root .shop-search-suggest{ list-style: none; margin: 0; }
+.glowvai-root .shop-search-suggest-row.is-active{ background: var(--ds-pearl); }

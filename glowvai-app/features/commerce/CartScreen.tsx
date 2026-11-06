@@ -8,8 +8,35 @@ import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/p
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
 
+type SkippedItem = { name: string; reason: string };
+
+const readSkipped = (params: unknown): SkippedItem[] => {
+  const list = (params as { reorderSkipped?: unknown } | null)?.reorderSkipped;
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((i): i is SkippedItem => typeof i?.name === 'string' && typeof i?.reason === 'string')
+    .slice(0, 20);
+};
+
+// Lists the items a "buy it again" could not add, and why. Shown whether or not the bag has other items.
+const ReorderNotice: React.FC<{ items: SkippedItem[] }> = ({ items }) =>
+  items.length === 0 ? null : (
+    <section className="commerce-card commerce-reorder-notice" role="status" aria-label="Items not added">
+      <h2>Not added from your last order</h2>
+      <ul>
+        {items.map((item, i) => (
+          <li key={`${item.name}-${i}`}>
+            <b>{item.name}</b> <span className="commerce-muted">{item.reason}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+
 export const CartScreen: React.FC = () => {
-  const { goBack, navigate, showToast } = useApp();
+  const { goBack, navigate, showToast, activeParams } = useApp();
+  // Items from a "buy it again" that could not be added, with the reason (see useBuyAgain).
+  const skipped = readSkipped(activeParams);
   const items = useCartStore((s) => s.items);
   const incrementItem = useCartStore((s) => s.incrementItem);
   const decrementItem = useCartStore((s) => s.decrementItem);
@@ -49,6 +76,7 @@ export const CartScreen: React.FC = () => {
       <main className="commerce-screen commerce-cart is-empty">
         <FlowHeader title="Your cart" onBack={goBack} />
         <div className="commerce-body">
+          <ReorderNotice items={skipped} />
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
               <ShoppingBag size={34} />
@@ -78,6 +106,7 @@ export const CartScreen: React.FC = () => {
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">
+          <ReorderNotice items={skipped} />
           {showProgress && (
             <section className="commerce-card commerce-progress">
               <div className="commerce-progress-top">

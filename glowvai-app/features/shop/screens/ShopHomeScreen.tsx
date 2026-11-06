@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
@@ -8,6 +8,7 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-home.css';
 
@@ -125,6 +126,19 @@ function ProductRail({ title, products }: { title: string; products: SkincarePro
       ))}
     </Rail>
   );
+}
+
+// The products the customer looked at most recently on this device (ids only), newest first. Hidden until there are some.
+function ContinueBrowsingRail() {
+  const { navigate } = useApp();
+  const catalog = useLiveCatalog();
+  const [ids] = useState(() => readRecentlyViewed());
+  const products = ids
+    .map((id) => catalog.find((p) => p.id === id))
+    .filter((p): p is SkincareProduct => Boolean(p))
+    .slice(0, 10);
+  if (products.length === 0) return null;
+  return <ProductRail title="Continue browsing" products={products} />;
 }
 
 function DealCard({ product }: { product: SkincareProduct }) {
@@ -390,6 +404,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </section>
       )}
 
+      <ContinueBrowsingRail />
       <ProductRail title="Top Rated" products={TOP_RATED} />
       <ProductRail title="Under ₹500" products={UNDER_500} />
 

@@ -94,6 +94,11 @@ export const PaymentProcessingScreen: React.FC = () => {
         leave('checkout-review');
         return;
       }
+      // A delivery time must be chosen on the review step before paying.
+      if (!useCheckoutSession.getState().slotId) {
+        leave('checkout-review');
+        return;
+      }
       if (!customerDetails) {
         leave('login', { returnTo: 'checkout-payment-method' });
         return;
@@ -111,6 +116,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         address,
         couponCode,
         tip: useCheckoutSession.getState().tip,
+        deliverySlot: useCheckoutSession.getState().slotId,
         paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
       });

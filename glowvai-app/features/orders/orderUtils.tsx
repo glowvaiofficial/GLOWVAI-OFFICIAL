@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowRight, Package, PackageOpen } from 'lucide-react';
 import { useApp } from '../../context/useApp';
-import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../core/state/cartStore';
 import { defaultVariant, lineKeyOf } from '../../../lib/shop/variants';
 import { useCustomerStore } from '../../core/state/customerStore';
-import type { ShopOrder, ShopOrderItem } from '../../core/services/shopApi';
+import { fetchReorder, type ShopOrder, type ShopOrderItem } from '../../core/services/shopApi';
+import { reorderReasonText } from '../../../lib/shop/reorder';
 
 // Helpers shared by the order screens. Orders come from the GlowVai server (GET /api/shop/orders), with any update
 // the GlowVai team made applied. Nothing is invented on the device: no rider, no ETA, no map.
@@ -114,36 +114,42 @@ export const useRequestedOrder = () => {
   return { order, requestedId, status, error, reload };
 };
 
-/** Adds the products that are still on sale back to the bag, at today's price, then opens the cart. */
+// "Buy it again" for one order. The server checks every line against today's price and stock: the available items go
+// into the bag (at the live price), and the rest are listed on the cart screen with the reason. Nothing is dropped silently.
 export const useBuyAgain = () => {
   const { navigate, showToast } = useApp();
-  return (order: ShopOrder) => {
-    const catalog = getLiveCatalog();
-    const { addItem, incrementItem } = useCartStore.getState();
-    let added = 0;
-    order.items.forEach((item) => {
-      const product = catalog.find((entry) => entry.id === item.productId);
-      if (!product || !(product.price > 0)) return;
-      // The size or shade bought last time, when the product still has it; otherwise the default one.
-      const picked = product.variants?.find((v) => v.id === item.variantId) ?? (product.variants?.length ? defaultVariant(product.variants) : null);
-      const line = picked
-        ? { productId: product.id, variantId: picked.id, variantLabel: picked.label, price: picked.price, mrp: picked.mrp }
-        : { productId: product.id, price: product.price, mrp: product.originalPrice };
-      addItem({
-        name: product.name,
-        brand: product.brand,
-        image: product.official_brand_image_url || item.imageUrl || '',
-        ...line,
-      });
-      for (let i = 1; i < (Number(item.quantity) || 1); i += 1) incrementItem(lineKeyOf(product.id, line.variantId));
-      added += 1;
-    });
-    if (added === 0) {
-      showToast('These items are not available right now');
+  return async (order: ShopOrder) => {
+    const res = await fetchReorder(order.orderId);
+    if (!res.ok || !res.data) {
+      showToast(res.error ?? 'We could not check these items. Try again.');
       return;
     }
-    showToast(added === order.items.length ? 'Items added to your bag' : 'Available items added to your bag');
-    navigate('cart-tab');
+    const { available, unavailable } = res.data;
+    const titleOf = (productId: string, fallback: string) => fallback || order.items.find((i) => i.productId === productId)?.title || 'An item';
+    const { addItem, incrementItem } = useCartStore.getState();
+    for (const item of available) {
+      addItem({
+        productId: item.productId,
+        name: item.name || titleOf(item.productId, ''),
+        brand: item.brand,
+        price: item.unitPrice,
+        mrp: item.originalPrice,
+        image: item.imageUrl || order.items.find((i) => i.productId === item.productId)?.imageUrl || '',
+      });
+      for (let i = 1; i < item.quantity; i += 1) incrementItem(item.productId);
+    }
+    if (available.length === 0 && unavailable.length === 0) {
+      showToast('This order has no items to add');
+      return;
+    }
+    if (unavailable.length === 0) showToast('Items added to your bag');
+    else if (available.length > 0) showToast('Available items added to your bag');
+    navigate(
+      'cart-tab',
+      unavailable.length > 0
+        ? { reorderSkipped: unavailable.map((u) => ({ name: titleOf(u.productId, u.name), reason: reorderReasonText(u.reason) })) }
+        : undefined,
+    );
   };
 };
 

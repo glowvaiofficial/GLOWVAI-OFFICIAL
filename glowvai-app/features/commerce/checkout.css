@@ -126,3 +126,19 @@
   .glowvai-root .commerce-result-head,
   .glowvai-root .commerce-processing-head { padding: 20px 40px; }
 }
+
+/* Delivery time picker (features/commerce/components/DeliverySlotPicker.tsx) */
+.commerce-slots { display: grid; gap: 14px; }
+.commerce-slots h3 { margin: 0 0 8px; font-size: 14px; font-weight: 800; color: var(--ds-ink, #1d1d24); }
+.commerce-slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.commerce-slot { display: grid; gap: 4px; min-height: 56px; padding: 12px; text-align: left; border: 1px solid var(--ds-line, #e4e4ea); border-radius: 12px; background: var(--ds-card, #fff); color: var(--ds-ink, #1d1d24); cursor: pointer; }
+.commerce-slot.is-on { border-color: var(--ds-brand, #0057fb); box-shadow: inset 0 0 0 1px var(--ds-brand, #0057fb); }
+.commerce-slot:focus-visible { outline: 2px solid var(--ds-brand, #0057fb); outline-offset: 2px; }
+.commerce-slot-title { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+.commerce-slot small { color: var(--ds-muted, #6b6b75); font-size: 12px; }
+.commerce-slot-note { margin: 0; font-size: 12px; }
+
+/* Items a buy-it-again could not add (features/commerce/CartScreen.tsx) */
+.commerce-reorder-notice { border-color: #f1c27d; background: #fff8ec; }
+.commerce-reorder-notice h2 { margin: 0; font-size: 15px; font-weight: 800; }
+.commerce-reorder-notice ul { display: grid; gap: 6px; margin: 8px 0 0; padding-left: 18px; font-size: 14px; }

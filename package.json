@@ -24,7 +24,8 @@
     "test:reviews": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/reviews/*.test.ts\"",
     "test:returns": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/returns/*.test.ts\"",
     "test:variants": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/variants/*.test.ts\"",
-    "test:notify": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/notify/*.test.ts\""
+    "test:notify": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/notify/*.test.ts\"",
+    "test:features": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/features/*.test.ts\""
   },
   "keywords": [],
   "author": "",
