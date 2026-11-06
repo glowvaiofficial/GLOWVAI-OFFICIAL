@@ -5,6 +5,7 @@ import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, too
 import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
 import { planReservation, reservationFor, stockProblemMessage, type ProductStock } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
+import { notifyCustomer } from "@/lib/shop/notify";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 class OrderBlocked extends Error {
@@ -241,6 +242,10 @@ export async function POST(req: NextRequest) {
     if (err instanceof OrderBlocked) return json({ ok: false, error: err.message }, err.status);
     throw err;
   }
+
+  // Customer notification: cash on delivery is placed now. Online orders are notified when the payment is confirmed.
+  // notifyCustomer never throws, so it cannot fail the order.
+  if (!online) await notifyCustomer(customer.uid, { type: "order_placed", relatedId: orderId });
 
   if (online && razorpay) {
     return json({

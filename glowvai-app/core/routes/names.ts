@@ -64,6 +64,8 @@ export type PortedScreenName =
   | 'profile-referral-code'
   | 'profile-referral-transactions'
   | 'profile-student-status'
+  // Notifications (features/notifications)
+  | 'notifications-list'
   // Routine and ingredient guidance (features/recommendations)
   | 'recommend-overview'
   | 'recommend-routine'
