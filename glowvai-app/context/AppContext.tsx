@@ -12,10 +12,9 @@ import {
 import { NO_ADDRESS } from '../data/serviceability';
 import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
-import { ApiService } from '../services/api';
 import { auth } from '../core/config/firebase';
 import { ensureCustomerSession } from '../core/services/customerSession';
-import { createSupportTicket, type ShopProfileAddress } from '../core/services/shopApi';
+import type { ShopProfileAddress } from '../core/services/shopApi';
 import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
@@ -67,7 +66,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const customerDetails: CustomerDetails | null = profile
     ? { fullName: profile.name, phoneNumber: profile.phone, email: profile.email }
     : null;
-  const [skinFlags, setSkinFlags] = useState({ facialAnalysisCompleted: false, consentGiven: false });
+  const skinFlags = { facialAnalysisCompleted: false, consentGiven: false };
   const user: UserProfile | null = profile
     ? {
         id: auth?.currentUser?.uid ?? '',
@@ -87,7 +86,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const saved = addresses.find((a) => a.id === selectedId);
     return saved ? toNovAddress(saved) : NO_ADDRESS;
   });
-  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
 
   // Preference
   const [shoppingPreference, setShoppingPreference] = useState<ShoppingPreference>('all');
@@ -123,10 +121,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [wishlist]);
 
-  // Face Analysis
-  const [capturedFaceImage, setCapturedFaceImage] = useState<string | null>(null);
-  const [skinReports, setSkinReports] = useState<SkinReport[]>([]);
-  const [activeReport, setActiveReport] = useState<SkinReport | null>(null);
+  // Face Analysis. Scan results are kept by the scan screens (features/scan); nothing here records a report.
+  const [skinReports] = useState<SkinReport[]>([]);
+  const [activeReport] = useState<SkinReport | null>(null);
 
   // Beauty Insurance Streaks (Seed with 1 active streak for immediate testing & auditability)
   // Seed fixtures exist only in local development. Production starts with no streaks or tickets.
@@ -154,7 +151,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       })),
     },
   ] : []);
-  const [activeStreak, setActiveStreak] = useState<BeautyInsuranceStreak | null>(null);
+  const [activeStreak] = useState<BeautyInsuranceStreak | null>(null);
 
   // Toast
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -210,7 +207,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addAddress = (addr: Address) => {
-    setSavedAddresses((prev) => [addr, ...prev]);
     setCurrentAddress(addr);
     showToast(`Saved address in ${addr.area}`);
   };
@@ -259,39 +255,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  const toggleItemInsurance = (cartItemId: string) => {
-    const target = cart.find((item) => item.id === cartItemId);
-    if (!target?.product.insuranceEligible) return;
-    const toggled = !target.withInsurance;
-    setCart((prev) => prev.map((item) => (item.id === cartItemId ? { ...item, withInsurance: toggled } : item)));
-    showToast(toggled ? 'Beauty Insurance added' : 'Beauty Insurance removed');
-  };
-
-  const removeFromCart = (cartItemId: string) => {
-    setCart((prev) => prev.filter((i) => i.id !== cartItemId));
-  };
-
   const clearCart = () => setCart([]);
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Authoritative cart pricing computed via ApiService
-  const cartAuthoritative = ApiService.validateCartPricing(cart, currentAddress);
 
   // Wishlist
   const toggleWishlist = (productId: string) => {
     const exists = wishlist.includes(productId);
     setWishlist(exists ? wishlist.filter((id) => id !== productId) : [...wishlist, productId]);
     showToast(exists ? 'Removed from saved wishlist' : 'Saved to wishlist');
-  };
-
-  // Facial Analysis
-  const runAnalysis = async (image: string, retain: boolean): Promise<SkinReport> => {
-    const res = await ApiService.analyzeFaceImage(image, retain);
-    setSkinReports((prev) => [res.report, ...prev]);
-    setActiveReport(res.report);
-    setSkinFlags({ facialAnalysisCompleted: true, consentGiven: true });
-    return res.report;
   };
 
   // Beauty Insurance Streaks
@@ -325,34 +297,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Check-in photo saved on this device.');
   };
 
-  const reportAdverseReaction = async (trackingId: string, description: string) => {
-    setStreaks((prev) =>
-      prev.map((s) => (s.trackingId === trackingId ? { ...s, status: 'adverse_reaction_reported' } : s))
-    );
-    const streak = streaks.find((s) => s.trackingId === trackingId);
-    const product = streak?.productName ?? 'a product';
-    const res = await createSupportTicket({
-      category: 'PRODUCT_SAFETY',
-      subject: `Skin reaction: ${product}`.slice(0, 120),
-      description: `Skin reaction reported for ${product}. ${description}`.trim(),
-      orderId: null,
-    });
-    showToast(res.ok ? 'Reported to the GlowVai team. They will contact you.' : res.error ?? 'We could not send the report. Try Help & support.');
-  };
-
-  // A claim is only recorded for review. No refund or decision is made on the device.
-  const submitClaim = async (trackingId: string, feedback: string) => {
-    setStreaks((prev) =>
-      prev.map((s) => (s.trackingId === trackingId ? { ...s, status: 'claim_submitted', claimFeedback: feedback } : s))
-    );
-    showToast('Saved on this device. Message support on WhatsApp to make a claim.');
-  };
-
   return (
     <AppContext.Provider
       value={{
         currentScreen,
-        screenHistory,
         navigate,
         goBack,
         activeParams,
@@ -361,7 +309,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         profileStatus,
         saveCustomerDetails,
         currentAddress,
-        savedAddresses,
         selectAddress,
         addAddress,
         shoppingPreference,
@@ -369,24 +316,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cart,
         addToCart,
         updateQuantity,
-        toggleItemInsurance,
-        removeFromCart,
         clearCart,
         cartItemCount,
-        cartAuthoritative,
         wishlist,
         toggleWishlist,
-        capturedFaceImage,
-        setCapturedFaceImage,
         skinReports,
         activeReport,
-        runAnalysis,
         streaks,
         activeStreak,
-        setActiveStreak,
         logStreakEvidence,
-        reportAdverseReaction,
-        submitClaim,
         toastMessage,
         showToast,
       }}
