@@ -110,7 +110,8 @@ export interface SupportTicketView {
   orderId: string | null;
   createdAt: string;
   resolution: string | null;
-  messages: Array<{ at: string; kind: string; text: string }>;
+  // STAFF: from the GlowVai team. CUSTOMER: written by this customer.
+  messages: Array<{ at: string; kind: "STAFF" | "CUSTOMER"; text: string; evidenceRequest?: boolean }>;
 }
 
 const post = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) });
@@ -151,4 +152,9 @@ export async function createSupportTicket(input: {
   orderId?: string | null;
 }): Promise<ApiResult<{ ticketId: string }>> {
   return apiFetch('/api/shop/support', post({ ...input, orderId: input.orderId || undefined }));
+}
+
+// Adds the customer's reply to one of their own requests. Replies are refused once a request is resolved or closed.
+export async function replySupportTicket(ticketId: string, text: string): Promise<ApiResult<{ message: { at: string; kind: 'CUSTOMER'; text: string } }>> {
+  return apiFetch('/api/shop/support/reply', post({ ticketId, text }));
 }
