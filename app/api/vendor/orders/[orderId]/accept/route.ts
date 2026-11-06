@@ -60,7 +60,7 @@ export const POST = vendorRoute<{ orderId: string }>({ route: "accept", ip: perM
       vendorAcceptedAt: now,
       // Dotted keys: the platform part of stockReservation (written at checkout) is kept, not overwritten.
       "stockReservation.vendorUid": me.uid,
-      "stockReservation.items": [...need].map(([productId, { quantity }]) => ({ productId, quantity })),
+      "stockReservation.items": [...need.values()].map(({ productId, variantId, quantity }) => ({ productId, variantId, quantity })),
       updatedAt: now,
       events: [...(Array.isArray(order.events) ? order.events : []), { at: now, actor: `Vendor ${vendor.storeName}`, event: "Order accepted by the store" }],
     };

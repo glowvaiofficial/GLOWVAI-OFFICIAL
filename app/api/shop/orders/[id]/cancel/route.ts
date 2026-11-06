@@ -5,7 +5,7 @@ import { planRelease } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
 import { firestoreRepo, wrapTx } from "@/lib/shop/growth/firestoreRepo";
 import { planLedgerEntry, writeLedgerPlan } from "@/lib/shop/growth/ledger";
-import { planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
+import { VARIANT_ID_PATTERN, planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
 import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
 
@@ -43,11 +43,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const releases: { ref: DocumentReference; quantity: number }[] = [];
       if (reservation && typeof reservation.vendorUid === "string" && reservation.vendorUid && !reservation.releasedAt && Array.isArray(reservation.items)) {
         const inventory = store.collection("vendors").doc(reservation.vendorUid).collection("vendorInventory");
-        const lines = (reservation.items as { productId?: unknown; quantity?: unknown }[])
-          .map((it) => ({ productId: String(it?.productId ?? ""), quantity: Math.floor(Number(it?.quantity) || 0) }))
-          .filter((it) => /^[A-Za-z0-9_-]{1,140}$/.test(it.productId) && it.quantity > 0);
+        // A line is the product id, or "productId::variantId" for one option of a product (vendor per-option stock).
+        const lines = (reservation.items as { productId?: unknown; variantId?: unknown; quantity?: unknown }[])
+          .map((it) => {
+            const productId = String(it?.productId ?? "");
+            const variantId = typeof it?.variantId === "string" && it.variantId ? it.variantId : null;
+            return { key: variantId ? `${productId}::${variantId}` : productId, productId, variantId, quantity: Math.floor(Number(it?.quantity) || 0) };
+          })
+          .filter((it) => /^[A-Za-z0-9_-]{1,140}$/.test(it.productId) && (!it.variantId || VARIANT_ID_PATTERN.test(it.variantId)) && it.quantity > 0);
         if (lines.length) {
-          const snaps = await tx.getAll(...lines.map((it) => inventory.doc(it.productId)));
+          const snaps = await tx.getAll(...lines.map((it) => inventory.doc(it.key)));
           // A line the store has since deleted is not re-created.
           snaps.forEach((s, i) => s.exists && releases.push({ ref: s.ref, quantity: lines[i].quantity }));
         }

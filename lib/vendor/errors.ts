@@ -19,6 +19,7 @@ export type VendorErrorCode =
   | "ORIGIN_NOT_ALLOWED"
   | "PAYLOAD_TOO_LARGE"
   | "RATE_LIMITED"
+  | "DAILY_LIMIT"
   | "INTERNAL";
 
 const DEFAULT_COPY: Record<VendorErrorCode, string> = {
@@ -39,6 +40,7 @@ const DEFAULT_COPY: Record<VendorErrorCode, string> = {
   ORIGIN_NOT_ALLOWED: "This website is not allowed to use the GlowVai vendor API.",
   PAYLOAD_TOO_LARGE: "The request is too large.",
   RATE_LIMITED: "Too many requests. Please wait a minute and try again.",
+  DAILY_LIMIT: "You have reached today's limit for this. Try again tomorrow.",
   INTERNAL: "Something went wrong on our side. Please try again.",
 };
 

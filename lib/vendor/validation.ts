@@ -1,6 +1,7 @@
 // Input checks for the vendor API. Pure functions: each returns the clean value to store, or a friendly error naming
 // the field. Nothing here touches the database.
 import { indianMobile, text } from "../shop/text";
+import { VARIANT_ID_PATTERN, type Variant } from "../shop/variants";
 
 export const STORE_CATEGORIES = ["skincare", "haircare", "makeup", "fragrance", "bath-body", "mens-grooming", "wellness"] as const;
 export type StoreCategory = (typeof STORE_CATEGORIES)[number];
@@ -241,10 +242,15 @@ export const MAX_INVENTORY_ITEMS = 100;
 
 export interface InventoryInput {
   productId: string;
+  /** Set for a per-option line (size, shade or pack). Absent for the product's own line. */
+  variantId?: string;
   stock: number;
   isAvailable: boolean;
   unitPriceOverride?: number;
 }
+
+/** Key of a stock line: the product id, or "productId::variantId" for one option of a product. */
+export const inventoryKey = (productId: string, variantId?: string | null): string => (variantId ? `${productId}::${variantId}` : productId);
 
 export function parseInventory(body: unknown): Result<InventoryInput[]> {
   const b = (body && typeof body === "object" ? body : {}) as Doc;
@@ -256,13 +262,23 @@ export function parseInventory(body: unknown): Result<InventoryInput[]> {
     const it = (raw && typeof raw === "object" ? raw : {}) as Doc;
     const productId = typeof it.productId === "string" ? it.productId.trim() : "";
     if (!PRODUCT_ID_RE.test(productId)) return fail("items.productId", "Every item needs a valid product.");
-    if (seen.has(productId)) return fail("items.productId", "A product appears twice. Send each product once.");
-    seen.add(productId);
+    let variantId: string | undefined;
+    if (it.variantId !== undefined && it.variantId !== null) {
+      if (typeof it.variantId !== "string" || !VARIANT_ID_PATTERN.test(it.variantId)) return fail("items.variantId", "That option is not valid.");
+      variantId = it.variantId;
+      if (it.unitPriceOverride !== undefined && it.unitPriceOverride !== null) {
+        return fail("items.unitPriceOverride", "Store prices are set per product, not per option.");
+      }
+    }
+    const key = inventoryKey(productId, variantId);
+    if (seen.has(key)) return fail("items.productId", "A product or option appears twice. Send each one once.");
+    seen.add(key);
     if (typeof it.stock !== "number" || !Number.isInteger(it.stock) || it.stock < 0 || it.stock > MAX_STOCK) {
       return fail("items.stock", `Stock must be a whole number from 0 to ${MAX_STOCK}.`);
     }
     if (typeof it.isAvailable !== "boolean") return fail("items.isAvailable", "Say whether each product is available.");
     const item: InventoryInput = { productId, stock: it.stock, isAvailable: it.isAvailable };
+    if (variantId) item.variantId = variantId;
     if (it.unitPriceOverride !== undefined && it.unitPriceOverride !== null) {
       const price = it.unitPriceOverride;
       if (typeof price !== "number" || !Number.isFinite(price) || price <= 0) return fail("items.unitPriceOverride", "A store price must be more than ₹0.");
@@ -271,6 +287,16 @@ export function parseInventory(body: unknown): Result<InventoryInput[]> {
     out.push(item);
   }
   return { ok: true, value: out };
+}
+
+/**
+ * Why a per-option stock line cannot be written for this product, or null when it can. `variants` is the product's own
+ * option list (null when it has none). Unknown options are refused, never created.
+ */
+export function variantLineProblem(variants: Variant[] | null | undefined, variantId: string): string | null {
+  if (!variants || variants.length === 0) return "This product has no options. Set its stock on the product line.";
+  if (!variants.some((v) => v.id === variantId)) return "That option is not one of this product's options.";
+  return null;
 }
 
 /** A product's MRP from the admin product record: `mrp` when set, else worked back from brandPrice and brandDiscount. */
