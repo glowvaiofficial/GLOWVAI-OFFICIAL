@@ -112,6 +112,9 @@ export function startProductFeed(): () => void {
         getDocs(query(collection(db, 'products'), where('status', '==', 'PUBLISHED'))),
         fetchRatings(),
       ]);
+      // Firestore answers from its local cache (an empty list when nothing is cached) when the server cannot be reached.
+      // That is not a real answer: it is treated as a failed read, so the last good list stays on screen.
+      if (snap.metadata.fromCache) throw new Error('products read from cache only');
       const rows = snap.docs.map((doc) => toShopProduct(doc.id, doc.data(), ratings[doc.id] ?? null));
       lastGood = rows;
       apply(rows);
