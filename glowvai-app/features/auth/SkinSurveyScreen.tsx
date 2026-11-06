@@ -92,5 +92,3 @@ export const SkinSurveyScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default SkinSurveyScreen;

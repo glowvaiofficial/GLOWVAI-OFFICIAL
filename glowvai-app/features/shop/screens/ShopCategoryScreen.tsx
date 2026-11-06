@@ -178,5 +178,3 @@ export const ShopCategoryScreen: React.FC = () => {
     </div>
   );
 };
-
-export default ShopCategoryScreen;

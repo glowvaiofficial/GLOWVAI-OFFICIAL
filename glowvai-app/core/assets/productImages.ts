@@ -122,24 +122,3 @@ export const LOCAL_PRODUCT_IMAGES: Record<string, any> = {
     uri: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
   },
 };
-
-/**
- * Universally resolves image sources for React Native <Image source={...} />
- * Handles raw URL strings, { uri: string } objects, and local require() numbers cleanly.
- */
-export function resolveImageSource(
-  img: any,
-  fallbackUrl: string = 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80'
-): any {
-  if (!img) return { uri: fallbackUrl };
-  if (typeof img === 'number') return img;
-  if (typeof img === 'string') return { uri: img };
-  if (typeof img === 'object' && img !== null) {
-    if (typeof img.uri === 'string' && img.uri) return { uri: img.uri };
-    if (typeof img.uri === 'number') return img.uri;
-  }
-  return { uri: fallbackUrl };
-}
-
-export default LOCAL_PRODUCT_IMAGES;
-

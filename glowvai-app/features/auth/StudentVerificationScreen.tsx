@@ -61,5 +61,3 @@ export const StudentVerificationScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default StudentVerificationScreen;

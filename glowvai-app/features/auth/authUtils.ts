@@ -1,7 +1,4 @@
 /** Reads a user-facing message from an unknown thrown value. */
-export const errorMessageOf = (err: unknown, fallback: string): string =>
-  (err as { message?: string } | null)?.message || fallback;
-
 /** Web equivalents of the native permission prompts used during onboarding. */
 
 // Triggers the browser location prompt. Resolves false when unsupported or denied.

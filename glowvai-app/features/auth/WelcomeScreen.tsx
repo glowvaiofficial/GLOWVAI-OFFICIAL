@@ -139,5 +139,3 @@ export const WelcomeScreen: React.FC = () => {
     </section>
   );
 };
-
-export default WelcomeScreen;

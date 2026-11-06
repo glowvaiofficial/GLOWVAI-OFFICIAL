@@ -62,16 +62,3 @@ export const ProfileListItem = ({ icon, title, note, value, danger = false, onCl
     <ChevronRight size={18} className="profile-chevron" />
   </button>
 );
-
-interface ProfileSwitchProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}
-
-export const ProfileSwitch = ({ label, checked, onChange }: ProfileSwitchProps) => (
-  <label className="profile-switch">
-    <input type="checkbox" role="switch" aria-label={label} checked={checked} onChange={(e) => onChange(e.target.checked)} />
-    <span />
-  </label>
-);

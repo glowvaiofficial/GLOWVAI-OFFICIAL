@@ -112,5 +112,3 @@ export const ProfileSetupScreen: React.FC = () => {
     </AuthShell>
   );
 };
-
-export default ProfileSetupScreen;

@@ -52,5 +52,3 @@ export const OnboardingSuccessScreen: React.FC = () => {
     </section>
   );
 };
-
-export default OnboardingSuccessScreen;
