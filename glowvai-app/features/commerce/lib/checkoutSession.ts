@@ -32,6 +32,9 @@ interface CheckoutSessionState {
   // What to do if an item cannot be supplied. Saved on the order after it is placed (see PaymentProcessingScreen).
   substitutionPreference: SubstitutionPreference;
   setSubstitutionPreference: (preference: SubstitutionPreference) => void;
+  // Glow coins the customer chose to use on this order (0 when none). The server caps and debits them.
+  coinsToRedeem: number;
+  setCoinsToRedeem: (coins: number) => void;
 }
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
@@ -52,4 +55,6 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   setTip: (tip) => set({ tip: Math.max(0, Math.min(500, Math.round(tip) || 0)) }),
   substitutionPreference: 'CALL_ME',
   setSubstitutionPreference: (substitutionPreference) => set({ substitutionPreference }),
+  coinsToRedeem: 0,
+  setCoinsToRedeem: (coinsToRedeem) => set({ coinsToRedeem: Math.max(0, Math.floor(coinsToRedeem) || 0) }),
 }));

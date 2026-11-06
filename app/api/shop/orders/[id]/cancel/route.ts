@@ -3,6 +3,8 @@ import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop/server";
 import { planRelease } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
+import { firestoreRepo, wrapTx } from "@/lib/shop/growth/firestoreRepo";
+import { planLedgerEntry, writeLedgerPlan } from "@/lib/shop/growth/ledger";
 import { planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
 import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
@@ -25,6 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const reason = text(body.reason, 200) || "Cancelled by the customer";
 
   const store = db();
+  const repo = firestoreRepo(store);
   const ref = store.collection("orders").doc(id);
   const overlayRef = store.collection("admin_orders").doc(id);
   try {
@@ -55,10 +58,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const platformChanges = planRelease(reservation, platformStock);
       const variantChanges = planVariantRelease(reservation, platformStock);
 
+      // Coins redeemed on this order go back to the wallet. The entry key is per order, so a second cancel (or a retry)
+      // finds the entry already there and credits nothing more. Read here, written below with the other writes.
+      const coinsBack = Math.floor(Number(o.pricing?.coinsRedeemed ?? 0)) || 0;
+      const coinsPlan = coinsBack > 0
+        ? await planLedgerEntry(wrapTx(tx, store), (path) => repo.ref(path), customer.uid, {
+          type: "CREDIT",
+          source: "ORDER_CANCELLED",
+          amount: coinsBack,
+          idempotencyKey: `cancel:${id}`,
+          reason: `Coins returned for cancelled order ${id}`,
+          orderId: id,
+          actor: "customer",
+        })
+        : null;
+      if (coinsPlan && !coinsPlan.ok) throw new Error("COINS_RETURN_FAILED");
+
       const now = Date.now();
       for (const r of releases) tx.update(r.ref, { stock: FieldValue.increment(r.quantity), updatedAt: now });
       writeStockChanges(tx, store, platformChanges, now);
       writeVariantStockChanges(tx, store, variantChanges, now);
+      if (coinsPlan && coinsPlan.ok) writeLedgerPlan(wrapTx(tx, store), coinsPlan.plan, now);
       tx.update(ref, {
         status: "CANCELLED",
         cancellationReason: reason,

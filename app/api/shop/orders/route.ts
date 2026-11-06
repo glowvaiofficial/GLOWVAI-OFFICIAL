@@ -1,27 +1,10 @@
 import { NextRequest } from "next/server";
-import { randomBytes } from "node:crypto";
-import { COUPON_VALUES, deliveryFeeFor } from "@/glowvai-app/shared/pricing-rules.mjs";
-import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
-import { createRazorpayOrder, razorpayConfigured, razorpayKeyId } from "@/lib/shop/razorpay";
-import type { ProductStock } from "@/lib/shop/platformStock";
-import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
-import { orderItemFor, orderReservationFor, parseCartLines, planOrderStock, currentUnitPrice } from "@/lib/shop/variants";
-import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
-import { notifyCustomer } from "@/lib/shop/notify";
-import { savedAddressForOrder } from "@/lib/shop/addressRepo";
-import { findOfferedSlot } from "@/lib/shop/slots";
-
-// Thrown inside the order transaction to stop it with a customer message and an HTTP status.
-class OrderBlocked extends Error {
-  constructor(readonly status: number, message: string) {
-    super(message);
-  }
-}
+import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
+import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
+import { placeOrderCore } from "@/lib/shop/orderCore";
+import { parseOrderRequest } from "@/lib/shop/orderRequest";
 
 export const dynamic = "force-dynamic";
-
-const MAX_LINES = 20;
-const MAX_QTY = 10;
 
 // Customer-facing status from the shop status, with any admin decision (saved in admin_orders) applied on top.
 function customerStatus(shopStatus: string, overlay: Record<string, unknown> | undefined): string {
@@ -68,9 +51,9 @@ export async function GET(req: NextRequest) {
           variantLabel: it.variantLabel ?? null,
         })),
         pricing: o.pricing ?? null,
+        deliverySlot: o.deliverySlot ?? null,
         payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
         shippingAddress: o.shippingAddress ?? null,
-        deliverySlot: o.deliverySlot ?? null,
         createdAt: o.createdAt ?? null,
         updatedAt: o.updatedAt ?? null,
       };
@@ -79,8 +62,8 @@ export async function GET(req: NextRequest) {
   return json({ ok: true, orders });
 }
 
-// Places an order. Prices, delivery fee and coupon are worked out here from the published products and the shop's
-// pricing rules, never taken from the browser. Only cash on delivery is offered until online payment is connected.
+// Places an order. The checks, pricing and transaction live in lib/shop/orderCore.ts (shared with the subscription cron).
+// Only cash on delivery is offered until online payment is connected; online orders need RAZORPAY_KEY_ID and secret.
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "orders-post", 30);
   if (ipLimited) return ipLimited;
@@ -92,168 +75,15 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
-  const method = String(body.paymentMethod ?? "COD").toUpperCase();
-  if (method !== "COD" && method !== "ONLINE") return json({ ok: false, error: "Choose a payment method." }, 400);
-  if (method === "ONLINE" && !razorpayConfigured()) {
-    return json({ ok: false, error: "Online payment is being set up. Please choose cash on delivery for now." }, 503);
-  }
+  const parsed = parseOrderRequest(body, { onlineAvailable: razorpayConfigured() });
+  if (!parsed.ok) return json({ ok: false, error: parsed.error }, parsed.status);
 
-  const lines = Array.isArray(body.items) ? body.items : [];
-  if (lines.length === 0) return json({ ok: false, error: "Your bag is empty." }, 400);
-  if (lines.length > MAX_LINES) return json({ ok: false, error: `Up to ${MAX_LINES} different products per order.` }, 400);
-  const cart = parseCartLines(lines, MAX_QTY);
-  if (!cart.ok) return json({ ok: false, error: cart.error }, 400);
-
-  // A saved address is read from the customer's own addresses and checked again here; the typed address is used only
-  // when no saved address is chosen. An address that was deleted meanwhile is refused, so the bag is not lost.
-  const addressId = typeof body.addressId === "string" && body.addressId ? body.addressId : null;
-  let addr = (body.address ?? {}) as Record<string, unknown>;
-  let savedLabel: string | null = null;
-  if (addressId !== null) {
-    const saved = /^adr_[a-f0-9]{16}$/.test(addressId) ? await savedAddressForOrder(customer.uid, addressId) : { ok: false as const };
-    if (!saved.ok) return json({ ok: false, error: "That address is no longer saved. Choose a delivery address again." }, 409);
-    addr = { name: saved.name, phone: saved.phone, fullAddress: saved.fullAddress, city: saved.city, pincode: saved.pincode, landmark: saved.landmark, area: saved.area };
-    savedLabel = saved.label;
-  }
-  const recipientName = text(addr.name, 80);
-  const phone = indianMobile(addr.phone);
-  const fullAddress = text(addr.fullAddress, 300);
-  const city = text(addr.city, 60);
-  const pincode = text(addr.pincode, 6);
-  const area = text(addr.area, 80);
-  if (recipientName.length < 2) return json({ ok: false, error: "Enter the name for delivery." }, 400);
-  if (!phone) return json({ ok: false, error: "Enter a 10-digit Indian mobile number for delivery." }, 400);
-  if (fullAddress.length < 8) return json({ ok: false, error: "Enter the full delivery address." }, 400);
-  if (!city) return json({ ok: false, error: "Enter the city." }, 400);
-  if (!/^\d{6}$/.test(pincode)) return json({ ok: false, error: "Enter a 6-digit pincode." }, 400);
-
-  const store = db();
-  const productRefs = [...new Set(cart.lines.map((l) => l.productId))].map((id) => store.collection("products").doc(id));
-  const productSnaps = await store.getAll(...productRefs);
-  const items: Record<string, unknown>[] = [];
-  for (const line of cart.lines) {
-    const built = orderItemFor(productSnaps.find((s) => s.id === line.productId)?.data(), line);
-    if (!built.ok) return json({ ok: false, error: built.error }, built.status);
-    items.push(built.item);
-  }
-
-  // Quick check on the snapshot read above. The transaction below checks again on fresh reads before anything is written.
-  const snapshotStock = new Map<string, ProductStock | undefined>(productSnaps.map((s) => [s.id, s.exists ? (s.data() as ProductStock) : undefined]));
-  const pre = planOrderStock(cart.lines, snapshotStock);
-  if (!pre.ok) return json({ ok: false, error: pre.message }, 409);
-
-  const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
-  const couponCode = text(body.couponCode, 20).toUpperCase();
-  const couponValue = couponCode ? (COUPON_VALUES as Record<string, number>)[couponCode] : undefined;
-  if (couponCode && couponValue === undefined) return json({ ok: false, error: "That coupon code is not valid." }, 400);
-  const discountAmount = Math.min(couponValue ?? 0, subtotal);
-  const deliveryFee = deliveryFeeFor({ itemTotal: subtotal, area: area || city });
-  // Optional tip for the delivery partner: a whole-rupee amount from 0 to 500, added to the bill.
-  const tipRaw = body.tip === undefined || body.tip === null || body.tip === "" ? 0 : Number(body.tip);
-  if (!Number.isFinite(tipRaw) || tipRaw < 0 || tipRaw > 500) return json({ ok: false, error: "The tip must be between ₹0 and ₹500." }, 400);
-  const tip = Math.round(tipRaw);
-  const grandTotal = subtotal - discountAmount + deliveryFee + tip;
-
-  // The delivery time: optional for older clients, but when it is sent it must be a slot offered right now.
-  const slotRaw = body.deliverySlot === undefined || body.deliverySlot === null || body.deliverySlot === "" ? null : text(body.deliverySlot, 60);
-  const deliverySlot = slotRaw === null ? null : findOfferedSlot(slotRaw, Date.now());
-  if (slotRaw !== null && !deliverySlot) return json({ ok: false, error: "That delivery time is no longer available. Choose another time." }, 409);
-
-  const now = Date.now();
-  const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
-  const orderId = `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
-  // Identifiers the customer and GlowVai use to follow the order: transaction (payment) reference and tracking number.
-  const online = method === "ONLINE";
-  const transactionId = online ? null : `COD-${randomBytes(4).toString("hex").toUpperCase()}`;
-  const trackingId = `TRK-${randomBytes(4).toString("hex").toUpperCase()}`;
-  // Online orders are created first and become PLACED only when Razorpay confirms the payment (see payments/razorpay).
-  let razorpay: { id: string; amount: number; currency: string } | null = null;
-  if (online) {
-    try {
-      razorpay = await createRazorpayOrder(grandTotal, orderId);
-    } catch {
-      return json({ ok: false, error: "The payment could not be started. Please try again." }, 502);
-    }
-  }
-  const order = {
-    orderId,
-    transactionId,
-    razorpayOrderId: razorpay?.id ?? null,
-    trackingId,
-    userId: customer.uid,
-    customerName: recipientName,
-    customerPhone: phone,
-    deliveryType: "STANDARD",
-    vendorId: null,
-    vendorName: null,
-    vendorStatus: "PENDING",
-    zoneId: null,
-    items,
-    deliverySlot: deliverySlot
-      ? { id: deliverySlot.id, kind: deliverySlot.kind, day: deliverySlot.day, label: deliverySlot.label, estimate: deliverySlot.estimate, startsAt: deliverySlot.startsAt, endsAt: deliverySlot.endsAt }
-      : null,
-    shippingAddress: {
-      label: savedLabel ?? "Home",
-      addressId,
-      recipientName,
-      phoneNumber: phone,
-      streetAddress: fullAddress,
-      fullAddress,
-      city,
-      pincode,
-      landmark: text(addr.landmark, 120),
-      area,
-      isDefault: true,
-    },
-    pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, tip, coinsRedeemed: 0, beautyProtectionTotal: 0, grandTotal },
-    payment: { method: online ? "ONLINE" : "COD", status: "PENDING", transactionId, paymentId: null },
-    status: online ? "PAYMENT_PENDING" : "PLACED",
-    couponCode: discountAmount > 0 ? couponCode : null,
-    referralCodeUsed: null,
-    referralProcessed: false,
-    source: "web_shop",
-    events: [{ at: now, actor: "Customer", event: online ? "Payment started (online)" : "Order placed (cash on delivery)" }],
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  // One transaction: the products are read fresh, every tracked line is checked (all or nothing), platform stock is
-  // decremented and the order is created with its stockReservation. Nothing is written if any check fails.
-  try {
-    await store.runTransaction(async (tx) => {
-      const ref = store.collection("orders").doc(orderId);
-      if ((await tx.get(ref)).exists) throw new Error("Order id clash, please retry.");
-      const fresh = await readProductStock(tx, store, items.map((it) => String(it.productId)));
-      for (const it of items) {
-        const p = fresh.get(String(it.productId));
-        if (!p || p.status !== "PUBLISHED") throw new OrderBlocked(409, "One of the products is no longer available. Remove it from your bag and try again.");
-        if (currentUnitPrice(p, (it.variantId as string | null) ?? null) !== Number(it.unitPrice)) throw new OrderBlocked(409, "The price of an item has changed. Refresh your bag and try again.");
-      }
-      const plan = planOrderStock(cart.lines, fresh);
-      if (!plan.ok) throw new OrderBlocked(409, plan.message);
-      writeStockChanges(tx, store, plan.decrements, now);
-      writeVariantStockChanges(tx, store, plan.variantWrites, now);
-      tx.create(ref, { ...order, stockReservation: orderReservationFor(plan) });
-      tx.set(store.collection("users").doc(customer.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
-    });
-  } catch (err) {
-    if (err instanceof OrderBlocked) return json({ ok: false, error: err.message }, err.status);
-    throw err;
-  }
-
-  // Customer notification: cash on delivery is placed now. Online orders are notified when the payment is confirmed.
-  // notifyCustomer never throws, so it cannot fail the order.
-  if (!online) await notifyCustomer(customer.uid, { type: "order_placed", relatedId: orderId });
-
-  if (online && razorpay) {
-    return json({
-      ok: true,
-      orderId,
-      trackingId,
-      pricing: order.pricing,
-      status: order.status,
-      payment: { provider: "razorpay", keyId: razorpayKeyId(), razorpayOrderId: razorpay.id, amount: razorpay.amount, currency: razorpay.currency },
-    });
-  }
-  return json({ ok: true, orderId, trackingId, transactionId, pricing: order.pricing, status: order.status });
+  const online = parsed.value.paymentMethod === "ONLINE";
+  const result = await placeOrderCore(db(), {
+    uid: customer.uid,
+    ...parsed.value,
+    startPayment: online ? (amount, orderId) => createRazorpayOrder(amount, orderId) : undefined,
+  });
+  if (!result.ok) return json({ ok: false, error: result.error }, result.status);
+  return json(result.body);
 }

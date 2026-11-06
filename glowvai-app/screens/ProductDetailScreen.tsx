@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { PRODUCTS } from '../data/products';
 import { ProductReviews } from '../features/reviews/ProductReviews';
 import { ProductQuestions } from '../features/reviews/ProductQuestions';
+import { SubscribePanel } from '../features/profile/SubscriptionsScreen';
 import '../responsive/home-products.css';
 
 export const ProductDetailScreen: React.FC = () => {
@@ -382,6 +383,11 @@ export const ProductDetailScreen: React.FC = () => {
         {/* Ratings, reviews and questions (features/reviews) */}
         <ProductReviews productId={product.id} />
         <ProductQuestions productId={product.id} />
+      </div>
+
+      {/* Subscribe and save for this product */}
+      <div className="product-subscribe-slot" style={{ padding: '0 16px 16px' }}>
+        <SubscribePanel productId={product.id} productName={product.name} />
       </div>
 
       {/* Persistent Bottom Add to Cart Bar */}

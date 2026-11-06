@@ -76,6 +76,8 @@ export interface PlaceOrderInput {
   addressId?: string | null;
   // The delivery time chosen from the offered slots (its id). Refused by the server when no longer offered.
   deliverySlot?: string | null;
+  // Glow coins the customer chose to use. The server caps them and debits them in the order transaction.
+  coinsToRedeem?: number;
 }
 
 export interface OnlinePaymentStart {
@@ -309,4 +311,107 @@ export async function addToWishlistRequest(productIds: string[]): Promise<ApiRes
 
 export async function removeFromWishlistRequest(productId: string): Promise<ApiResult<{ items: string[] }>> {
   return apiFetch('/api/shop/wishlist', { method: 'DELETE', body: JSON.stringify({ productId }) });
+}
+
+// ---- Growth: referrals, GlowVai coins, subscriptions, payment options ----
+
+export interface ReferralView {
+  code: string | null;
+  shareUrl: string;
+  applied: boolean;
+  rewardStatus: 'NONE' | 'PENDING' | 'REWARDED';
+  rewardCoins: number;
+  referredCount: number;
+  rewardedCount: number;
+  referrerCoins: number;
+  refereeCoins: number;
+}
+
+export interface CoinHistoryEntry {
+  id: string;
+  type: 'CREDIT' | 'DEBIT' | 'EXPIRY';
+  source: string;
+  amount: number;
+  signed: number;
+  balanceAfter: number;
+  reason: string;
+  orderId: string | null;
+  createdAt: number;
+}
+
+export interface CoinsView {
+  balance: number;
+  rupeesPerCoin: number;
+  history: CoinHistoryEntry[];
+}
+
+export interface CoinPreview {
+  itemTotal: number;
+  balance: number;
+  maxCoins: number;
+  maxDiscount: number;
+  capPercent: number;
+}
+
+export interface SubscriptionView {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  intervalWeeks: number;
+  status: 'ACTIVE' | 'PAUSED' | 'CANCELLED' | string;
+  nextRunAt: number | null;
+  lastSkipReason: string | null;
+  createdAt: number;
+}
+
+export interface SubscriptionAddressInput {
+  name: string;
+  phone: string;
+  fullAddress: string;
+  city: string;
+  pincode: string;
+  area?: string;
+  landmark?: string;
+}
+
+export async function fetchReferral(): Promise<ApiResult<{ referral: ReferralView }>> {
+  return apiFetch<{ referral: ReferralView }>('/api/shop/referral');
+}
+
+export async function applyReferralCode(code: string): Promise<ApiResult<unknown>> {
+  return apiFetch('/api/shop/referral/apply', post({ code }));
+}
+
+export async function fetchCoins(): Promise<ApiResult<{ coins: CoinsView }>> {
+  return apiFetch<{ coins: CoinsView }>('/api/shop/coins');
+}
+
+export async function previewCoinRedemption(items: Array<{ productId: string; quantity: number }>): Promise<ApiResult<{ preview: CoinPreview }>> {
+  return apiFetch<{ preview: CoinPreview }>('/api/shop/coins/redeem-preview', post({ items }));
+}
+
+export async function fetchSubscriptions(): Promise<ApiResult<{ subscriptions: SubscriptionView[] }>> {
+  return apiFetch<{ subscriptions: SubscriptionView[] }>('/api/shop/subscriptions');
+}
+
+export async function createSubscription(input: {
+  productId: string;
+  quantity: number;
+  intervalWeeks: number;
+  address: SubscriptionAddressInput;
+}): Promise<ApiResult<{ subscriptionId: string }>> {
+  return apiFetch<{ subscriptionId: string }>('/api/shop/subscriptions', post(input));
+}
+
+export async function changeSubscription(
+  id: string,
+  change: { action: 'pause' | 'resume' | 'cancel' } | { action: 'quantity'; quantity: number },
+): Promise<ApiResult<unknown>> {
+  return apiFetch(`/api/shop/subscriptions/${encodeURIComponent(id)}`, post(change));
+}
+
+// Public settings: whether EMI is offered (RAZORPAY_EMI_ENABLED on the server).
+export async function fetchShopConfig(): Promise<ApiResult<{ payments: { emi: { available: boolean } } }>> {
+  return apiFetch<{ payments: { emi: { available: boolean } } }>('/api/shop/config');
 }

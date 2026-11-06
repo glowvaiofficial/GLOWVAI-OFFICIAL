@@ -8,6 +8,7 @@ import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
 import { DeliverySlotPicker } from './components/DeliverySlotPicker';
+import { CoinsRedeemCard } from './CoinsRedeemCard';
 
 // Step 2 of checkout: the items and the delivery address. Back goes to the cart.
 export const CheckoutReviewScreen: React.FC = () => {
@@ -58,6 +59,7 @@ export const CheckoutReviewScreen: React.FC = () => {
     <main className="commerce-screen commerce-review has-aside">
       <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={() => navigate('cart-tab')} />
       <CheckoutSteps step={2} />
+      <CoinsRedeemCard items={cartItems} />
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">
