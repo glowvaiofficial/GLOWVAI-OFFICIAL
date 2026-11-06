@@ -9,6 +9,7 @@ import { placeCartOrder } from './lib/orderPlacement';
 import { PAY_METHOD_LABEL, decidePlacement, parsePayMethod, toApiPaymentMethod, type PayMethod } from './lib/paymentMethod';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { verifyOnlinePayment } from '../../core/services/shopApi';
+import { setSubstitutionPreference } from '../../core/services/shopTracking';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
 import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
@@ -120,6 +121,8 @@ export const PaymentProcessingScreen: React.FC = () => {
           useCheckoutSession.getState().setPlacement('finished');
           // The confirmation screen shows this order, so the order-status popup must not announce it again.
           markOrderSeen(verified.data.orderId, 'PLACED');
+          // The preference is saved on the placed order. A failure here does not undo the order: it can be changed later.
+          void setSubstitutionPreference(verified.data.orderId, useCheckoutSession.getState().substitutionPreference);
           void useCustomerStore.getState().loadOrders();
           navigate('checkout-payment-success', {
             orderId: verified.data.orderId,
@@ -148,6 +151,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         useCheckoutSession.getState().setPlacement('finished');
         // The confirmation screen shows this order, so the order-status popup must not announce it again.
         markOrderSeen(decision.orderId, 'PLACED');
+        void setSubstitutionPreference(decision.orderId, useCheckoutSession.getState().substitutionPreference);
         void useCustomerStore.getState().loadOrders();
         navigate('checkout-payment-success', {
           orderId: decision.orderId,

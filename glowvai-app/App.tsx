@@ -26,7 +26,7 @@ import { SupportScreen } from './screens/SupportScreen';
 import { StudentReferralScreen } from './screens/StudentReferralScreen';
 import { OrdersListScreen } from './features/orders/OrdersListScreen';
 import { OrderDetailsScreen } from './features/orders/OrderDetailsScreen';
-import { LiveRiderTrackingScreen } from './features/orders/LiveRiderTrackingScreen';
+import { OrderTrackingScreen } from './features/orders/OrderTrackingScreen';
 import { PaymentSuccessScreen } from './features/commerce/PaymentResultScreens';
 import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen';
 
@@ -91,7 +91,7 @@ const AppContent: React.FC = () => {
       case 'order-cancelled':
         return <OrderDetailsScreen />;
       case 'order-tracking':
-        return <LiveRiderTrackingScreen />;
+        return <OrderTrackingScreen />;
       case 'streak-tracking':
         return <StreakTrackingScreen />;
       case 'order-history':

@@ -1,0 +1,11 @@
+/* Order tracking and returns: the parts the shared orders styles do not cover. */
+.glowvai-root .orders-choice-group{ display: grid; gap: 8px; margin: 8px 0 0; padding: 0; border: 0; min-width: 0; }
+.glowvai-root .orders-choice-group:disabled{ opacity: .6; }
+.glowvai-root .orders-choice{ display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--ds-line); border-radius: 12px; background: var(--ds-card); cursor: pointer; }
+.glowvai-root .orders-choice input{ margin-top: 3px; accent-color: var(--ds-brand); }
+.glowvai-root .orders-choice b{ display: block; font-size: 14px; }
+.glowvai-root .orders-choice small{ display: block; margin-top: 2px; color: var(--ds-muted); font-size: 12px; line-height: 1.4; }
+.glowvai-root .orders-timeline{ margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.glowvai-root .orders-timeline li{ display: grid; gap: 2px; padding-left: 14px; border-left: 2px solid var(--ds-line); font-size: 14px; }
+.glowvai-root .orders-timeline small{ color: var(--ds-muted); font-size: 12px; }
+.glowvai-root .orders-note.is-error{ color: var(--ds-danger); }
