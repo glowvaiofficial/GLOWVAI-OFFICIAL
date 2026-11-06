@@ -19,6 +19,9 @@ interface CheckoutSessionState {
   setPayMethod: (method: 'cod' | 'online') => void;
   // Optional tip for the delivery partner, in rupees (0, 10, 20, 30 or a custom amount up to 500).
   tip: number;
+  // The delivery time the customer chose (an id from the slots the server offered), or null. The server checks it again.
+  slotId: string | null;
+  setSlotId: (slotId: string | null) => void;
   placement: PlacementState;
   setPlacement: (placement: PlacementState) => void;
   setCouponCode: (code: string | null) => void;
@@ -35,6 +38,8 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   payMethod: 'cod',
   setPayMethod: (payMethod) => set({ payMethod }),
   tip: 0,
+  slotId: null,
+  setSlotId: (slotId) => set({ slotId }),
   placement: 'idle',
   setPlacement: (placement) => set({ placement }),
   setCouponCode: (couponCode) => set({ couponCode }),

@@ -4,6 +4,7 @@ import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
+import { rememberProductViewed } from '../lib/recentlyViewed';
 import '../styles/shop-product.css';
 
 // Shop category ids mapped to the names used on the browse screen.
@@ -37,6 +38,11 @@ export const ShopProductScreen: React.FC = () => {
     setQuantity(1);
     setImageFailed(false);
   }, [productId]);
+
+  // Remembered for "Continue browsing" (ids only, on this device).
+  useEffect(() => {
+    if (product) rememberProductViewed(product.id);
+  }, [product?.id]);
 
   if (!product) {
     return (

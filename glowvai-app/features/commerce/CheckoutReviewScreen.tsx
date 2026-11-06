@@ -6,17 +6,20 @@ import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
+import { DeliverySlotPicker } from './components/DeliverySlotPicker';
 
 // Step 2 of checkout: the items and the delivery address. Back goes to the cart.
 export const CheckoutReviewScreen: React.FC = () => {
   const { navigate } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
+  const slotId = useCheckoutSession((s) => s.slotId);
   const address = useDeliveryAddress();
 
   const cartItems = Object.values(items);
   const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress);
-  const canContinue = Boolean(address?.serviceable);
+  // A delivery time is required too: the order says when it should arrive.
+  const canContinue = Boolean(address?.serviceable) && Boolean(slotId);
 
   if (cartItems.length === 0) {
     return (
@@ -48,7 +51,7 @@ export const CheckoutReviewScreen: React.FC = () => {
     useCheckoutSession.getState().setAddressConfirmed(true);
     navigate('checkout-payment-method');
   };
-  const ctaLabel = address ? 'Confirm address and continue' : 'Add delivery address';
+  const ctaLabel = !address ? 'Add delivery address' : slotId ? 'Confirm address and continue' : 'Choose a delivery time';
 
   return (
     <main className="commerce-screen commerce-review has-aside">
@@ -69,6 +72,15 @@ export const CheckoutReviewScreen: React.FC = () => {
           )}
 
           <DeliveryAddressCard address={address} onChange={() => navigate('address-saved', { returnTo: 'checkout-review' })} onAdd={() => navigate('location-setup', { returnTo: 'checkout-review' })} />
+
+          {address?.serviceable && (
+            <section className="commerce-card" aria-labelledby="review-slot-title">
+              <div className="commerce-card-head">
+                <h2 id="review-slot-title">When should it arrive?</h2>
+              </div>
+              <DeliverySlotPicker />
+            </section>
+          )}
 
           <section className="commerce-card" aria-label="Items">
             <div className="commerce-card-head">

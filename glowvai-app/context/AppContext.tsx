@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   Address,
   CartItem,
@@ -14,6 +15,8 @@ import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressS
 import { PRODUCTS } from '../data/products';
 import { auth } from '../core/config/firebase';
 import { ensureCustomerSession } from '../core/services/customerSession';
+import { refreshSavedAddresses } from '../features/commerce/lib/savedAddresses';
+import { pushWishlistAdd, pushWishlistRemove, syncWishlistWithAccount } from '../features/shop/lib/wishlistSync';
 import type { ShopProfileAddress } from '../core/services/shopApi';
 import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
@@ -120,6 +123,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Storage blocked: the list works for this visit only.
     }
   }, [wishlist]);
+  // Once per signed-in session: the device list is merged into the account wishlist, and the saved addresses are read.
+  const wishlistRef = useRef(wishlist);
+  wishlistRef.current = wishlist;
+  useEffect(() => {
+    if (!auth) return undefined;
+    let lastUid: string | null = null;
+    return onAuthStateChanged(auth, (signedIn) => {
+      if (!signedIn || signedIn.uid === lastUid) return;
+      lastUid = signedIn.uid;
+      void refreshSavedAddresses();
+      void syncWishlistWithAccount(wishlistRef.current).then((merged) => {
+        if (merged) setWishlist(merged.slice(0, 200));
+      });
+    });
+  }, []);
 
   // Face Analysis. Scan results are kept by the scan screens (features/scan); nothing here records a report.
   const [skinReports] = useState<SkinReport[]>([]);
@@ -179,21 +197,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Saves the customer's details on the server (users/{uid}). The saved address is kept unless a new one is given.
   const saveCustomerDetails = async (details: CustomerDetails, address?: ShopProfileAddress): Promise<ActionResult> => {
-    const { addresses, selectedId } = useAddressStore.getState();
-    const selected = addresses.find((a) => a.id === selectedId);
-    const fallback: ShopProfileAddress = selected
+    // users.address mirrors the default saved address on the server, so the profile carries the default too.
+    const { addresses } = useAddressStore.getState();
+    const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];
+    const fallback: ShopProfileAddress = defaultAddress
       ? {
-          fullAddress: [selected.houseNo, selected.buildingName, selected.areaAddress].filter(Boolean).join(', '),
-          city: selected.city,
-          pincode: selected.pincode,
-          landmark: selected.landmark ?? '',
+          fullAddress: defaultAddress.fullAddress,
+          city: defaultAddress.city,
+          pincode: defaultAddress.pincode,
+          landmark: defaultAddress.landmark ?? '',
         }
       : { fullAddress: '', city: '', pincode: '' };
     const result = await useCustomerStore.getState().saveProfile({
       name: details.fullName,
       phone: details.phoneNumber,
       email: details.email,
-      address: address ?? profile?.address ?? fallback,
+      address: address ?? (defaultAddress ? fallback : profile?.address ?? fallback),
       marketingOptIn: profile?.marketingOptIn ?? false,
     });
     if (result.ok) showToast('Your details are saved');
@@ -262,7 +281,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Wishlist
   const toggleWishlist = (productId: string) => {
     const exists = wishlist.includes(productId);
+    if (!exists && wishlist.length >= 200) {
+      showToast('Your wishlist is full. Remove an item to save another.');
+      return;
+    }
     setWishlist(exists ? wishlist.filter((id) => id !== productId) : [...wishlist, productId]);
+    // The device list changes at once; the account copy follows (see wishlistSync).
+    if (exists) pushWishlistRemove(productId);
+    else pushWishlistAdd(productId);
     showToast(exists ? 'Removed from saved wishlist' : 'Saved to wishlist');
   };
 
