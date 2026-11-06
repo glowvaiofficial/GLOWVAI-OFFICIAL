@@ -70,11 +70,5 @@ export type PortedScreenName =
   | 'recommend-ingredients'
   | 'recommend-patch-test'
   | 'recommend-checkout'
-  // Admin & vendor (features/admin, features/vendor)
-  | 'admin-portal'
-  | 'admin-claims'
-  | 'admin-darkstore'
-  | 'admin-vendor-portal'
-  | 'vendor-home'
   // Debug
   | 'debug-app-doctor';
