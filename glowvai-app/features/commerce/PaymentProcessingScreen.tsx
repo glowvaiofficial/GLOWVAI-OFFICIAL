@@ -10,6 +10,7 @@ import { PAY_METHOD_LABEL, decidePlacement, parsePayMethod, toApiPaymentMethod, 
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
+import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
 const MIN_DISPLAY_MS = 1200;
@@ -117,6 +118,8 @@ export const PaymentProcessingScreen: React.FC = () => {
           if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
           useCartStore.getState().clearCart();
           useCheckoutSession.getState().setPlacement('finished');
+          // The confirmation screen shows this order, so the order-status popup must not announce it again.
+          markOrderSeen(verified.data.orderId, 'PLACED');
           void useCustomerStore.getState().loadOrders();
           navigate('checkout-payment-success', {
             orderId: verified.data.orderId,
@@ -143,6 +146,8 @@ export const PaymentProcessingScreen: React.FC = () => {
       if (decision.kind === 'placed') {
         useCartStore.getState().clearCart();
         useCheckoutSession.getState().setPlacement('finished');
+        // The confirmation screen shows this order, so the order-status popup must not announce it again.
+        markOrderSeen(decision.orderId, 'PLACED');
         void useCustomerStore.getState().loadOrders();
         navigate('checkout-payment-success', {
           orderId: decision.orderId,

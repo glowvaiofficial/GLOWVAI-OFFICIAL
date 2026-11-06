@@ -35,7 +35,7 @@ export type PlacementDecision<P> =
   | { kind: 'failed'; error: string };
 
 const FAILED_MESSAGE = 'The order could not be placed. Try again.';
-const ONLINE_NOT_STARTED = 'The payment could not be started. Nothing was charged. Try again.';
+const ONLINE_NOT_STARTED = 'The payment could not be started. Nothing was charged.';
 
 // Decides what the screen does with the server reply for the method the customer chose.
 export const decidePlacement = <P extends { amount: number }>(method: PayMethod, result: PlaceOrderOutcome<P>): PlacementDecision<P> => {

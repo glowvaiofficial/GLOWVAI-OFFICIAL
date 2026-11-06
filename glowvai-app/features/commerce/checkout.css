@@ -30,6 +30,9 @@
 .glowvai-root .commerce-summary-address b { display: block; color: var(--ds-ink); font-size: 13px; }
 .glowvai-root .commerce-summary-address p { margin-top: 2px; overflow-wrap: anywhere; }
 
+/* Payment options: the icon stays on the same line as the option title. */
+.glowvai-root .commerce-pay-option b svg { display: inline-block; flex: 0 0 auto; margin: 0 4px 0 0; vertical-align: -2px; }
+
 /* Payment step: address still to confirm (inline notice instead of an extra screen). */
 .glowvai-root .commerce-confirm-address { display: flex; align-items: center; gap: 12px; border-color: var(--ds-brand); }
 .glowvai-root .commerce-confirm-address > svg { flex: 0 0 auto; color: var(--ds-brand); }
