@@ -186,7 +186,8 @@ export const isModalEvent = (kind: OrderEventKind): boolean => kind === 'placed'
 export type MessageTone = 'info' | 'success' | 'warning' | 'danger';
 
 export interface OrderMessageCopy {
-  kind: OrderEventKind;
+  // Set for order messages. Push messages from the server carry no order event kind.
+  kind?: OrderEventKind;
   variant: 'toast' | 'modal';
   tone: MessageTone;
   title: string;

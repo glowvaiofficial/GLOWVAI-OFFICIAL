@@ -7,6 +7,7 @@ import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
 import { startProductFeed } from './core/services/productFeed';
 import { OrderNotifications } from './core/notifications/OrderNotifications';
+import { InboxBridge } from './core/notifications/InboxBridge';
 
 // Screens
 import { WelcomeScreen } from './screens/WelcomeScreen';
@@ -47,6 +48,10 @@ const AppContent: React.FC = () => {
     try {
       const productId = new URLSearchParams(window.location.search).get('product');
       if (productId && /^[A-Za-z0-9_-]{1,140}$/.test(productId)) navigate('shop-product', { productId });
+      // A notification link: an order opens its details, and inbox=1 opens the notifications list.
+      const orderId = new URLSearchParams(window.location.search).get('order');
+      if (orderId && /^[A-Za-z0-9_-]{1,140}$/.test(orderId)) navigate('orders-detail', { orderId });
+      else if (new URLSearchParams(window.location.search).get('inbox') === '1') navigate('notifications-list');
     } catch {
       // Unreadable address: open the normal start screen.
     }
@@ -135,6 +140,7 @@ const AppContent: React.FC = () => {
         </div>
       )}
       <OrderNotifications />
+      <InboxBridge />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { planRelease } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
 import { planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
 import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
+import { notifyCustomer } from "@/lib/shop/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -73,5 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (code === "TOO_LATE") return json({ ok: false, error: "This order is already packed or on its way. Contact support to cancel it." }, 409);
     throw err;
   }
+  // Customer notification. notifyCustomer never throws, so the cancellation stands even if it fails.
+  await notifyCustomer(customer.uid, { type: "order_cancelled", relatedId: id });
   return json({ ok: true });
 }

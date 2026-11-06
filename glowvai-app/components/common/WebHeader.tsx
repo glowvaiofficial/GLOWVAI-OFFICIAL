@@ -1,8 +1,9 @@
 import React from 'react';
-import { LayoutGrid, RotateCcw, ScanFace, Search, ShoppingCart, User } from 'lucide-react';
+import { Bell, LayoutGrid, RotateCcw, ScanFace, Search, ShoppingCart, User } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { activeTabFor, NavTab, showsWebHeader, TAB_TARGET } from './navGroups';
 import { itemsLabel, useShellCart } from './useShellCart';
+import { useInbox } from '../../core/notifications/inboxStore';
 
 // Top navigation for tablet and desktop widths. Phones keep the bottom bar, so this is hidden there by CSS.
 const LINKS: { label: string; tab: NavTab; icon: React.ReactNode }[] = [
@@ -15,6 +16,7 @@ const LINKS: { label: string; tab: NavTab; icon: React.ReactNode }[] = [
 export const WebHeader: React.FC = () => {
   const { currentScreen, navigate } = useApp();
   const cart = useShellCart();
+  const unread = useInbox((s) => s.unreadCount);
 
   if (!showsWebHeader(currentScreen)) return null;
 
@@ -42,6 +44,11 @@ export const WebHeader: React.FC = () => {
               </button>
             );
           })}
+          <button type="button" className="notif-bell" onClick={() => navigate('notifications-list')} aria-current={currentScreen === 'notifications-list' ? 'page' : undefined} aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} title="Notifications">
+            <Bell size={18} aria-hidden="true" />
+            <span>Alerts</span>
+            {unread > 0 && <b className="notif-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</b>}
+          </button>
         </nav>
         <button
           className={`web-header-cart${cart.count > 0 ? ' has-items' : ''}`}

@@ -39,7 +39,7 @@ const shopCsp = [
 ].join('; ');
 
 // Static files that load their own third-party scripts keep their own rules. The shop has its own policy above.
-const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop).*';
+const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop|firebase-messaging-sw\\.js).*';
 
 // The shop's Firebase web config is written into the browser bundle at build time, so a production build without it
 // would ship a shop that cannot start. Fail the Vercel production build instead (see .env.example).
@@ -130,6 +130,16 @@ const nextConfig = {
             {
               source: '/',
               headers: [{ key: 'Cache-Control', value: 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400' }],
+            },
+            // The push service worker: its own policy, so it may load the Firebase messaging scripts from Google's CDN and
+            // nothing else. It is served from the app origin only.
+            {
+              source: '/firebase-messaging-sw.js',
+              headers: [
+                { key: 'Content-Security-Policy', value: "default-src 'none'; script-src 'self' https://www.gstatic.com; connect-src 'self' https://*.googleapis.com" },
+                { key: 'X-Content-Type-Options', value: 'nosniff' },
+                { key: 'Cache-Control', value: 'no-cache' },
+              ],
             },
             {
               source: '/images/:path*',

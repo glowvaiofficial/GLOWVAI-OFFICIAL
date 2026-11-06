@@ -51,7 +51,7 @@ const ToastCard: React.FC<{ message: NotificationMessage; onOpen: (m: Notificati
       </span>
       <span className="order-notify-text">
         <span className="order-notify-title">{message.title}</span>
-        <span className="order-notify-body">Order {message.orderId}</span>
+        <span className="order-notify-body">{message.orderId ? `Order ${message.orderId}` : message.body}</span>
       </span>
       <button type="button" className="order-notify-link" onClick={() => onOpen(message)}>
         View order
@@ -158,7 +158,9 @@ export const OrderNotifications: React.FC = () => {
   const openOrder = (message: NotificationMessage) => {
     if (message.variant === 'modal') useNotificationStore.getState().dismissModal(message.id);
     else useNotificationStore.getState().dismissToast(message.id);
-    navigate('orders-detail', { orderId: message.orderId });
+    // Messages without an order (pushes about rewards or reviews) open the notifications list.
+    if (message.orderId) navigate('orders-detail', { orderId: message.orderId });
+    else navigate('notifications-list');
   };
 
   const closeModal = (message: NotificationMessage) => useNotificationStore.getState().dismissModal(message.id);

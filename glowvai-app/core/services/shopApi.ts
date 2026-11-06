@@ -143,6 +143,56 @@ export async function cancelOrder(orderId: string, reason: string): Promise<ApiR
   return apiFetch(`/api/shop/orders/${encodeURIComponent(orderId)}/cancel`, post({ reason }));
 }
 
+// ---- Notifications (in-app list, read marking, push device, preferences) ---------------------------------------------
+
+export interface InAppNotification {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  relatedType: 'order' | 'review' | 'question' | 'account' | 'subscription';
+  relatedId: string | null;
+  createdAt: number;
+  readAt: number | null;
+}
+
+export interface NotificationPage {
+  notifications: InAppNotification[];
+  nextCursor: string | null;
+  unreadCount: number;
+}
+
+export interface NotificationPrefs {
+  orders: boolean;
+  offers: boolean;
+  reviews: boolean;
+}
+
+export async function fetchNotifications(cursor?: string | null): Promise<ApiResult<NotificationPage>> {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  return apiFetch<NotificationPage>(`/api/shop/notifications${query}`);
+}
+
+export async function markNotificationsRead(input: { ids: string[] } | { all: true }): Promise<ApiResult<{ marked: number; unreadCount: number }>> {
+  return apiFetch('/api/shop/notifications/read', post(input));
+}
+
+export async function registerPushToken(token: string): Promise<ApiResult<unknown>> {
+  return apiFetch('/api/shop/notifications/token', post({ token }));
+}
+
+export async function removePushToken(token: string): Promise<ApiResult<unknown>> {
+  return apiFetch('/api/shop/notifications/token', { method: 'DELETE', body: JSON.stringify({ token }) });
+}
+
+export async function fetchNotificationPrefs(): Promise<ApiResult<{ prefs: NotificationPrefs; marketingConsent: boolean }>> {
+  return apiFetch('/api/shop/notifications/prefs');
+}
+
+export async function saveNotificationPrefs(patch: Partial<NotificationPrefs>): Promise<ApiResult<{ prefs: NotificationPrefs }>> {
+  return apiFetch('/api/shop/notifications/prefs', post(patch));
+}
+
 export async function fetchSupportTickets(): Promise<ApiResult<{ tickets: SupportTicketView[] }>> {
   return apiFetch<{ tickets: SupportTicketView[] }>('/api/shop/support');
 }

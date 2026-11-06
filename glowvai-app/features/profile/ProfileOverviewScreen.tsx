@@ -1,4 +1,5 @@
-import { ChevronRight, Gift, Heart, HelpCircle, MapPin, Package, ScanFace, Settings, Sparkles } from 'lucide-react';
+import { Bell, ChevronRight, Gift, Heart, HelpCircle, MapPin, Package, ScanFace, Settings, Sparkles } from 'lucide-react';
+import { useInbox } from '../../core/notifications/inboxStore';
 import { useApp } from '../../context/useApp';
 import { getInitials, ProfileHeader, ProfileListItem } from './ProfileShared';
 import { formatRupee, orderTotal, statusLabel as orderStatusLabel, useShopOrders } from '../orders/orderUtils';
@@ -13,6 +14,7 @@ export const ProfileOverviewScreen = () => {
   const phone = customerDetails?.phoneNumber ? `+91 ${customerDetails.phoneNumber} · not verified yet` : 'Name and mobile number not added';
   const report = activeReport ?? skinReports[0] ?? null;
   const recentOrder = orders[0] ?? null;
+  const unread = useInbox((s) => s.unreadCount);
 
   return (
     <main className="profile-screen">
@@ -111,6 +113,7 @@ export const ProfileOverviewScreen = () => {
         <p className="profile-label">Account settings</p>
         <section className="profile-card">
           <ProfileListItem icon={<MapPin size={18} />} title="My addresses" onClick={() => navigate('address-list')} />
+          <ProfileListItem icon={<Bell size={18} />} title="Notifications" value={unread > 0 ? String(unread) : undefined} onClick={() => navigate('notifications-list')} />
           <ProfileListItem icon={<Settings size={18} />} title="Settings & privacy" onClick={() => navigate('profile-settings')} />
           <ProfileListItem icon={<HelpCircle size={18} />} title="Help & support" onClick={() => navigate('profile-support')} />
         </section>

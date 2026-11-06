@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
 import { retakeStockTx } from "@/lib/shop/platformStockTx";
+import { notifyCustomer } from "@/lib/shop/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,14 @@ export async function POST(req: NextRequest) {
   const now = Date.now();
   // Only an unsettled payment is confirmed here. A repeat after a refund must not flip the order back to PAID.
   // The check, the stock retake and the update happen in one transaction on the order as it is now.
+  let confirmed = false;
   await store.runTransaction(async (tx) => {
     const snap = await tx.get(doc.ref);
     const cur = snap.data();
     if (!snap.exists || !cur) return;
     const settled = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(String(cur.payment?.status ?? ""));
     if (settled) return;
+    confirmed = true;
     const retake = await retakeStockTx(tx, store, cur.stockReservation, now);
     const notes = retake.shortNote ? [{ at: now, actor: "Stock", event: retake.shortNote }] : [];
     tx.update(doc.ref, {
@@ -48,5 +51,7 @@ export async function POST(req: NextRequest) {
       events: [...(Array.isArray(cur.events) ? cur.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
     });
   });
+  // Customer notification, only when this call confirmed the payment (a repeat call sends nothing).
+  if (confirmed) await notifyCustomer(customer.uid, { type: "order_placed", relatedId: doc.id });
   return json({ ok: true, orderId: o.orderId, trackingId: o.trackingId, transactionId: paymentId });
 }
