@@ -2,13 +2,41 @@ import React, { useState } from 'react';
 import { ArrowRight, Minus, Plus, ShieldCheck, ShoppingBag, Tag, Trash2, Truck, X } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf } from '../../../lib/shop/variants';
 import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics';
 import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
 
+type SkippedItem = { name: string; reason: string };
+
+const readSkipped = (params: unknown): SkippedItem[] => {
+  const list = (params as { reorderSkipped?: unknown } | null)?.reorderSkipped;
+  if (!Array.isArray(list)) return [];
+  return list
+    .filter((i): i is SkippedItem => typeof i?.name === 'string' && typeof i?.reason === 'string')
+    .slice(0, 20);
+};
+
+// Lists the items a "buy it again" could not add, and why. Shown whether or not the bag has other items.
+const ReorderNotice: React.FC<{ items: SkippedItem[] }> = ({ items }) =>
+  items.length === 0 ? null : (
+    <section className="commerce-card commerce-reorder-notice" role="status" aria-label="Items not added">
+      <h2>Not added from your last order</h2>
+      <ul>
+        {items.map((item, i) => (
+          <li key={`${item.name}-${i}`}>
+            <b>{item.name}</b> <span className="commerce-muted">{item.reason}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+
 export const CartScreen: React.FC = () => {
-  const { goBack, navigate, showToast } = useApp();
+  const { goBack, navigate, showToast, activeParams } = useApp();
+  // Items from a "buy it again" that could not be added, with the reason (see useBuyAgain).
+  const skipped = readSkipped(activeParams);
   const items = useCartStore((s) => s.items);
   const incrementItem = useCartStore((s) => s.incrementItem);
   const decrementItem = useCartStore((s) => s.decrementItem);
@@ -48,6 +76,7 @@ export const CartScreen: React.FC = () => {
       <main className="commerce-screen commerce-cart is-empty">
         <FlowHeader title="Your cart" onBack={goBack} />
         <div className="commerce-body">
+          <ReorderNotice items={skipped} />
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
               <ShoppingBag size={34} />
@@ -77,6 +106,7 @@ export const CartScreen: React.FC = () => {
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">
+          <ReorderNotice items={skipped} />
           {showProgress && (
             <section className="commerce-card commerce-progress">
               <div className="commerce-progress-top">
@@ -120,13 +150,14 @@ export const CartScreen: React.FC = () => {
               )}
             </div>
             {cartItems.map((item) => (
-              <article className="commerce-line" key={item.productId}>
+              <article className="commerce-line" key={lineKeyOf(item.productId, item.variantId)}>
                 <div className="commerce-thumb">
                   {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={22} />}
                 </div>
                 <div className="commerce-line-copy">
                   <small>{item.brand}</small>
                   <h3>{item.name}</h3>
+                  {item.variantLabel && <small className="commerce-variant">{item.variantLabel}</small>}
                   <p>
                     <b>₹{item.price * item.quantity}</b>
                     {item.mrp && item.mrp > item.price && <s>₹{item.mrp * item.quantity}</s>}
@@ -138,7 +169,7 @@ export const CartScreen: React.FC = () => {
                     <button
                       onClick={() => {
                         safeHapticSelection();
-                        decrementItem(item.productId);
+                        decrementItem(lineKeyOf(item.productId, item.variantId));
                       }}
                       aria-label={item.quantity === 1 ? `Remove ${item.name}` : `Remove one ${item.name}`}
                     >
@@ -148,14 +179,14 @@ export const CartScreen: React.FC = () => {
                     <button
                       onClick={() => {
                         safeHapticSelection();
-                        incrementItem(item.productId);
+                        incrementItem(lineKeyOf(item.productId, item.variantId));
                       }}
                       aria-label={`Add one ${item.name}`}
                     >
                       <Plus size={14} />
                     </button>
                   </div>
-                  <button className="commerce-remove" onClick={() => removeItem(item.productId)} aria-label={`Remove ${item.name} from cart`}>
+                  <button className="commerce-remove" onClick={() => removeItem(lineKeyOf(item.productId, item.variantId))} aria-label={`Remove ${item.name} from cart`}>
                     <Trash2 size={14} /> Remove
                   </button>
                 </div>

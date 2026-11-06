@@ -720,3 +720,6 @@
   .glowvai-root .commerce-orb-spin,
   .glowvai-root .commerce-spinner { animation: none; }
 }
+
+/* Size, shade or pack of a cart or checkout line. */
+.commerce-variant { display: inline-block; color: var(--ds-muted, #667085); font-size: 12px; font-weight: 600; }

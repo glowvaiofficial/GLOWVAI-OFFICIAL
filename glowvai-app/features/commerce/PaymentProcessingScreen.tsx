@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Lock, Shield } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf, lineStillSold } from '../../../lib/shop/variants';
 import { useCustomerStore } from '../../core/state/customerStore';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { placeCartOrder } from './lib/orderPlacement';
 import { PAY_METHOD_LABEL, decidePlacement, parsePayMethod, toApiPaymentMethod, type PayMethod } from './lib/paymentMethod';
 import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
-import { verifyOnlinePayment } from '../../core/services/shopApi';
+import { setSubstitutionPreference } from '../../core/services/shopTracking';
+import { fetchShopConfig, verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
 import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
@@ -74,10 +76,13 @@ export const PaymentProcessingScreen: React.FC = () => {
         fail('Products are still loading. Check your connection and try again.', method);
         return;
       }
-      const liveIds = new Set(live.map((p) => p.id));
-      const unavailable = allItems.filter((item) => !liveIds.has(item.productId));
+      // Old lines move to their default variant, and lines already in the bag take the current variant prices.
+      useCartStore.getState().reconcileWithCatalog(live);
+      const liveById = new Map(live.map((p) => [p.id, p]));
+      // A line is kept only when its product, and its variant when it has one, is still sold.
+      const unavailable = Object.values(useCartStore.getState().items).filter((item) => !lineStillSold(item, liveById.get(item.productId)));
       if (unavailable.length > 0) {
-        unavailable.forEach((item) => useCartStore.getState().removeItem(item.productId));
+        unavailable.forEach((item) => useCartStore.getState().removeItem(lineKeyOf(item.productId, item.variantId)));
         const names = unavailable.map((item) => item.name || item.productId).slice(0, 3).join(', ');
         fail(
           `We removed ${unavailable.length} item${unavailable.length === 1 ? '' : 's'} that ${unavailable.length === 1 ? 'is' : 'are'} no longer sold (${names}). Review your bag and place the order again.`,
@@ -86,6 +91,11 @@ export const PaymentProcessingScreen: React.FC = () => {
         return;
       }
       if (!address?.serviceable) {
+        leave('checkout-review');
+        return;
+      }
+      // A delivery time must be chosen on the review step before paying.
+      if (!useCheckoutSession.getState().slotId) {
         leave('checkout-review');
         return;
       }
@@ -105,7 +115,9 @@ export const PaymentProcessingScreen: React.FC = () => {
         items: allItems,
         address,
         couponCode,
+        coinsToRedeem: useCheckoutSession.getState().coinsToRedeem,
         tip: useCheckoutSession.getState().tip,
+        deliverySlot: useCheckoutSession.getState().slotId,
         paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
       });
@@ -113,13 +125,17 @@ export const PaymentProcessingScreen: React.FC = () => {
 
       if (decision.kind === 'razorpay') {
         try {
-          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone });
+          const config = await fetchShopConfig();
+          const emi = config.ok && config.data?.payments?.emi?.available === true;
+          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone }, { emi });
           const verified = await verifyOnlinePayment(paid);
           if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
           useCartStore.getState().clearCart();
           useCheckoutSession.getState().setPlacement('finished');
           // The confirmation screen shows this order, so the order-status popup must not announce it again.
           markOrderSeen(verified.data.orderId, 'PLACED');
+          // The preference is saved on the placed order. A failure here does not undo the order: it can be changed later.
+          void setSubstitutionPreference(verified.data.orderId, useCheckoutSession.getState().substitutionPreference);
           void useCustomerStore.getState().loadOrders();
           navigate('checkout-payment-success', {
             orderId: verified.data.orderId,
@@ -148,6 +164,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         useCheckoutSession.getState().setPlacement('finished');
         // The confirmation screen shows this order, so the order-status popup must not announce it again.
         markOrderSeen(decision.orderId, 'PLACED');
+        void setSubstitutionPreference(decision.orderId, useCheckoutSession.getState().substitutionPreference);
         void useCustomerStore.getState().loadOrders();
         navigate('checkout-payment-success', {
           orderId: decision.orderId,

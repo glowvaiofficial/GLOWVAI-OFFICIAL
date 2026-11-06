@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, error: "Enter a valid email, or leave it empty." }, 400);
 
   const raw = (body.address ?? {}) as Record<string, unknown>;
-  const pincode = text(raw.pincode, 6);
+  // Not cut to six characters: a 7-digit pincode is refused, not shortened into a valid-looking one.
+  const pincode = text(raw.pincode, 20);
   if (pincode && !/^\d{6}$/.test(pincode)) return json({ ok: false, error: "Enter a 6-digit pincode." }, 400);
   const address = {
     fullAddress: text(raw.fullAddress, 300),

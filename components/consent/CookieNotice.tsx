@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { captureUtmParameters } from "@/lib/analytics/utm";
 
 /**
@@ -22,6 +23,7 @@ export interface ConsentState {
 
 export function CookieNotice() {
   const [showBanner, setShowBanner] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Capture UTM parameters into sessionStorage on load
@@ -67,7 +69,8 @@ export function CookieNotice() {
     window.dispatchEvent(new CustomEvent("gv_consent_updated", { detail: consentState }));
   };
 
-  if (!showBanner) return null;
+  // The rider page is a work tool: the banner would cover the deliveries. Partners see it on other pages.
+  if (!showBanner || pathname?.startsWith("/rider")) return null;
 
   return (
     <div

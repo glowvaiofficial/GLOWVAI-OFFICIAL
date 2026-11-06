@@ -3,6 +3,7 @@ import { db, json, limitByIp } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
 import { releaseStockTx, retakeStockTx } from "@/lib/shop/platformStockTx";
+import { notifyCustomer } from "@/lib/shop/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
   if (!doc) return json({ ok: true, ignored: true });
   const now = Date.now();
   const store = db();
+  // Set inside the transaction when this event changed the order; the customer is told after it commits.
+  let notice = null as { uid: string; type: "order_placed" | "payment_failed" } | null;
   // The order and its platform stock change together: a failed payment gives the stock back (once), and a payment
   // confirmed after that takes it again. The order is read inside the transaction before anything is written.
   await store.runTransaction(async (tx) => {
@@ -63,6 +66,7 @@ export async function POST(req: NextRequest) {
         updatedAt: now,
         events: [...history, { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
       });
+      notice = { uid: String(o.userId ?? ""), type: "order_placed" };
     } else if (event.event === "payment.failed" && o.payment?.status === "PENDING") {
       const release = await releaseStockTx(tx, store, o.stockReservation, now);
       tx.update(doc.ref, {
@@ -71,8 +75,11 @@ export async function POST(req: NextRequest) {
         updatedAt: now,
         events: [...history, { at: now, actor: "Payment provider", event: "Payment failed" }],
       });
+      notice = { uid: String(o.userId ?? ""), type: "payment_failed" };
     }
   });
+  // Customer notification after the transaction. notifyCustomer never throws, so the webhook still answers Razorpay.
+  if (notice?.uid) await notifyCustomer(notice.uid, { type: notice.type, relatedId: doc.id });
   return json({ ok: true });
 }
 

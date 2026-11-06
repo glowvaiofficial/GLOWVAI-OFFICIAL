@@ -9,6 +9,7 @@ import { HelpAndSupportScreen } from './HelpAndSupportScreen';
 import { ReferralHubScreen } from './ReferralHubScreen';
 import { StudentReferralScreen } from './StudentReferralScreen';
 import { ReferralTransactionsScreen } from './ReferralTransactionsScreen';
+import { SubscriptionsScreen } from './SubscriptionsScreen';
 import { StudentStatusScreen } from './StudentStatusScreen';
 import { AppDoctorScreen } from './AppDoctorScreen';
 
@@ -22,6 +23,7 @@ export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'profile-referrals': ReferralHubScreen,
   'profile-referral-code': StudentReferralScreen,
   'profile-referral-transactions': ReferralTransactionsScreen,
+  'profile-subscriptions': SubscriptionsScreen,
   'profile-student-status': StudentStatusScreen,
   'debug-app-doctor': AppDoctorScreen,
 };

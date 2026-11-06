@@ -42,7 +42,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, compact = fal
       </div>
 
       <div className="commerce-product-copy">
-        <small className="commerce-product-delivery"><Zap size={11} fill="currentColor" /> {product.deliveryMinutes} mins</small>
+        {product.deliveryMinutes !== null && <small className="commerce-product-delivery"><Zap size={11} fill="currentColor" /> {product.deliveryMinutes} mins</small>}
         <button className="commerce-product-name" onClick={() => navigate('product-detail', { productId: product.id })}>
           <b className="line-clamp-2">{product.name}</b>
           <span>{variant.size}</span>

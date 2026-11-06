@@ -3,7 +3,9 @@
 // are ever written by these helpers; the rest of the product document belongs to the catalogue.
 import "server-only";
 import type { DocumentReference, Firestore, Transaction } from "firebase-admin/firestore";
-import { planRelease, planRetake, platformLinesOf, type ProductStock, type StockChange } from "./platformStock";
+import { planRelease, planRetake, type ProductStock, type StockChange } from "./platformStock";
+import { planVariantRelease, planVariantRetake, reservedProductIds } from "./variants";
+import { writeVariantStockChanges } from "./variantStockTx";
 
 export const productRef = (store: Firestore, productId: string): DocumentReference => store.collection("products").doc(productId);
 
@@ -35,8 +37,9 @@ export async function releaseStockTx(
 ): Promise<{ patch: Record<string, unknown> }> {
   const r = (reservation ?? null) as { releasedAt?: unknown } | null;
   if (!r || r.releasedAt) return { patch: {} };
-  const stock = await readProductStock(tx, store, platformLinesOf(reservation).map((l) => l.productId));
+  const stock = await readProductStock(tx, store, reservedProductIds(reservation));
   writeStockChanges(tx, store, planRelease(reservation, stock), now);
+  writeVariantStockChanges(tx, store, planVariantRelease(reservation, stock), now);
   return { patch: { "stockReservation.releasedAt": now } };
 }
 
@@ -50,11 +53,14 @@ export async function retakeStockTx(
 ): Promise<{ patch: Record<string, unknown>; shortNote: string | null }> {
   const r = (reservation ?? null) as { releasedAt?: unknown } | null;
   if (!r || !r.releasedAt) return { patch: {}, shortNote: null };
-  const stock = await readProductStock(tx, store, platformLinesOf(reservation).map((l) => l.productId));
+  const stock = await readProductStock(tx, store, reservedProductIds(reservation));
   const { decrements, short } = planRetake(reservation, stock);
+  const variantRetake = planVariantRetake(reservation, stock);
   writeStockChanges(tx, store, decrements, now);
-  const shortNote = short.length
-    ? `Stock was short when the payment was retaken: ${short.map((s) => `${s.name || s.productId} (${s.available} of ${s.requested} left)`).join(", ")}. Review before dispatch.`
+  writeVariantStockChanges(tx, store, variantRetake.writes, now);
+  const allShort = [...short, ...variantRetake.short];
+  const shortNote = allShort.length
+    ? `Stock was short when the payment was retaken: ${allShort.map((s) => `${s.name || s.productId} (${s.available} of ${s.requested} left)`).join(", ")}. Review before dispatch.`
     : null;
   return { patch: { "stockReservation.releasedAt": null }, shortNote };
 }

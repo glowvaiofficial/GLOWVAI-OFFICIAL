@@ -2,21 +2,26 @@ import React from 'react';
 import { ArrowRight, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
+import { lineKeyOf } from '../../../lib/shop/variants';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
+import { DeliverySlotPicker } from './components/DeliverySlotPicker';
+import { CoinsRedeemCard } from './CoinsRedeemCard';
 
 // Step 2 of checkout: the items and the delivery address. Back goes to the cart.
 export const CheckoutReviewScreen: React.FC = () => {
   const { navigate } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
+  const slotId = useCheckoutSession((s) => s.slotId);
   const address = useDeliveryAddress();
 
   const cartItems = Object.values(items);
   const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress);
-  const canContinue = Boolean(address?.serviceable);
+  // A delivery time is required too: the order says when it should arrive.
+  const canContinue = Boolean(address?.serviceable) && Boolean(slotId);
 
   if (cartItems.length === 0) {
     return (
@@ -48,12 +53,13 @@ export const CheckoutReviewScreen: React.FC = () => {
     useCheckoutSession.getState().setAddressConfirmed(true);
     navigate('checkout-payment-method');
   };
-  const ctaLabel = address ? 'Confirm address and continue' : 'Add delivery address';
+  const ctaLabel = !address ? 'Add delivery address' : slotId ? 'Confirm address and continue' : 'Choose a delivery time';
 
   return (
     <main className="commerce-screen commerce-review has-aside">
       <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={() => navigate('cart-tab')} />
       <CheckoutSteps step={2} />
+      <CoinsRedeemCard items={cartItems} />
 
       <div className="commerce-body commerce-split">
         <div className="commerce-main">
@@ -70,6 +76,15 @@ export const CheckoutReviewScreen: React.FC = () => {
 
           <DeliveryAddressCard address={address} onChange={() => navigate('address-saved', { returnTo: 'checkout-review' })} onAdd={() => navigate('location-setup', { returnTo: 'checkout-review' })} />
 
+          {address?.serviceable && (
+            <section className="commerce-card" aria-labelledby="review-slot-title">
+              <div className="commerce-card-head">
+                <h2 id="review-slot-title">When should it arrive?</h2>
+              </div>
+              <DeliverySlotPicker />
+            </section>
+          )}
+
           <section className="commerce-card" aria-label="Items">
             <div className="commerce-card-head">
               <h2>Items ({totals.itemCount})</h2>
@@ -78,14 +93,17 @@ export const CheckoutReviewScreen: React.FC = () => {
               </button>
             </div>
             {cartItems.map((item) => (
-              <div className="commerce-review-line" key={item.productId}>
+              <div className="commerce-review-line" key={lineKeyOf(item.productId, item.variantId)}>
                 <div className="commerce-thumb">
                   {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={20} />}
                 </div>
                 <div>
                   <small>{item.brand}</small>
                   <h3>{item.name}</h3>
-                  <p>Qty {item.quantity}</p>
+                  <p>
+                    {item.variantLabel && <span className="commerce-variant">{item.variantLabel} · </span>}
+                    Qty {item.quantity}
+                  </p>
                 </div>
                 <b className="commerce-review-price">₹{item.price * item.quantity}</b>
               </div>

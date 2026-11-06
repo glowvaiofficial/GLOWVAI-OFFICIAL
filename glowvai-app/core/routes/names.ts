@@ -45,6 +45,7 @@ export type PortedScreenName =
   | 'orders-detail'
   | 'orders-tracking'
   | 'orders-rate'
+  | 'returns-request'
   // Skin scan (features/scan, features/recommendations)
   | 'scan-tab'
   | 'scan-intro'
@@ -63,7 +64,10 @@ export type PortedScreenName =
   | 'profile-referrals'
   | 'profile-referral-code'
   | 'profile-referral-transactions'
+  | 'profile-subscriptions'
   | 'profile-student-status'
+  // Notifications (features/notifications)
+  | 'notifications-list'
   // Routine and ingredient guidance (features/recommendations)
   | 'recommend-overview'
   | 'recommend-routine'

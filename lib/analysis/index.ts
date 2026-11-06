@@ -1,4 +1,4 @@
-import { HeuristicSkinEngine, SkinEngine, AnalysisReport } from "./engine";
+import { HeuristicSkinEngine, type SkinEngine, type AnalysisReport } from "./engine";
 
 const currentEngine: SkinEngine = new HeuristicSkinEngine();
 

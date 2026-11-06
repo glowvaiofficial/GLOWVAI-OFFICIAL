@@ -4,6 +4,7 @@
 import "server-only";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
+import { getMessaging, type Messaging } from "firebase-admin/messaging";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -27,6 +28,11 @@ export function db(): Firestore {
 // Firebase Auth (Admin SDK) on the same app, for the vendor API's token checks.
 export function adminAuth(): Auth {
   return getAuth(adminApp());
+}
+
+// Firebase Cloud Messaging (web push) on the same app. Used by lib/shop/notify.ts only.
+export function messaging(): Messaging {
+  return getMessaging(adminApp());
 }
 
 export const json = (body: unknown, status = 200) =>

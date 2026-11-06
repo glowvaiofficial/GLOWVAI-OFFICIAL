@@ -20,7 +20,15 @@
     "test:support": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/support/*.test.ts\"",
     "test": "npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
     "seo:test": "npx tsx scripts/check-sitemap.ts && npx tsx scripts/check-links.ts && npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
-    "test:stock": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/stock/*.test.ts\""
+    "test:stock": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/stock/*.test.ts\"",
+    "test:reviews": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/reviews/*.test.ts\"",
+    "test:returns": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/returns/*.test.ts\"",
+    "test:variants": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/variants/*.test.ts\"",
+    "test:notify": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/notify/*.test.ts\"",
+    "test:features": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/features/*.test.ts\"",
+    "test:growth": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/growth/*.test.ts\"",
+    "test:rider": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/rider/*.test.ts\"",
+    "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-import { SubScores } from "./analysis";
+import type { SubScores } from "./analysis";
 
 export interface ExcelProduct {
   id: string;

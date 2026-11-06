@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
+import { useLiveCatalog, type SkincareProduct } from '../../../core/data/indianSkincareCatalog';
+import { rankSuggestions } from '../../../../lib/shop/suggest';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import '../styles/shop-search-filters.css';
 
+const SUGGEST_LIST_ID = 'shop-search-suggestions';
 const REAL_CATEGORIES = ['Serums', 'Cleansers', 'Moisturizers', 'Suncare', 'Treatments'];
 const OPTION_LABELS: Record<string, string> = { Suncare: 'Sunscreen' };
 // Only brands with at least one catalogue product, so a brand filter never empties the list on its own.
@@ -35,6 +37,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const [query, setQuery] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const resultsRef = useRef<HTMLElement>(null);
@@ -45,16 +48,39 @@ export const ShopSearchFiltersScreen: React.FC = () => {
     setVoiceSupported(Boolean(w.SpeechRecognition || w.webkitSpeechRecognition));
   }, []);
 
-  const suggestions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const source = q
-      ? catalog.filter((p) => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))
-      : catalog;
-    return source
-      .slice(0, 5)
-      .map((p) => p.name)
-      .filter((name) => !q || name.toLowerCase().includes(q));
-  }, [query]);
+  // Suggestions are the best matches by name and brand from the products already loaded: no request per keystroke.
+  const suggestions = useMemo(() => rankSuggestions(catalog, query), [catalog, query]);
+  const showSuggest = isSearchFocused && suggestions.length > 0;
+  const openSuggestion = (product: SkincareProduct) => {
+    setIsSearchFocused(false);
+    setActiveSuggestion(-1);
+    navigate('shop-product', { productId: product.id });
+  };
+  const closeSuggest = () => {
+    setIsSearchFocused(false);
+    setActiveSuggestion(-1);
+  };
+  const onSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown' && suggestions.length > 0) {
+      e.preventDefault();
+      setIsSearchFocused(true);
+      setActiveSuggestion((i) => (i + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp' && suggestions.length > 0) {
+      e.preventDefault();
+      setIsSearchFocused(true);
+      setActiveSuggestion((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === 'Enter' && showSuggest && activeSuggestion >= 0) {
+      e.preventDefault();
+      openSuggestion(suggestions[activeSuggestion]);
+    } else if (e.key === 'Escape') {
+      if (showSuggest) {
+        e.preventDefault();
+        closeSuggest();
+      } else if (query) {
+        setQuery('');
+      }
+    }
+  };
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -103,7 +129,6 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   };
 
   const count = results.length;
-  const suggestTitle = query.trim() ? `Matches for "${query.trim()}"` : 'Products in the shop';
   const showResults = () => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   return (
@@ -121,11 +146,18 @@ export const ShopSearchFiltersScreen: React.FC = () => {
             <Search size={18} />
             <input
               type="text"
+              role="combobox"
+              aria-expanded={showSuggest}
+              aria-controls={SUGGEST_LIST_ID}
+              aria-autocomplete="list"
+              aria-activedescendant={showSuggest && activeSuggestion >= 0 ? `${SUGGEST_LIST_ID}-${activeSuggestion}` : undefined}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
+                setActiveSuggestion(-1);
                 setIsSearchFocused(true);
               }}
+              onKeyDown={onSearchKey}
               onFocus={() => setIsSearchFocused(true)}
               placeholder="Search by ingredient, product or brand..."
               aria-label="Search products"
@@ -151,38 +183,31 @@ export const ShopSearchFiltersScreen: React.FC = () => {
             )}
           </div>
 
-          {isSearchFocused && (
+          {showSuggest && (
             <>
-              <button
-                type="button"
-                className="shop-search-backdrop"
-                onClick={() => setIsSearchFocused(false)}
-                aria-label="Close suggestions"
-              />
-              <div className="shop-search-suggest">
-                <div className="shop-search-suggest-head">
-                  <span>{suggestTitle}</span>
-                  <button type="button" onClick={() => setIsSearchFocused(false)}>
-                    Done
-                  </button>
-                </div>
-                {suggestions.map((term) => (
-                  <button
-                    key={term}
-                    type="button"
-                    className="shop-search-suggest-row"
-                    onClick={() => {
-                      setQuery(term);
-                      setIsSearchFocused(false);
+              <button type="button" className="shop-search-backdrop" onClick={closeSuggest} aria-label="Close suggestions" tabIndex={-1} />
+              <ul id={SUGGEST_LIST_ID} role="listbox" aria-label="Suggested products" className="shop-search-suggest">
+                {suggestions.map((product, index) => (
+                  <li
+                    key={product.id}
+                    id={`${SUGGEST_LIST_ID}-${index}`}
+                    role="option"
+                    aria-selected={index === activeSuggestion}
+                    className={index === activeSuggestion ? 'shop-search-suggest-row is-active' : 'shop-search-suggest-row'}
+                    // The input keeps focus while a suggestion is picked; the choice is made on press.
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      openSuggestion(product);
                     }}
+                    onMouseEnter={() => setActiveSuggestion(index)}
                   >
                     <span>
-                      <Search size={14} /> {term}
+                      <Search size={14} /> {product.name}
                     </span>
-                    <span>Select</span>
-                  </button>
+                    <span>{product.brand}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </>
           )}
         </div>

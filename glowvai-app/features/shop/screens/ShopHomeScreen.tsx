@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
@@ -8,12 +8,13 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-home.css';
 
 function buildCatalogLists(catalog: SkincareProduct[]) {
   const FULL_SIZE_PRODUCTS = catalog.filter((p) => !isTrialProduct(p));
-  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount).slice(0, 6);
+  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0)).slice(0, 6);
   const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500).slice(0, 6);
 
   // Deals are real catalogue products with a discount from their own MRP.
@@ -127,6 +128,19 @@ function ProductRail({ title, products }: { title: string; products: SkincarePro
   );
 }
 
+// The products the customer looked at most recently on this device (ids only), newest first. Hidden until there are some.
+function ContinueBrowsingRail() {
+  const { navigate } = useApp();
+  const catalog = useLiveCatalog();
+  const [ids] = useState(() => readRecentlyViewed());
+  const products = ids
+    .map((id) => catalog.find((p) => p.id === id))
+    .filter((p): p is SkincareProduct => Boolean(p))
+    .slice(0, 10);
+  if (products.length === 0) return null;
+  return <ProductRail title="Continue browsing" products={products} />;
+}
+
 function DealCard({ product }: { product: SkincareProduct }) {
   const { navigate } = useApp();
   const quantity = useCartStore((s) => s.items[product.id]?.quantity ?? 0);
@@ -150,7 +164,12 @@ function DealCard({ product }: { product: SkincareProduct }) {
       <button
         type="button"
         className="shop-home-deal-add"
-        onClick={() =>
+        onClick={() => {
+          // Products with sizes or shades are chosen on their page.
+          if (product.variants?.length) {
+            navigate('shop-product', { productId: product.id });
+            return;
+          }
           addItem({
             productId: product.id,
             name: product.name,
@@ -158,10 +177,10 @@ function DealCard({ product }: { product: SkincareProduct }) {
             image: getProductImageUrl(product),
             price: product.price,
             mrp: product.originalPrice,
-          })
-        }
+          });
+        }}
       >
-        {quantity > 0 ? `In cart · ${quantity}` : 'Add +'}
+        {product.variants?.length ? 'Choose +' : quantity > 0 ? `In cart · ${quantity}` : 'Add +'}
       </button>
     </article>
   );
@@ -385,6 +404,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </section>
       )}
 
+      <ContinueBrowsingRail />
       <ProductRail title="Top Rated" products={TOP_RATED} />
       <ProductRail title="Under ₹500" products={UNDER_500} />
 

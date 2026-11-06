@@ -51,9 +51,13 @@ export const ShopProductReviewsScreen: React.FC = () => {
   }
 
   const image = getProductThumbUrl(product);
-  const reviewCount = product.reviewCount.toLocaleString('en-IN');
+  const reviewCount = (product.reviewCount ?? 0).toLocaleString('en-IN');
 
   const handleAddToCart = () => {
+    if (product.variants?.length) {
+      navigate('shop-product', { productId: product.id });
+      return;
+    }
     addItem({
       productId: product.id,
       name: product.name,
@@ -79,13 +83,19 @@ export const ShopProductReviewsScreen: React.FC = () => {
       <div className="shop-reviews-body">
         <aside className="shop-reviews-side">
           <section className="shop-reviews-summary" aria-label="Rating summary">
-            <span className="shop-reviews-score-value">{product.rating.toFixed(1)}</span>
-            <div className="shop-reviews-score-meta">
-              <Stars value={product.rating} size={16} className="shop-reviews-stars" />
-              <span className="shop-reviews-total">
-                {product.rating.toFixed(1)} out of 5 · {reviewCount} reviews
-              </span>
-            </div>
+            {product.rating !== null ? (
+              <>
+                <span className="shop-reviews-score-value">{product.rating.toFixed(1)}</span>
+                <div className="shop-reviews-score-meta">
+                  <Stars value={product.rating} size={16} className="shop-reviews-stars" />
+                  <span className="shop-reviews-total">
+                    {product.rating.toFixed(1)} out of 5 · {reviewCount} reviews
+                  </span>
+                </div>
+              </>
+            ) : (
+              <span className="shop-reviews-total">No reviews yet</span>
+            )}
           </section>
 
           <section className="shop-reviews-buybar" aria-label="Product">
