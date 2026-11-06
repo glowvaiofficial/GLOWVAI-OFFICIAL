@@ -18,6 +18,11 @@ export function HeaderAndFooterWrapper({ children, city }: HeaderAndFooterWrappe
   const pathname = usePathname();
 
   // The shop runs the glowvai app shell, which has its own navigation and bottom bar.
+  // The rider page is a standalone tool for delivery partners: no site navigation or promotional bars.
+  if (pathname?.startsWith("/rider")) {
+    return <main id="main" className="flex-1">{children}</main>;
+  }
+
   if (pathname?.startsWith("/shop")) {
     return (
       <>

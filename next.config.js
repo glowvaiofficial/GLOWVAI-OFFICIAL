@@ -39,8 +39,21 @@ const shopCsp = [
 ].join('; ');
 
 // Static files that load their own third-party scripts keep their own rules. The shop has its own policy above.
-const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop|firebase-messaging-sw\\.js).*';
+const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop|firebase-messaging-sw\\.js|rider).*';
 
+// The rider page (delivery partners) talks only to this site. It gets its own, stricter policy and no third-party hosts.
+const riderCsp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
 // The shop's Firebase web config is written into the browser bundle at build time, so a production build without it
 // would ship a shop that cannot start. Fail the Vercel production build instead (see .env.example).
 const SHOP_FIREBASE_ENV = ['NEXT_PUBLIC_FIREBASE_API_KEY', 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN', 'NEXT_PUBLIC_FIREBASE_PROJECT_ID', 'NEXT_PUBLIC_FIREBASE_APP_ID'];
@@ -106,6 +119,27 @@ const nextConfig = {
                 { key: 'X-Frame-Options', value: 'DENY' },
                 { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
                 { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=(self)' },
+              ],
+            },
+            {
+              source: '/rider',
+              headers: [
+                { key: 'Content-Security-Policy', value: riderCsp },
+                { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+                { key: 'X-Content-Type-Options', value: 'nosniff' },
+                { key: 'X-Frame-Options', value: 'DENY' },
+                { key: 'Referrer-Policy', value: 'no-referrer' },
+                { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
+                { key: 'Cache-Control', value: 'no-store' },
+                { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+              ],
+            },
+            {
+              source: '/api/rider/:path*',
+              headers: [
+                { key: 'X-Content-Type-Options', value: 'nosniff' },
+                { key: 'Referrer-Policy', value: 'no-referrer' },
+                { key: 'Cache-Control', value: 'no-store' },
               ],
             },
             {
