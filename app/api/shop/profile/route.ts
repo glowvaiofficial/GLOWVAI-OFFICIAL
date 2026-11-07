@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
+import { noteDeviceSighting } from "@/lib/shop/privacy/sightings";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ export async function GET(req: NextRequest) {
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   const userLimited = limitByUser(customer.uid, "profile-get", 60);
   if (userLimited) return userLimited;
+  await noteDeviceSighting(req, customer.uid);
   const snap = await db().collection("users").doc(customer.uid).get();
   const d = snap.data() ?? {};
   return json({

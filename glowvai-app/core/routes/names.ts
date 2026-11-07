@@ -75,4 +75,9 @@ export type PortedScreenName =
   | 'recommend-patch-test'
   | 'recommend-checkout'
   // Debug
-  | 'debug-app-doctor';
+  | 'debug-app-doctor'
+  // Privacy and security (features/privacy): privacy centre, devices, saved payment methods, gift cards
+  | 'privacy-center'
+  | 'privacy-devices'
+  | 'payment-methods'
+  | 'gift-cards';

@@ -8,6 +8,7 @@ import { routes as scanRoutes } from './features/scan/routes';
 import { routes as profileRoutes } from './features/profile/routes';
 import { routes as recommendationRoutes } from './features/recommendations/routes';
 import { routes as notificationRoutes } from './features/notifications/routes';
+import { routes as privacyRoutes } from './features/privacy/routes';
 
 // Every customer-facing mobile-app screen, keyed by its PortedScreenName.
 export const portedRoutes: Partial<Record<PortedScreenName, ComponentType>> = {
@@ -19,4 +20,5 @@ export const portedRoutes: Partial<Record<PortedScreenName, ComponentType>> = {
   ...profileRoutes,
   ...recommendationRoutes,
   ...notificationRoutes,
+  ...privacyRoutes,
 };
