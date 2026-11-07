@@ -75,4 +75,17 @@ export type PortedScreenName =
   | 'recommend-patch-test'
   | 'recommend-checkout'
   // Debug
-  | 'debug-app-doctor';
+  | 'debug-app-doctor'
+  // Account settings hub (features/settings). 'profile-settings' is the hub itself.
+  | 'settings-language'
+  | 'settings-notifications'
+  | 'settings-activity'
+  | 'settings-wallet'
+  | 'settings-gift-cards'
+  | 'settings-privacy'
+  | 'settings-sell'
+  | 'settings-affiliate'
+  | 'help-index'
+  | 'help-faq'
+  | 'help-terms'
+  | 'help-privacy';

@@ -20,7 +20,7 @@ const TAB_SCREENS: Record<NavTab, ScreenName[]> = {
   categories: ['categories', 'shop-browse', 'shop-category'],
   scan: ['face-prep', 'face-capture', 'face-loading', 'skin-report', 'scan-tab', 'scan-intro', 'scan-camera', 'scan-gallery', 'scan-preview', 'scan-analyzing', 'scan-report', 'scan-failed'],
   orders: ['order-history', 'order-tracking', 'order-cancelled', 'streak-tracking', 'orders-list', 'orders-detail', 'orders-tracking', 'orders-rate', 'returns-request'],
-  account: ['profile', 'support', 'student-referral', 'profile-tab', 'profile-overview', 'profile-edit', 'profile-settings', 'profile-support', 'profile-referrals', 'profile-referral-code', 'profile-subscriptions', 'auth-change-phone', 'auth-student-verify', 'address-list', 'address-saved', 'address-add', 'shop-wishlist', 'notifications-list'],
+  account: ['profile', 'support', 'student-referral', 'profile-tab', 'profile-overview', 'profile-edit', 'profile-settings', 'profile-support', 'profile-referrals', 'profile-referral-code', 'profile-subscriptions', 'auth-change-phone', 'auth-student-verify', 'address-list', 'address-saved', 'address-add', 'shop-wishlist', 'notifications-list', 'settings-language', 'settings-notifications', 'settings-activity', 'settings-wallet', 'settings-gift-cards', 'settings-privacy', 'settings-sell', 'settings-affiliate', 'help-index', 'help-faq', 'help-terms', 'help-privacy'],
   cart: ['cart', 'cart-tab'],
 };
 

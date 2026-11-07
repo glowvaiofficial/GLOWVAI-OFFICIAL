@@ -6,6 +6,7 @@ import { readProductVariants, resolveVariant } from "@/lib/shop/variants";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { firstRunAt, validateSubscriptionInput } from "@/lib/shop/growth/subscriptions";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -103,5 +104,6 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
     });
   });
+  await recordActivity(customer.uid, "subscription_started", now);
   return json({ ok: true, subscriptionId: id });
 }

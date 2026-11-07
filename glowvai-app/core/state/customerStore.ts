@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { isLanguageCode } from '@/lib/shop/settings/rules';
+import { useLanguageStore } from '../i18n/store';
 import {
   cancelOrder as cancelOrderRequest,
   fetchOrders,
@@ -41,23 +43,33 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
   loadProfile: async () => {
     set({ profileStatus: 'loading' });
     const res = await fetchProfile();
-    if (res.ok) set({ profile: res.data?.profile ?? null, profileStatus: 'ready' });
-    else set({ profileStatus: 'error' });
+    if (res.ok) {
+      const profile = res.data?.profile ?? null;
+      set({ profile, profileStatus: 'ready' });
+      // The account language wins over the device choice once the account is loaded.
+      if (profile?.language && isLanguageCode(profile.language)) useLanguageStore.getState().setLanguage(profile.language);
+    } else set({ profileStatus: 'error' });
   },
 
   saveProfile: async (input) => {
     const res = await saveProfileRequest(input);
     if (!res.ok) return { ok: false, error: res.error };
+    // Show the saved values at once, then take the server's copy (with the consent dates) so nothing drifts.
+    const previous = get().profile;
     set({
       profile: {
+        ...(previous ?? { address: null, language: undefined }),
         name: input.name.trim(),
         phone: input.phone.replace(/\D/g, '').slice(-10),
+        phoneVerified: false,
         email: (input.email ?? '').trim().toLowerCase(),
-        address: input.address,
-        marketingOptIn: input.marketingOptIn === true,
+        address: input.address === undefined || input.address === null ? previous?.address ?? null : input.address,
+        marketingOptIn: input.marketingOptIn ?? previous?.marketingOptIn ?? false,
+        analyticsOptIn: input.analyticsOptIn ?? previous?.analyticsOptIn ?? false,
       },
       profileStatus: 'ready',
     });
+    await get().loadProfile();
     return { ok: true, error: null };
   },
 
