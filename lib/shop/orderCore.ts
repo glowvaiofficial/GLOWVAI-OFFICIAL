@@ -51,6 +51,8 @@ export interface PlaceOrderInput extends ParsedOrderRequest {
   // Subscription orders: the subscription they belong to, and a fixed order id so a repeat run cannot create two.
   subscriptionId?: string | null;
   orderId?: string;
+  // Affiliate code earned by the visit (set by the orders route from the signed cookie; null for the cron).
+  affiliateCode?: string | null;
   // Starts the online payment for the amount (rupees). Only used when paymentMethod is ONLINE.
   startPayment?: (amountRupees: number, orderId: string) => Promise<{ id: string; amount: number; currency: string }>;
   now?: number;
@@ -182,6 +184,7 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     couponCode: discountAmount > 0 ? input.couponCode : null,
     referralCodeUsed: null,
     referralProcessed: false,
+    affiliateCode: input.affiliateCode ?? null,
     source: "web_shop",
     ...(input.subscriptionId ? { subscriptionId: input.subscriptionId } : {}),
     events: [{ at: now, actor: "Customer", event: online ? "Payment started (online)" : "Order placed (cash on delivery)" }],
