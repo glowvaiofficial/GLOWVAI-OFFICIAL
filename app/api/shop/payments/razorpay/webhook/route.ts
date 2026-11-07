@@ -4,6 +4,7 @@ import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
 import { releaseStockTx, retakeStockTx } from "@/lib/shop/platformStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
+import { topupWebhookLive } from "@/lib/shop/wallet/live";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ const UNSETTLED = new Set(["PENDING", "FAILED"]);
 interface RazorpayEvent {
   event?: string;
   payload?: {
-    payment?: { entity?: { id?: string; order_id?: string } };
+    payment?: { entity?: { id?: string; order_id?: string; amount?: number; currency?: string; status?: string } };
     refund?: { entity?: RazorpayRefundEntity };
   };
 }
@@ -42,7 +43,18 @@ export async function POST(req: NextRequest) {
   if (!entity?.order_id) return json({ ok: true, ignored: true });
   const found = await db().collection("orders").where("razorpayOrderId", "==", entity.order_id).limit(1).get();
   const doc = found.docs[0];
-  if (!doc) return json({ ok: true, ignored: true });
+  if (!doc) {
+    // Not an order: it may be a GlowVai Coins top-up. Top-ups credit through the same idempotent path as the verify call.
+    if (!entity.id) return json({ ok: true, ignored: true });
+    const topup = await topupWebhookLive(event.event ?? "", {
+      id: entity.id,
+      order_id: entity.order_id,
+      amount: Number(entity.amount),
+      currency: String(entity.currency ?? ""),
+      status: String(entity.status ?? ""),
+    });
+    return json({ ok: true, ...(topup ? {} : { ignored: true }) });
+  }
   const now = Date.now();
   const store = db();
   // Set inside the transaction when this event changed the order; the customer is told after it commits.

@@ -66,6 +66,8 @@ export type PortedScreenName =
   | 'profile-referral-transactions'
   | 'profile-subscriptions'
   | 'profile-student-status'
+  // GlowVai Coins wallet: balance, top-up, history (features/wallet)
+  | 'wallet-home'
   // Notifications (features/notifications)
   | 'notifications-list'
   // Routine and ingredient guidance (features/recommendations)
