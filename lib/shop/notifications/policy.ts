@@ -5,7 +5,8 @@ import type { NotificationCategory, RelatedType, RenderedNotification } from "./
 
 // ---- Push tokens -------------------------------------------------------------------------------------------------
 
-export const MAX_TOKENS_PER_USER = 5;
+import { MAX_TOKENS_PER_USER, MAX_NOTIFICATIONS } from "./limits";
+export { MAX_TOKENS_PER_USER, MAX_NOTIFICATIONS };
 // FCM registration tokens are long URL-safe strings. Anything shorter or with other characters is refused.
 export const TOKEN_PATTERN = /^[A-Za-z0-9:_-]{20,400}$/;
 
@@ -40,7 +41,6 @@ export function planTokenSave(existing: StoredToken[], id: string, max = MAX_TOK
 
 // ---- In-app notifications ----------------------------------------------------------------------------------------
 
-export const MAX_NOTIFICATIONS = 100;
 
 export interface StoredNotification {
   id: string;
@@ -120,19 +120,50 @@ export function pageLimit(raw: string | null): number {
 // ---- Preferences and quiet hours ---------------------------------------------------------------------------------
 
 export interface NotificationPrefs {
+  // Categories: order updates, offers (marketing), reviews and questions.
   orders: boolean;
   offers: boolean;
   reviews: boolean;
+  // Sub-topics, checked on top of the category: returns and refunds, referrals and coins, subscriptions.
+  returns: boolean;
+  referrals: boolean;
+  subscriptions: boolean;
 }
 
-// Orders and reviews are on by default. Offers are off: marketing needs an explicit choice.
-export const DEFAULT_PREFS: Readonly<NotificationPrefs> = { orders: true, offers: false, reviews: true };
+export const NOTIFICATION_PREF_KEYS = ["orders", "offers", "reviews", "returns", "referrals", "subscriptions"] as const;
+export type NotificationPrefKey = (typeof NOTIFICATION_PREF_KEYS)[number];
+
+// Orders, reviews and the sub-topics are on by default. Offers are off: marketing needs an explicit choice.
+export const DEFAULT_PREFS: Readonly<NotificationPrefs> = {
+  orders: true,
+  offers: false,
+  reviews: true,
+  returns: true,
+  referrals: true,
+  subscriptions: true,
+};
+
+// Which sub-topic a notification type belongs to. Types not listed here are checked on their category only.
+export const TOPIC_FOR_TYPE: Readonly<Record<string, NotificationPrefKey>> = {
+  return_update: "returns",
+  refund_processed: "returns",
+  referral_reward: "referrals",
+  coins_credited: "referrals",
+  subscription_processed: "subscriptions",
+};
 
 // Reads users/{uid}.notificationPrefs. Anything that is not a boolean falls back to the default.
 export function prefsFrom(raw: unknown): NotificationPrefs {
   const source = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
-  const pick = (key: keyof NotificationPrefs) => (typeof source[key] === "boolean" ? (source[key] as boolean) : DEFAULT_PREFS[key]);
-  return { orders: pick("orders"), offers: pick("offers"), reviews: pick("reviews") };
+  const pick = (key: NotificationPrefKey) => (typeof source[key] === "boolean" ? (source[key] as boolean) : DEFAULT_PREFS[key]);
+  return {
+    orders: pick("orders"),
+    offers: pick("offers"),
+    reviews: pick("reviews"),
+    returns: pick("returns"),
+    referrals: pick("referrals"),
+    subscriptions: pick("subscriptions"),
+  };
 }
 
 // Quiet hours for pushes, in India time: from 22:00 until 08:00. A push that falls inside is not sent. The in-app
@@ -149,6 +180,8 @@ export type PushSkip = "preference-off" | "no-marketing-consent" | "quiet-hours"
 
 export interface PushInput {
   category: NotificationCategory;
+  // The notification type (for example "refund_processed"), used to check its sub-topic toggle.
+  type?: string;
   prefs: NotificationPrefs;
   // consents.marketing on users/{uid}. Only an explicit true counts.
   marketingConsent: boolean;
@@ -158,6 +191,8 @@ export interface PushInput {
 // Decides whether a push may be sent. The in-app notification never goes through this check.
 export function pushDecision(input: PushInput): { send: true } | { send: false; reason: PushSkip } {
   if (!input.prefs[input.category]) return { send: false, reason: "preference-off" };
+  const topic = input.type ? TOPIC_FOR_TYPE[input.type] : undefined;
+  if (topic && !input.prefs[topic]) return { send: false, reason: "preference-off" };
   if (input.category === "offers" && input.marketingConsent !== true) return { send: false, reason: "no-marketing-consent" };
   if (isQuietHour(input.nowMs)) return { send: false, reason: "quiet-hours" };
   return { send: true };

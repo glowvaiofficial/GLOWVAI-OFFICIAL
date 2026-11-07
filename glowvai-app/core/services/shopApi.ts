@@ -12,16 +12,25 @@ export interface ShopProfileAddress {
 export interface ShopProfile {
   name: string;
   phone: string;
+  // Always false until SMS sign-in is connected.
+  phoneVerified?: boolean;
   email: string;
   address: ShopProfileAddress | null;
   marketingOptIn: boolean;
+  analyticsOptIn?: boolean;
+  // When each consent choice was made (epoch ms), or null when it has not been chosen.
+  marketingAt?: number | null;
+  analyticsAt?: number | null;
+  language?: string;
 }
 
 export interface ShopProfileInput {
   name: string;
   phone: string;
   email?: string;
-  address: ShopProfileAddress;
+  // Left out (or null) keeps the address already on the account.
+  address?: ShopProfileAddress | null;
+  // Left out keeps the stored choice.
   marketingOptIn?: boolean;
   analyticsOptIn?: boolean;
 }
@@ -198,6 +207,23 @@ export async function saveProfile(input: ShopProfileInput): Promise<ApiResult<un
   return apiFetch('/api/shop/profile', post(input));
 }
 
+// The account language (users/{uid}.language). The server accepts only en, hi or te.
+export async function saveLanguage(language: string): Promise<ApiResult<{ language: string }>> {
+  return apiFetch<{ language: string }>('/api/shop/profile/language', post({ language }));
+}
+
+export interface ActivityEntry {
+  id: string;
+  type: string;
+  message: string;
+  createdAt: number;
+}
+
+export async function fetchActivity(cursor?: string | null): Promise<ApiResult<{ items: ActivityEntry[]; nextCursor: string | null }>> {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  return apiFetch<{ items: ActivityEntry[]; nextCursor: string | null }>(`/api/shop/activity${query}`);
+}
+
 export async function fetchOrders(): Promise<ApiResult<{ orders: ShopOrder[] }>> {
   return apiFetch<{ orders: ShopOrder[] }>('/api/shop/orders');
 }
@@ -245,6 +271,9 @@ export interface NotificationPrefs {
   orders: boolean;
   offers: boolean;
   reviews: boolean;
+  returns: boolean;
+  referrals: boolean;
+  subscriptions: boolean;
 }
 
 export async function fetchNotifications(cursor?: string | null): Promise<ApiResult<NotificationPage>> {

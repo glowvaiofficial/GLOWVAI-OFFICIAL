@@ -3,6 +3,7 @@ import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/
 import { PRODUCT_ID_PATTERN, WISHLIST_MAX } from "@/lib/shop/wishlist";
 import { addToWishlist, getWishlist, removeFromWishlist } from "@/lib/shop/wishlistService";
 import { wishlistRepo } from "@/lib/shop/wishlistRepo";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export async function PUT(req: NextRequest) {
   if (body.productIds.length > WISHLIST_MAX) return json({ ok: false, error: `Up to ${WISHLIST_MAX} products can be sent at once.` }, 400);
   const incoming = body.productIds.filter((v): v is string => typeof v === "string" && PRODUCT_ID_PATTERN.test(v));
   const result = await addToWishlist(wishlistRepo, customer.uid, incoming, Date.now());
+  await recordActivity(customer.uid, "wishlist_changed", Date.now());
   return json({ ok: true, items: result.items, added: result.added, full: result.full, max: WISHLIST_MAX });
 }
 
@@ -51,5 +53,6 @@ export async function DELETE(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as { productId?: unknown } | null;
   const productId = typeof body?.productId === "string" ? body.productId : "";
   if (!PRODUCT_ID_PATTERN.test(productId)) return json({ ok: false, error: "Invalid product." }, 400);
+  await recordActivity(customer.uid, "wishlist_changed", Date.now());
   return json({ ok: true, items: await removeFromWishlist(wishlistRepo, customer.uid, productId), max: WISHLIST_MAX });
 }
