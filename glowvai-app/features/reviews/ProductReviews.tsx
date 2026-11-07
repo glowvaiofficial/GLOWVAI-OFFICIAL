@@ -17,7 +17,7 @@ const SORTS: Array<{ id: ReviewSort; label: string }> = [
 ];
 
 const STATUS_TEXT: Record<string, string> = {
-  PENDING: 'Waiting for our team to check it. It is not shown on this page yet.',
+  PENDING: 'Your review is being checked. It is not shown on this page yet.',
   APPROVED: 'Shown on this page.',
   REJECTED: 'Not shown on this page.',
 };
@@ -247,7 +247,7 @@ function ReviewForm({ productId }: { productId: string }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {review && (
         <div style={{ padding: '12px 14px', borderRadius: '10px', backgroundColor: '#F7F8FB', border: `1px solid ${line}` }}>
-          <p style={{ ...bodyText, color: ink, fontWeight: 700 }}>Your review: {review.status === 'APPROVED' ? 'published' : review.status === 'PENDING' ? 'waiting for checks' : 'not published'}</p>
+          <p style={{ ...bodyText, color: ink, fontWeight: 700 }}>{review.status === 'PENDING' ? 'Your review is being checked' : review.status === 'APPROVED' ? 'Your review is published' : 'Your review is not published'}</p>
           <p style={{ ...smallText, marginTop: '4px' }}>{STATUS_TEXT[review.status]}</p>
           {review.status === 'REJECTED' && review.rejectionReason && (
             <p style={{ ...smallText, marginTop: '6px', color: '#92400E' }}>Reason: {review.rejectionReason}</p>

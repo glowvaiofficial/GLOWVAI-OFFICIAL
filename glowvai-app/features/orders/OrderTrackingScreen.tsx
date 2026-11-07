@@ -11,6 +11,7 @@ import {
   type SubstitutionPreference,
 } from '../../core/services/shopTracking';
 import { OrdersHeader } from './components/OrdersHeader';
+import { TrackingShareCard } from './components/TrackingShare';
 import { OrdersEmpty, OrdersLoadState, formatOrderDate, statusLabel, useRequestedOrder } from './orderUtils';
 
 const timeText = (ms: number | null | undefined) => formatOrderDate(ms ?? null);
@@ -105,6 +106,8 @@ export const OrderTrackingScreen: React.FC = () => {
             <button type="button" className="orders-secondary-button" onClick={() => void load()}>Try again</button>
           </div>
         )}
+
+        <TrackingShareCard orderId={order.orderId} />
 
         <section className="orders-card orders-status-card" aria-live="polite">
           <div className="orders-status-head">

@@ -3,6 +3,11 @@ import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/s
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
 import { parseOrderRequest } from "@/lib/shop/orderRequest";
+import { compareNewestFirst, decodeOrderCursor, pageOrders, parseOrderFilter, parsePageLimit, toneOfStatus } from "@/lib/shop/orderHistory";
+import { RETURN_COLLECTION } from "@/lib/shop/returns";
+import { PRODUCT_ID_PATTERN, REVIEWS, reviewIdFor } from "@/lib/shop/reviews";
+import { canEditReview } from "@/lib/shop/reviewRules";
+import { deliveredAtOf, toMillis, type Doc } from "@/lib/shop/orderState";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +20,10 @@ function customerStatus(shopStatus: string, overlay: Record<string, unknown> | u
 }
 
 // The signed-in customer's orders, newest first, with any admin decision applied.
+// Without paging parameters this returns every order held (at most 100), as before.
+// With ?filter=all|active|delivered|cancelled|returns&limit=1..50&cursor=... it returns one page:
+// { orders, nextCursor } where nextCursor is null on the last page. Each delivered order also carries `reviews`, the
+// customer's own review state per product (so the rate prompt needs no extra calls), and every order carries `hasReturn`.
 export async function GET(req: NextRequest) {
   const ipLimited = limitByIp(req, "orders-get", 30);
   if (ipLimited) return ipLimited;
@@ -22,7 +31,17 @@ export async function GET(req: NextRequest) {
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   const userLimited = limitByUser(customer.uid, "orders", 60);
   if (userLimited) return userLimited;
+
+  const params = req.nextUrl.searchParams;
+  const paged = params.has("limit") || params.has("cursor") || params.has("filter");
+  const filter = parseOrderFilter(params.get("filter"));
+  const limit = parsePageLimit(params.get("limit"));
+  const cursor = decodeOrderCursor(params.get("cursor"));
+  if (cursor === "invalid") return json({ ok: false, error: "Those orders could not be opened. Start again from the first page." }, 400);
+
   const snap = await db().collection("orders").where("userId", "==", customer.uid).limit(100).get();
+  const returnsSnap = await db().collection(RETURN_COLLECTION).where("uid", "==", customer.uid).limit(100).get();
+  const returnedOrderIds = new Set(returnsSnap.docs.map((d) => String((d.data() as Doc).orderId ?? "")));
   const ids = snap.docs.map((d) => d.id);
   const overlays = new Map<string, Record<string, unknown>>();
   if (ids.length) {
@@ -56,10 +75,55 @@ export async function GET(req: NextRequest) {
         shippingAddress: o.shippingAddress ?? null,
         createdAt: o.createdAt ?? null,
         updatedAt: o.updatedAt ?? null,
+        deliveredAt: deliveredAtOf(o),
       };
     })
-    .sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0));
-  return json({ ok: true, orders });
+    .map((order) => ({ order, sortKey: { orderId: order.orderId, createdAt: toMillis(order.createdAt), status: order.status, hasReturn: returnedOrderIds.has(String(order.orderId)) } }));
+
+  if (!paged) {
+    const sorted = orders.sort((a, b) => compareNewestFirst(a.sortKey, b.sortKey));
+    return json({ ok: true, orders: await withReviewState(sorted.map((s) => s.order), sorted.map((s) => s.sortKey.status), customer.uid) });
+  }
+  const page = pageOrders(orders.map((o) => o.sortKey), filter, limit, cursor);
+  const byId = new Map(orders.map((o) => [o.sortKey.orderId, o.order] as const));
+  const pageOrdersOut = page.items.map((k) => byId.get(k.orderId)!);
+  return json({ ok: true, orders: await withReviewState(pageOrdersOut, page.items.map((k) => k.status), customer.uid), nextCursor: page.nextCursor, filter });
+}
+
+// Adds `reviews` (the customer's own review of each product, by product id) to delivered orders. Review ids are
+// deterministic (productId__uid), so one getAll covers the whole page.
+async function withReviewState<T extends { items: { productId: unknown }[]; orderId: unknown }>(
+  list: T[],
+  statuses: string[],
+  uid: string,
+): Promise<(T & { reviews: Record<string, { status: string; rating: number; canEdit: boolean }> })[]> {
+  const wanted = new Set<string>();
+  list.forEach((o, i) => {
+    if (toneOfStatus(statuses[i]) !== "delivered") return;
+    for (const it of o.items) if (typeof it.productId === "string" && PRODUCT_ID_PATTERN.test(it.productId)) wanted.add(it.productId);
+  });
+  const found = new Map<string, { status: string; rating: number; canEdit: boolean }>();
+  if (wanted.size) {
+    const ids = [...wanted];
+    const snaps = await db().getAll(...ids.map((pid) => db().collection(REVIEWS).doc(reviewIdFor(pid, uid))));
+    snaps.forEach((s, i) => {
+      if (!s.exists) return;
+      const d = s.data() as Doc;
+      const edit = canEditReview({ createdAtMs: Number(d.createdAtMs), editCount: Number(d.editCount ?? 0) }, Date.now());
+      found.set(ids[i], { status: String(d.status ?? "PENDING"), rating: Number(d.rating), canEdit: edit.ok });
+    });
+  }
+  return list.map((o, i) => {
+    const reviews: Record<string, { status: string; rating: number; canEdit: boolean }> = {};
+    if (toneOfStatus(statuses[i]) === "delivered") {
+      for (const it of o.items) {
+        const pid = typeof it.productId === "string" ? it.productId : "";
+        const r = found.get(pid);
+        if (r) reviews[pid] = r;
+      }
+    }
+    return { ...o, reviews };
+  });
 }
 
 // Places an order. The checks, pricing and transaction live in lib/shop/orderCore.ts (shared with the subscription cron).

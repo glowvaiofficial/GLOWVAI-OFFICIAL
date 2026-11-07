@@ -5,6 +5,7 @@ import { useCustomerStore } from '../../core/state/customerStore';
 import { SUPPORT_HOTLINE } from '../../core/utils/whatsapp';
 import { openInvoice } from '../../core/services/shopTracking';
 import { OrdersHeader } from './components/OrdersHeader';
+import { RateProductsSection } from './components/RateProducts';
 import {
   OrderThumb,
   OrdersEmpty,
@@ -144,6 +145,10 @@ export const OrderDetailsScreen: React.FC = () => {
             ))}
           </section>
 
+          <section className="orders-card" aria-label="Ratings">
+            <RateProductsSection order={order} />
+          </section>
+
           {pricing && (
             <>
               <h2 className="orders-section-title">Bill summary</h2>
@@ -193,7 +198,7 @@ export const OrderDetailsScreen: React.FC = () => {
                     <FileText size={18} /> Invoice
                   </button>
                   <button type="button" className="orders-action-tile" onClick={() => navigate('returns-request', { orderId: order.orderId })}>
-                    <RotateCcw size={18} /> Return or replace
+                    <RotateCcw size={18} /> Request return
                   </button>
                 </>
               )}
