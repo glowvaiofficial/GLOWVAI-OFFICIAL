@@ -19,6 +19,7 @@ import './tracking.css';
 import { OrdersHeader } from './components/OrdersHeader';
 import { TrackingMap } from './components/TrackingMap';
 import { TrackingStepper } from './components/TrackingStepper';
+import { TrackingShareCard } from './components/TrackingShare';
 import { OrdersEmpty, OrdersLoadState, formatOrderDate, statusLabel, useRequestedOrder } from './orderUtils';
 import { RIDER_REFRESH_MS, riderRefreshDue, shouldFollowRider } from './trackingMapRules';
 
@@ -253,6 +254,8 @@ export const OrderTrackingScreen: React.FC = () => {
             <Phone size={16} aria-hidden="true" /> Call store
           </a>
         )}
+
+        {orderId && <TrackingShareCard orderId={orderId} />}
 
         <section className="orders-card orders-status-card" aria-label="Order details">
           <div className="orders-status-head">

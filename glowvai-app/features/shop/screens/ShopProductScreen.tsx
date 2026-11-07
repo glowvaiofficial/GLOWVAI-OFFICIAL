@@ -5,6 +5,8 @@ import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import { defaultVariant, isSellable, variantStockState, type Variant } from '../../../../lib/shop/variants';
+import { productShareUrl } from '../../../../lib/shop/productShare';
+import { ProductReviews } from '../../reviews/ProductReviews';
 import { rememberProductViewed } from '../lib/recentlyViewed';
 import { SubscribePanel } from '../../profile/SubscriptionsScreen';
 
@@ -92,15 +94,15 @@ export const ShopProductScreen: React.FC = () => {
   const categoryLabel = CATEGORY_LABELS[product.category] ?? product.category;
 
   const handleShare = async () => {
-    // A link to this product itself, so anyone who opens it lands on the same product.
-    const url = typeof window !== 'undefined' ? `${window.location.origin}/shop?product=${encodeURIComponent(product.id)}` : '';
-    const text = `${product.brand} ${product.name} on GlowVAI`;
+    // The canonical link to this product. Opening it on a cold load lands on this product (App.tsx reads ?product=).
+    const url = productShareUrl(product.id);
+    const text = `${product.brand} ${product.name} on GlowVai`;
     try {
-      if (navigator.share) {
+      if (typeof navigator.share === 'function') {
         await navigator.share({ title: product.name, text, url });
       } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url ? `${text}: ${url}` : text);
-        showToast('Link copied');
+        await navigator.clipboard.writeText(url);
+        showToast('Product link copied to your clipboard');
       } else {
         showToast("Sharing isn't available in this browser");
       }
@@ -324,6 +326,10 @@ export const ShopProductScreen: React.FC = () => {
         </section>
 
         {canBuy && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
+
+        <section className="shop-product-reviews-block" aria-label="Customer reviews" style={{ padding: '16px' }}>
+          <ProductReviews productId={product.id} />
+        </section>
       </div>
 
       <div className="shop-product-buybar">

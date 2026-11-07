@@ -64,6 +64,11 @@ export interface ShopOrder {
   payment: { method: string; status: string };
   shippingAddress: ShopOrderAddress | null;
   createdAt: number | null;
+  deliveredAt?: number | null;
+  // Set by GET /api/shop/orders: whether the customer has a return or replacement request on this order.
+  hasReturn?: boolean;
+  // Delivered orders only: the customer's own review per product id (none when not reviewed).
+  reviews?: Record<string, { status: 'PENDING' | 'APPROVED' | 'REJECTED'; rating: number; canEdit: boolean }>;
 }
 
 export interface PlaceOrderInput {
@@ -195,6 +200,13 @@ export async function saveProfile(input: ShopProfileInput): Promise<ApiResult<un
 
 export async function fetchOrders(): Promise<ApiResult<{ orders: ShopOrder[] }>> {
   return apiFetch<{ orders: ShopOrder[] }>('/api/shop/orders');
+}
+
+// One page of the order history (newest first). Pass the nextCursor from the previous page to get the next one.
+export async function fetchOrdersPage(filter: string, cursor: string | null): Promise<ApiResult<{ orders: ShopOrder[]; nextCursor: string | null }>> {
+  const params = new URLSearchParams({ filter, limit: '20' });
+  if (cursor) params.set('cursor', cursor);
+  return apiFetch<{ orders: ShopOrder[]; nextCursor: string | null }>(`/api/shop/orders?${params.toString()}`);
 }
 
 export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; trackingId?: string; pricing: ShopOrderPricing; status: string; payment?: OnlinePaymentStart }>> {

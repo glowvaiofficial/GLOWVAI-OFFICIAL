@@ -29,6 +29,7 @@
     "test:growth": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/growth/*.test.ts\"",
     "test:rider": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/rider/*.test.ts\"",
     "test:tracking": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/tracking/*.test.ts\"",
+    "test:wishlist-orders": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/wishlist-orders/*.test.ts\"",
     "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],

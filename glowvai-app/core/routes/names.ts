@@ -74,5 +74,7 @@ export type PortedScreenName =
   | 'recommend-ingredients'
   | 'recommend-patch-test'
   | 'recommend-checkout'
+  // Public shared tracking link (features/orders): /shop?track=ORDER&k=TOKEN
+  | 'orders-shared-tracking'
   // Debug
   | 'debug-app-doctor';
