@@ -108,7 +108,7 @@ export const ReferralHubScreen = () => {
             <p className="profile-card-sub">
               {coins ? `Worth ₹${coins.balance * coins.rupeesPerCoin} at checkout, up to 20% of an order.` : 'Your balance loads from the shop.'}
             </p>
-            <button type="button" className="profile-button is-outline is-small" onClick={() => navigate('profile-referral-transactions')}>
+            <button type="button" className="profile-button is-outline is-small" onClick={() => navigate('wallet-home')}>
               See coin activity <ChevronRight size={14} />
             </button>
           </section>

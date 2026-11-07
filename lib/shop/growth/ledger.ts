@@ -11,7 +11,7 @@ import { GROWTH_CONFIG } from "../growth-config";
 import type { GrowthRef, GrowthTx } from "./repo";
 
 export type LedgerType = "CREDIT" | "DEBIT" | "EXPIRY";
-export type LedgerSource = "REFERRAL_REFERRER" | "REFERRAL_REFEREE" | "ADMIN_ADJUSTMENT" | "CHECKOUT_REDEMPTION" | "ORDER_CANCELLED" | "EXPIRY";
+export type LedgerSource = "REFERRAL_REFERRER" | "REFERRAL_REFEREE" | "ADMIN_ADJUSTMENT" | "CHECKOUT_REDEMPTION" | "ORDER_CANCELLED" | "EXPIRY" | "TOPUP" | "GIFT_CARD";
 
 export interface LedgerInput {
   type: LedgerType;
