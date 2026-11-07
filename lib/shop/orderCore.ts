@@ -162,6 +162,7 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     deliverySlot: deliverySlot
       ? { id: deliverySlot.id, kind: deliverySlot.kind, day: deliverySlot.day, label: deliverySlot.label, estimate: deliverySlot.estimate, startsAt: deliverySlot.startsAt, endsAt: deliverySlot.endsAt }
       : null,
+    ...(input.customerLocation ? { customerLocation: { lat: input.customerLocation.lat, lng: input.customerLocation.lng, sharedAt: now } } : {}),
     shippingAddress: {
       label: addressLabel,
       addressId: input.addressId ?? null,

@@ -3,6 +3,7 @@
 import { text, indianMobile } from "./text";
 import { parseCoinsRequested } from "./growth/coins";
 import { parseCartLines, type CartLine } from "./variants";
+import { isLatLng, type LatLng } from "./tracking";
 
 export const MAX_LINES = 20;
 export const MAX_QTY = 10;
@@ -32,6 +33,8 @@ export interface ParsedOrderRequest {
   couponCode: string;
   tipRaw: unknown;
   coinsRequested: number;
+  // The customer's own location, only when they chose to share it at checkout. Optional; never required.
+  customerLocation?: LatLng;
 }
 
 export type ParseResult<T> = { ok: true; value: T } | { ok: false; status: number; error: string };
@@ -59,6 +62,8 @@ export function parseOrderRequest(body: Record<string, unknown>, options: { onli
   const coins = parseCoinsRequested(body.coinsToRedeem);
   if (!coins.ok) return { ok: false, status: 400, error: coins.error };
   const couponCode = text(body.couponCode, 20).toUpperCase();
+  const loc = body.customerLocation;
+  const sharedLocation = isLatLng(loc) ? { lat: Math.round(loc.lat * 1e6) / 1e6, lng: Math.round(loc.lng * 1e6) / 1e6 } : null;
   const slotRaw = body.deliverySlot === undefined || body.deliverySlot === null || body.deliverySlot === "" ? null : text(body.deliverySlot, 60);
   return {
     ok: true,
@@ -71,6 +76,7 @@ export function parseOrderRequest(body: Record<string, unknown>, options: { onli
       couponCode,
       tipRaw: body.tip,
       coinsRequested: coins.value,
+      ...(sharedLocation ? { customerLocation: sharedLocation } : {}),
     },
   };
 }

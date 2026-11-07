@@ -10,6 +10,8 @@ export const siteConfig = {
   ogImage: `${SITE_URL}/opengraph-image`,
   supportEmail: "contact@glowvai.in",
   phone: "+91 89778 55998",
+  // The dark store's own phone for the order tracking "Call store" button. Empty until the owner supplies it: no button is shown.
+  storePhone: "",
   address: "Studio 4B, Design District, Hyderabad, Telangana 500081",
   deliveryEstimateMinutes: 15,
   defaultCity: "Vijayawada",

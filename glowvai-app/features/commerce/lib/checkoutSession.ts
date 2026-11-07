@@ -35,6 +35,9 @@ interface CheckoutSessionState {
   // Glow coins the customer chose to use on this order (0 when none). The server caps and debits them.
   coinsToRedeem: number;
   setCoinsToRedeem: (coins: number) => void;
+  // The customer's position, only when they tapped "share my location" at checkout. Never requested on load.
+  customerLocation: { lat: number; lng: number } | null;
+  setCustomerLocation: (location: { lat: number; lng: number } | null) => void;
 }
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
@@ -57,4 +60,6 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   setSubstitutionPreference: (substitutionPreference) => set({ substitutionPreference }),
   coinsToRedeem: 0,
   setCoinsToRedeem: (coinsToRedeem) => set({ coinsToRedeem: Math.max(0, Math.floor(coinsToRedeem) || 0) }),
+  customerLocation: null,
+  setCustomerLocation: (customerLocation) => set({ customerLocation }),
 }));

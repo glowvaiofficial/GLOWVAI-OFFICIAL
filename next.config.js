@@ -22,7 +22,15 @@ const devEval = process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'";
 // Local backends (scan API on :4000, the CNN server on :10000) are reachable only from development builds.
 const devConnect = process.env.NODE_ENV === 'production' ? '' : ' http://localhost:4000 http://localhost:10000';
 
-const shopCsp = [
+// Google Maps (the order tracking map) is allowed on the shop only when the build has a key. The shop is one page, so the
+// hosts are added to its policy and nowhere else; without a key the policy is unchanged.
+const MAPS_ON = Boolean((process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '').trim());
+const withMaps = (csp) =>
+  MAPS_ON
+    ? ['script-src', 'img-src', 'connect-src'].reduce((acc, directive) => acc.replace(new RegExp(`(${directive} [^;]*)`), '$1 https://maps.googleapis.com https://maps.gstatic.com'), csp)
+    : csp;
+
+const shopCsp = withMaps([
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${devEval} 'wasm-unsafe-eval' https://www.googletagmanager.com https://checkout.razorpay.com`,
   "style-src 'self' 'unsafe-inline'",
@@ -36,7 +44,7 @@ const shopCsp = [
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self' https://api.razorpay.com",
-].join('; ');
+].join('; '));
 
 // Static files that load their own third-party scripts keep their own rules. The shop has its own policy above.
 const exceptStaticPortals = '(?!portal\\.html|referral/portal\\.html|referral/index\\.html|shop|firebase-messaging-sw\\.js|rider).*';

@@ -30,6 +30,12 @@
 //   referral_reward         a referral reward was earned (offers category)
 //   coins_credited          coins were added (offers category)
 //   subscription_processed  a subscription was processed (relatedId = subscription id)
+//   tracking_confirmed      live tracking stage 2: the store has confirmed the order (relatedId = order id)
+//   tracking_on_the_way     live tracking stage 5: the rider has picked up the order
+//   tracking_almost_there   live tracking stage 6: the rider is 2 to 3 km away
+//   tracking_arriving       live tracking stage 7: the rider is under 500 m away
+//   tracking_arrived        live tracking stage 8: the rider is at the drop point (the code is not sent in the push)
+//   tracking_delayed        a delay banner was set on the order (lib/shop/delay.ts)
 import "server-only";
 import { notifyCustomerWith, type NotifyDeps, type NotifyEvent, type NotifyResult, type SendReport } from "./notifications/dispatch";
 import { prefsFor, dropTokens, tokensFor, writeInApp } from "./notifyStore";

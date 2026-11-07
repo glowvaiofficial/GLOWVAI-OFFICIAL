@@ -78,6 +78,8 @@ export interface PlaceOrderInput {
   deliverySlot?: string | null;
   // Glow coins the customer chose to use. The server caps them and debits them in the order transaction.
   coinsToRedeem?: number;
+  // The customer's position, only when they chose to share it. Used for the live map; the server checks it.
+  customerLocation?: { lat: number; lng: number } | null;
 }
 
 export interface OnlinePaymentStart {

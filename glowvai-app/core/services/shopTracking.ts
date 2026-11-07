@@ -128,3 +128,17 @@ export async function openInvoice(orderId: string): Promise<string | null> {
     return 'We could not reach GlowVai. Check your connection and try again.';
   }
 }
+
+// Live tracking (stage, copy, banners, estimate, map points). Built by lib/shop/liveTracking.ts; the types come from the
+// shared pure module so the screen and the server agree on the shape.
+export type { LiveTracking, LiveStep, TrackingStage } from '../../../lib/shop/tracking';
+import type { LiveTracking } from '../../../lib/shop/tracking';
+
+export const fetchLiveTracking = (orderId: string): Promise<ApiResult<{ tracking: LiveTracking }>> =>
+  apiFetch<{ tracking: LiveTracking }>(`/api/shop/orders/${encodeURIComponent(orderId)}/tracking`);
+
+// The delivery code is returned only at stage 8. Anything else is {available: false} and no code.
+export type DeliveryCodeState = { available: false } | { available: true; code: string; locked: boolean; lockedMinutes: number };
+
+export const fetchDeliveryCode = (orderId: string): Promise<ApiResult<{ deliveryCode: DeliveryCodeState }>> =>
+  apiFetch<{ deliveryCode: DeliveryCodeState }>(`/api/shop/orders/${encodeURIComponent(orderId)}/delivery-code`);
