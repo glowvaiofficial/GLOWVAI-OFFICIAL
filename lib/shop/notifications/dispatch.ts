@@ -1,6 +1,6 @@
 // The decision flow behind notifyCustomer, with every side effect passed in. No server imports, so the tests can run
 // it with fakes. lib/shop/notify.ts supplies the real Firestore and FCM functions.
-import { pushDecision, pushDataFor, type NotificationPrefs } from "./policy";
+import { pushDecision, pushDataFor, type NotificationPrefs, type PushTokenType } from "./policy";
 import { isRelatedId, renderNotification, type RenderedNotification } from "./templates";
 
 export interface NotifyEvent {
@@ -32,8 +32,9 @@ export interface NotifyDeps {
   writeInApp(uid: string, rendered: RenderedNotification, relatedId: string | null, now: number): Promise<string>;
   prefsFor(uid: string): Promise<{ prefs: NotificationPrefs; marketingConsent: boolean }>;
   pushConfigured(): boolean;
-  tokensFor(uid: string): Promise<{ id: string; token: string }[]>;
-  send(tokens: string[], data: Record<string, string>): Promise<SendReport>;
+  tokensFor(uid: string): Promise<{ id: string; token: string; tokenType?: PushTokenType }[]>;
+  // tokenTypes lines up with tokens by index. A missing entry means FCM.
+  send(tokens: string[], data: Record<string, string>, tokenTypes?: PushTokenType[]): Promise<SendReport>;
   dropTokens(uid: string, ids: string[]): Promise<void>;
   // Logs a short message and plain details. Never called with a uid, token, name or address.
   log(message: string, detail: Record<string, string | number | boolean>): void;
@@ -91,6 +92,7 @@ export async function notifyCustomerWith(deps: NotifyDeps, uid: string, event: N
     const report = await deps.send(
       tokens.map((t) => t.token),
       pushDataFor(rendered, relatedId),
+      tokens.map((t) => t.tokenType ?? "FCM"),
     );
     const dropped = report.invalidIndexes.map((i) => tokens[i]?.id).filter((id): id is string => Boolean(id));
     if (dropped.length > 0) await deps.dropTokens(uid, dropped);

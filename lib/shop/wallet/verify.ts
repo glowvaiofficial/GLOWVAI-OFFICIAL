@@ -4,8 +4,10 @@
 //  - applyTopupWebhook: Razorpay's own event (payment.captured / payment.failed), signed over the raw body by the route.
 // Both are idempotent: a second call for the same top-up credits nothing more.
 import type { GrowthRepo } from "../growth/repo";
-import { creditTopup, markFailed, readTopup, type CreditResult } from "./topups";
+import { creditTopup, markFailed, readTopup, topupPath, type CreditResult, type TopupRecord } from "./topups";
 import type { TopupStatus } from "./rules";
+import type { RecheckOutcome } from "./recheck";
+import { numberOr0 } from "../growth/ledger";
 
 export interface PaymentFacts {
   id: string;
@@ -101,4 +103,39 @@ async function settle(deps: VerifyDeps, input: { topupId: string; expectUid: str
   if (result.code === "AMOUNT_MISMATCH") return { ok: false, status: 409, code: "AMOUNT_MISMATCH", error: MESSAGES.AMOUNT_MISMATCH };
   if (result.code === "BALANCE_CAP") return { ok: false, status: 409, code: "BALANCE_CAP", error: MESSAGES.BALANCE_CAP };
   return { ok: false, status: 409, code: "NOT_CAPTURED", error: MESSAGES.NOT_CAPTURED };
+}
+
+// Re-checks a held capture (a payment that could not be credited yet). The payment is read again from Razorpay, never
+// taken from the caller, and the credit goes through the same settle path as verify and the webhook. The
+// `topup:{topupId}` key means a second re-check credits nothing. A PAID top-up answers CREDITED with no change.
+export async function recheckHeldTopup(deps: VerifyDeps, input: { topupId?: string; captureId?: string }): Promise<RecheckOutcome> {
+  let rec: TopupRecord | null = null;
+  if (input.captureId) {
+    const rows = await deps.repo.query("walletTopups", [["holdPaymentId", "==", input.captureId]], { limit: 1 });
+    const snap = rows[0];
+    if (snap) rec = readTopup(snap.id, snap.data() ?? {});
+  } else if (input.topupId) {
+    const snap = await deps.repo.get(deps.repo.ref(topupPath(input.topupId)));
+    if (snap.exists && snap.data()) rec = readTopup(input.topupId, snap.data() ?? {});
+  }
+  if (!rec) return { outcome: "REFUSED", topupId: null, code: "NOT_FOUND", error: MESSAGES.NOT_FOUND };
+  if (rec.status === "PAID") {
+    return { outcome: "CREDITED", topupId: rec.id, coins: rec.coins, balance: numberOr0(rec.balanceAfter), alreadyCredited: true };
+  }
+  if (!rec.holdPaymentId) {
+    return { outcome: "REFUSED", topupId: rec.id, code: "NOT_HELD", error: "This top-up has no held payment to check." };
+  }
+  const facts = await deps.fetchPayment(rec.holdPaymentId);
+  if (!facts) return { outcome: "STILL_HELD", topupId: rec.id, reason: "PAYMENT_UNCONFIRMED" };
+  if (rec.razorpayOrderId !== null && facts.order_id !== rec.razorpayOrderId) {
+    return { outcome: "REFUSED", topupId: rec.id, code: "ORDER_MISMATCH", error: MESSAGES.ORDER_MISMATCH };
+  }
+  const result = await settle(deps, { topupId: rec.id, expectUid: null, orderId: facts.order_id, facts });
+  if (result.ok && result.status === "PAID") {
+    return { outcome: "CREDITED", topupId: rec.id, coins: result.coins, balance: result.balance, alreadyCredited: false };
+  }
+  if (result.ok && result.status === "PENDING") return { outcome: "STILL_HELD", topupId: rec.id, reason: "PAYMENT_PENDING" };
+  if (result.ok) return { outcome: "REFUSED", topupId: rec.id, code: `PAYMENT_${result.status}`, error: "This payment failed, so no coins were added." };
+  if (result.code === "AMOUNT_MISMATCH" || result.code === "BALANCE_CAP") return { outcome: "STILL_HELD", topupId: rec.id, reason: result.code };
+  return { outcome: "REFUSED", topupId: rec.id, code: result.code, error: result.error };
 }

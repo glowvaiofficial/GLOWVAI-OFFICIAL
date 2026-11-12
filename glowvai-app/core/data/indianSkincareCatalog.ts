@@ -28,6 +28,8 @@ export interface SkincareProduct {
   };
   // null when the product carries no delivery time. The screens show nothing for it.
   deliveryMinutes: number | null;
+  // True only when the admin has marked the product subscribable. Subscribe is offered only for these.
+  subscribable?: boolean;
   // Sizes, shades or packs with their own price and stock. Empty or missing: the product is sold as one item.
   variants?: Variant[];
 }
