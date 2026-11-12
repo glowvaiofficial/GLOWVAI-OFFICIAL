@@ -7,12 +7,11 @@ import { useT } from '../../core/i18n/store';
 import { SettingsPage } from './SettingsParts';
 import { EditProfileScreen } from '../profile/EditProfileScreen';
 import { SubscriptionsScreen } from '../profile/SubscriptionsScreen';
-import { SettingsAndSecurityScreen } from '../profile/SettingsAndSecurityScreen';
 import { LanguageSettings } from './LanguageSettings';
 import { NotificationSettings } from './NotificationSettings';
 import { ActivityScreen } from './ActivityScreen';
 import { HelpIndexScreen } from './HelpScreens';
-import { PlaceholderBody } from './SettingsParts';
+import { SettingsLinkPanel, SettingsWebPage } from './SettingsLinks';
 
 // One entry in the Settings hub. `route` is the full-page screen on phones; `Panel` is the same content shown next to the
 // list on large screens. The sign-out entry has no route: it asks for confirmation instead.
@@ -41,11 +40,12 @@ const AddressesPanel = () => {
   );
 };
 
-// Wrappers so each placeholder has a panel that matches its page.
-const WalletPanel = () => <PlaceholderBody titleKey="section.wallet.title" embedded />;
-const GiftCardsPanel = () => <PlaceholderBody titleKey="section.giftCards.title" embedded />;
-const SellPanel = () => <PlaceholderBody titleKey="section.sell.title" embedded />;
-const AffiliatePanel = () => <PlaceholderBody titleKey="section.affiliate.title" embedded />;
+// Rows that open another team's page. Wallet and privacy/gift cards open their own full pages; sell and affiliate are web pages.
+const WalletPanel = () => <SettingsLinkPanel route="wallet-home" titleKey="section.wallet.title" label="Open wallet" />;
+const GiftCardsPanel = () => <SettingsLinkPanel route="gift-cards" titleKey="section.giftCards.title" label="Open gift cards" />;
+const PrivacyPanel = () => <SettingsLinkPanel route="privacy-center" titleKey="section.privacy.title" label="Open privacy centre" />;
+const SellPanel = () => <SettingsWebPage href="/sell" titleKey="section.sell.title" label="Open Sell on GlowVai" />;
+const AffiliatePanel = () => <SettingsWebPage href="/affiliate" titleKey="section.affiliate.title" label="Open affiliate programme" />;
 
 export const settingsSections: SettingsSection[] = [
   { id: 'profile', icon: icon(User), titleKey: 'section.profile.title', descKey: 'section.profile.desc', route: 'profile-edit', Panel: () => <EditProfileScreen embedded /> },
@@ -53,10 +53,9 @@ export const settingsSections: SettingsSection[] = [
   { id: 'language', icon: icon(Languages), titleKey: 'section.language.title', descKey: 'section.language.desc', route: 'settings-language', Panel: () => <LanguageSettings embedded /> },
   { id: 'notifications', icon: icon(Bell), titleKey: 'section.notifications.title', descKey: 'section.notifications.desc', route: 'settings-notifications', Panel: () => <NotificationSettings embedded /> },
   { id: 'subscriptions', icon: icon(Repeat), titleKey: 'section.subscriptions.title', descKey: 'section.subscriptions.desc', route: 'profile-subscriptions', Panel: SubscriptionsScreen },
-  { id: 'wallet', icon: icon(Wallet), titleKey: 'section.wallet.title', descKey: 'section.wallet.desc', route: 'settings-wallet', Panel: WalletPanel },
-  { id: 'giftCards', icon: icon(Gift), titleKey: 'section.giftCards.title', descKey: 'section.giftCards.desc', route: 'settings-gift-cards', Panel: GiftCardsPanel },
-  // Interim: the existing privacy content (AI scan privacy, deletion request). The privacy team replaces this page.
-  { id: 'privacy', icon: icon(ShieldCheck), titleKey: 'section.privacy.title', descKey: 'section.privacy.desc', route: 'settings-privacy', Panel: SettingsAndSecurityScreen },
+  { id: 'wallet', icon: icon(Wallet), titleKey: 'section.wallet.title', descKey: 'section.wallet.desc', route: 'wallet-home', Panel: WalletPanel },
+  { id: 'giftCards', icon: icon(Gift), titleKey: 'section.giftCards.title', descKey: 'section.giftCards.desc', route: 'gift-cards', Panel: GiftCardsPanel },
+  { id: 'privacy', icon: icon(ShieldCheck), titleKey: 'section.privacy.title', descKey: 'section.privacy.desc', route: 'privacy-center', Panel: PrivacyPanel },
   { id: 'sell', icon: icon(Store), titleKey: 'section.sell.title', descKey: 'section.sell.desc', route: 'settings-sell', Panel: SellPanel },
   { id: 'affiliate', icon: icon(Share2), titleKey: 'section.affiliate.title', descKey: 'section.affiliate.desc', route: 'settings-affiliate', Panel: AffiliatePanel },
   { id: 'help', icon: icon(HelpCircle), titleKey: 'section.help.title', descKey: 'section.help.desc', route: 'help-index', Panel: () => <HelpIndexScreen embedded /> },
