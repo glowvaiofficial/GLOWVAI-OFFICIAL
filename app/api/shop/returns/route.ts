@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { DAY_MS, ORDER_ID_PATTERN, type Doc } from "@/lib/shop/orderState";
+import { recordActivity } from "@/lib/shop/activity";
 import {
   RETURN_COLLECTION,
   RETURN_LOCK_COLLECTION,
@@ -102,7 +103,8 @@ export async function POST(req: NextRequest) {
       for (const ref of lockRefs) tx.create(ref, { returnId, orderId, uid: customer.uid, createdAt: now });
       return { doc, created: true };
     });
-    return json({ ok: true, created: result.created, return: customerReturnView(result.doc, returnId) }, result.created ? 201 : 200);
+    if (result.created) await recordActivity(customer.uid, "return_requested", Date.now());
+  return json({ ok: true, created: result.created, return: customerReturnView(result.doc, returnId) }, result.created ? 201 : 200);
   } catch (err) {
     if (err instanceof RequestBlocked) return json({ ok: false, error: err.message }, err.status);
     throw err;

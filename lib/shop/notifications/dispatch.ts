@@ -81,7 +81,7 @@ export async function notifyCustomerWith(deps: NotifyDeps, uid: string, event: N
     }
 
     const { prefs, marketingConsent } = await deps.prefsFor(uid);
-    const decision = pushDecision({ category: rendered.category, prefs, marketingConsent, nowMs: now });
+    const decision = pushDecision({ category: rendered.category, type: rendered.type, prefs, marketingConsent, nowMs: now });
     if (!decision.send) return { inApp, push: "skipped", reason: decision.reason };
     if (!deps.pushConfigured()) return { inApp, push: "not-configured" };
 

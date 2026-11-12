@@ -12,16 +12,25 @@ export interface ShopProfileAddress {
 export interface ShopProfile {
   name: string;
   phone: string;
+  // Always false until SMS sign-in is connected.
+  phoneVerified?: boolean;
   email: string;
   address: ShopProfileAddress | null;
   marketingOptIn: boolean;
+  analyticsOptIn?: boolean;
+  // When each consent choice was made (epoch ms), or null when it has not been chosen.
+  marketingAt?: number | null;
+  analyticsAt?: number | null;
+  language?: string;
 }
 
 export interface ShopProfileInput {
   name: string;
   phone: string;
   email?: string;
-  address: ShopProfileAddress;
+  // Left out (or null) keeps the address already on the account.
+  address?: ShopProfileAddress | null;
+  // Left out keeps the stored choice.
   marketingOptIn?: boolean;
   analyticsOptIn?: boolean;
 }
@@ -64,6 +73,11 @@ export interface ShopOrder {
   payment: { method: string; status: string };
   shippingAddress: ShopOrderAddress | null;
   createdAt: number | null;
+  deliveredAt?: number | null;
+  // Set by GET /api/shop/orders: whether the customer has a return or replacement request on this order.
+  hasReturn?: boolean;
+  // Delivered orders only: the customer's own review per product id (none when not reviewed).
+  reviews?: Record<string, { status: 'PENDING' | 'APPROVED' | 'REJECTED'; rating: number; canEdit: boolean }>;
 }
 
 export interface PlaceOrderInput {
@@ -78,6 +92,8 @@ export interface PlaceOrderInput {
   deliverySlot?: string | null;
   // Glow coins the customer chose to use. The server caps them and debits them in the order transaction.
   coinsToRedeem?: number;
+  // The customer's position, only when they chose to share it. Used for the live map; the server checks it.
+  customerLocation?: { lat: number; lng: number } | null;
 }
 
 export interface OnlinePaymentStart {
@@ -191,8 +207,32 @@ export async function saveProfile(input: ShopProfileInput): Promise<ApiResult<un
   return apiFetch('/api/shop/profile', post(input));
 }
 
+// The account language (users/{uid}.language). The server accepts only en, hi or te.
+export async function saveLanguage(language: string): Promise<ApiResult<{ language: string }>> {
+  return apiFetch<{ language: string }>('/api/shop/profile/language', post({ language }));
+}
+
+export interface ActivityEntry {
+  id: string;
+  type: string;
+  message: string;
+  createdAt: number;
+}
+
+export async function fetchActivity(cursor?: string | null): Promise<ApiResult<{ items: ActivityEntry[]; nextCursor: string | null }>> {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : '';
+  return apiFetch<{ items: ActivityEntry[]; nextCursor: string | null }>(`/api/shop/activity${query}`);
+}
+
 export async function fetchOrders(): Promise<ApiResult<{ orders: ShopOrder[] }>> {
   return apiFetch<{ orders: ShopOrder[] }>('/api/shop/orders');
+}
+
+// One page of the order history (newest first). Pass the nextCursor from the previous page to get the next one.
+export async function fetchOrdersPage(filter: string, cursor: string | null): Promise<ApiResult<{ orders: ShopOrder[]; nextCursor: string | null }>> {
+  const params = new URLSearchParams({ filter, limit: '20' });
+  if (cursor) params.set('cursor', cursor);
+  return apiFetch<{ orders: ShopOrder[]; nextCursor: string | null }>(`/api/shop/orders?${params.toString()}`);
 }
 
 export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; trackingId?: string; pricing: ShopOrderPricing; status: string; payment?: OnlinePaymentStart }>> {
@@ -231,6 +271,9 @@ export interface NotificationPrefs {
   orders: boolean;
   offers: boolean;
   reviews: boolean;
+  returns: boolean;
+  referrals: boolean;
+  subscriptions: boolean;
 }
 
 export async function fetchNotifications(cursor?: string | null): Promise<ApiResult<NotificationPage>> {

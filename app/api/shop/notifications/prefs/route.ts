@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
-import { prefsFrom } from "@/lib/shop/notifications/policy";
+import { NOTIFICATION_PREF_KEYS, prefsFrom, type NotificationPrefKey } from "@/lib/shop/notifications/policy";
 import { prefsFor, savePrefs } from "@/lib/shop/notifyStore";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +30,14 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
-  const patch: Partial<Record<"orders" | "offers" | "reviews", boolean>> = {};
-  for (const key of ["orders", "offers", "reviews"] as const) {
+  const patch: Partial<Record<NotificationPrefKey, boolean>> = {};
+  for (const key of NOTIFICATION_PREF_KEYS) {
     if (body[key] === undefined) continue;
     if (typeof body[key] !== "boolean") return json({ ok: false, error: "Each choice must be on or off." }, 400);
     patch[key] = body[key] as boolean;
   }
-  const saved = await savePrefs(customer.uid, patch, Date.now());
+  const now = Date.now();
+  const saved = await savePrefs(customer.uid, patch, now);
+  await recordActivity(customer.uid, "notification_settings_changed", now);
   return json({ ok: true, prefs: prefsFrom(saved) });
 }

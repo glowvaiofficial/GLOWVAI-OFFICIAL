@@ -128,3 +128,52 @@ export async function openInvoice(orderId: string): Promise<string | null> {
     return 'We could not reach GlowVai. Check your connection and try again.';
   }
 }
+
+// Live tracking (stage, copy, banners, estimate, map points). Built by lib/shop/liveTracking.ts; the types come from the
+// shared pure module so the screen and the server agree on the shape.
+export type { LiveTracking, LiveStep, TrackingStage } from '../../../lib/shop/tracking';
+import type { LiveTracking } from '../../../lib/shop/tracking';
+
+export const fetchLiveTracking = (orderId: string): Promise<ApiResult<{ tracking: LiveTracking }>> =>
+  apiFetch<{ tracking: LiveTracking }>(`/api/shop/orders/${encodeURIComponent(orderId)}/tracking`);
+
+// The delivery code is returned only at stage 8. Anything else is {available: false} and no code.
+export type DeliveryCodeState = { available: false } | { available: true; code: string; locked: boolean; lockedMinutes: number };
+
+export const fetchDeliveryCode = (orderId: string): Promise<ApiResult<{ deliveryCode: DeliveryCodeState }>> =>
+  apiFetch<{ deliveryCode: DeliveryCodeState }>(`/api/shop/orders/${encodeURIComponent(orderId)}/delivery-code`);
+// --- Shareable tracking link ------------------------------------------------------------------------------------------
+// The customer makes (or replaces, or revokes) a link for one of their orders. The link itself is built on the server.
+export const createTrackingShare = (orderId: string): Promise<ApiResult<{ url: string; expiresAt: string }>> =>
+  apiFetch<{ url: string; expiresAt: string }>(`/api/shop/orders/${encodeURIComponent(orderId)}/share`, post({}));
+
+export const revokeTrackingShare = (orderId: string): Promise<ApiResult<unknown>> =>
+  apiFetch(`/api/shop/orders/${encodeURIComponent(orderId)}/share`, { method: 'DELETE' });
+
+export interface SharedTracking {
+  orderId: string;
+  storeName: string;
+  status: string;
+  statusText: string;
+  cancelled: boolean;
+  delivered: boolean;
+  outForDelivery: boolean;
+  expectedWindow: { from: number; to: number } | null;
+  delayed: boolean;
+  delayText: string | null;
+  riderFirstName: string | null;
+}
+
+// The public view of a shared link. No sign-in: a visitor opens the link as it is. Never throws.
+export async function fetchSharedTracking(orderId: string, token: string): Promise<ApiResult<{ tracking: SharedTracking }>> {
+  const failure = 'This tracking link is no longer valid. Ask the customer for a new link.';
+  try {
+    const params = new URLSearchParams({ orderId, k: token });
+    const response = await fetch(`/api/shop/shared-tracking?${params.toString()}`, { cache: 'no-store' });
+    const body = (await response.json().catch(() => null)) as { ok?: boolean; tracking?: SharedTracking; error?: string } | null;
+    const ok = response.ok && body?.ok === true && Boolean(body.tracking);
+    return { ok, status: response.status, data: ok ? { tracking: body!.tracking! } : null, error: ok ? null : body?.error || failure };
+  } catch {
+    return { ok: false, status: 0, data: null, error: 'We could not reach GlowVai. Check your connection and try again.' };
+  }
+}

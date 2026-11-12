@@ -8,6 +8,7 @@ import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { BillRows, CheckoutSteps, DeliveryAddressCard, FlowHeader, useDeliveryAddress } from './components/shared';
 import { DeliverySlotPicker } from './components/DeliverySlotPicker';
+import { ShareLocationOption } from './components/ShareLocationOption';
 import { CoinsRedeemCard } from './CoinsRedeemCard';
 
 // Step 2 of checkout: the items and the delivery address. Back goes to the cart.
@@ -82,6 +83,7 @@ export const CheckoutReviewScreen: React.FC = () => {
                 <h2 id="review-slot-title">When should it arrive?</h2>
               </div>
               <DeliverySlotPicker />
+              <ShareLocationOption />
             </section>
           )}
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { GlowVaiShop } from '@/glowvai-app/GlowVaiShop';
 import { siteConfig } from '@/config/site';
+import { AffiliateClickCapture } from '@/components/affiliate/AffiliateClickCapture';
 
 export const metadata: Metadata = {
   title: 'Shop skincare',
@@ -15,5 +16,10 @@ export function generateStaticParams() {
 }
 
 export default function ShopPage() {
-  return <GlowVaiShop />;
+  return (
+    <>
+      <AffiliateClickCapture />
+      <GlowVaiShop />
+    </>
+  );
 }

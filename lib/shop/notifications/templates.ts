@@ -20,6 +20,12 @@ export const NOTIFICATION_TYPES = [
   "referral_reward",
   "coins_credited",
   "subscription_processed",
+  "tracking_confirmed",
+  "tracking_on_the_way",
+  "tracking_almost_there",
+  "tracking_arriving",
+  "tracking_arrived",
+  "tracking_delayed",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
@@ -52,6 +58,12 @@ export const TEMPLATES: Readonly<Record<NotificationType, NotificationTemplate>>
   referral_reward: { category: "offers", relatedType: "account", title: "Referral reward", body: "You have earned a referral reward. Check your rewards in your account." },
   coins_credited: { category: "offers", relatedType: "account", title: "Coins added", body: "Coins have been added to your account." },
   subscription_processed: { category: "orders", relatedType: "subscription", title: "Subscription update", body: "Your subscription has been processed." },
+  tracking_confirmed: { category: "orders", relatedType: "order", title: "Order confirmed", body: "Your products are reserved at our dark store." },
+  tracking_on_the_way: { category: "orders", relatedType: "order", title: "On the way", body: "Your order has been picked up and is heading to you." },
+  tracking_almost_there: { category: "orders", relatedType: "order", title: "Almost there", body: "Your delivery partner is nearly on the way to you." },
+  tracking_arriving: { category: "orders", relatedType: "order", title: "Arriving in 2 mins", body: "Keep your phone handy, your delivery partner is nearby." },
+  tracking_arrived: { category: "orders", relatedType: "order", title: "Your delivery partner has arrived", body: "Open your order to see the delivery code." },
+  tracking_delayed: { category: "orders", relatedType: "order", title: "Running a little late", body: "Your delivery is running a little late. Open your order for the new arrival time." },
 };
 
 export interface RenderedNotification {

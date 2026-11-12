@@ -6,6 +6,7 @@
 // phone number has been verified.
 import { browserLocalPersistence, setPersistence, signInAnonymously, type User } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import { currentDeviceId } from './deviceId';
 
 export interface ApiResult<T> {
   ok: boolean;
@@ -63,6 +64,8 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
   const send = async (bearer: string) => {
     const headers = new Headers(init.headers);
     headers.set('Authorization', `Bearer ${bearer}`);
+    const device = currentDeviceId();
+    if (device) headers.set('X-GlowVai-Device', device);
     if (init.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
     return fetch(path, { ...init, headers, cache: 'no-store' });
   };
