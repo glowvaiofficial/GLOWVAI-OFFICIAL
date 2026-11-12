@@ -1,16 +1,19 @@
 import { db } from "@/lib/shop/server";
 import { invalid } from "@/lib/vendor/errors";
 import { perMinute, preflight, readJson, vendorRoute } from "@/lib/vendor/http";
-import { PUSH_TOKEN_MAX, deviceCapAllows, deviceCapError, parsePushToken, tokenIdOf } from "@/lib/vendor/push";
+import { parseVendorPushToken } from "@/lib/vendor/pushToken";
+import { PUSH_TOKEN_MAX, deviceCapAllows, deviceCapError, tokenIdOf } from "@/lib/vendor/push";
 
 export const dynamic = "force-dynamic";
 
-// Registers this device for vendor notifications. Stored at vendors/{uid}/pushTokens/{sha256(token)}; at most
-// PUSH_TOKEN_MAX devices per vendor. Re-sending a token that is already stored only refreshes it.
+// Registers this device for vendor notifications. Body: { token, platform: ios|android|web, tokenType: EXPO|FCM }.
+// Stored at vendors/{uid}/pushTokens/{sha256(token)} with the token and its type; at most PUSH_TOKEN_MAX devices per
+// vendor. Re-sending a token that is already stored only refreshes it. A new device over the cap is refused (not evicted).
+// Returns { registered, devices }. The token is never sent back.
 export const POST = vendorRoute({ route: "push-token", ip: perMinute(10), user: perMinute(5) }, async ({ req, me }) => {
-  const parsed = parsePushToken(await readJson(req));
+  const parsed = parseVendorPushToken(await readJson(req));
   if (!parsed.ok) throw invalid(parsed.error, { field: parsed.field });
-  const { token, platform } = parsed.value;
+  const { token, platform, tokenType } = parsed.value;
 
   const store = db();
   const col = store.collection("vendors").doc(me.uid).collection("pushTokens");
@@ -24,7 +27,7 @@ export const POST = vendorRoute({ route: "push-token", ip: perMinute(10), user: 
     if (!deviceCapAllows(count, mine.exists)) throw deviceCapError();
     tx.set(
       col.doc(id),
-      { token, platform, updatedAt: now, createdAt: mine.exists ? (mine.get("createdAt") ?? now) : now },
+      { token, platform, tokenType, updatedAt: now, createdAt: mine.exists ? (mine.get("createdAt") ?? now) : now },
       { merge: true },
     );
     devices = mine.exists ? count : count + 1;

@@ -3,6 +3,7 @@ import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/serve
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { transition, type SubscriptionAction } from "@/lib/shop/growth/subscriptions";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -37,5 +38,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return { ok: true as const, status: 200, error: "" };
   });
   if (!result.ok) return json({ ok: false, error: result.error }, result.status);
+  await recordActivity(customer.uid, "subscription_changed", now);
   return json({ ok: true });
 }

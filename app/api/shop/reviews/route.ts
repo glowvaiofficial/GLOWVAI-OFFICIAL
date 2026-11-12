@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
 import { PRODUCT_ID_PATTERN, createReview, editReview, reviewEligibility, reviewFailure } from "@/lib/shop/reviews";
 import { validateReviewInput } from "@/lib/shop/reviewRules";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
   if (!checked.ok) return json({ ok: false, error: checked.error }, 400);
   try {
     const created = await createReview(gate.uid, productId, checked.value, Date.now());
+    await recordActivity(gate.uid, "review_submitted", Date.now());
     return json({ ok: true, status: created.status, message: "Thanks. Your review will show once our team has checked it." });
   } catch (err) {
     const refused = reviewFailure(err);

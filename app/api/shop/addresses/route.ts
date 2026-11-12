@@ -3,6 +3,7 @@ import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/
 import { ADDRESS_ID, MAX_ADDRESSES, sortAddresses, type StoredAddress } from "@/lib/shop/addressRules";
 import { listAddresses, runAddressOp } from "@/lib/shop/addressService";
 import { addressRepo, newAddressId } from "@/lib/shop/addressRepo";
+import { recordActivity } from "@/lib/shop/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
   const outcome = await runAddressOp(addressRepo, customer.uid, { kind: "create", input: body, makeDefault: body.makeDefault === true }, Date.now(), newAddressId());
   if (!outcome.ok) return json({ ok: false, error: outcome.error }, outcome.status);
+  await recordActivity(customer.uid, "address_added", Date.now());
   return json({ ok: true, addresses: outcome.addresses.map(view) });
 }
 
@@ -81,6 +83,7 @@ export async function PATCH(req: NextRequest) {
     newAddressId(),
   );
   if (!outcome.ok) return json({ ok: false, error: outcome.error }, outcome.status);
+  await recordActivity(customer.uid, "address_updated", Date.now());
   return json({ ok: true, addresses: outcome.addresses.map(view) });
 }
 
@@ -100,5 +103,6 @@ export async function DELETE(req: NextRequest) {
   if (!ADDRESS_ID.test(id)) return json({ ok: false, error: "That address is not on your account." }, 404);
   const outcome = await runAddressOp(addressRepo, customer.uid, { kind: "delete", id }, Date.now(), newAddressId());
   if (!outcome.ok) return json({ ok: false, error: outcome.error }, outcome.status);
+  await recordActivity(customer.uid, "address_removed", Date.now());
   return json({ ok: true, addresses: outcome.addresses.map(view) });
 }

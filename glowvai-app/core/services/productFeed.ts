@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { db } from '../config/firebase';
 import { setLiveCatalog, type SkincareProduct } from '../data/indianSkincareCatalog';
 import { defaultVariant, readProductVariants } from '../../../lib/shop/variants';
+import { subscribableOf } from '../../../lib/shop/subscribable';
 import { useCartStore } from '../state/cartStore';
 
 // Splits a comma or line separated list into trimmed items.
@@ -49,6 +50,7 @@ export function toShopProduct(id: string, d: Record<string, unknown>, rating?: P
     keyActives: splitList(typeof d.keyActives === 'string' && d.keyActives ? d.keyActives : ingredients),
     metrics: { hydration: '', glow: '', barrier: '' },
     deliveryMinutes: Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes) : null,
+    subscribable: subscribableOf(d.subscribable),
     ...(options ? { variants: options } : {}),
   };
 }

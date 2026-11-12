@@ -6,6 +6,8 @@ import { readProductVariants, resolveVariant } from "@/lib/shop/variants";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { firstRunAt, validateSubscriptionInput } from "@/lib/shop/growth/subscriptions";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
+import { recordActivity } from "@/lib/shop/activity";
+import { subscriptionRefusal } from "@/lib/shop/subscribable";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +66,9 @@ export async function POST(req: NextRequest) {
   if (!product.exists || !p || p.status !== "PUBLISHED") {
     return json({ ok: false, error: "That product is not available to subscribe to." }, 409);
   }
+  // Only products the admin has marked subscribable (the flag is written by the admin console, never by the shop).
+  const notSubscribable = subscriptionRefusal(p);
+  if (notSubscribable) return json({ ok: false, error: notSubscribable }, 409);
   // A product sold in sizes or shades needs the one the customer picked; it is priced and checked on that variant at each run.
   const stored = readProductVariants(p.variants);
   if (!stored.ok) return json({ ok: false, error: "That product is not available to subscribe to." }, 409);
@@ -103,5 +108,6 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
     });
   });
+  await recordActivity(customer.uid, "subscription_started", now);
   return json({ ok: true, subscriptionId: id });
 }

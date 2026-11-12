@@ -139,7 +139,7 @@ describe("in-app notification cap", () => {
 
 describe("preferences and quiet hours", () => {
   test("orders and reviews are on by default and offers are off", () => {
-    assert.deepEqual(DEFAULT_PREFS, { orders: true, offers: false, reviews: true });
+    assert.deepEqual(DEFAULT_PREFS, { orders: true, offers: false, reviews: true, returns: true, referrals: true, subscriptions: true });
     assert.deepEqual(prefsFrom(undefined), DEFAULT_PREFS);
     assert.deepEqual(prefsFrom({ offers: "yes", orders: 0 }), DEFAULT_PREFS);
   });

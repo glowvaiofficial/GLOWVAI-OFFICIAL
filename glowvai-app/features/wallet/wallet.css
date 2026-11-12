@@ -1,0 +1,145 @@
+/* GlowVai Coins wallet screen. Uses the profile card classes for the shared look; these rules add the top-up parts. */
+.wallet-screen .profile-body {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.wallet-balance-value {
+  margin: 6px 0 2px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink, #0b1020);
+}
+
+.wallet-balance-value span {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wallet-rate {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+.wallet-notice-text {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.85;
+}
+
+.wallet-topup {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.wallet-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.wallet-preset {
+  min-height: 44px;
+  border: 1px solid #0057fb;
+  border-radius: 10px;
+  background: #fff;
+  color: #0057fb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wallet-preset[aria-pressed='true'] {
+  background: #0057fb;
+  color: #fff;
+}
+
+.wallet-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wallet-field {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.wallet-field input {
+  min-height: 44px;
+  border: 1px solid #b8c2d6;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 16px;
+}
+
+.wallet-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.wallet-blocked {
+  margin: 0;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.wallet-pay {
+  min-height: 48px;
+  width: 100%;
+}
+
+.wallet-pay:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wallet-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.wallet-notice-ok {
+  background: #e7f6ec;
+  color: #05603a;
+}
+
+.wallet-notice-info {
+  background: #eef4ff;
+  color: #1b3a7a;
+}
+
+.wallet-notice-error {
+  background: #fdecec;
+  color: #912018;
+}
+
+.wallet-amount-in {
+  color: #05603a;
+}
+
+.wallet-amount-out {
+  color: #912018;
+}
+
+.wallet-more {
+  margin: 12px 16px 16px;
+}
+
+@media (max-width: 480px) {
+  .wallet-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .wallet-balance-value {
+    font-size: 28px;
+  }
+}

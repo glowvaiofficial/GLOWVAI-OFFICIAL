@@ -53,6 +53,10 @@ const AppContent: React.FC = () => {
       const orderId = new URLSearchParams(window.location.search).get('order');
       if (orderId && /^[A-Za-z0-9_-]{1,140}$/.test(orderId)) navigate('orders-detail', { orderId });
       else if (new URLSearchParams(window.location.search).get('inbox') === '1') navigate('notifications-list');
+      // A shared tracking link (/shop?track=ORDER&k=TOKEN): the public view of that one order.
+      const track = new URLSearchParams(window.location.search).get('track');
+      const shareToken = new URLSearchParams(window.location.search).get('k');
+      if (track && shareToken && /^[A-Za-z0-9-]{6,40}$/.test(track) && /^[A-Za-z0-9_-]{43}$/.test(shareToken)) navigate('orders-shared-tracking', { orderId: track, token: shareToken });
     } catch {
       // Unreadable address: open the normal start screen.
     }

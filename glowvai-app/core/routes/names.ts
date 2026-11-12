@@ -66,6 +66,8 @@ export type PortedScreenName =
   | 'profile-referral-transactions'
   | 'profile-subscriptions'
   | 'profile-student-status'
+  // GlowVai Coins wallet: balance, top-up, history (features/wallet)
+  | 'wallet-home'
   // Notifications (features/notifications)
   | 'notifications-list'
   // Routine and ingredient guidance (features/recommendations)
@@ -74,5 +76,25 @@ export type PortedScreenName =
   | 'recommend-ingredients'
   | 'recommend-patch-test'
   | 'recommend-checkout'
+  // Public shared tracking link (features/orders): /shop?track=ORDER&k=TOKEN
+  | 'orders-shared-tracking'
   // Debug
-  | 'debug-app-doctor';
+  | 'debug-app-doctor'
+  // Account settings hub (features/settings). 'profile-settings' is the hub itself.
+  | 'settings-language'
+  | 'settings-notifications'
+  | 'settings-activity'
+  | 'settings-wallet'
+  | 'settings-gift-cards'
+  | 'settings-privacy'
+  | 'settings-sell'
+  | 'settings-affiliate'
+  | 'help-index'
+  | 'help-faq'
+  | 'help-terms'
+  | 'help-privacy'
+  // Privacy and security (features/privacy): privacy centre, devices, saved payment methods, gift cards
+  | 'privacy-center'
+  | 'privacy-devices'
+  | 'payment-methods'
+  | 'gift-cards';

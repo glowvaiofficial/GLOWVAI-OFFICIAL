@@ -4,7 +4,8 @@ import './profile.css';
 import '../../responsive/profile-admin.css';
 import { ProfileOverviewScreen } from './ProfileOverviewScreen';
 import { EditProfileScreen } from './EditProfileScreen';
-import { SettingsAndSecurityScreen } from './SettingsAndSecurityScreen';
+import { SettingsHubScreen } from '../settings/SettingsHubScreen';
+import { routes as settingsRoutes } from '../settings/routes';
 import { HelpAndSupportScreen } from './HelpAndSupportScreen';
 import { ReferralHubScreen } from './ReferralHubScreen';
 import { StudentReferralScreen } from './StudentReferralScreen';
@@ -14,11 +15,12 @@ import { StudentStatusScreen } from './StudentStatusScreen';
 import { AppDoctorScreen } from './AppDoctorScreen';
 
 export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
+  ...settingsRoutes,
   'profile-tab': ProfileOverviewScreen,
   // The mobile app's profile-overview route renders the edit screen, so both names do.
   'profile-overview': EditProfileScreen,
   'profile-edit': EditProfileScreen,
-  'profile-settings': SettingsAndSecurityScreen,
+  'profile-settings': SettingsHubScreen,
   'profile-support': HelpAndSupportScreen,
   'profile-referrals': ReferralHubScreen,
   'profile-referral-code': StudentReferralScreen,

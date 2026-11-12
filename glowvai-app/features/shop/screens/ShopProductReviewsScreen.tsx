@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowLeft, MessageSquareText, PackageSearch, Star } from 'lucide-react';
+import { ArrowLeft, PackageSearch, Star } from 'lucide-react';
+import { ProductReviews } from '../../reviews/ProductReviews';
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
@@ -114,18 +115,8 @@ export const ShopProductReviewsScreen: React.FC = () => {
           </section>
         </aside>
 
-        <section className="shop-reviews-none">
-          <span className="shop-reviews-none-icon">
-            <MessageSquareText size={22} />
-          </span>
-          <h2>No written reviews yet</h2>
-          <p>
-            The rating shown here is the product's catalogue rating. Written reviews from GlowVAI customers will appear here once
-            they are available.
-          </p>
-          <button type="button" className="shop-btn-primary shop-reviews-empty-btn" onClick={() => navigate('shop-product', { productId: product.id })}>
-            Back to product
-          </button>
+        <section className="shop-reviews-list" aria-label="Customer reviews">
+          <ProductReviews productId={product.id} />
         </section>
       </div>
     </div>

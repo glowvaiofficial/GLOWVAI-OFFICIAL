@@ -13,7 +13,7 @@ export function razorpayKeyId(): string {
 }
 
 // Creates a Razorpay order for an amount in rupees. Razorpay works in paise.
-export async function createRazorpayOrder(amountRupees: number, receipt: string): Promise<{ id: string; amount: number; currency: string }> {
+export async function createRazorpayOrder(amountRupees: number, receipt: string, notes?: Record<string, string>): Promise<{ id: string; amount: number; currency: string }> {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const secret = process.env.RAZORPAY_KEY_SECRET;
   if (!keyId || !secret) throw new Error("NOT_CONFIGURED");
@@ -25,7 +25,7 @@ export async function createRazorpayOrder(amountRupees: number, receipt: string)
       "Content-Type": "application/json",
       Authorization: "Basic " + Buffer.from(`${keyId}:${secret}`).toString("base64"),
     },
-    body: JSON.stringify({ amount: Math.round(amountRupees * 100), currency: "INR", receipt: receipt.slice(0, 40) }),
+    body: JSON.stringify({ amount: Math.round(amountRupees * 100), currency: "INR", receipt: receipt.slice(0, 40), ...(notes ? { notes } : {}) }),
     cache: "no-store",
   });
   const data = (await res.json().catch(() => ({}))) as { id?: string; amount?: number; currency?: string; error?: { description?: string } };
@@ -53,4 +53,29 @@ export function verifyWebhookSignature(rawBody: string, signature: string): bool
   if (!secret || !signature) return false;
   const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
   return safeEqualHex(expected, signature);
+}
+
+// Reads a payment from Razorpay (server to server). Used to learn the amount actually paid, which the browser never
+// reports: a verify call trusts this, not the request body. Returns null when Razorpay does not know the payment.
+export interface RazorpayPaymentFacts {
+  id: string;
+  order_id: string;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+export async function fetchRazorpayPayment(paymentId: string): Promise<RazorpayPaymentFacts | null> {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const secret = process.env.RAZORPAY_KEY_SECRET;
+  if (!keyId || !secret) throw new Error("NOT_CONFIGURED");
+  if (!/^pay_[A-Za-z0-9]{6,64}$/.test(paymentId)) return null;
+  const res = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, {
+    headers: { Authorization: "Basic " + Buffer.from(`${keyId}:${secret}`).toString("base64") },
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  const data = (await res.json().catch(() => null)) as Partial<RazorpayPaymentFacts> | null;
+  if (!data || typeof data.id !== "string" || typeof data.order_id !== "string") return null;
+  return { id: data.id, order_id: data.order_id, amount: Number(data.amount), currency: String(data.currency ?? ""), status: String(data.status ?? "") };
 }
