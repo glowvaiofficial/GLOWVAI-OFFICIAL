@@ -7,7 +7,7 @@ const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://api.qrserver.com https://www.google-analytics.com https://www.googletagmanager.com https://*.googleusercontent.com https://drive.google.com",
+  "img-src 'self' data: blob: https://images.unsplash.com https://api.qrserver.com https://www.google-analytics.com https://www.googletagmanager.com https://*.googleusercontent.com https://drive.google.com https://firebasestorage.googleapis.com https://*.gstatic.com https://*.nykaa.com https://*.cureka.com https://*.apollo247.in https://*.gumlet.io https://thedermaco.com https://beminimalist.co https://*.speedsize.com https://m.media-amazon.com https://cdn.shopify.com https://*.ppl-media.com https://rukminim2.flixcart.com https://*.flixcart.com",
   "font-src 'self' data:",
   // The shop bundle also runs on these pages after a client-side link to /shop (the document keeps this policy), so the
   // Firebase hosts it calls are listed here too. Firestore reads go over HTTPS and its listen channel over WSS.
