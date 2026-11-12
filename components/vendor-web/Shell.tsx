@@ -78,7 +78,8 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
   const session = useVendorSession();
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
-  const current = active ?? pathname;
+  // Pages pass a short name ("orders"); the nav matches on the full path, so map it to "/vendor/<name>".
+  const current = active ? `/vendor/${active}` : pathname;
   const storeName = session.me?.application?.storeName || "Your store";
 
   useEffect(() => {

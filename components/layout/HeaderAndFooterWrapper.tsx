@@ -8,6 +8,7 @@ import { Footer } from "./Footer";
 import { StickyCtaBar } from "./StickyCtaBar";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { ReferralCapture } from "./ReferralCapture";
+import { isVendorPath } from "@/lib/vendor-web/chrome";
 
 interface HeaderAndFooterWrapperProps {
   children: React.ReactNode;
@@ -20,6 +21,11 @@ export function HeaderAndFooterWrapper({ children, city }: HeaderAndFooterWrappe
   // The shop runs the glowvai app shell, which has its own navigation and bottom bar.
   // The rider page is a standalone tool for delivery partners: no site navigation or promotional bars.
   if (pathname?.startsWith("/rider")) {
+    return <main id="main" className="flex-1">{children}</main>;
+  }
+
+  // The vendor store runs its own shell (VendorShell), with its own top bar and navigation.
+  if (isVendorPath(pathname)) {
     return <main id="main" className="flex-1">{children}</main>;
   }
 
