@@ -17,6 +17,7 @@
     "export:merchant-feed": "npx tsx scripts/export-merchant-feed.ts",
     "test:vendor": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/vendor/*.test.ts\"",
     "test:vendor-remaining": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/vendor-remaining/*.test.ts\"",
+    "test:vendor-web-ops": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/vendor-web/*.test.ts\"",
     "test:refunds": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/refunds/*.test.ts\"",
     "test:support": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/support/*.test.ts\"",
     "test": "npx tsx scripts/test-entity.ts && npx tsx scripts/test-schema.ts && npx tsx scripts/test-email-analytics.ts",
