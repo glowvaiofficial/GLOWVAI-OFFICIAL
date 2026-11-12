@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { browserStore, dismissQuiz } from '../features/shop/lib/firstVisit';
 import '../responsive/entry-scan.css';
 const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.png';
 const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.png';
@@ -34,7 +35,7 @@ const steps = [
 ];
 
 export const OnboardingScreen: React.FC = () => {
-  const { navigate, activeParams } = useApp();
+  const { navigate } = useApp();
   const [step, setStep] = useState(0);
   const item = steps[step];
 
@@ -43,9 +44,13 @@ export const OnboardingScreen: React.FC = () => {
       setStep((value) => value + 1);
       return;
     }
-    // Last carousel step: skin survey, then "Your details", then the shop (no sign-in code is offered yet).
-    if (activeParams?.phoneNumber) navigate('auth-login', { returnTo: 'auth-onboarding-success' });
-    else navigate('auth-skin-survey');
+    // Last carousel step opens the optional skin quiz. It never leads to the "Your details" form.
+    navigate('auth-skin-survey');
+  };
+
+  const skip = () => {
+    dismissQuiz(browserStore());
+    navigate('shop-home');
   };
 
   return (
@@ -78,6 +83,9 @@ export const OnboardingScreen: React.FC = () => {
 
         <button type="button" className="onboarding-next" onClick={advance} style={{ display: 'flex', width: '100%', minHeight: 52, alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: step === 2 ? 19 : 25, borderRadius: 'var(--ds-pill)', background: 'var(--ds-brand)', color: '#fff', fontSize: 16, fontWeight: 700 }}>
           {item.action}<ArrowRight size={20} />
+        </button>
+        <button type="button" onClick={skip} style={{ display: 'block', width: '100%', marginTop: 14, color: 'var(--ds-muted)', fontSize: 15, fontWeight: 600 }}>
+          Skip, show me products
         </button>
         <span aria-hidden="true" className="onboarding-home-indicator" style={{ position: 'absolute', bottom: 8, left: '50%', width: 118, height: 4, transform: 'translateX(-50%)', borderRadius: 999, background: '#7f8794' }} />
       </section>

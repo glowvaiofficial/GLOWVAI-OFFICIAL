@@ -308,3 +308,55 @@
 /* Snap rows start at the page gutter, not flush with the screen edge. */
 .glowvai-root .shop-home .shop-home-rail,
 .glowvai-root .shop-home .shop-home-deals{ scroll-padding-inline: var(--shop-home-gutter); }
+
+/* Optional skin quiz banner (first visit). */
+.glowvai-root .shop-home .shop-quiz-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #eaf1ff;
+  color: var(--ds-ink, #0b1220);
+}
+.glowvai-root .shop-home .shop-quiz-banner-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ds-brand, #0861f7);
+}
+.glowvai-root .shop-home .shop-quiz-banner-copy {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 2px;
+  font-size: 13px;
+}
+.glowvai-root .shop-home .shop-quiz-banner-copy strong { font-size: 14px; }
+.glowvai-root .shop-home .shop-quiz-banner-copy > span { color: var(--ds-muted, #475569); }
+.glowvai-root .shop-home .shop-quiz-banner-cta {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ds-brand, #0861f7);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.glowvai-root .shop-home .shop-quiz-banner-skip {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 4px;
+  color: var(--ds-muted, #475569);
+  font-size: 13px;
+  font-weight: 600;
+}

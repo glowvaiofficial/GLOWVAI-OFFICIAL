@@ -6,6 +6,7 @@ import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
+import { CONCERN_KEYWORDS } from '../lib/firstVisit';
 import '../styles/shop-browse.css';
 
 // Each tile shows the first full-size catalogue product in that category, as on the shop home.
@@ -23,14 +24,6 @@ const CATEGORY_ITEMS: { id: string; name: string; imageUri: string; Icon: Lucide
   { id: 'Treatments', name: 'Spot Treatments', imageUri: '', Icon: Activity },
 ];
 
-// Keyword groups matched against product name/description/keyActives.
-const CONCERN_KEYWORDS: Record<string, string[]> = {
-  acne: ['acne', 'blemish', 'salicylic', 'niacinamide', 'tea tree', 'breakout'],
-  hydration: ['hydrat', 'moistur', 'dry', 'hyaluronic', 'ceramide', 'glycerin'],
-  brightening: ['bright', 'dark spot', 'vitamin c', 'glow', 'pigment', 'tone'],
-  antiaging: ['anti-aging', 'anti aging', 'firm', 'wrinkle', 'retinol', 'peptide', 'collagen'],
-  barrier: ['barrier', 'repair', 'ceramide', 'soothe', 'sensitive'],
-};
 
 const SKIN_CONCERNS = [
   { id: 'all', label: 'All Items' },

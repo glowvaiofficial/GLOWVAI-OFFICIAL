@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Check, CircleDot, Droplets, Flame, Palette, Sparkles, Waves } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { safeHapticImpact } from '../../core/utils/haptics';
-import { storage } from '../../core/utils/storage';
+import { browserStore, dismissQuiz, saveQuizAnswers } from '../shop/lib/firstVisit';
 import { AuthShell } from './components/AuthShell';
-import { PROFILE_ANSWERS_KEY } from './authUtils';
 
 const SKIN_CONCERNS = [
   { id: 'ACNE', label: 'Acne & Blemishes', icon: <CircleDot /> },
@@ -15,20 +14,9 @@ const SKIN_CONCERNS = [
   { id: 'FINE_LINES', label: 'Fine Lines & Aging', icon: <Waves /> },
 ];
 
-// The name typed on the profile step (kept on this device), used to pre-fill the "Your details" step.
-const savedProfileName = async (): Promise<string> => {
-  try {
-    const saved = JSON.parse((await storage.getItem(PROFILE_ANSWERS_KEY)) ?? '{}') as { name?: unknown };
-    return typeof saved.name === 'string' ? saved.name.slice(0, 80) : '';
-  } catch {
-    return '';
-  }
-};
-
 export const SkinSurveyScreen: React.FC = () => {
-  const { navigate, goBack } = useApp();
+  const { goBack, navigate } = useApp();
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const toggleConcern = (id: string) => {
     safeHapticImpact();
@@ -37,37 +25,32 @@ export const SkinSurveyScreen: React.FC = () => {
     );
   };
 
-  // Skin concerns stay on this device and are not sent anywhere: the shop's profile route (POST /api/shop/profile)
-  // has no field for them.
-  const handleSaveAndContinue = async (saveAnswers = true) => {
-    if (isLoading) return;
+  // Answers stay on this device and power the skin-matched picks on the shop home. The quiz never opens the
+  // "Your details" form: account details are asked at checkout, where they are needed.
+  const finish = (answered: boolean) => {
     safeHapticImpact();
-    setIsLoading(true);
-    if (saveAnswers) await storage.setItem('glowvai_skin_concerns', JSON.stringify(selectedConcerns));
-    const name = await savedProfileName();
-    setIsLoading(false);
-    // Details come right after the skin survey, so orders can be delivered from the first visit. That step saves the
-    // name, mobile and email to the account (POST /api/shop/profile) and shows the server's error if saving fails.
-    navigate('auth-login', { returnTo: 'auth-onboarding-success', ...(name ? { name } : {}) });
+    if (answered) saveQuizAnswers(browserStore(), selectedConcerns);
+    else dismissQuiz(browserStore());
+    navigate('shop-home');
   };
 
   return (
     <AuthShell
       onBack={goBack}
       footer={
-        <button type="button" className="auth-primary-button" onClick={() => void handleSaveAndContinue()} disabled={isLoading}>
-          {isLoading ? <span className="auth-spinner" aria-label="Saving" /> : 'Save & Finish Setup'}
+        <button type="button" className="auth-primary-button" onClick={() => finish(true)} disabled={selectedConcerns.length === 0}>
+          Get my picks
         </button>
       }
     >
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '100%' }} /></div>
-        <span className="auth-step-label">Step 2 of 2: Skin Survey</span>
+        <span className="auth-step-label">Skin quiz (optional)</span>
       </div>
 
       <h1 className="auth-title">What are your main skin concerns?</h1>
       <p className="auth-subtitle">
-        Select all that apply. This helps us personalize your first routine and skin report.
+        Select all that apply. Pick a few and we show skin-matched products on the shop home. You can skip this.
       </p>
 
       <div className="auth-concern-grid">
@@ -93,7 +76,7 @@ export const SkinSurveyScreen: React.FC = () => {
         })}
       </div>
 
-      <button type="button" className="auth-text-button auth-skip-link" onClick={() => void handleSaveAndContinue(false)}>
+      <button type="button" className="auth-text-button auth-skip-link" onClick={() => finish(false)}>
         Skip for now
       </button>
     </AuthShell>
