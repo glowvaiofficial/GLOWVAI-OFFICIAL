@@ -40,41 +40,47 @@ describe("substitution preference on the pack screen", () => {
 });
 
 describe("order timeline", () => {
-  test("only reached stages appear, with their times", () => {
+  test("only recorded milestones appear, with their times and fixed labels", () => {
     const steps = orderTimeline({ status: "VENDOR_ACCEPTED", vendorAcceptedAt: T0 + 60_000 });
-    assert.deepEqual(steps, [{ stage: "ACCEPTED", at: T0 + 60_000 }]);
+    assert.deepEqual(steps, [{ at: T0 + 60_000, label: "Accepted" }]);
   });
 
   test("packed follows accepted", () => {
     const steps = orderTimeline({ status: "PACKED", vendorAcceptedAt: T0, vendorPackedAt: T0 + 600_000 });
-    assert.deepEqual(steps.map((s) => s.stage), ["ACCEPTED", "PACKED"]);
+    assert.deepEqual(steps, [
+      { at: T0, label: "Accepted" },
+      { at: T0 + 600_000, label: "Packed" },
+    ]);
   });
 
-  test("handed to a rider takes the time of the 'Out for delivery' event, and the event text is never returned", () => {
+  test("handed to the delivery partner uses the order's own outForDeliveryAt, and event text is never read", () => {
     const steps = orderTimeline({
       status: "OUT_FOR_DELIVERY",
       vendorAcceptedAt: T0,
       vendorPackedAt: T0 + 1000,
+      outForDeliveryAt: T0 + 3000,
       events: [
         { at: T0 + 2000, actor: "Customer", event: "Order placed" },
-        { at: T0 + 3000, actor: "Delivery partner Ravi 9876543210", event: "Out for delivery" },
+        { at: T0 + 2500, actor: "Delivery partner Ravi 9876543210", event: "Out for delivery" },
       ],
     });
-    assert.deepEqual(steps.map((s) => s.stage), ["ACCEPTED", "PACKED", "HANDED_TO_RIDER"]);
+    assert.deepEqual(steps.map((s) => s.label), ["Accepted", "Packed", "Handed to delivery partner"]);
     assert.equal(steps[2].at, T0 + 3000);
     const serialised = JSON.stringify(steps);
     assert.equal(serialised.includes("Ravi"), false);
     assert.equal(serialised.includes("9876543210"), false);
     assert.equal(serialised.includes("Out for delivery"), false);
+    assert.equal(serialised.includes("Customer"), false);
   });
 
-  test("a stage reached with no recorded time shows null, not a made-up time", () => {
+  test("a milestone with no recorded time is left out, not shown with a made-up time", () => {
     const steps = orderTimeline({ status: "DELIVERED", vendorAcceptedAt: T0, events: [] });
-    assert.deepEqual(steps.at(-1), { stage: "HANDED_TO_RIDER", at: null });
+    assert.deepEqual(steps, [{ at: T0, label: "Accepted" }]);
   });
 
-  test("a cancelled order with no stages has an empty timeline", () => {
+  test("an order with no milestones has an empty timeline", () => {
     assert.deepEqual(orderTimeline({ status: "CANCELLED" }), []);
+    assert.deepEqual(orderTimeline({ status: "PLACED", vendorAcceptedAt: 0, vendorPackedAt: "soon" }), []);
   });
 
   test("offers have no timeline (the store has not accepted them)", () => {

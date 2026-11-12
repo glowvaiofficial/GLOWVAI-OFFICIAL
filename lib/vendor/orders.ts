@@ -6,7 +6,7 @@
 import { lineKeyOf } from "../shop/variants";
 import { parseSubstitutionPreference, type SubstitutionPreference } from "../shop/preferences";
 import type { OperatingVendor } from "./state";
-import { orderTimeline, type TimelineStep } from "./vendorView";
+import { orderTimeline, type TimelineEntry } from "./vendorView";
 
 type Doc = Record<string, unknown>;
 
@@ -44,7 +44,7 @@ export interface VendorOrder {
   /** The customer's substitution preference. Read-only for the vendor; null on older orders. */
   substitutionPreference: SubstitutionPreference | null;
   /** Stages reached so far (my orders only). */
-  timeline: TimelineStep[];
+  timeline: TimelineEntry[];
 }
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
