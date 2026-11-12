@@ -3,7 +3,9 @@ import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/s
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
 import { parseOrderRequest } from "@/lib/shop/orderRequest";
-import { compareNewestFirst, decodeOrderCursor, pageOrders, parseOrderFilter, parsePageLimit, toneOfStatus } from "@/lib/shop/orderHistory";
+import { compareNewestFirst, decodeOrderCursor, parseOrderFilter, parsePageLimit, toneOfStatus } from "@/lib/shop/orderHistory";
+import { listCustomerOrderPage, type OrderPagingPort, type StoredOrderRow } from "@/lib/shop/orderPaging";
+import { FieldPath, type DocumentData } from "firebase-admin/firestore";
 import { RETURN_COLLECTION } from "@/lib/shop/returns";
 import { PRODUCT_ID_PATTERN, REVIEWS, reviewIdFor } from "@/lib/shop/reviews";
 import { canEditReview } from "@/lib/shop/reviewRules";
@@ -23,10 +25,12 @@ function customerStatus(shopStatus: string, overlay: Record<string, unknown> | u
 }
 
 // The signed-in customer's orders, newest first, with any admin decision applied.
-// Without paging parameters this returns every order held (at most 100), as before.
+// Without paging parameters this returns the most recent orders held (at most 100), as before.
 // With ?filter=all|active|delivered|cancelled|returns&limit=1..50&cursor=... it returns one page:
-// { orders, nextCursor } where nextCursor is null on the last page. Each delivered order also carries `reviews`, the
-// customer's own review state per product (so the rate prompt needs no extra calls), and every order carries `hasReturn`.
+// { orders, nextCursor, filter } where nextCursor is null on the last page. Pages are read from Firestore newest first
+// (createdAt, then order id) and filtered as they are read, so every order of the customer can be reached. Each delivered
+// order also carries `reviews`, the customer's own review state per product (so the rate prompt needs no extra calls),
+// and every order carries `hasReturn`.
 export async function GET(req: NextRequest) {
   const ipLimited = limitByIp(req, "orders-get", 30);
   if (ipLimited) return ipLimited;
@@ -42,55 +46,80 @@ export async function GET(req: NextRequest) {
   const cursor = decodeOrderCursor(params.get("cursor"));
   if (cursor === "invalid") return json({ ok: false, error: "Those orders could not be opened. Start again from the first page." }, 400);
 
-  const snap = await db().collection("orders").where("userId", "==", customer.uid).limit(100).get();
   const returnsSnap = await db().collection(RETURN_COLLECTION).where("uid", "==", customer.uid).limit(100).get();
   const returnedOrderIds = new Set(returnsSnap.docs.map((d) => String((d.data() as Doc).orderId ?? "")));
-  const ids = snap.docs.map((d) => d.id);
   const overlays = new Map<string, Record<string, unknown>>();
-  if (ids.length) {
-    const refs = ids.map((id) => db().collection("admin_orders").doc(id));
-    for (const s of await db().getAll(...refs)) if (s.exists) overlays.set(s.id, s.data() as Record<string, unknown>);
-  }
-  const orders = snap.docs
-    .map((d) => {
-      const o = d.data();
-      const overlay = overlays.get(d.id);
-      return {
-        orderId: o.orderId ?? d.id,
-        trackingId: o.trackingId ?? null,
-        transactionId: o.transactionId ?? o.payment?.transactionId ?? null,
-        vendorId: o.vendorId ?? null,
-        status: customerStatus(String(o.status ?? ""), overlay),
-        cancellationReason: (overlay?.cancellationReason as string | undefined) ?? o.cancellationReason ?? null,
-        items: (o.items ?? []).map((it: Record<string, unknown>) => ({
-          productId: it.productId,
-          title: it.productName ?? it.title,
-          brand: it.brand ?? "",
-          quantity: it.quantity,
-          unitPrice: it.unitPrice,
-          imageUrl: it.imageUrl ?? "",
-          variantId: it.variantId ?? null,
-          variantLabel: it.variantLabel ?? null,
-        })),
-        pricing: o.pricing ?? null,
-        deliverySlot: o.deliverySlot ?? null,
-        payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
-        shippingAddress: o.shippingAddress ?? null,
-        createdAt: o.createdAt ?? null,
-        updatedAt: o.updatedAt ?? null,
-        deliveredAt: deliveredAtOf(o),
-      };
-    })
-    .map((order) => ({ order, sortKey: { orderId: order.orderId, createdAt: toMillis(order.createdAt), status: order.status, hasReturn: returnedOrderIds.has(String(order.orderId)) } }));
+  const overlayChecked = new Set<string>();
+  // Reads the admin decisions for these orders that are not loaded yet.
+  const loadOverlays = async (ids: string[]) => {
+    const missing = ids.filter((id) => !overlayChecked.has(id));
+    if (!missing.length) return;
+    missing.forEach((id) => overlayChecked.add(id));
+    for (const s of await db().getAll(...missing.map((id) => db().collection("admin_orders").doc(id)))) {
+      if (s.exists) overlays.set(s.id, s.data() as Record<string, unknown>);
+    }
+  };
 
   if (!paged) {
-    const sorted = orders.sort((a, b) => compareNewestFirst(a.sortKey, b.sortKey));
-    return json({ ok: true, orders: await withReviewState(sorted.map((s) => s.order), sorted.map((s) => s.sortKey.status), customer.uid) });
+    const snap = await db().collection("orders").where("userId", "==", customer.uid).limit(100).get();
+    const rows = snap.docs.map((d) => ({ orderId: d.id, createdAt: toMillis(d.data().createdAt), data: d.data() }));
+    rows.sort((a, b) => compareNewestFirst(a, b));
+    await loadOverlays(rows.map((r) => r.orderId));
+    const orders = rows.map((r) => orderView(r.orderId, r.data, overlays.get(r.orderId), returnedOrderIds.has(r.orderId)));
+    return json({ ok: true, orders: await withReviewState(orders, orders.map((o) => o.status), customer.uid) });
   }
-  const page = pageOrders(orders.map((o) => o.sortKey), filter, limit, cursor);
-  const byId = new Map(orders.map((o) => [o.sortKey.orderId, o.order] as const));
-  const pageOrdersOut = page.items.map((k) => byId.get(k.orderId)!);
-  return json({ ok: true, orders: await withReviewState(pageOrdersOut, page.items.map((k) => k.status), customer.uid), nextCursor: page.nextCursor, filter });
+
+  const port: OrderPagingPort<OrderRow> = {
+    async readBatch(uid, after, size) {
+      // Only this customer's orders. The index is (userId ASC, createdAt DESC); document id breaks ties in the same order.
+      let query = db().collection("orders").where("userId", "==", uid).orderBy("createdAt", "desc").orderBy(FieldPath.documentId(), "desc");
+      if (after) query = query.startAfter(after.createdAt, after.orderId);
+      const snap = await query.limit(size).get();
+      return snap.docs.map((d) => ({ orderId: d.id, createdAt: toMillis(d.data().createdAt), data: d.data() }));
+    },
+    async classify(rows) {
+      await loadOverlays(rows.map((r) => r.orderId));
+      return rows.map((r) => ({
+        status: customerStatus(String(r.data.status ?? ""), overlays.get(r.orderId)),
+        hasReturn: returnedOrderIds.has(r.orderId),
+      }));
+    },
+  };
+  const page = await listCustomerOrderPage(port, customer.uid, { filter, limit, cursor });
+  const orders = page.items.map((item) => orderView(item.orderId, item.data, overlays.get(item.orderId), item.hasReturn));
+  return json({ ok: true, orders: await withReviewState(orders, page.items.map((i) => i.status), customer.uid), nextCursor: page.nextCursor, filter });
+}
+
+type OrderRow = StoredOrderRow & { data: DocumentData };
+
+// The order as the customer app shows it. Admin decisions (admin_orders) are applied on top of the shop status.
+function orderView(orderId: string, o: DocumentData, overlay: Record<string, unknown> | undefined, hasReturn: boolean) {
+  return {
+    orderId: o.orderId ?? orderId,
+    trackingId: o.trackingId ?? null,
+    transactionId: o.transactionId ?? o.payment?.transactionId ?? null,
+    vendorId: o.vendorId ?? null,
+    status: customerStatus(String(o.status ?? ""), overlay),
+    cancellationReason: (overlay?.cancellationReason as string | undefined) ?? o.cancellationReason ?? null,
+    items: (o.items ?? []).map((it: Record<string, unknown>) => ({
+      productId: it.productId,
+      title: it.productName ?? it.title,
+      brand: it.brand ?? "",
+      quantity: it.quantity,
+      unitPrice: it.unitPrice,
+      imageUrl: it.imageUrl ?? "",
+      variantId: it.variantId ?? null,
+      variantLabel: it.variantLabel ?? null,
+    })),
+    pricing: o.pricing ?? null,
+    deliverySlot: o.deliverySlot ?? null,
+    payment: { method: o.payment?.method ?? "COD", status: o.payment?.status ?? "PENDING" },
+    shippingAddress: o.shippingAddress ?? null,
+    createdAt: o.createdAt ?? null,
+    updatedAt: o.updatedAt ?? null,
+    deliveredAt: deliveredAtOf(o),
+    hasReturn,
+  };
 }
 
 // Adds `reviews` (the customer's own review of each product, by product id) to delivered orders. Review ids are
