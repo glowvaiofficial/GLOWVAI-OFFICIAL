@@ -6,6 +6,7 @@ import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getDiscountPercent, getProductImageUrl } from '../shared/shopUtils';
 import { defaultVariant, isSellable, variantStockState, type Variant } from '../../../../lib/shop/variants';
 import { productShareUrl } from '../../../../lib/shop/productShare';
+import { showSubscribePanel } from '../../../../lib/shop/subscribable';
 import { ProductReviews } from '../../reviews/ProductReviews';
 import { rememberProductViewed } from '../lib/recentlyViewed';
 import { SubscribePanel } from '../../profile/SubscriptionsScreen';
@@ -84,6 +85,8 @@ export const ShopProductScreen: React.FC = () => {
   const discount = selected ? (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0) : getDiscountPercent(product);
   const stockState = selected ? variantStockState(selected) : null;
   const canBuy = selected ? isSellable(selected) : true;
+  // Subscribe is offered only for products the admin marked subscribable (the server refuses the rest).
+  const showSubscribe = showSubscribePanel(product);
   const maxQty = selected && selected.stock !== null ? Math.max(1, Math.min(MAX_QTY, selected.stock)) : MAX_QTY;
   const qty = Math.min(quantity, maxQty);
   const optionNoun = selected ? selected.label : product.volume;
@@ -325,7 +328,7 @@ export const ShopProductScreen: React.FC = () => {
           </button>
         </section>
 
-        {canBuy && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
+        {canBuy && showSubscribe && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
 
         <section className="shop-product-reviews-block" aria-label="Customer reviews" style={{ padding: '16px' }}>
           <ProductReviews productId={product.id} />

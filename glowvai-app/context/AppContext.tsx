@@ -20,6 +20,9 @@ import { pushWishlistAdd, pushWishlistRemove, syncWishlistWithAccount } from '..
 import type { ShopProfileAddress } from '../core/services/shopApi';
 import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
+import { useCartStore } from '../core/state/cartStore';
+import { buildState, entryFromState, popDecision, restoreTarget, sameEntry, type NavEntry } from './navHistory';
+import { currentScrollY, queueScrollRestore, rememberScroll } from './scrollMemory';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
@@ -48,11 +51,29 @@ const firstScreen = (): ScreenName => {
 // Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
 const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : firstScreen();
 
+const bagUnitsNow = (): number => Object.values(useCartStore.getState().items).reduce((n, item) => n + item.quantity, 0);
+
+// The step to start on: the one saved in this history entry (a reload), or the normal first screen. The entry is written
+// now so that every later step has an earlier entry to come back to.
+const startEntry = (): NavEntry => {
+  const saved = entryFromState(window.history.state);
+  const entry: NavEntry = saved ? restoreTarget(saved, bagUnitsNow()).entry : { screen: initialScreen, params: null, trail: [] };
+  try {
+    window.history.replaceState(buildState(window.history.state, entry), '', window.location.href);
+  } catch {
+    // History unavailable: start on the normal screen without Back support.
+  }
+  return entry;
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation stack
-  const [currentScreen, setCurrentScreen] = useState<ScreenName>(initialScreen);
-  const [screenHistory, setScreenHistory] = useState<ScreenName[]>([]);
-  const [activeParams, setActiveParams] = useState<any>(null);
+  // Navigation stack. The step is restored from the browser history entry on load (reload), so it starts from there.
+  const [start] = useState<NavEntry>(startEntry);
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>(start.screen as ScreenName);
+  const [screenHistory, setScreenHistory] = useState<ScreenName[]>(start.trail as ScreenName[]);
+  const [activeParams, setActiveParams] = useState<any>(start.params);
+  // The current step, kept in a ref so handlers (including popstate) always see the latest one.
+  const navRef = useRef<NavEntry>(start);
 
   // Customer: a Firebase session for this device (anonymous until SMS sign-in exists) and the details the customer
   // saved on the server (users/{uid}). Nothing is treated as signed in or verified on the device alone.
@@ -178,22 +199,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Navigation handlers
+  // Navigation handlers. Every screen change is one browser history entry, so the browser Back button and the in-app back
+  // move through the same steps. The rules (checkout, bag, payment) live in navHistory.ts.
+  const writeEntry = (entry: NavEntry, mode: 'push' | 'replace') => {
+    try {
+      const state = buildState(window.history.state, entry);
+      if (mode === 'push') window.history.pushState(state, '', window.location.href);
+      else window.history.replaceState(state, '', window.location.href);
+    } catch {
+      // History unavailable: the in-app stack still works, only Back is limited.
+    }
+  };
+  const showEntry = (next: NavEntry) => {
+    navRef.current = next;
+    setScreenHistory(next.trail as ScreenName[]);
+    setCurrentScreen(next.screen as ScreenName);
+    setActiveParams(next.params);
+  };
+
   const navigate = (screen: ScreenName, params?: any) => {
-    setScreenHistory((prev) => [...prev, currentScreen]);
-    setCurrentScreen(screen);
-    if (params !== undefined) setActiveParams(params);
+    const cur = navRef.current;
+    rememberScroll(cur.screen, cur.params, currentScrollY());
+    const next: NavEntry = { screen, params: params !== undefined ? params : cur.params, trail: [...cur.trail, cur.screen] };
+    writeEntry(next, 'push');
+    showEntry(next);
   };
 
   const goBack = () => {
-    if (screenHistory.length === 0) {
-      if (currentScreen !== 'home') setCurrentScreen('home');
+    const cur = navRef.current;
+    if (cur.trail.length === 0) {
+      // No earlier step in this app: the home screen, unless that would take a customer out of checkout with items in the bag.
+      if (cur.screen === 'home' || popDecision(cur.screen, 'home', bagUnitsNow()) === 'block') return;
+      const home: NavEntry = { screen: 'home', params: null, trail: [] };
+      writeEntry(home, 'replace');
+      showEntry(home);
       return;
     }
-    const prev = screenHistory[screenHistory.length - 1];
-    setScreenHistory((h) => h.slice(0, -1));
-    setCurrentScreen(prev);
+    // Normal case: step back in the browser history; the popstate handler applies the same step as the browser Back button.
+    if (entryFromState(window.history.state)) {
+      window.history.back();
+      return;
+    }
+    const prev: NavEntry = { screen: cur.trail[cur.trail.length - 1], params: null, trail: cur.trail.slice(0, -1) };
+    writeEntry(prev, 'replace');
+    showEntry(prev);
   };
+
+  // Browser Back, Forward and history traversal. Only entries written by this app are handled.
+  useEffect(() => {
+    const onPop = (event: PopStateEvent) => {
+      const target = entryFromState(event.state);
+      if (!target) return;
+      const cur = navRef.current;
+      const bag = bagUnitsNow();
+      if (popDecision(cur.screen, target.screen, bag) === 'block') {
+        // Back out of checkout to home with items in the bag is refused: step forward again to where the customer was.
+        window.history.go(1);
+        return;
+      }
+      const { entry: next, fallback } = restoreTarget(target, bag);
+      if (fallback) window.history.replaceState(buildState(event.state, next), '', window.location.href);
+      if (sameEntry(cur, next)) return;
+      showEntry(next);
+      queueScrollRestore(next.screen, next.params);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   // Saves the customer's details on the server (users/{uid}). The saved address is kept unless a new one is given.
   const saveCustomerDetails = async (details: CustomerDetails, address?: ShopProfileAddress): Promise<ActionResult> => {

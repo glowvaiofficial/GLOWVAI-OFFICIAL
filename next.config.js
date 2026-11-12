@@ -9,7 +9,9 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://api.qrserver.com https://www.google-analytics.com https://www.googletagmanager.com https://*.googleusercontent.com https://drive.google.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://script.google.com https://script.googleusercontent.com https://docs.google.com https://api.ipify.org https://ipapi.co https://nominatim.openstreetmap.org https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+  // The shop bundle also runs on these pages after a client-side link to /shop (the document keeps this policy), so the
+  // Firebase hosts it calls are listed here too. Firestore reads go over HTTPS and its listen channel over WSS.
+  "connect-src 'self' https://script.google.com https://script.googleusercontent.com https://docs.google.com https://api.ipify.org https://ipapi.co https://nominatim.openstreetmap.org https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://firestore.googleapis.com wss://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
   "media-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",

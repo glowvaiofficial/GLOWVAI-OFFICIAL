@@ -9,3 +9,6 @@ export const subscribableOf = (value: unknown): boolean => value === true;
 export function subscriptionRefusal(product: { subscribable?: unknown } | null | undefined): string | null {
   return subscribableOf(product?.subscribable) ? null : NOT_SUBSCRIBABLE_MESSAGE;
 }
+
+// Whether the product page shows the subscribe panel: only for a product the admin marked subscribable.
+export const showSubscribePanel = (product: { subscribable?: unknown } | null | undefined): boolean => subscribableOf(product?.subscribable);

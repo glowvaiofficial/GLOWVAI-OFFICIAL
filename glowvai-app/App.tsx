@@ -9,6 +9,7 @@ import { startProductFeed } from './core/services/productFeed';
 import { ProductFeedNotice } from './components/common/ProductFeedNotice';
 import { OrderNotifications } from './core/notifications/OrderNotifications';
 import { InboxBridge } from './core/notifications/InboxBridge';
+import { applyScroll, takeScrollRestore } from './context/scrollMemory';
 
 // Screens
 import { WelcomeScreen } from './screens/WelcomeScreen';
@@ -35,10 +36,13 @@ import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen'
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();
 
-  // Each screen opens at the top, rather than keeping the previous screen's scroll position.
+  // Each screen opens at the top, except when Back returns to a list: that list comes back at the position it was left.
   React.useEffect(() => {
-    window.scrollTo(0, 0);
-    document.querySelector('.glowvai-root .screen-content')?.scrollTo(0, 0);
+    const restoreY = takeScrollRestore();
+    const y = restoreY ?? 0;
+    applyScroll(y);
+    // The list may not be laid out yet on this frame, so the position is applied again on the next one.
+    if (restoreY !== null) requestAnimationFrame(() => applyScroll(y));
   }, [currentScreen, activeParams]);
 
   // Products come from the database. The feed stays open while the app is on screen.
