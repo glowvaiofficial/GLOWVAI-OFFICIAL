@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { customerFrom, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { isPushToken, MAX_TOKENS_PER_USER } from "@/lib/shop/notifications/policy";
 import { removeToken, saveToken } from "@/lib/shop/notifyStore";
+import { noteDeviceSighting } from "@/lib/shop/privacy/sightings";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as { token?: unknown } | null;
   if (!body || !isPushToken(body.token)) return json({ ok: false, error: "Invalid device token." }, 400);
   await saveToken(customer.uid, body.token, Date.now());
+  await noteDeviceSighting(req, customer.uid);
   return json({ ok: true, maxDevices: MAX_TOKENS_PER_USER });
 }
 

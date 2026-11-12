@@ -1,0 +1,35 @@
+/* Privacy centre, devices, saved payment methods and gift cards. Built on the profile screens' classes (profile.css). */
+.glowvai-root .privacy-screen .privacy-error{ color:#B3261E; font-size:13px; }
+.glowvai-root .privacy-kv{ display:grid; grid-template-columns:auto 1fr; gap:8px 16px; font-size:14px; }
+.glowvai-root .privacy-kv span{ color:var(--ds-muted); }
+.glowvai-root .privacy-kv strong{ color:var(--ds-ink); font-weight:700; overflow-wrap:anywhere; }
+.glowvai-root .privacy-link{ text-decoration:none; color:inherit; }
+.glowvai-root .privacy-warning{ padding:10px 12px; border-radius:12px; background:#FFF4E5; color:#663C00; font-size:13px; line-height:1.5; }
+.glowvai-root .privacy-empty{ padding:16px; }
+
+/* Consent switches */
+.glowvai-root .privacy-consent-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.glowvai-root .privacy-consent-copy{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+.glowvai-root .privacy-consent-copy strong{ color:var(--ds-ink); font-size:15px; }
+.glowvai-root .privacy-consent-date{ color:var(--ds-muted); font-size:12px; }
+.glowvai-root .privacy-switch{ position:relative; flex:0 0 auto; width:48px; height:28px; border:0; border-radius:999px; background:#C9D3E6; cursor:pointer; transition:background .15s; }
+.glowvai-root .privacy-switch.is-on{ background:#0057FB; }
+.glowvai-root .privacy-switch:disabled{ opacity:.5; cursor:default; }
+.glowvai-root .privacy-switch-knob{ position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:transform .15s; }
+.glowvai-root .privacy-switch.is-on .privacy-switch-knob{ transform:translateX(20px); }
+.glowvai-root .privacy-switch:focus-visible{ outline:3px solid #0057FB; outline-offset:2px; }
+
+/* Device and method rows */
+.glowvai-root .privacy-device-row{ display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--ds-line); }
+.glowvai-root .privacy-device-row:last-child{ border-bottom:0; }
+.glowvai-root .privacy-device-copy{ display:flex; flex:1; flex-direction:column; gap:3px; min-width:0; }
+.glowvai-root .privacy-device-copy .profile-list-title{ overflow-wrap:anywhere; }
+.glowvai-root .privacy-this-device{ display:inline-block; margin-left:6px; padding:2px 8px; border-radius:999px; background:#E6EEFF; color:#0057FB; font-size:11px; font-weight:800; vertical-align:middle; }
+
+/* Gift cards */
+.glowvai-root .privacy-code-input{ font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:18px; letter-spacing:.08em; text-transform:uppercase; }
+.glowvai-root .privacy-code-display{ padding:14px; border-radius:14px; background:#F2F6FF; color:var(--ds-ink); font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:20px; font-weight:800; letter-spacing:.12em; text-align:center; user-select:all; overflow-wrap:anywhere; }
+
+@media (min-width: 900px){
+  .glowvai-root .privacy-screen .profile-body{ max-width:720px; margin:0 auto; }
+}

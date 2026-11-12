@@ -33,6 +33,7 @@
     "test:tracking": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/tracking/*.test.ts\"",
     "test:wishlist-orders": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/wishlist-orders/*.test.ts\"",
     "test:settings": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/settings/*.test.ts\"",
+    "test:privacy": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/privacy/*.test.ts\"",
     "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],

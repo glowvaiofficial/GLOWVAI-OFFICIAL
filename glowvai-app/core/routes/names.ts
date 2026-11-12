@@ -92,4 +92,9 @@ export type PortedScreenName =
   | 'help-index'
   | 'help-faq'
   | 'help-terms'
-  | 'help-privacy';
+  | 'help-privacy'
+  // Privacy and security (features/privacy): privacy centre, devices, saved payment methods, gift cards
+  | 'privacy-center'
+  | 'privacy-devices'
+  | 'payment-methods'
+  | 'gift-cards';
