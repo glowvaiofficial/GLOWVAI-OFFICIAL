@@ -2,6 +2,7 @@
 // preferences and quiet hours, the read-marking plan, paging cursors and the push payload. No server imports.
 import { createHash } from "node:crypto";
 import type { NotificationCategory, RelatedType, RenderedNotification } from "./templates";
+import { isExpoToken } from "./expoPush";
 
 // ---- Push tokens -------------------------------------------------------------------------------------------------
 
@@ -10,6 +11,19 @@ export const MAX_TOKENS_PER_USER = 5;
 export const TOKEN_PATTERN = /^[A-Za-z0-9:_-]{20,400}$/;
 
 export const isPushToken = (value: unknown): value is string => typeof value === "string" && TOKEN_PATTERN.test(value);
+
+// Which service delivers to a token. EXPO is the GlowVai customer app (Expo push service); FCM is the web shop's
+// browser push. A request with no tokenType is an FCM token, so the web client keeps working unchanged.
+export type PushTokenType = "EXPO" | "FCM";
+
+export function parseTokenType(value: unknown): PushTokenType | null {
+  if (value === undefined) return "FCM";
+  if (value === "EXPO" || value === "FCM") return value;
+  return null;
+}
+
+export const isTokenOfType = (type: PushTokenType, value: unknown): value is string =>
+  type === "EXPO" ? isExpoToken(value) : isPushToken(value);
 
 // The Firestore document id for a token: SHA-256 (hex) of the token. The token itself is stored in the document
 // because it is needed to send; the id never reveals it.

@@ -19,6 +19,7 @@ import {
   type ReadRequest,
 } from "./notifications/policy";
 import { isRelatedId, type RenderedNotification } from "./notifications/templates";
+import type { PushTokenType } from "./notifications/policy";
 
 const userDoc = (uid: string) => db().collection("users").doc(uid);
 const inbox = (uid: string) => userDoc(uid).collection("notifications");
@@ -114,7 +115,7 @@ export async function savePrefs(uid: string, patch: Partial<NotificationPrefs>, 
 
 // Saves an FCM token for the customer. The document id is the SHA-256 of the token. Over the cap, the least recently
 // refreshed token is removed in the same transaction.
-export async function saveToken(uid: string, token: string, now: number): Promise<void> {
+export async function saveToken(uid: string, token: string, now: number, tokenType: PushTokenType = "FCM"): Promise<void> {
   const col = tokens(uid);
   const id = tokenHash(token);
   await db().runTransaction(async (tx) => {
@@ -124,7 +125,7 @@ export async function saveToken(uid: string, token: string, now: number): Promis
       id,
     );
     for (const evict of plan.evict) tx.delete(col.doc(evict));
-    tx.set(col.doc(id), { token, updatedAt: now, ...(plan.alreadyRegistered ? {} : { createdAt: now }) }, { merge: true });
+    tx.set(col.doc(id), { token, tokenType, updatedAt: now, ...(plan.alreadyRegistered ? {} : { createdAt: now }) }, { merge: true });
   });
 }
 
@@ -133,9 +134,11 @@ export async function removeToken(uid: string, token: string): Promise<void> {
 }
 
 // Every token the customer has. Used by the sender only; never returned to a client.
-export async function tokensFor(uid: string): Promise<{ id: string; token: string }[]> {
+export async function tokensFor(uid: string): Promise<{ id: string; token: string; tokenType: PushTokenType }[]> {
   const snap = await tokens(uid).limit(MAX_TOKENS_PER_USER).get();
-  return snap.docs.map((d) => ({ id: d.id, token: String(d.data().token ?? "") })).filter((t) => t.token.length > 0);
+  return snap.docs
+    .map((d) => ({ id: d.id, token: String(d.data().token ?? ""), tokenType: (d.data().tokenType === "EXPO" ? "EXPO" : "FCM") as PushTokenType }))
+    .filter((t) => t.token.length > 0);
 }
 
 export async function dropTokens(uid: string, ids: string[]): Promise<void> {
