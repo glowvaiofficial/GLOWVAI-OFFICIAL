@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { Activity, Bell, Gift, HelpCircle, Languages, LogOut, MapPin, Repeat, Share2, ShieldCheck, Store, User, Wallet } from 'lucide-react';
+import { Activity, Bell, BookOpen, Gift, HelpCircle, Languages, LogOut, MapPin, Repeat, Share2, ShieldCheck, Sparkles, Store, User, Wallet } from 'lucide-react';
 import type { PortedScreenName } from '../../core/routes/names';
 import type { MessageKey } from '../../core/i18n/messages';
 import { useApp } from '../../context/useApp';
@@ -16,7 +16,7 @@ import { SettingsLinkPanel, SettingsWebPage } from './SettingsLinks';
 // One entry in the Settings hub. `route` is the full-page screen on phones; `Panel` is the same content shown next to the
 // list on large screens. The sign-out entry has no route: it asks for confirmation instead.
 export interface SettingsSection {
-  id: 'profile' | 'addresses' | 'language' | 'notifications' | 'subscriptions' | 'wallet' | 'giftCards' | 'privacy' | 'sell' | 'affiliate' | 'help' | 'activity' | 'signOut';
+  id: 'profile' | 'quiz' | 'intro' | 'addresses' | 'language' | 'notifications' | 'subscriptions' | 'wallet' | 'giftCards' | 'privacy' | 'sell' | 'affiliate' | 'help' | 'activity' | 'signOut';
   icon: ReactNode;
   titleKey: MessageKey;
   descKey: MessageKey;
@@ -44,6 +44,8 @@ const AddressesPanel = () => {
 const WalletPanel = () => <SettingsLinkPanel route="wallet-home" titleKey="section.wallet.title" label="Open wallet" />;
 const GiftCardsPanel = () => <SettingsLinkPanel route="gift-cards" titleKey="section.giftCards.title" label="Open gift cards" />;
 const PrivacyPanel = () => <SettingsLinkPanel route="privacy-center" titleKey="section.privacy.title" label="Open privacy centre" />;
+const QuizPanel = () => <SettingsLinkPanel route="auth-skin-survey" titleKey="section.quiz.title" label="Take the skin quiz" />;
+const IntroPanel = () => <SettingsLinkPanel route="auth-onboarding" titleKey="section.intro.title" label="Replay the intro" />;
 const SellPanel = () => <SettingsWebPage href="/sell" titleKey="section.sell.title" label="Open Sell on GlowVai" />;
 const AffiliatePanel = () => <SettingsWebPage href="/affiliate" titleKey="section.affiliate.title" label="Open affiliate programme" />;
 
@@ -58,6 +60,8 @@ export const settingsSections: SettingsSection[] = [
   { id: 'privacy', icon: icon(ShieldCheck), titleKey: 'section.privacy.title', descKey: 'section.privacy.desc', route: 'privacy-center', Panel: PrivacyPanel },
   { id: 'sell', icon: icon(Store), titleKey: 'section.sell.title', descKey: 'section.sell.desc', route: 'settings-sell', Panel: SellPanel },
   { id: 'affiliate', icon: icon(Share2), titleKey: 'section.affiliate.title', descKey: 'section.affiliate.desc', route: 'settings-affiliate', Panel: AffiliatePanel },
+  { id: 'quiz', icon: icon(Sparkles), titleKey: 'section.quiz.title', descKey: 'section.quiz.desc', route: 'auth-skin-survey', Panel: QuizPanel },
+  { id: 'intro', icon: icon(BookOpen), titleKey: 'section.intro.title', descKey: 'section.intro.desc', route: 'auth-onboarding', Panel: IntroPanel },
   { id: 'help', icon: icon(HelpCircle), titleKey: 'section.help.title', descKey: 'section.help.desc', route: 'help-index', Panel: () => <HelpIndexScreen embedded /> },
   { id: 'activity', icon: icon(Activity), titleKey: 'section.activity.title', descKey: 'section.activity.desc', route: 'settings-activity', Panel: () => <ActivityScreen embedded /> },
   { id: 'signOut', icon: icon(LogOut), titleKey: 'section.signOut.title', descKey: 'section.signOut.desc', route: null, Panel: null },

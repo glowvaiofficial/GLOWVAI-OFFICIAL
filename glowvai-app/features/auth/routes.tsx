@@ -3,7 +3,7 @@ import type { PortedScreenName } from '../../core/routes/names';
 import './auth.css';
 import '../../responsive/auth-ported.css';
 import { WelcomeScreen } from './WelcomeScreen';
-import { OnboardingRedirect } from './OnboardingRedirect';
+import { OnboardingScreen } from '../../screens/OnboardingScreen';
 import { OnboardingSuccessScreen } from './OnboardingSuccessScreen';
 import { LoginScreen } from '../../screens/LoginScreen';
 import { ProfileSetupScreen } from './ProfileSetupScreen';
@@ -14,7 +14,8 @@ import { PermissionsScreen } from './PermissionsScreen';
 
 export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'auth-welcome': WelcomeScreen,
-  'auth-onboarding': OnboardingRedirect,
+  // The optional intro (also reached from the shop banner and the settings hub). Its last step opens the skin quiz.
+  'auth-onboarding': OnboardingScreen,
   'auth-onboarding-success': OnboardingSuccessScreen,
   // No sign-in code is offered until SMS sign-in exists: these open the "Your details" step.
   'auth-login': LoginScreen,

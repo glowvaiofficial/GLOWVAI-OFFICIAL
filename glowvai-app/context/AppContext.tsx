@@ -27,26 +27,9 @@ export { AppContext, type AppContextType, type ScreenName } from './contextDefin
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
 const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearchParams(window.location.search).get('screen') as ScreenName | null : null;
-// A visitor who already passed the welcome screen goes straight to the shop. Storage can be blocked, so reads are guarded.
-const hasSeenWelcome = (): boolean => {
-  try {
-    return ['skipped_onboarding', 'glowvai_onboarding_completed', 'welcome_seen'].some((key) => window.localStorage.getItem(key) === 'true');
-  } catch {
-    return false;
-  }
-};
-
-// The app renders only in the browser (GlowVaiShop loads it with ssr: false), so the first screen is chosen once,
-// at load, before the first paint. The splash plays once per device and is marked as seen when it first shows.
-const firstScreen = (): ScreenName => {
-  if (hasSeenWelcome()) return 'shop-home';
-  try {
-    window.localStorage.setItem('welcome_seen', 'true');
-  } catch {
-    // Storage blocked: the splash simply shows again next time.
-  }
-  return 'welcome';
-};
+// Every visit opens the product list. The intro and the skin quiz are optional and are offered from a banner there
+// (features/shop/lib/firstVisit.ts), so nothing stands between a new visitor and the products.
+const firstScreen = (): ScreenName => 'shop-home';
 
 // Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
 const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : firstScreen();

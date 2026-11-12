@@ -8,6 +8,8 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { SkinQuizBanner } from '../shared/SkinQuizBanner';
+import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import '../styles/shop-home.css';
@@ -139,6 +141,17 @@ function ContinueBrowsingRail() {
     .slice(0, 10);
   if (products.length === 0) return null;
   return <ProductRail title="Continue browsing" products={products} />;
+}
+
+// Products matched to the skin quiz answers. Shown only when the quiz was answered and something matches;
+// otherwise the normal lists below are the whole story.
+function SkinPicksRail() {
+  const catalog = useLiveCatalog();
+  const [state] = useState(() => firstVisitState(browserStore()));
+  if (!state.recommendationsOn) return null;
+  const products = skinMatchedPicks(catalog.filter((p) => !isTrialProduct(p)), state.concerns);
+  if (products.length === 0) return null;
+  return <ProductRail title="Picked for your skin" products={products} />;
 }
 
 function DealCard({ product }: { product: SkincareProduct }) {
@@ -294,6 +307,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </div>
       </header>
 
+      <SkinQuizBanner />
+
       <section className="shop-home-showcase">
         <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" width={1891} height={831} fetchPriority="high" decoding="async" />
         <div className="shop-home-showcase-copy">
@@ -404,6 +419,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </section>
       )}
 
+      <SkinPicksRail />
       <ContinueBrowsingRail />
       <ProductRail title="Top Rated" products={TOP_RATED} />
       <ProductRail title="Under ₹500" products={UNDER_500} />
