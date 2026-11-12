@@ -93,7 +93,10 @@ describe("the dispatch flow passes token types to the sender", () => {
     const d: NotifyDeps = {
       now: () => DAY,
       writeInApp: async () => "doc1",
-      prefsFor: async () => ({ prefs: { orders: true, offers: false, reviews: true }, marketingConsent: false }),
+      prefsFor: async () => ({
+        prefs: { orders: true, offers: false, reviews: true, returns: true, referrals: true, subscriptions: true },
+        marketingConsent: false,
+      }),
       pushConfigured: () => true,
       tokensFor: async () => tokens,
       send: async (sendTokens, _data, types): Promise<SendReport> => {

@@ -5,7 +5,7 @@ import { db } from "../server";
 import { firestoreRepo } from "../growth/firestoreRepo";
 import { createRazorpayOrder, fetchRazorpayPayment, razorpayKeyId, verifyPaymentSignature } from "../razorpay";
 import { creditGiftCardCoins, createTopup, listTopups, topupStatus, walletHistory, walletSummary, type TopupFilters, type CreateResult } from "./topups";
-import { applyTopupWebhook, verifyTopupPayment, type PaymentFacts, type VerifyResult } from "./verify";
+import { applyTopupWebhook, recheckHeldTopup, verifyTopupPayment, type PaymentFacts, type VerifyResult } from "./verify";
 
 const repo = () => firestoreRepo(db());
 
@@ -56,4 +56,9 @@ export function listTopupsLive(filters: TopupFilters) {
 
 export function creditGiftCardValue(uid: string, cardId: string, coins: number) {
   return creditGiftCardCoins({ repo: repo(), now: Date.now() }, { uid, cardId, coins });
+}
+
+// For the GlowVai team (signed internal route): re-checks a held capture against Razorpay. See recheckHeldTopup.
+export function recheckHeldTopupLive(input: { topupId?: string; captureId?: string }) {
+  return recheckHeldTopup({ repo: repo(), now: Date.now(), verifySignature: verifyPaymentSignature, fetchPayment: fetchRazorpayPayment }, input);
 }

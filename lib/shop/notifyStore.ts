@@ -133,6 +133,25 @@ export async function removeToken(uid: string, token: string): Promise<void> {
   await tokens(uid).doc(tokenHash(token)).delete();
 }
 
+// Idempotency claims for server-sent events (POST /api/shop/internal/notify). One document per (uid, type, relatedId),
+// created with a create() so two racing calls cannot both win. Stored beside the in-app list, never shown to a client.
+const claims = (uid: string) => userDoc(uid).collection("notifyClaims");
+
+export async function claimNotification(uid: string, claimId: string, now: number): Promise<boolean> {
+  try {
+    await claims(uid).doc(claimId).create({ createdAt: now });
+    return true;
+  } catch (err) {
+    const code = (err as { code?: unknown } | null)?.code;
+    if (code === 6 || code === "already-exists") return false;
+    throw err;
+  }
+}
+
+export async function releaseNotificationClaim(uid: string, claimId: string): Promise<void> {
+  await claims(uid).doc(claimId).delete().catch(() => undefined);
+}
+
 // Every token the customer has. Used by the sender only; never returned to a client.
 export async function tokensFor(uid: string): Promise<{ id: string; token: string; tokenType: PushTokenType }[]> {
   const snap = await tokens(uid).limit(MAX_TOKENS_PER_USER).get();
