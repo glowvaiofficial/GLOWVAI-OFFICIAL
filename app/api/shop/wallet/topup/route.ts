@@ -13,6 +13,10 @@ const HOUR = 60 * 60 * 1000;
 // the top-up id only. Returns the order id and the public key id for Razorpay Checkout. Never the secret.
 // Limits: 5 per hour per customer, 20 per hour per IP.
 export async function POST(req: NextRequest) {
+  // Off until the owner confirms the legal review and a live Razorpay account (set WALLET_TOPUP_ENABLED=true).
+  if (process.env.WALLET_TOPUP_ENABLED !== "true") {
+    return json({ ok: false, code: "NOT_AVAILABLE", error: "GlowVai Coins top-up is not available yet." }, 503);
+  }
   const ipLimited = limitByIp(req, "wallet-topup-create", TOPUP_LIMITS.createPerIpPerHour, HOUR);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
