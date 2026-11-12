@@ -5,6 +5,7 @@
 import { createHash } from "node:crypto";
 import { invalid } from "./errors";
 import type { Result } from "./validation";
+import type { PushTokenType } from "../shop/notifications/policy";
 
 export const PUSH_TOKEN_MAX = 3;
 export const PUSH_PLATFORMS = ["android", "ios", "web"] as const;
@@ -36,11 +37,30 @@ export const deviceCapError = () =>
 export interface StoredToken {
   id: string;
   token: string;
+  // A missing type is FCM (devices registered before EXPO tokens were accepted).
+  tokenType?: PushTokenType;
 }
+
+export interface OfferMessage {
+  title: string;
+  body: string;
+  data: Record<string, string>;
+}
+
+export interface OfferSendReport {
+  successCount: number;
+  failureCount: number;
+  // Indexes into the tokens array that the provider reports as no longer valid.
+  invalidIndexes: number[];
+}
+
+/** Sends to one kind of token. tokens and the report indexes are local to that call. */
+export type OfferSender = (tokens: string[], message: OfferMessage) => Promise<OfferSendReport>;
 
 export interface OfferPushDeps {
   loadTokens: (vendorUid: string) => Promise<StoredToken[]>;
-  send: (tokens: string[], message: { title: string; body: string; data: Record<string, string> }) => Promise<{ successCount: number; failureCount: number; invalidIndexes: number[] }>;
+  // tokenTypes lines up with tokens by index. The live version sends FCM tokens through FCM and EXPO tokens through Expo.
+  send: (tokens: string[], message: OfferMessage, tokenTypes: PushTokenType[]) => Promise<OfferSendReport>;
   removeTokens: (vendorUid: string, ids: string[]) => Promise<void>;
   log: (message: string, code?: string) => void;
 }
@@ -67,6 +87,7 @@ export async function notifyVendorOfferWith(deps: OfferPushDeps, vendorUid: stri
     const report = await deps.send(
       tokens.map((t) => t.token),
       { title: OFFER_PUSH_TITLE, body: OFFER_PUSH_BODY, data: { type: "vendor_offer", orderId } },
+      tokens.map((t) => (t.tokenType === "EXPO" ? "EXPO" : "FCM")),
     );
     const dead = report.invalidIndexes.map((i) => tokens[i]?.id).filter((id): id is string => Boolean(id));
     if (dead.length) await deps.removeTokens(vendorUid, dead);
@@ -75,4 +96,34 @@ export async function notifyVendorOfferWith(deps: OfferPushDeps, vendorUid: stri
     deps.log("vendor offer push failed", (err as { code?: string })?.code ?? "UNKNOWN");
     return none;
   }
+}
+
+/**
+ * Sends one offer to a mixed list of tokens: each token goes through the sender for its type (EXPO or FCM), and the two
+ * reports are merged with the indexes mapped back to the original list. A sender that throws counts its tokens as failed
+ * and does not stop the other sender. Never throws.
+ */
+export async function sendOfferBySender(
+  tokens: string[],
+  tokenTypes: PushTokenType[],
+  message: OfferMessage,
+  senders: { FCM: OfferSender; EXPO: OfferSender },
+): Promise<OfferSendReport> {
+  const out: OfferSendReport = { successCount: 0, failureCount: 0, invalidIndexes: [] };
+  for (const kind of ["FCM", "EXPO"] as const) {
+    const indexes = tokens.flatMap((_, i) => ((tokenTypes[i] === "EXPO" ? "EXPO" : "FCM") === kind ? [i] : []));
+    if (indexes.length === 0) continue;
+    try {
+      const r = await senders[kind](indexes.map((i) => tokens[i]), message);
+      out.successCount += r.successCount;
+      out.failureCount += r.failureCount;
+      r.invalidIndexes.forEach((j) => {
+        const original = indexes[j];
+        if (original !== undefined) out.invalidIndexes.push(original);
+      });
+    } catch {
+      out.failureCount += indexes.length;
+    }
+  }
+  return out;
 }

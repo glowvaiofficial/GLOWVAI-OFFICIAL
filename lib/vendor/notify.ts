@@ -10,7 +10,8 @@ import "server-only";
 import type { Firestore } from "firebase-admin/firestore";
 import { db, messaging } from "@/lib/shop/server";
 import { OFFER_FRESHNESS_MS } from "./orders";
-import { PUSH_TOKEN_MAX, notifyVendorOfferWith, type OfferPushDeps, type OfferPushResult } from "./push";
+import { sendExpoBatch } from "@/lib/shop/notifications/expoSend";
+import { PUSH_TOKEN_MAX, notifyVendorOfferWith, sendOfferBySender, type OfferMessage, type OfferPushDeps, type OfferPushResult, type OfferSendReport } from "./push";
 import { loadVendor, operatorOf } from "./store";
 
 /** Most stores one order is offered to by push at once (the offer pool is capped the same way on the app side). */
@@ -18,23 +19,39 @@ export const OFFER_POOL_PUSH_LIMIT = 10;
 
 const INVALID_TOKEN_CODES = new Set(["messaging/invalid-registration-token", "messaging/registration-token-not-registered"]);
 
+// FCM tokens (the vendor web and Android app). Notification plus data, so the vendor app shows it.
+async function sendFcmOffer(tokens: string[], message: OfferMessage): Promise<OfferSendReport> {
+  const res = await messaging().sendEachForMulticast({
+    tokens,
+    notification: { title: message.title, body: message.body },
+    data: message.data,
+  });
+  const invalidIndexes: number[] = [];
+  res.responses.forEach((r, i) => {
+    if (!r.success && r.error && INVALID_TOKEN_CODES.has(r.error.code)) invalidIndexes.push(i);
+  });
+  return { successCount: res.successCount, failureCount: res.failureCount, invalidIndexes };
+}
+
+// EXPO tokens (the vendor app on Expo). The same Expo sender the customer app uses; title and body travel in the data too,
+// because the Expo request carries them in its data field.
+async function sendExpoOffer(tokens: string[], message: OfferMessage): Promise<OfferSendReport> {
+  const report = await sendExpoBatch(tokens, { ...message.data, title: message.title, body: message.body });
+  return { successCount: report.sent, failureCount: report.failed, invalidIndexes: report.invalidIndexes };
+}
+
 const liveDeps: OfferPushDeps = {
   async loadTokens(vendorUid) {
     const snap = await db().collection("vendors").doc(vendorUid).collection("pushTokens").limit(PUSH_TOKEN_MAX).get();
-    return snap.docs.map((d) => ({ id: d.id, token: String(d.get("token") ?? "") }));
+    return snap.docs.map((d) => ({
+      id: d.id,
+      token: String(d.get("token") ?? ""),
+      tokenType: d.get("tokenType") === "EXPO" ? "EXPO" : "FCM",
+    }));
   },
-  async send(tokens, message) {
+  async send(tokens, message, tokenTypes) {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT_JSON) return { successCount: 0, failureCount: 0, invalidIndexes: [] };
-    const res = await messaging().sendEachForMulticast({
-      tokens,
-      notification: { title: message.title, body: message.body },
-      data: message.data,
-    });
-    const invalidIndexes: number[] = [];
-    res.responses.forEach((r, i) => {
-      if (!r.success && r.error && INVALID_TOKEN_CODES.has(r.error.code)) invalidIndexes.push(i);
-    });
-    return { successCount: res.successCount, failureCount: res.failureCount, invalidIndexes };
+    return sendOfferBySender(tokens, tokenTypes, message, { FCM: sendFcmOffer, EXPO: sendExpoOffer });
   },
   async removeTokens(vendorUid, ids) {
     const store = db();
