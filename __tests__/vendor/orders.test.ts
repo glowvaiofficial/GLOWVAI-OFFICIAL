@@ -121,12 +121,12 @@ describe("VendorOrder projection privacy", () => {
   test("an offer carries only reference, items, value and times", () => {
     const p = toVendorOrder(shopOrder(), { uid: "v1", isOffer: true });
     assertPrivate(p);
-    assert.deepEqual(Object.keys(p).sort(), ["cancelled", "isOffer", "itemCount", "items", "itemsValue", "orderId", "placedAt", "reference", "status", "updatedAt", "vendorStatus"].sort());
+    assert.deepEqual(Object.keys(p).sort(), ["cancelled", "isOffer", "itemCount", "items", "itemsValue", "orderId", "placedAt", "reference", "status", "substitutionPreference", "timeline", "updatedAt", "vendorStatus"].sort());
     assert.equal(p.reference, "GV-261106-ABC123");
     assert.equal(p.isOffer, true);
     assert.equal(p.itemCount, 3);
     assert.equal(p.itemsValue, 599 * 2 + 349);
-    assert.deepEqual(p.items[0], { productId: "p1", title: "Vitamin C Serum", brand: "Minimalist", quantity: 2, unitPrice: 599, imageUrl: "https://x/p1.jpg" });
+    assert.deepEqual(p.items[0], { productId: "p1", variantId: null, variantLabel: null, title: "Vitamin C Serum", brand: "Minimalist", quantity: 2, unitPrice: 599, imageUrl: "https://x/p1.jpg" });
     assert.equal(p.customerFirstName, undefined);
   });
 
@@ -177,8 +177,8 @@ describe("stock and packing checks", () => {
       { productId: "p2", exists: true, stock: 9, isAvailable: false },
     ]);
     assert.deepEqual(missing, [
-      { productId: "p1", title: "Vitamin C Serum", need: 2, have: 1 },
-      { productId: "p2", title: "SPF 50 Sunscreen", need: 1, have: 0 },
+      { productId: "p1", variantId: null, title: "Vitamin C Serum", need: 2, have: 1 },
+      { productId: "p2", variantId: null, title: "SPF 50 Sunscreen", need: 1, have: 0 },
     ]);
     assert.deepEqual(missingStock(shopOrder(), [{ productId: "p1", exists: true, stock: 2, isAvailable: true }, { productId: "p2", exists: true, stock: 1, isAvailable: true }]), []);
     assert.equal(missingStock(shopOrder(), []).length, 2);

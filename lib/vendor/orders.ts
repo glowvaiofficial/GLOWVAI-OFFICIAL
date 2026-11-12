@@ -3,7 +3,10 @@
 // Privacy (PRD 3.3, 9.1): the projection is built from an allow-list. The customer's phone, address, landmark,
 // coordinates, email, userId, payment ids and tracking id are never copied. The customer's first name is added only
 // once this vendor has accepted the order.
+import { lineKeyOf } from "../shop/variants";
+import { parseSubstitutionPreference, type SubstitutionPreference } from "../shop/preferences";
 import type { OperatingVendor } from "./state";
+import { orderTimeline, type TimelineStep } from "./vendorView";
 
 type Doc = Record<string, unknown>;
 
@@ -12,6 +15,9 @@ export const OFFER_FRESHNESS_MS = 3 * 60_000;
 
 export interface VendorOrderItem {
   productId: string;
+  /** The option the customer chose, for a product with options. */
+  variantId: string | null;
+  variantLabel: string | null;
   title: string;
   brand: string;
   quantity: number;
@@ -35,6 +41,10 @@ export interface VendorOrder {
   customerFirstName?: string;
   cancelled: boolean;
   cancellationReason?: string;
+  /** The customer's substitution preference. Read-only for the vendor; null on older orders. */
+  substitutionPreference: SubstitutionPreference | null;
+  /** Stages reached so far (my orders only). */
+  timeline: TimelineStep[];
 }
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
@@ -97,6 +107,8 @@ export function orderItems(order: Doc): VendorOrderItem[] {
     const it = (raw ?? {}) as Doc;
     return {
       productId: str(it.productId),
+      variantId: str(it.variantId) || null,
+      variantLabel: str(it.variantLabel) || null,
       title: str(it.productName) || str(it.title),
       brand: str(it.brand),
       quantity: Math.max(0, Math.floor(num(it.quantity))),
@@ -106,39 +118,53 @@ export function orderItems(order: Doc): VendorOrderItem[] {
   });
 }
 
-/** Quantity needed per product (an order may, in theory, list a product twice). */
-export function neededStock(order: Doc): Map<string, { quantity: number; title: string }> {
-  const need = new Map<string, { quantity: number; title: string }>();
+export interface NeededLine {
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  title: string;
+}
+
+/**
+ * Quantity needed per stock line: one line per product, or per option of a product. The map is keyed by the stock line
+ * key (see lineKeyOf), so a product with options and a product without never share a line.
+ */
+export function neededStock(order: Doc): Map<string, NeededLine> {
+  const need = new Map<string, NeededLine>();
   for (const it of orderItems(order)) {
     if (!it.productId || it.quantity <= 0) continue;
-    const prev = need.get(it.productId);
-    need.set(it.productId, { quantity: (prev?.quantity ?? 0) + it.quantity, title: prev?.title || it.title });
+    const variantId = it.variantId;
+    const key = lineKeyOf(it.productId, variantId);
+    const prev = need.get(key);
+    need.set(key, { productId: it.productId, variantId, quantity: (prev?.quantity ?? 0) + it.quantity, title: prev?.title || it.title });
   }
   return need;
 }
 
 export interface StockLine {
+  /** The stock line key: the product id, or "productId::variantId". */
   productId: string;
   exists: boolean;
   stock: number;
   isAvailable: boolean;
 }
 
-/** Items the vendor cannot supply: `have` is 0 when the product is unavailable or not stocked. */
-export function missingStock(order: Doc, inventory: StockLine[]): { productId: string; title: string; need: number; have: number }[] {
-  const byId = new Map(inventory.map((l) => [l.productId, l]));
-  const missing: { productId: string; title: string; need: number; have: number }[] = [];
-  for (const [productId, { quantity, title }] of neededStock(order)) {
-    const line = byId.get(productId);
+/** Items the vendor cannot supply: `have` is 0 when the product or option is unavailable or not stocked. */
+export function missingStock(order: Doc, inventory: StockLine[]): { productId: string; variantId: string | null; title: string; need: number; have: number }[] {
+  const byKey = new Map(inventory.map((l) => [l.productId, l]));
+  const missing: { productId: string; variantId: string | null; title: string; need: number; have: number }[] = [];
+  for (const [key, { productId, variantId, quantity, title }] of neededStock(order)) {
+    const line = byKey.get(key);
     const have = line && line.exists && line.isAvailable ? Math.max(0, Math.floor(line.stock)) : 0;
-    if (have < quantity) missing.push({ productId, title, need: quantity, have });
+    if (have < quantity) missing.push({ productId, variantId, title, need: quantity, have });
   }
   return missing;
 }
 
-/** Every product in the order is in `checked`; returns the product ids still unchecked. */
+/** Every product in the order is in `checked` (one tick per product id); returns the product ids still unchecked. */
 export function uncheckedItems(order: Doc, checked: string[]): string[] {
-  return [...neededStock(order).keys()].filter((id) => !checked.includes(id));
+  const products = new Set([...neededStock(order).values()].map((n) => n.productId));
+  return [...products].filter((id) => !checked.includes(id));
 }
 
 export function toVendorOrder(order: Doc, opts: { uid: string; isOffer: boolean; overlay?: Doc | null; orderId?: string }): VendorOrder {
@@ -148,6 +174,8 @@ export function toVendorOrder(order: Doc, opts: { uid: string; isOffer: boolean;
   const staffCancelled = isStaffCancelled(opts.overlay);
   const cancelled = staffCancelled || str(order.status) === "CANCELLED";
   const out: VendorOrder = {
+    substitutionPreference: parseSubstitutionPreference(order.substitutionPreference),
+    timeline: mine ? orderTimeline(order) : [],
     orderId,
     reference: orderId,
     status: cancelled ? "CANCELLED" : str(order.status) || "PLACED",

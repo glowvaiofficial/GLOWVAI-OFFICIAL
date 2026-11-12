@@ -3,6 +3,7 @@ import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/serve
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
 import { retakeStockTx } from "@/lib/shop/platformStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
+import { notifyOfferPool } from "@/lib/vendor/notify";
 
 export const dynamic = "force-dynamic";
 
@@ -53,5 +54,6 @@ export async function POST(req: NextRequest) {
   });
   // Customer notification, only when this call confirmed the payment (a repeat call sends nothing).
   if (confirmed) await notifyCustomer(customer.uid, { type: "order_placed", relatedId: doc.id });
+  if (confirmed) await notifyOfferPool(store, String(o.orderId ?? ""), String((o.shippingAddress as { pincode?: unknown } | undefined)?.pincode ?? ""));
   return json({ ok: true, orderId: o.orderId, trackingId: o.trackingId, transactionId: paymentId });
 }

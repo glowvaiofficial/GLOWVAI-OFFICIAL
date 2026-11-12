@@ -14,6 +14,7 @@ import { ADDRESS_ID_PATTERN, parseDeliveryAddress, type DeliveryAddress, type Pa
 import { savedAddressForOrder } from "./addressRepo";
 import { findOfferedSlot } from "./slots";
 import { notifyCustomer } from "./notify";
+import { notifyOfferPool } from "@/lib/vendor/notify";
 import { applyCoins, maxRedeemable } from "./growth/coins";
 import { wrapTx, firestoreRepo } from "./growth/firestoreRepo";
 import { razorpayKeyId } from "./razorpay";
@@ -225,6 +226,8 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
 
   // Cash on delivery is placed now (online orders are notified when the payment is confirmed). notifyCustomer never throws.
   if (!online) await notifyCustomer(input.uid, { type: "order_placed", relatedId: orderId });
+  // The stores that can take it are offered it by push (never throws). Online orders are offered once paid (see razorpay).
+  if (!online) await notifyOfferPool(store, orderId, address.pincode);
 
   if (online && razorpay) {
     return {
