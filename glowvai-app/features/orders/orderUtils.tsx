@@ -10,7 +10,8 @@ import { reorderReasonText } from '../../../lib/shop/reorder';
 // Helpers shared by the order screens. Orders come from the GlowVai server (GET /api/shop/orders), with any update
 // the GlowVai team made applied. Nothing is invented on the device: no rider, no ETA, no map.
 
-export type OrderTone = 'active' | 'delivered' | 'cancelled';
+// 'unpaid': the customer started an online payment and did not finish it. The order was never placed.
+export type OrderTone = 'active' | 'delivered' | 'cancelled' | 'unpaid';
 
 const KNOWN_STATUS: Record<string, string> = {
   PLACED: 'Order placed',
@@ -23,6 +24,7 @@ const KNOWN_STATUS: Record<string, string> = {
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
   VENDOR_REJECTED: 'Cancelled by the store',
+  PAYMENT_PENDING: 'Payment not completed',
 };
 
 export const statusLabel = (status: string): string => {
@@ -43,6 +45,8 @@ export const statusNote = (order: ShopOrder): string => {
       return 'Your order is packed at the store and waiting for pickup.';
     case 'DELIVERED':
       return 'This order was delivered.';
+    case 'PAYMENT_PENDING':
+      return 'This order was not placed because the online payment was not completed. Nothing was charged. Add the items to your bag again to order.';
     case 'CANCELLED':
     case 'VENDOR_REJECTED':
       return order.cancellationReason ? `Cancelled: ${order.cancellationReason}` : 'This order was cancelled and will not be delivered.';
@@ -55,6 +59,7 @@ export const orderTone = (order: ShopOrder): OrderTone => {
   const status = String(order.status).toUpperCase();
   if (status === 'CANCELLED' || status === 'VENDOR_REJECTED') return 'cancelled';
   if (status === 'DELIVERED') return 'delivered';
+  if (status === 'PAYMENT_PENDING') return 'unpaid';
   return 'active';
 };
 
@@ -84,6 +89,7 @@ export const paymentSummary = (order: ShopOrder): string => {
   const status = String(order.payment?.status || 'PENDING').toUpperCase();
   if (status === 'PAID' || status === 'COMPLETED') return method === 'COD' ? 'Paid on delivery' : 'Paid';
   if (orderTone(order) === 'cancelled') return method === 'COD' ? 'Cash on delivery (nothing to pay)' : 'Payment cancelled';
+  if (orderTone(order) === 'unpaid') return 'Payment not completed. Nothing was charged.';
   return method === 'COD' ? 'Pay on delivery' : `Payment ${status.toLowerCase()}`;
 };
 

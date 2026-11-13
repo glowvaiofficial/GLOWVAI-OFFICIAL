@@ -41,7 +41,7 @@ const EMPTY_TEXT: Record<OrderFilter, { title: string; body: string }> = {
 
 const StatusBadge: React.FC<{ order: ShopOrder }> = ({ order }) => {
   const tone = orderTone(order);
-  const Icon = tone === 'delivered' ? CheckCircle2 : tone === 'cancelled' ? XCircle : Clock;
+  const Icon = tone === 'delivered' ? CheckCircle2 : tone === 'cancelled' || tone === 'unpaid' ? XCircle : Clock;
   return (
     <span className={`orders-badge is-${tone}`}>
       <Icon size={13} /> {statusLabel(order.status)}
