@@ -63,3 +63,65 @@ test("an empty string or a missing picture means no picture", () => {
   assert.equal(withImage("")?.[0].image, "");
   assert.equal(withImage(undefined)?.[0].image, "");
 });
+
+// ---- Mini banners and offers strip: picture, link, title and item limits.
+const promoBlock = (id: "mini-banners" | "offers", settings: Record<string, unknown>) =>
+  readBlockSettings({ blocks: [{ id, enabled: true, position: 0, settings }] })[id];
+const item = (over: Record<string, unknown> = {}) => ({ label: "Deal", sub: "Sub text", link: "/shop", image: "", ...over });
+
+test("offers keep at most 3 items, and mini banners at most 3", () => {
+  const five = [1, 2, 3, 4, 5].map((i) => item({ label: "Offer " + i }));
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: five })?.items.length, 3);
+  assert.equal(promoBlock("mini-banners", { title: "", background: "", textColor: "", items: five })?.items.length, 3);
+});
+
+test("invalid items do not use up the limit: the first 3 valid items show", () => {
+  const items = [item({ label: "" }), item({ link: "//evil" }), item({ label: "A" }), item({ label: "B" }), item({ label: "C" }), item({ label: "D" })];
+  const got = promoBlock("offers", { title: "", background: "", textColor: "", items });
+  assert.deepEqual(got?.items.map((i) => i.label), ["A", "B", "C"]);
+});
+
+test("item order is kept", () => {
+  const got = promoBlock("mini-banners", { title: "", background: "", textColor: "", items: [item({ label: "First" }), item({ label: "Second" })] });
+  assert.deepEqual(got?.items.map((i) => i.label), ["First", "Second"]);
+});
+
+test("a title is kept when set, and a title over 60 characters is dropped", () => {
+  assert.equal(promoBlock("offers", { title: "Today's offers", background: "", textColor: "", items: [item()] })?.title, "Today's offers");
+  assert.equal(promoBlock("offers", { title: "x".repeat(61), background: "", textColor: "", items: [item()] })?.title, "");
+  assert.equal(promoBlock("offers", { title: "x".repeat(60), background: "", textColor: "", items: [item()] })?.title, "x".repeat(60));
+});
+
+test("a valid internal link is kept on the item", () => {
+  for (const link of ["/shop", "/shop/category/shoes?sort=new", ""]) {
+    assert.equal(promoBlock("mini-banners", { title: "", background: "", textColor: "", items: [item({ link })] })?.items[0].link, link);
+  }
+});
+
+test("external, protocol-relative, backslash and whitespace links are dropped with their item", () => {
+  for (const link of ["https://example.com", "javascript:alert(1)", "//evil.com", "/a\b", "/has space", "shop"]) {
+    assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ link })] }), undefined, link);
+  }
+});
+
+test("labels over 40 and subs over 80 characters are dropped", () => {
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ label: "x".repeat(41) })] }), undefined);
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ sub: "x".repeat(81) })] }), undefined);
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ label: "x".repeat(40), sub: "" })] })?.items.length, 1);
+});
+
+test("a valid picture on a mini banner or offer is kept with its item", () => {
+  assert.equal(promoBlock("mini-banners", { title: "", background: "", textColor: "", items: [item({ image: PNG })] })?.items[0].image, PNG);
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ image: "data:image/jpeg;base64,/9j/4A==" })] })?.items[0].image, "data:image/jpeg;base64,/9j/4A==");
+});
+
+test("a bad picture on an offer keeps the item without a picture", () => {
+  const got = promoBlock("offers", { title: "", background: "", textColor: "", items: [item({ image: "data:image/gif;base64,R0lG" })] });
+  assert.equal(got?.items.length, 1);
+  assert.equal(got?.items[0].image, "");
+});
+
+test("a block whose items are not an array is left out", () => {
+  assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: "nope" }), undefined);
+  assert.equal(promoBlock("mini-banners", { title: "", background: "", textColor: "" }), undefined);
+});

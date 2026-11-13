@@ -112,7 +112,8 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
     const s = d.settings && typeof d.settings === "object" ? (d.settings as Record<string, unknown>) : null;
     if (!s) continue;
     const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
-    const items = Array.isArray(s.items) ? s.items.slice(0, limit).map(readItem).filter((x): x is BlockItem => x !== null) : [];
+    // Bad items are dropped first, then the limit applies, so a bad item never takes a valid one's place.
+    const items = Array.isArray(s.items) ? s.items.map(readItem).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
     if (items.length === 0) continue;
     out[id] = {
       title: typeof s.title === "string" && s.title.length <= 60 ? s.title : "",
