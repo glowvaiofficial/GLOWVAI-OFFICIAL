@@ -13,10 +13,19 @@ function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'c
       {title && <div className="hp-head"><h2 className="hp-title">{title}</h2></div>}
       <div className={kind === 'tiles' ? 'hp-brands' : kind === 'chips' ? 'hp-grid is-three' : 'hp-grid is-three'} style={{ ...style }}>
         {settings.items.map((item, i) => {
+          const pic = item.image || '';
           const inner = kind === 'tiles' ? (
-            <span className="hp-brand" style={style}>{item.label}</span>
+            pic ? (
+              <span className="hp-brand hp-brand-pic" style={style}><img src={pic} alt={item.label} /></span>
+            ) : (
+              <span className="hp-brand" style={style}>{item.label}</span>
+            )
           ) : kind === 'chips' ? (
-            <span className="hp-chip" style={style}><span className="hp-dot" /><span><b>{item.label}</b>{item.sub && <small>{item.sub}</small>}</span></span>
+            // The label sits next to the picture, so the picture is decorative (empty alt).
+            <span className="hp-chip" style={style}>{pic ? <img className="hp-dot hp-dot-img" src={pic} alt="" /> : <span className="hp-dot" />}<span><b>{item.label}</b>{item.sub && <small>{item.sub}</small>}</span></span>
+          ) : pic ? (
+            // The label is printed on the card, so the background picture is decorative. The gradient keeps the text readable.
+            <span className="hp-card hp-card-pic" style={{ backgroundImage: `linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.05) 65%), url("${pic}")` }}><strong>{item.label}</strong>{item.sub && <span>{item.sub}</span>}</span>
           ) : (
             <span className="hp-card" style={{ ...style, background: settings.background || undefined }}><strong>{item.label}</strong>{item.sub && <span>{item.sub}</span>}</span>
           );
