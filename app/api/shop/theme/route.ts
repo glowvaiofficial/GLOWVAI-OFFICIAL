@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { readTheme, themeCssVariables } from "@/lib/shop/theme";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
+import { activePreset, themeWithPreset } from "@/lib/shop/presets";
+import { loadPresets } from "@/lib/shop/presetLookup";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,9 @@ export async function GET(req: NextRequest) {
   try {
     const snap = await db().collection("siteContent").doc("theme").get();
     const data = snap.exists ? (snap.data() as Record<string, unknown> | undefined) : undefined;
-    const theme = readTheme(isPreview ? data?.draft : data?.published);
+    // A live seasonal preset lays its colours and fonts over the published theme.
+    const preset = activePreset(await loadPresets(db()), Date.now());
+    const theme = themeWithPreset(readTheme(isPreview ? data?.draft : data?.published), preset);
     const res = json({ ok: true, theme, cssVariables: themeCssVariables(theme), preview: isPreview });
     res.headers.set(
       "Cache-Control",

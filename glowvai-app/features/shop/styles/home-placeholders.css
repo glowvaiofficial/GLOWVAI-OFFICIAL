@@ -42,3 +42,8 @@
   .hp-brands { grid-template-columns: repeat(6, 1fr); padding: 0 24px; }
   .hp-card { min-height: 170px; }
 }
+
+/* Gentle entrance for home sections. Off for people who ask for less motion. */
+@keyframes hp-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.hp-section { animation: hp-in .45s ease both; }
+@media (prefers-reduced-motion: reduce) { .hp-section { animation: none; } }

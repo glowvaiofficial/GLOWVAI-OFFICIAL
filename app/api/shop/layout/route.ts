@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { readBlockSettings, readHomeLayout } from "@/lib/shop/homeLayout";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
+import { activePreset, orderWithPreset } from "@/lib/shop/presets";
+import { loadPresets } from "@/lib/shop/presetLookup";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,9 @@ export async function GET(req: NextRequest) {
     const snap = await db().collection("siteContent").doc("homeLayout").get();
     const data = snap.exists ? (snap.data() as Record<string, unknown> | undefined) : undefined;
     const source = isPreview ? data?.draft : data?.published;
-    const blocks = readHomeLayout(source);
+    // A live seasonal preset can replace the block order. Footer stays last.
+    const preset = activePreset(await loadPresets(db()), Date.now());
+    const blocks = orderWithPreset(readHomeLayout(source), preset);
     const settings = readBlockSettings(source);
     const res = json({ ok: true, blocks, settings, preview: isPreview });
     res.headers.set("Cache-Control", isPreview ? "private, no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
