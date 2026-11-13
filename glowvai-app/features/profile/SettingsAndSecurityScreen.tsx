@@ -30,7 +30,7 @@ export const SettingsAndSecurityScreen = () => {
       <div className="profile-body">
         <div className="profile-side">
         <section className="profile-card">
-          <button type="button" className="profile-user-button" onClick={() => navigate(customerDetails ? 'profile-edit' : 'login', customerDetails ? undefined : { returnTo: 'profile-settings' })}>
+          <button type="button" className="profile-user-button" onClick={() => navigate(customerDetails ? 'profile-edit' : 'customer-details', customerDetails ? undefined : { returnTo: 'profile-settings' })}>
             <span className="profile-hero-avatar">{getInitials(customerDetails?.fullName || user?.name)}</span>
             <span className="profile-user-copy">
               <span className="profile-user-name">{name}</span>
@@ -47,7 +47,7 @@ export const SettingsAndSecurityScreen = () => {
           {customerDetails ? (
             <ProfileListItem icon={<User size={18} />} title="Edit your details" note="Name, mobile number and email" onClick={() => navigate('profile-edit')} />
           ) : (
-            <ProfileListItem icon={<UserRound size={18} />} title="Add your details" note="Needed to place an order" onClick={() => navigate('login', { returnTo: 'profile-settings' })} />
+            <ProfileListItem icon={<UserRound size={18} />} title="Add your details" note="Needed to place an order" onClick={() => navigate('customer-details', { returnTo: 'profile-settings' })} />
           )}
           <ProfileListItem icon={<MapPin size={18} />} title="Saved addresses" onClick={() => navigate('address-list')} />
         </section>

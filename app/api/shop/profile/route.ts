@@ -4,6 +4,7 @@ import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, too
 import { recordActivity } from "@/lib/shop/activity";
 import { DEFAULT_LANGUAGE, nextConsents, validateProfileInput, type ActivityType } from "@/lib/shop/settings/rules";
 import { noteDeviceSighting } from "@/lib/shop/privacy/sightings";
+import { phoneChangeAllowed } from "@/lib/shop/account/rules";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
       ? {
           name: d.name ?? "",
           phone: d.phone ?? "",
-          phoneVerified: false,
+          phoneVerified: d.phoneVerified === true,
           email: d.email ?? "",
           address: d.address ?? null,
           marketingOptIn: consents.marketing === true,
@@ -55,11 +56,18 @@ export async function POST(req: NextRequest) {
   const ref = db().collection("users").doc(customer.uid);
   const now = Date.now();
   let changed: ActivityType[] = [];
+  // Set when a verified number would change: nothing is written, and the route answers 400.
+  let phoneLocked = false;
   await db().runTransaction(async (tx) => {
     // Reset on every attempt: Firestore may run this callback again after a conflict.
     changed = [];
+    phoneLocked = false;
     const existing = await tx.get(ref);
     const before = (existing.data() ?? {}) as Record<string, unknown>;
+    if (!phoneChangeAllowed(before.phoneVerified === true, typeof before.phone === "string" ? before.phone : "", input.phone)) {
+      phoneLocked = true;
+      return;
+    }
     const prevConsents = (before.consents ?? {}) as Record<string, unknown>;
     const consents = nextConsents(
       {
@@ -91,7 +99,6 @@ export async function POST(req: NextRequest) {
         email: input.email || FieldValue.delete(),
         // The address is only written when the request carries one. A save without it keeps the stored address.
         ...(input.address ? { address: input.address } : {}),
-        phoneVerified: false,
         consents: { marketing: consents.marketing, analytics: consents.analytics, marketingAt: consents.marketingAt, analyticsAt: consents.analyticsAt },
         consentTimestamp: now,
         onboardingCompleted: true,
@@ -104,6 +111,9 @@ export async function POST(req: NextRequest) {
       { merge: true },
     );
   });
+  if (phoneLocked) {
+    return json({ ok: false, error: "Your mobile number is verified. To change it, sign in with the new number.", field: "phone" }, 400);
+  }
   for (const type of [...new Set(changed)]) await recordActivity(customer.uid, type, now);
   return json({ ok: true });
 }

@@ -275,7 +275,7 @@ export const HelpAndSupportScreen = () => {
           )}
           {!customerDetails && (
             <p className="profile-field-hint">
-              Tip: <button type="button" className="profile-text-link" onClick={() => navigate('login', { returnTo: 'profile-support' })}>add your name and mobile number</button> so the team can contact you.
+              Tip: <button type="button" className="profile-text-link" onClick={() => navigate('customer-details', { returnTo: 'profile-support' })}>add your name and mobile number</button> so the team can contact you.
             </p>
           )}
           <div className="profile-form-grid">

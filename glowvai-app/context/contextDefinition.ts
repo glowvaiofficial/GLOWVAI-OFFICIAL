@@ -50,6 +50,11 @@ export interface AppContextType {
   customerDetails: CustomerDetails | null;
   // 'ready' once the server answered whether this device has saved details (customerDetails is null if not).
   profileStatus: 'idle' | 'loading' | 'ready' | 'error';
+  // Phone account: accountSignedIn is true once a phone number is signed in on this device; accountPhone is its E.164 number.
+  accountSignedIn: boolean;
+  accountPhone: string | null;
+  // Asks a visitor without a phone account to sign in first. The action, when given, runs after sign-in.
+  requireSignIn: (resume?: () => void) => void;
   saveCustomerDetails: (details: CustomerDetails, address?: ShopProfileAddress) => Promise<{ ok: boolean; error: string | null }>;
 
   // Address

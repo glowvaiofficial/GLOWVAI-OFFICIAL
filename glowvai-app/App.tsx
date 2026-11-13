@@ -1,4 +1,5 @@
 import React from 'react';
+import { auth } from './core/config/firebase';
 import { AppProvider } from './context/AppContext';
 import { useApp } from './context/useApp';
 import { AndroidStatusBar } from './components/common/AndroidStatusBar';
@@ -15,6 +16,8 @@ import { applyScroll, takeScrollRestore } from './context/scrollMemory';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { LoginScreen } from './screens/LoginScreen';
+import { PhoneSignInScreen } from './features/auth/PhoneSignInScreen';
+import { OtpScreen } from './features/auth/OtpScreen';
 import { FaceAnalysisPrepScreen } from './screens/FaceAnalysisPrepScreen';
 import { FaceAnalysisCameraScreen } from './screens/FaceAnalysisCameraScreen';
 import { FaceAnalysisLoadingScreen } from './screens/FaceAnalysisLoadingScreen';
@@ -75,9 +78,11 @@ const AppContent: React.FC = () => {
         return <WelcomeScreen />;
       case 'onboarding':
         return <OnboardingScreen />;
-      // There is no sign-in code yet: these older names open the "Your details" step.
+      // Sign-in with a mobile number, then the code. The details form (name, email, address) is 'customer-details'.
       case 'login':
+        return <PhoneSignInScreen />;
       case 'otp':
+        return <OtpScreen />;
       case 'customer-details':
         return <LoginScreen />;
       case 'face-prep':
@@ -155,7 +160,29 @@ const AppContent: React.FC = () => {
   );
 };
 
+// The saved session is read before the shop opens, so the first screen is chosen with the right account. A slow
+// Firebase answer never holds the shop for more than five seconds.
+const useSessionReady = (): boolean => {
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => {
+    let done = false;
+    const finish = () => {
+      if (!done) {
+        done = true;
+        setReady(true);
+      }
+    };
+    const timer = window.setTimeout(finish, 5000);
+    const restored = auth?.authStateReady ? auth.authStateReady() : Promise.resolve();
+    restored.then(finish, finish);
+    return () => window.clearTimeout(timer);
+  }, []);
+  return ready;
+};
+
 export const App: React.FC = () => {
+  const ready = useSessionReady();
+  if (!ready) return <div className="app-viewport glowvai-boot" aria-busy="true" />;
   return (
     <AppProvider>
       <AppContent />

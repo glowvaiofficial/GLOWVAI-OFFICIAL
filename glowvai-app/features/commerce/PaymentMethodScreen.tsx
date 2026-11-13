@@ -70,7 +70,7 @@ export const PaymentMethodScreen: React.FC = () => {
     safeHapticImpact();
     // The order is linked to the customer's saved details, so ask for them first.
     if (!customerDetails) {
-      navigate('login', { returnTo: 'checkout-payment-method', name: address.recipientName, phone: address.phoneNumber });
+      navigate('customer-details', { returnTo: 'checkout-payment-method', name: address.recipientName, phone: address.phoneNumber });
       return;
     }
     // The address must be confirmed on the review step first, so the customer always sees where the order goes.
@@ -161,7 +161,7 @@ export const PaymentMethodScreen: React.FC = () => {
             <section className="commerce-card commerce-address-card">
               <div className="commerce-card-head">
                 <h2>Your details</h2>
-                <button className="commerce-link" onClick={() => navigate('login', { returnTo: 'checkout-payment-method' })}>
+                <button className="commerce-link" onClick={() => navigate('customer-details', { returnTo: 'checkout-payment-method' })}>
                   Edit
                 </button>
               </div>

@@ -35,7 +35,7 @@ const steps = [
 ];
 
 export const OnboardingScreen: React.FC = () => {
-  const { navigate } = useApp();
+  const { navigate, accountSignedIn } = useApp();
   const [step, setStep] = useState(0);
   const item = steps[step];
 
@@ -44,8 +44,8 @@ export const OnboardingScreen: React.FC = () => {
       setStep((value) => value + 1);
       return;
     }
-    // Last carousel step opens the optional skin quiz. It never leads to the "Your details" form.
-    navigate('auth-skin-survey');
+    // The last intro step leads to sign-in. A signed-in account opens the optional skin quiz instead.
+    navigate(accountSignedIn ? 'auth-skin-survey' : 'auth-login');
   };
 
   const skip = () => {

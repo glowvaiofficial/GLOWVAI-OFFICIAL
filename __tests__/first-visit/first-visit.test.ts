@@ -156,7 +156,8 @@ describe("no route forces the profile form before products", () => {
     "glowvai-app/features/shop/shared/SkinQuizBanner.tsx",
     "glowvai-app/features/shop/lib/firstVisit.ts",
   ];
-  const detailsRoutes = /navigate\(\s*['"](login|otp|customer-details|auth-login|auth-otp|auth-verify-otp|auth-profile-setup)['"]/;
+  // Sign-in with a phone number is the account gate (features/auth/accountGate.ts), so 'login' and 'auth-login' are allowed.
+  const detailsRoutes = /navigate\(\s*['"](customer-details|auth-profile-setup)['"]/;
   const root = join(import.meta.dirname, "..", "..");
 
   for (const file of files) {
