@@ -9,6 +9,7 @@ import { SITE_URL } from "@/lib/site-url";
 import { CookieNotice } from "@/components/consent/CookieNotice";
 import { GA4Script } from "@/components/analytics/GA4Script";
 import { RouteTracker } from "@/components/analytics/RouteTracker";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const displayFont = Familjen_Grotesk({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ export default async function RootLayout({
           {children}
         </HeaderAndFooterWrapper>
         <CookieNotice />
+        <SpeedInsights />
       </body>
     </html>
   );

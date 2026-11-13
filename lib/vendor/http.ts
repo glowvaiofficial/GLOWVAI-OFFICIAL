@@ -59,7 +59,7 @@ interface RouteOptions {
   user: Limit;
   /** Only GET /me answers accounts whose email is not verified yet. */
   allowUnverified?: boolean;
-  /** Count the ip and user limits in the shared limiter (Upstash when configured). Off unless a route asks for it. */
+  /** Count the ip and user limits in the shared limiter (Firestore counter). Off unless a route asks for it. */
   shared?: boolean;
 }
 

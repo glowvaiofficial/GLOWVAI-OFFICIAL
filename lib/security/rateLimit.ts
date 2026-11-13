@@ -3,7 +3,7 @@
  *
  * Note: this keeps counts in memory of the running instance. On serverless hosting
  * each instance has its own counts, so this slows down bursts from one client but is
- * not a global quota. Use a shared store (for example Upstash Redis) for a hard limit.
+ * not a global quota. Use a shared store (for example a Firestore counter, see lib/shop/rateLimit.ts) for a hard limit.
  */
 
 type Entry = { count: number; resetAt: number };

@@ -7,7 +7,7 @@ import { getAuth, type Auth } from "firebase-admin/auth";
 import { getMessaging, type Messaging } from "firebase-admin/messaging";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { NextResponse, type NextRequest } from "next/server";
-import { checkRateLimit, memoryCheck, type RateLimitResult } from "./rateLimit";
+import { checkRateLimit, memoryCheck, type RateLimitInput, type RateLimitResult } from "./rateLimit";
 
 let app: App | undefined;
 
@@ -82,7 +82,21 @@ export function limitByUser(uid: string, route: string, max: number, windowMs = 
     : null;
 }
 
-// ---- Shared limiter (Upstash when configured, see ./rateLimit). Same keys and responses as the sync helpers above.
+// ---- Shared limiter (Firestore counter, see ./rateLimit). Same keys and responses as the sync helpers above.
+
+// The Firestore handle for the shared limiter. Null when Firebase is not configured: the in-memory limiter then decides.
+function sharedStore(): Firestore | null {
+  try {
+    return db();
+  } catch {
+    return null;
+  }
+}
+
+// Shared check for any key. Only the sensitive routes call this; everything else uses the sync helpers.
+export function checkShared(input: RateLimitInput): Promise<RateLimitResult> {
+  return checkRateLimit(input, sharedStore());
+}
 
 function limited(result: RateLimitResult, message: string): NextResponse | null {
   if (result.allowed) return null;
@@ -94,15 +108,15 @@ function limited(result: RateLimitResult, message: string): NextResponse | null 
 // Async check for any key, used by routes that need a custom limit. True when the request is over the limit.
 export async function overLimit(key: string, max: number, windowMs: number, shared: boolean): Promise<boolean> {
   if (!shared) return tooMany(key, max, windowMs);
-  return !(await checkRateLimit({ key, max, windowMs })).allowed;
+  return !(await checkShared({ key, max, windowMs })).allowed;
 }
 
 export async function limitByIpShared(req: NextRequest, route: string, max: number, windowMs = 60_000, message?: string): Promise<NextResponse | null> {
-  const result = await checkRateLimit({ key: `ip:${route}:${clientIp(req)}`, max, windowMs });
+  const result = await checkShared({ key: `ip:${route}:${clientIp(req)}`, max, windowMs });
   return limited(result, message ?? "Too many requests. Please try again later.");
 }
 
 export async function limitByUserShared(uid: string, route: string, max: number, windowMs = 60_000, message?: string): Promise<NextResponse | null> {
-  const result = await checkRateLimit({ key: `user:${route}:${uid}`, max, windowMs });
+  const result = await checkShared({ key: `user:${route}:${uid}`, max, windowMs });
   return limited(result, message ?? "Too many requests. Please try again later.");
 }
