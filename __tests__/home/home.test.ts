@@ -61,14 +61,23 @@ describe("home section order", () => {
     ["footer", "<footer"],
   ];
 
-  test("sections render in the agreed order", () => {
+  test("the blocks are rendered from the published layout, in its order", () => {
+    // The page renders each block by its id, in the order the admin layout gives (useHomeLayout). The header and the
+    // skin quiz strip stay at the top; the skin scan and closing card sit after the blocks; the footer is last.
+    const pinnedTop = ["mode switch", "skin quiz banner"];
     let last = -1;
-    for (const [name, marker] of order) {
+    for (const [name, marker] of pinnedTop.map((n) => order.find(([k]) => k === n)!)) {
       const at = homeSource.indexOf(marker);
-      assert.notEqual(at, -1, `${name} is missing (marker ${marker})`);
-      assert.ok(at > last, `${name} must come after the section before it`);
+      assert.notEqual(at, -1, name + " is missing");
+      assert.ok(at > last, name + " must be in the header area, in order");
       last = at;
     }
+    assert.ok(homeSource.includes("layoutOrder.filter((id) => id !== 'footer').map("));
+    for (const id of ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer"]) {
+      assert.match(homeSource, new RegExp("case '" + id + "':"), "block " + id + " is missing");
+    }
+    assert.ok(homeSource.indexOf("const pinnedTail") < homeSource.indexOf("{pinnedTail}"));
+    assert.ok(homeSource.includes("{pinnedTail}") && homeSource.includes("{renderBlock('footer')}"));
   });
 
   test("each section has an honest empty or loading state, not a blank one", () => {
