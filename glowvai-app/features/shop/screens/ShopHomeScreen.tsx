@@ -11,6 +11,7 @@ import { siteConfig } from '../../../../config/site';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
+import { HomeBanners } from '../shared/HomeBanners';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
@@ -456,6 +457,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           </button>
         </section>
       </div>}
+
+      <HomeBanners />
 
       <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
         <div className="shop-home-section-head">
