@@ -1,21 +1,21 @@
 import { NextRequest } from "next/server";
-import { COUPON_VALUES } from "@/glowvai-app/shared/pricing-rules.mjs";
 import { customerFrom, db, json, limitByIp } from "@/lib/shop/server";
-import { evaluateOffer, normalizeCode, type OfferLine } from "@/lib/shop/offers";
-import { findOfferByCode, offerUsage } from "@/lib/shop/offerLookup";
+import { type OfferLine } from "@/lib/shop/offers";
+import { resolveBag } from "@/lib/shop/offerResolve";
 import { orderItemFor, parseCartLines, type ProductDoc } from "@/lib/shop/variants";
 
 export const dynamic = "force-dynamic";
 
-// What a promo code would take off this bag, worked out from the catalogue prices (never from the phone). Used by the
-// cart so the discount shown matches the order. Public, rate limited. Lines are product id, variant id and quantity.
+// What the bag is taken off right now: the best of a built-in code, a typed offer code and the automatic offers. Worked
+// out from catalogue prices, never from the phone, and by the same rules as the order. The code is optional: with no
+// code, the automatic offers still apply. Public, rate limited. Lines are product id, variant id and quantity.
 export async function POST(req: NextRequest) {
   const limited = limitByIp(req, "offer-quote", 60);
   if (limited) return limited;
   const body = (await req.json().catch(() => null)) as { code?: unknown; lines?: unknown } | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
-  const code = normalizeCode(body.code);
-  if (!code) return json({ ok: false, error: "That coupon code is not valid." }, 400);
+  const rawCode = typeof body.code === "string" && body.code.trim() !== "" ? body.code.trim() : null;
+  if (rawCode !== null && rawCode.length > 40) return json({ ok: false, error: "That coupon code is not valid." }, 400);
   const parsed = parseCartLines(Array.isArray(body.lines) ? body.lines : [], 20);
   if (!parsed.ok) return json({ ok: false, error: parsed.error }, 400);
 
@@ -31,18 +31,13 @@ export async function POST(req: NextRequest) {
   }
   const subtotal = lines.reduce((s, l) => s + l.total, 0);
 
-  // The two built-in codes keep their fixed value, as at checkout.
-  const builtIn = (COUPON_VALUES as Record<string, number>)[code];
-  if (builtIn !== undefined) {
-    const discount = Math.min(builtIn, subtotal);
-    return json({ ok: true, code, discount, label: `₹${builtIn} off`, subtotal });
-  }
-
-  const offer = await findOfferByCode(store, code);
-  if (!offer) return json({ ok: false, error: "That coupon code is not valid." }, 400);
   const customer = await customerFrom(req).catch(() => null);
-  const usage = await offerUsage(store, offer.code, customer?.uid ?? null);
-  const verdict = evaluateOffer(offer, lines, Date.now(), usage);
-  if (!verdict.ok) return json({ ok: false, error: verdict.error }, 400);
-  return json({ ok: true, code: offer.code, discount: verdict.discount, label: verdict.label, subtotal });
+  const result = await resolveBag(store, { rawCode, lines, uid: customer?.uid ?? null, now: Date.now() });
+  if (!result.ok) return json({ ok: false, error: result.error }, 400);
+  const c = result.chosen;
+  return json({
+    ok: true,
+    subtotal,
+    chosen: c ? { source: c.source, code: c.code, offerId: c.offerId, discount: c.discount, label: c.label } : null,
+  });
 }

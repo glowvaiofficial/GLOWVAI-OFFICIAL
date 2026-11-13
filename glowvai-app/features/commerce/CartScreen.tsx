@@ -6,7 +6,7 @@ import { lineKeyOf } from '../../../lib/shop/variants';
 import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics';
 import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
-import { useEffect } from 'react';
+import { quoteBag } from './lib/bagQuote';
 import { BillRows, CheckoutSteps, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
 
 type SkippedItem = { name: string; reason: string };
@@ -45,49 +45,16 @@ export const CartScreen: React.FC = () => {
   const clearCart = useCartStore((s) => s.clearCart);
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const setCouponCode = useCheckoutSession((s) => s.setCouponCode);
-  const couponQuote = useCheckoutSession((s) => s.couponQuote);
-  const setCouponQuote = useCheckoutSession((s) => s.setCouponQuote);
+  const bagQuote = useCheckoutSession((s) => s.bagQuote);
+  const setBagQuote = useCheckoutSession((s) => s.setBagQuote);
   const address = useDeliveryAddress();
   const [codeInput, setCodeInput] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
 
   const cartItems = Object.values(items);
-  const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress, couponQuote && couponQuote.code === couponCode ? couponQuote.discount : null);
 
-  // Asks the server what an admin offer code takes off this bag. The bag is sent as product and variant ids only.
-  const quoteOffer = async (code: string): Promise<{ ok: true; discount: number; label: string } | { ok: false; error: string }> => {
-    try {
-      const res = await fetch('/api/shop/offers/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ code, lines: cartItems.map((i) => ({ productId: i.productId, variantId: i.variantId ?? null, quantity: i.quantity })) }),
-      });
-      const data = await res.json().catch(() => null);
-      if (res.ok && data?.ok) return { ok: true, discount: Number(data.discount) || 0, label: String(data.label || '') };
-      return { ok: false, error: String(data?.error || 'That code is not valid.') };
-    } catch {
-      return { ok: false, error: 'We could not check that code. Try again.' };
-    }
-  };
-
-  // Keeps an offer discount in line with the bag: when the bag changes, the offer is checked again.
-  const bagKey = JSON.stringify(cartItems.map((i) => [i.productId, i.variantId ?? null, i.quantity]));
-  useEffect(() => {
-    if (!couponCode || normaliseCoupon(couponCode)) return;
-    let alive = true;
-    quoteOffer(couponCode).then((r) => {
-      if (!alive) return;
-      if (r.ok) setCouponQuote({ code: couponCode, discount: r.discount, label: r.label });
-      else {
-        setCouponCode(null);
-        showToast(r.error);
-      }
-    });
-    return () => { alive = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bagKey, couponCode]);
+  const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress, bagQuote);
 
   const applyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,14 +72,15 @@ export const CartScreen: React.FC = () => {
       showToast(`${builtIn} applied`);
       return;
     }
+    // An offer code is checked with the server before it is applied, so a wrong code is refused here, not at payment.
     const code = raw.toUpperCase();
-    const r = await quoteOffer(code);
+    const r = await quoteBag(code, cartItems);
     if (!r.ok) {
       setCodeError(r.error);
       return;
     }
+    setBagQuote(r.bag);
     setCouponCode(code);
-    setCouponQuote({ code, discount: r.discount, label: r.label });
     setCodeInput('');
     setCodeError(null);
     showToast(`${code} applied`);
@@ -249,6 +217,9 @@ export const CartScreen: React.FC = () => {
 
         <aside className="commerce-aside">
           <section className="commerce-card commerce-coupon" aria-label="Coupon">
+            {totals.offerLabel && totals.couponDiscount > 0 && (
+              <p className="commerce-offer-note" role="status"><Tag size={14} /> Offer applied: {totals.offerLabel} You save ₹{totals.couponDiscount}</p>
+            )}
             {totals.couponCode ? (
               <div className="commerce-coupon-applied">
                 <Tag size={18} />

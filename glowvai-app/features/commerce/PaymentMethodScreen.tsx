@@ -18,7 +18,7 @@ export const PaymentMethodScreen: React.FC = () => {
   const { navigate, goBack, customerDetails } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
-  const couponQuote = useCheckoutSession((s) => s.couponQuote);
+  const bagQuote = useCheckoutSession((s) => s.bagQuote);
   const address = useDeliveryAddress();
   const addressConfirmed = useCheckoutSession((s) => s.addressConfirmed);
   const payMethod = useCheckoutSession((s) => s.payMethod);
@@ -62,7 +62,7 @@ export const PaymentMethodScreen: React.FC = () => {
     );
   }
 
-  const totals = computeCartTotals(cartItems, couponCode, address.fullAddress, couponQuote && couponQuote.code === couponCode ? couponQuote.discount : null);
+  const totals = computeCartTotals(cartItems, couponCode, address.fullAddress, bagQuote);
   const online = payMethod === 'online';
   const payable = totals.grandTotal + tip;
   const displayAddress = formatAddressForDisplay(address.fullAddress);

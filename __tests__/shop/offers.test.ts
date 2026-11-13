@@ -4,7 +4,7 @@ import { evaluateOffer, normalizeCode, offerSentence, readOffer, type Offer, typ
 
 const NOW = 1_800_000_000_000;
 const base = (over: Partial<Offer> = {}): Offer => ({
-  id: "o1", code: "GLOW20", name: "Glow 20", type: "percent", value: 20, maxDiscount: 200, minSubtotal: 699,
+  id: "o1", code: "GLOW20", automatic: false, name: "Glow 20", type: "percent", value: 20, maxDiscount: 200, minSubtotal: 699,
   category: null, startsAt: null, endsAt: null, enabled: true, perCustomerLimit: 1, totalLimit: null, ...over,
 });
 const lines = (total: number, category = "Serums"): OfferLine[] => [{ productId: "p1", category, total }];
@@ -56,4 +56,28 @@ test("stored offers are read strictly", () => {
   assert.equal(readOffer("o1", { code: "GLOW20", name: "x", type: "percent", value: 80, maxDiscount: 200, minSubtotal: 0, category: null, enabled: true }), null);
   assert.equal(readOffer("o1", { code: "GLOW20", name: "x", type: "flat", value: 50, maxDiscount: 10, minSubtotal: 0, category: null, enabled: true }), null);
   assert.equal(readOffer("o1", { code: "GLOW20", name: "x", type: "flat", value: 50, minSubtotal: 0, category: null, enabled: true, startsAt: 5, endsAt: 4 }), null);
+});
+
+import { chooseBest, type BagCandidate } from "@/lib/shop/offers";
+
+const cand = (source: BagCandidate["source"], discount: number): BagCandidate => ({ source, code: source === "auto" ? null : "X", offerId: source === "auto" ? "a" : null, discount, label: "" });
+
+test("the largest discount wins across built-in, typed and automatic offers", () => {
+  assert.equal(chooseBest([cand("builtin", 50), cand("auto", 120), cand("code", 80)])?.source, "auto");
+  assert.equal(chooseBest([cand("builtin", 50), cand("code", 80)])?.source, "code");
+});
+
+test("a tie goes to the code the customer chose, not to an automatic offer", () => {
+  assert.equal(chooseBest([cand("auto", 60), cand("code", 60)])?.source, "code");
+});
+
+test("no positive discount means no offer", () => {
+  assert.equal(chooseBest([cand("auto", 0)]), null);
+  assert.equal(chooseBest([]), null);
+});
+
+test("an automatic offer needs no code, and a code offer needs one", () => {
+  assert.ok(readOffer("a1", { automatic: true, name: "Cart deal", type: "flat", value: 100, minSubtotal: 500, category: null, enabled: true }));
+  assert.equal(readOffer("a1", { automatic: true, code: "SHOULDNOT", name: "Cart deal", type: "flat", value: 100, minSubtotal: 500, category: null, enabled: true }), null);
+  assert.equal(readOffer("c1", { automatic: false, name: "Typed", type: "flat", value: 100, minSubtotal: 0, category: null, enabled: true }), null);
 });
