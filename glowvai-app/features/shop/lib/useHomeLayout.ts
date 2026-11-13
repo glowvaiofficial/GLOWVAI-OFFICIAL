@@ -12,11 +12,13 @@ export const DEFAULT_BLOCK_ORDER: HomeBlockId[] = [
 
 export interface BlockItem { label: string; sub: string; link: string }
 export interface BlockSettings { title: string; background: string; textColor: string; items: BlockItem[] }
-export interface HomeLayoutView { order: HomeBlockId[]; settings: Partial<Record<HomeBlockId, BlockSettings>> }
+export interface ProductRowView { title: string; source: 'category' | 'brand' | 'bestsellers' | 'new'; value: string; limit: number }
+export interface HomeLayoutView { order: HomeBlockId[]; settings: Partial<Record<HomeBlockId, BlockSettings>>; rows: ProductRowView[] }
 
 export function useHomeLayout(): HomeLayoutView {
   const [order, setOrder] = useState<HomeBlockId[]>(DEFAULT_BLOCK_ORDER);
   const [settings, setSettings] = useState<Partial<Record<HomeBlockId, BlockSettings>>>({});
+  const [rows, setRows] = useState<ProductRowView[]>([]);
   useEffect(() => {
     let alive = true;
     let token: string | null = null;
@@ -32,6 +34,7 @@ export function useHomeLayout(): HomeLayoutView {
         if (!alive || !data) return;
         if (Array.isArray(data.blocks)) setOrder(data.blocks as HomeBlockId[]);
         if (data.settings && typeof data.settings === 'object') setSettings(data.settings as Partial<Record<HomeBlockId, BlockSettings>>);
+        if (Array.isArray(data.rows)) setRows(data.rows as ProductRowView[]);
       })
       .catch(() => {
         // The built-in order stays.
@@ -40,5 +43,5 @@ export function useHomeLayout(): HomeLayoutView {
       alive = false;
     };
   }, []);
-  return { order, settings };
+  return { order, settings, rows };
 }

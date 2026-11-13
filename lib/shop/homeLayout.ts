@@ -116,3 +116,38 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
   }
   return out;
 }
+
+// ---- Configurable product rows (the product-rails block). The admin sets them; the shop checks them again here.
+export const ROW_SOURCES = ["category", "brand", "bestsellers", "new"] as const;
+export type RowSource = (typeof ROW_SOURCES)[number];
+
+export interface ProductRow {
+  title: string;
+  source: RowSource;
+  value: string;
+  limit: number;
+}
+
+export const ROW_LIMITS = { maxRows: 6, minLimit: 4, maxLimit: 12, minProducts: 4 } as const;
+
+function readRow(raw: unknown): ProductRow | null {
+  if (!raw || typeof raw !== "object") return null;
+  const d = raw as Record<string, unknown>;
+  const title = typeof d.title === "string" && d.title.trim().length > 0 && d.title.length <= 40 ? d.title : null;
+  const source = (ROW_SOURCES as readonly string[]).includes(d.source as string) ? (d.source as RowSource) : null;
+  const needsValue = source === "category" || source === "brand";
+  const value = typeof d.value === "string" ? d.value : null;
+  const limit = typeof d.limit === "number" && Number.isInteger(d.limit) && d.limit >= ROW_LIMITS.minLimit && d.limit <= ROW_LIMITS.maxLimit ? d.limit : null;
+  if (!title || !source || value === null || limit === null) return null;
+  if (needsValue && (value.trim().length === 0 || value.length > 60)) return null;
+  if (!needsValue && value !== "") return null;
+  return { title, source, value: needsValue ? value.trim() : "", limit };
+}
+
+// The rows set on the product-rails block, in order. Empty when none are set: the shop then shows its default rows.
+export function readProductRows(raw: unknown): ProductRow[] {
+  const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
+  const block = blocks.find((b) => b && typeof b === "object" && (b as { id?: unknown }).id === "product-rails") as { enabled?: unknown; settings?: { rows?: unknown } } | undefined;
+  if (!block || block.enabled !== true || !block.settings || !Array.isArray(block.settings.rows)) return [];
+  return block.settings.rows.slice(0, ROW_LIMITS.maxRows).map(readRow).filter((r): r is ProductRow => r !== null);
+}

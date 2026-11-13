@@ -327,6 +327,17 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     return dedupeRails(candidates);
   }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
 
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows } = useHomeLayout();
+  // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
+  const configuredRows = useMemo(() => {
+    const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
+    layoutRows.forEach((r, i) => {
+      const pool = r.source === 'category' ? catalog.filter((p) => p.category === r.value) : r.source === 'brand' ? catalog.filter((p) => p.brand === r.value) : r.source === 'bestsellers' ? lists.TOP_RATED : [...catalog].reverse();
+      if (pool.length >= 4) out.push({ id: 'row-' + i, title: r.title, products: pool.slice(0, r.limit) });
+    });
+    return out;
+  }, [layoutRows, catalog, lists]);
+
   const navigate = useHomeNavigate();
   const { setShoppingPreference, shoppingPreference, currentAddress } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
@@ -345,7 +356,6 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     }
   };
 
-  const { order: layoutOrder, settings: blockSettings } = useHomeLayout();
   const socials = configuredSocials(siteConfig.socials);
 
   // Each homepage block. The order comes from the admin layout (useHomeLayout); the code of each block is unchanged.
@@ -523,7 +533,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         <>
           {loading && skinState.recommendationsOn && <SkeletonRail title="Picked for your skin" />}
           {loading && recentIds.length > 0 && <SkeletonRail title="Continue browsing" />}
-          {rails.map((rail) => (
+          {(configuredRows.length > 0 ? configuredRows : rails).map((rail) => (
             <ProductRail key={rail.id} title={rail.title} products={rail.products} />
           ))}
           {loading && <SkeletonRail title="Top Rated" />}
