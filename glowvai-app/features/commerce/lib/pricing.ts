@@ -29,14 +29,17 @@ export interface CartTotals {
 }
 
 // area is the delivery address text; the fee for an area is matched inside it (AREA_DELIVERY_FEES).
-export const computeCartTotals = (items: CartItem[], couponCode: string | null, area = ''): CartTotals => {
+export const computeCartTotals = (items: CartItem[], couponCode: string | null, area = '', quoteDiscount: number | null = null): CartTotals => {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   // Falls back to the selling price when no MRP is stored, so no savings are invented.
   const itemTotal = items.reduce((sum, item) => sum + Math.max(item.mrp ?? item.price, item.price) * item.quantity, 0);
   const discountedTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const catalogSavings = itemTotal - discountedTotal;
-  const code = normaliseCoupon(couponCode);
-  const couponDiscount = code ? Math.min(couponValue(code), discountedTotal) : 0;
+  const builtIn = normaliseCoupon(couponCode);
+  // An admin offer code uses the server's figure (quoteDiscount), never a number from this phone.
+  const offerCode = !builtIn && couponCode && quoteDiscount !== null ? couponCode.trim().toUpperCase() : null;
+  const code = builtIn ?? offerCode;
+  const couponDiscount = builtIn ? Math.min(couponValue(builtIn), discountedTotal) : offerCode ? Math.min(quoteDiscount ?? 0, discountedTotal) : 0;
   const isFreeDelivery = discountedTotal > FREE_DELIVERY_ABOVE;
   const deliveryFee = items.length === 0 ? 0 : deliveryFeeFor({ itemTotal: discountedTotal, area });
   const grandTotal = Math.max(0, discountedTotal - couponDiscount + deliveryFee);

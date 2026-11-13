@@ -30,13 +30,14 @@ const STEPS: Record<PayMethod, string[]> = {
 export const PaymentProcessingScreen: React.FC = () => {
   const { navigate, showToast, customerDetails, activeParams } = useApp();
   const couponCode = useCheckoutSession((s) => s.couponCode);
+  const couponQuote = useCheckoutSession((s) => s.couponQuote);
   const payMethod = useCheckoutSession((s) => s.payMethod);
   const tip = useCheckoutSession((s) => s.tip);
   const address = useDeliveryAddress();
   const customer = useCustomer();
   const method = parsePayMethod(payMethod);
   const [step, setStep] = useState(0);
-  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress).grandTotal + tip);
+  const [amount] = useState(() => computeCartTotals(Object.values(useCartStore.getState().items), couponCode, address?.fullAddress, (() => { const q = useCheckoutSession.getState().couponQuote; return q && q.code === couponCode ? q.discount : null; })()).grandTotal + tip);
   const started = useRef(false);
   const steps = STEPS[method ?? 'cod'];
 
