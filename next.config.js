@@ -34,12 +34,12 @@ const withMaps = (csp) =>
 
 const shopCsp = withMaps([
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${devEval} 'wasm-unsafe-eval' https://www.googletagmanager.com https://checkout.razorpay.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
+  `script-src 'self' 'unsafe-inline'${devEval} 'wasm-unsafe-eval' https://www.googletagmanager.com https://checkout.razorpay.com https://apis.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://*.googleusercontent.com https://www.google-analytics.com https://www.googletagmanager.com https://*.gstatic.com https://*.nykaa.com https://*.cureka.com https://*.apollo247.in https://*.gumlet.io https://thedermaco.com https://beminimalist.co https://*.speedsize.com https://m.media-amazon.com https://cdn.shopify.com https://*.ppl-media.com https://rukminim2.flixcart.com https://*.flixcart.com",
   "font-src 'self' data:",
   `connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.google.com/recaptcha/ https://glowvai-backend-r7u2.onrender.com https://api.razorpay.com https://lumberjack.razorpay.com https://script.google.com https://script.googleusercontent.com https://nominatim.openstreetmap.org https://api.bigdatacloud.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com${devConnect}`,
-  "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+  "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://*.firebaseapp.com https://apis.google.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
   "worker-src 'self' blob:",
   "media-src 'self' blob:",
   "object-src 'none'",
