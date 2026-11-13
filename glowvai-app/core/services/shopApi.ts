@@ -1,6 +1,7 @@
 // Typed calls to the shop's own server routes. The server checks who the customer is (Firebase ID token), prices
 // orders from the published catalogue and writes in the shape the GlowVai admin panel reads.
 import { apiFetch, type ApiResult } from './customerSession';
+import { auth } from '../config/firebase';
 
 export interface ShopProfileAddress {
   fullAddress: string;
@@ -339,6 +340,15 @@ export async function deleteAddress(id: string): Promise<ApiResult<{ addresses: 
 // Delivery times offered right now (server clock, IST). A chosen slot is checked again when the order is placed.
 export async function fetchDeliverySlots(): Promise<ApiResult<{ shopOpen: boolean; slots: DeliverySlotView[]; serverTime: number }>> {
   return apiFetch('/api/shop/slots');
+}
+
+// Buy it again rail: products from the customer's recent orders. Only asked for a customer who is already signed in on this
+// device, so a visitor with no session does not get one created just by opening the home page.
+export interface ReorderRailItem { productId: string; name: string; price: number; image: string }
+export async function fetchReorderItems(): Promise<ApiResult<{ items: ReorderRailItem[] }>> {
+  if (typeof auth?.authStateReady === 'function') await auth.authStateReady();
+  if (!auth?.currentUser) return { ok: false, status: 401, data: null, error: 'Not signed in' };
+  return apiFetch('/api/shop/reorder-items');
 }
 
 // Buy it again: what can be bought now (live price and stock) and what cannot, for one of the customer's orders.

@@ -3,7 +3,7 @@ import { customerFrom, db, json, limitByIp, limitByIpShared, limitByUser, limitB
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
 import { parseOrderRequest } from "@/lib/shop/orderRequest";
-import { compareNewestFirst, decodeOrderCursor, parseOrderFilter, parsePageLimit, toneOfStatus } from "@/lib/shop/orderHistory";
+import { compareNewestFirst, customerStatus, decodeOrderCursor, parseOrderFilter, parsePageLimit, toneOfStatus } from "@/lib/shop/orderHistory";
 import { listCustomerOrderPage, type OrderPagingPort, type StoredOrderRow } from "@/lib/shop/orderPaging";
 import { FieldPath, type DocumentData } from "firebase-admin/firestore";
 import { RETURN_COLLECTION } from "@/lib/shop/returns";
@@ -15,14 +15,6 @@ import { AFFILIATE_CONFIG } from "@/lib/shop/affiliate/config";
 import { affiliateCodeForOrder } from "@/lib/shop/affiliate/store";
 
 export const dynamic = "force-dynamic";
-
-// Customer-facing status from the shop status, with any admin decision (saved in admin_orders) applied on top.
-function customerStatus(shopStatus: string, overlay: Record<string, unknown> | undefined): string {
-  const fulfilment = String(overlay?.fulfilment ?? "");
-  if (fulfilment === "CANCELLED") return "CANCELLED";
-  if (fulfilment === "DELIVERED") return "DELIVERED";
-  return shopStatus || "PLACED";
-}
 
 // The signed-in customer's orders, newest first, with any admin decision applied.
 // Without paging parameters this returns the most recent orders held (at most 100), as before.

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShieldCheck, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
@@ -13,7 +13,9 @@ import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
 import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
-import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
+import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
+import { fetchReorderItems } from '../../../core/services/shopApi';
+import { pickDeals } from '../../../../lib/shop/homeLayout';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
@@ -156,6 +158,31 @@ function ProductRail({ title, products }: { title: string; products: SkincarePro
       ))}
     </Rail>
   );
+}
+
+// "Buy it again": the customer's recent products, from the live catalogue. Shows nothing when the customer is not signed in,
+// has no orders, or the request fails.
+function ReorderRail({ catalog }: { catalog: SkincareProduct[] }) {
+  const [ids, setIds] = useState<string[]>([]);
+  useEffect(() => {
+    let alive = true;
+    fetchReorderItems()
+      .then((res) => {
+        if (alive && res.ok && res.data) setIds(res.data.items.map((i) => i.productId));
+      })
+      .catch(() => {
+        // Nothing is shown.
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const products = useMemo(() => {
+    const byId = new Map(catalog.map((p) => [p.id, p] as const));
+    return ids.map((id) => byId.get(id)).filter((p): p is SkincareProduct => p !== undefined);
+  }, [ids, catalog]);
+  if (products.length === 0) return null;
+  return <ProductRail title="Buy it again" products={products} />;
 }
 
 function SkeletonRail({ title }: { title: string }) {
@@ -356,6 +383,11 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     return out;
   }, [layoutRows, catalog, lists]);
 
+  // The deals the admin chose, in the admin's order (published products only). None chosen: the built-in deals.
+  const adminDeals = blockSettings['deals']?.items ?? [];
+  const adminDealProducts = useMemo(() => pickDeals(adminDeals, catalog), [adminDeals, catalog]);
+  const dealProducts = adminDeals.length > 0 ? adminDealProducts : lists.DEAL_PRODUCTS;
+
   const navigate = useHomeNavigate();
   const { setShoppingPreference, shoppingPreference, currentAddress } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
@@ -504,7 +536,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           <div className="shop-home-section-head">
             <div className="shop-home-section-titles">
               <h2 id="shop-home-deals-title">Deals</h2>
-              <p>Products priced below their listed MRP</p>
+              <p>{adminDeals.length > 0 ? 'Picked by GlowVAI' : 'Products priced below their listed MRP'}</p>
             </div>
             <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
               View all
@@ -515,9 +547,9 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
             <div className="shop-home-deals" aria-busy="true" aria-hidden="true">
               {skeletonCards(4, true)}
             </div>
-          ) : lists.DEAL_PRODUCTS.length > 0 ? (
+          ) : dealProducts.length > 0 ? (
             <div className="shop-home-deals">
-              {lists.DEAL_PRODUCTS.map((product) => (
+              {dealProducts.map((product) => (
                 <DealCard key={product.id} product={product} />
               ))}
             </div>
@@ -534,7 +566,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     case 'reorder':
       return (
         <>
-      <ReorderPlaceholder />
+      <ReorderRail catalog={catalog} />
         </>
       );
     case 'product-rails':
