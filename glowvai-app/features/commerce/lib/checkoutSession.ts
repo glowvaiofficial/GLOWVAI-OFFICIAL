@@ -3,10 +3,12 @@ import type { SubstitutionPreference } from '../../../core/services/shopTracking
 
 // What the server says the bag is taken off. code is null for an automatic offer.
 export interface BagQuote {
-  source: 'builtin' | 'code' | 'auto';
+  source: 'builtin' | 'code' | 'auto' | null;
   code: string | null;
   discount: number;
   label: string;
+  // What active flash sales take off the bag, from the server (0 when none).
+  flashSavings: number;
 }
 
 export type PayChoice = 'gpay' | 'phonepe' | 'paytm' | 'bhim' | 'card' | 'cod';

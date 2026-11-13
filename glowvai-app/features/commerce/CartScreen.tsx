@@ -217,6 +217,9 @@ export const CartScreen: React.FC = () => {
 
         <aside className="commerce-aside">
           <section className="commerce-card commerce-coupon" aria-label="Coupon">
+            {totals.flashSavings > 0 && (
+              <p className="commerce-offer-note" role="status"><Tag size={14} /> Flash sale: you save ₹{totals.flashSavings}</p>
+            )}
             {totals.offerLabel && totals.couponDiscount > 0 && (
               <p className="commerce-offer-note" role="status"><Tag size={14} /> Offer applied: {totals.offerLabel} You save ₹{totals.couponDiscount}</p>
             )}

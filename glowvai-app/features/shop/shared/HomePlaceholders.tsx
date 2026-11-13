@@ -163,3 +163,69 @@ export function HelpGiftPlaceholder({ settings }: { settings?: BlockSettings }) 
     </section>
   );
 }
+
+// Live flash sales: each sale with a countdown, the units left and the sale price per product. Shows nothing when no
+// sale is running, so the page only carries a sale while it is on.
+type FlashSaleView = {
+  id: string;
+  name: string;
+  endsAt: number;
+  discountPercent: number;
+  remaining: number | null;
+  items: { productId: string; name: string; price: number; salePrice: number }[];
+};
+
+const countdown = (ms: number): string => {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = String(Math.floor(total / 3600)).padStart(2, '0');
+  const m = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+  const s = String(total % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+};
+
+export function FlashSaleStrip() {
+  const [sales, setSales] = useState<FlashSaleView[]>([]);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/shop/flash-sales', { credentials: 'same-origin', cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive && d && Array.isArray(d.sales)) setSales(d.sales as FlashSaleView[]);
+      })
+      .catch(() => {
+        // No sales shown when the list cannot be loaded.
+      });
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => {
+      alive = false;
+      window.clearInterval(id);
+    };
+  }, []);
+  const live = sales.filter((s) => s.endsAt > now);
+  if (live.length === 0) return null;
+  return (
+    <>
+      {live.map((s) => (
+        <section key={s.id} className="hp-section" aria-label={s.name}>
+          <div className="hp-head">
+            <h2 className="hp-title">{s.name}</h2>
+            <span className="hp-timer">Ends in {countdown(s.endsAt - now)}</span>
+          </div>
+          {s.remaining !== null && <p className="hp-sub" style={{ margin: '0 16px 8px' }}>{s.remaining} left at this price</p>}
+          <div className="hp-grid is-three">
+            {s.items.map((i) => (
+              <div key={i.productId} className="hp-card" style={{ background: '#fff', borderStyle: 'solid' }}>
+                <span className="hp-tag">{s.discountPercent}% off</span>
+                <strong>{i.name}</strong>
+                <span>
+                  <b style={{ color: 'var(--ds-ink)' }}>₹{i.salePrice}</b> <s>₹{i.price}</s>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}

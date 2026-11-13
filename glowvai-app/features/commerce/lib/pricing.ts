@@ -23,6 +23,8 @@ export interface CartTotals {
   couponDiscount: number;
   // The plain-words line for an automatic offer (no code), or null.
   offerLabel: string | null;
+  // The saving from flash sales on this bag, or 0.
+  flashSavings: number;
   deliveryFee: number;
   isFreeDelivery: boolean;
   amountNeededForFreeDelivery: number;
@@ -40,13 +42,15 @@ export const computeCartTotals = (items: CartItem[], couponCode: string | null, 
   const catalogSavings = itemTotal - discountedTotal;
   // With the server's answer, its discount is used (it may be an automatic offer). Before the answer arrives, a built-in
   // code shows its fixed value; an offer code shows nothing until the server has checked it.
+  // The server's answer (bag) already has the best discount and the flash sale saving, so its figures are used as they are.
   const builtIn = normaliseCoupon(couponCode);
   const code = bag ? bag.code : builtIn;
   const couponDiscount = bag ? Math.min(bag.discount, discountedTotal) : builtIn ? Math.min(couponValue(builtIn), discountedTotal) : 0;
-  const offerLabel = bag && !bag.code ? bag.label : null;
+  const flashSavings = bag ? Math.min(bag.flashSavings, discountedTotal) : 0;
+  const offerLabel = bag && !bag.code && couponDiscount > 0 ? bag.label : null;
   const isFreeDelivery = discountedTotal > FREE_DELIVERY_ABOVE;
   const deliveryFee = items.length === 0 ? 0 : deliveryFeeFor({ itemTotal: discountedTotal, area });
-  const grandTotal = Math.max(0, discountedTotal - couponDiscount + deliveryFee);
+  const grandTotal = Math.max(0, discountedTotal - couponDiscount - flashSavings + deliveryFee);
 
   return {
     itemCount,
@@ -56,12 +60,13 @@ export const computeCartTotals = (items: CartItem[], couponCode: string | null, 
     couponCode: code,
     couponDiscount,
     offerLabel,
+    flashSavings,
     deliveryFee,
     isFreeDelivery,
     // "Above ₹499" means the item total has to reach ₹500.
     amountNeededForFreeDelivery: isFreeDelivery ? 0 : FREE_DELIVERY_ABOVE + 1 - discountedTotal,
     freeDeliveryProgress: Math.min(1, discountedTotal / (FREE_DELIVERY_ABOVE + 1)),
     grandTotal,
-    totalSavings: catalogSavings + couponDiscount,
+    totalSavings: catalogSavings + couponDiscount + flashSavings,
   };
 };

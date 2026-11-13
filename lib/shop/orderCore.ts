@@ -20,6 +20,7 @@ import { wrapTx, firestoreRepo } from "./growth/firestoreRepo";
 import { razorpayKeyId } from "./razorpay";
 import type { OfferLine } from "./offers";
 import { resolveBag } from "./offerResolve";
+import { applyFlashSales } from "./flashPricing";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 export class OrderBlocked extends Error {
@@ -113,6 +114,15 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
   const pre = planOrderStock(lines, snapshotStock);
   if (!pre.ok) return fail(409, "OUT_OF_STOCK", pre.message);
 
+  // Flash sales: units inside a live sale (and the sale limit) get the sale price; the rest keep their price.
+  const flashed = await applyFlashSales(store, items.map((it) => ({ productId: String(it.productId), quantity: Number(it.quantity), unitPrice: Number(it.unitPrice), totalPrice: Number(it.totalPrice) })), input.uid, now);
+  flashed.forEach((f, i) => {
+    items[i].totalPrice = f.totalPrice;
+    items[i].flashSaleId = f.flashSaleId;
+    items[i].flashUnits = f.flashUnits;
+    items[i].flashUnitPrice = f.flashUnitPrice;
+  });
+  const flashSaleIds = [...new Set(flashed.map((f) => f.flashSaleId).filter((x): x is string => x !== null))];
   const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
   // Coupons and automatic offers: one rule set (lib/shop/offerResolve.ts), the largest discount wins.
   const categoryById = new Map(productSnaps.map((s) => [s.id, String((s.data() as { category?: unknown } | undefined)?.category ?? "")]));
@@ -169,6 +179,7 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     vendorStatus: "PENDING",
     zoneId: null,
     items,
+    flashSaleIds,
     deliverySlot: deliverySlot
       ? { id: deliverySlot.id, kind: deliverySlot.kind, day: deliverySlot.day, label: deliverySlot.label, estimate: deliverySlot.estimate, startsAt: deliverySlot.startsAt, endsAt: deliverySlot.endsAt }
       : null,

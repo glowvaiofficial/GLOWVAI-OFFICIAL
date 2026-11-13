@@ -4,7 +4,7 @@ import { useCheckoutSession, type BagQuote } from './checkoutSession';
 
 // Asks the server what this bag is taken off. The bag goes as product id, variant id and quantity only; the server works
 // out every price itself. The code is optional: with no code, automatic offers still apply.
-export type QuoteResult = { ok: true; bag: BagQuote | null; subtotal: number } | { ok: false; error: string };
+export type QuoteResult = { ok: true; bag: BagQuote; subtotal: number } | { ok: false; error: string };
 
 type CartLine = { productId: string; variantId?: string | null; quantity: number };
 
@@ -22,7 +22,13 @@ export async function quoteBag(code: string | null, lines: CartLine[]): Promise<
     const data = await res.json().catch(() => null);
     if (!res.ok || !data?.ok) return { ok: false, error: String(data?.error || 'We could not check the offers. Try again.') };
     const c = data.chosen as { source: BagQuote['source']; code: string | null; discount: number; label: string } | null;
-    const bag: BagQuote | null = c ? { source: c.source, code: c.code, discount: Number(c.discount) || 0, label: String(c.label || '') } : null;
+    const bag: BagQuote = {
+      source: c ? c.source : null,
+      code: c ? c.code : null,
+      discount: c ? Number(c.discount) || 0 : 0,
+      label: c ? String(c.label || '') : '',
+      flashSavings: Number(data.flashSavings) || 0,
+    };
     return { ok: true, bag, subtotal: Number(data.subtotal) || 0 };
   } catch {
     return { ok: false, error: 'We could not check the offers. Check your connection and try again.' };

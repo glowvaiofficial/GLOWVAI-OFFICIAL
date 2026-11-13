@@ -13,7 +13,7 @@ import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
 import { useHomeLayout, type HomeBlockId } from '../lib/useHomeLayout';
-import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
+import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
@@ -493,6 +493,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </section>
       )}
 
+      <FlashSaleStrip />
       <FlashDealsPlaceholder />
         </>
       );
