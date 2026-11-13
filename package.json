@@ -43,6 +43,7 @@
     "test:first-visit": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/first-visit/*.test.ts\"",
     "test:account-setup": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/account-setup/*.test.ts\"",
     "test:layout": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/layout/*.test.ts\"",
+    "test:ratelimit": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/ratelimit/*.test.ts\"",
     "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],

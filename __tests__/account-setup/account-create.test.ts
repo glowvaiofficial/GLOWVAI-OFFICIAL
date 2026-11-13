@@ -133,15 +133,15 @@ describe("rate limits for the create route", () => {
     assert.equal(ACCOUNT_LIMITS.windowMs, 60 * 60 * 1000);
   });
 
-  test("the route applies both limits from these constants", () => {
+  test("the route applies both limits through the shared limiter", () => {
     const source = read("app/api/shop/account/create/route.ts");
-    assert.match(source, /account-create:ip:.*ACCOUNT_LIMITS\.perIpPerHour, ACCOUNT_LIMITS\.windowMs/);
-    assert.match(source, /account-create:uid:.*ACCOUNT_LIMITS\.perUidPerHour, ACCOUNT_LIMITS\.windowMs/);
+    assert.match(source, /limitByIpShared\(req, "account-create", 10, HOUR/);
+    assert.match(source, /limitByUserShared\(checked\.uid, "account-create", 5, HOUR/);
   });
 
   test("the IP limit is checked before the token is verified", () => {
     const source = read("app/api/shop/account/create/route.ts");
-    assert.ok(source.indexOf("account-create:ip:") < source.indexOf("verifyIdToken"));
+    assert.ok(source.indexOf("limitByIpShared(req, \"account-create\"") < source.indexOf("verifyIdToken"));
   });
 });
 

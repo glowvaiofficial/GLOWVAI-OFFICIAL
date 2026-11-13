@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
 import { parseOrderRequest } from "@/lib/shop/orderRequest";
@@ -161,13 +161,12 @@ async function withReviewState<T extends { items: { productId: unknown }[]; orde
 // Places an order. The checks, pricing and transaction live in lib/shop/orderCore.ts (shared with the subscription cron).
 // Only cash on delivery is offered until online payment is connected; online orders need RAZORPAY_KEY_ID and secret.
 export async function POST(req: NextRequest) {
-  const ipLimited = limitByIp(req, "orders-post", 30);
+  const ipLimited = await limitByIpShared(req, "orders-post", 60, 60 * 60 * 1000, "Too many orders in a short time. Try again later.");
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
-  const userLimited = limitByUser(customer.uid, "orders", 60);
+  const userLimited = await limitByUserShared(customer.uid, "orders-post", 20, 60 * 60 * 1000, "Too many orders in a short time. Try again later.");
   if (userLimited) return userLimited;
-  if (tooMany(`order:${customer.uid}`, 10, 60 * 60 * 1000)) return json({ ok: false, error: "Too many orders in a short time. Try again later." }, 429);
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);

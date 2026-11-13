@@ -4,7 +4,7 @@
 // name only and answered with a generic message.
 import "server-only";
 import { NextResponse, type NextRequest } from "next/server";
-import { clientIp, tooMany } from "@/lib/shop/server";
+import { clientIp, overLimit } from "@/lib/shop/server";
 import { SITE_URL } from "@/lib/site-url";
 import { RiderError } from "./errors";
 import { riderFrom, type RiderPartner } from "./auth";
@@ -83,6 +83,8 @@ export interface RouteOptions {
   ip?: Limit;
   /** Per signed-in partner. */
   partner?: Limit;
+  /** Count ip and partner limits in the shared limiter (Upstash when configured). Off unless a route asks for it. */
+  shared?: boolean;
 }
 
 export function riderRoute<P extends Record<string, string> = Record<string, never>>(
@@ -96,12 +98,12 @@ export function riderRoute<P extends Record<string, string> = Record<string, nev
         if (!sameOrigin(req)) throw new RiderError("ORIGIN_BLOCKED", 403, "This request was blocked. Reload the page and try again.");
         if (!isJsonRequest(req)) throw new RiderError("CONTENT_TYPE", 415, "Send the request as JSON.");
       }
-      if (opts.ip && tooMany(`ip:rider-${opts.route}:${clientIp(req)}`, opts.ip.max, opts.ip.windowMs)) {
+      if (opts.ip && (await overLimit(`ip:rider-${opts.route}:${clientIp(req)}`, opts.ip.max, opts.ip.windowMs, opts.shared === true))) {
         throw new RiderError("RATE_LIMITED", 429, "Too many requests. Please wait a moment and try again.", Math.ceil(opts.ip.windowMs / 1000));
       }
       const partner = opts.auth ? await riderFrom(req) : null;
       if (opts.auth && !partner) throw new RiderError("UNAUTHENTICATED", 401, "Sign in to continue.");
-      if (partner && opts.partner && tooMany(`partner:rider-${opts.route}:${partner.id}`, opts.partner.max, opts.partner.windowMs)) {
+      if (partner && opts.partner && (await overLimit(`partner:rider-${opts.route}:${partner.id}`, opts.partner.max, opts.partner.windowMs, opts.shared === true))) {
         throw new RiderError("RATE_LIMITED", 429, "Too many requests. Please wait a moment and try again.", Math.ceil(opts.partner.windowMs / 1000));
       }
       const body = opts.write ? await readBody(req) : {};
