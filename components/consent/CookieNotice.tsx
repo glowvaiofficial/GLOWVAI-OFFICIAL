@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { captureUtmParameters } from "@/lib/analytics/utm";
+import { isCookieNoticeHidden } from "@/lib/consent/notice";
 
 /**
  * GLOW VAI Basic Consent Mode Banner.
@@ -70,7 +71,9 @@ export function CookieNotice() {
   };
 
   // The rider page is a work tool: the banner would cover the deliveries. Partners see it on other pages.
-  if (!showBanner || pathname?.startsWith("/rider")) return null;
+  // Rider and vendor pages never show the notice (see lib/consent/notice.ts). Their analytics
+  // follow the choice already saved on the shop, which GA4Script reads on mount.
+  if (!showBanner || isCookieNoticeHidden(pathname)) return null;
 
   return (
     <div
