@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, Check, Package, X, type LucideIcon } from 'lucide-react';
 import { useApp } from '../../context/useApp';
+import { ONBOARDING_SCREEN, SIGN_IN_SCREEN } from '../../features/auth/accountGate';
 import { startOrderNotifier } from './orderNotifier';
 import { useNotificationStore, type NotificationMessage } from './notificationStore';
 import type { MessageTone } from './orderEvents';
@@ -149,11 +150,18 @@ const OrderDialog: React.FC<{
 };
 
 export const OrderNotifications: React.FC = () => {
-  const { navigate } = useApp();
+  const { navigate, currentScreen } = useApp();
   const toasts = useNotificationStore((s) => s.toasts);
   const modal = useNotificationStore((s) => s.modals[0] ?? null);
+  // The welcome and sign-in screens never show order messages. Anything still queued is dropped there, so an old
+  // "Order placed" dialog cannot appear over the intro later.
+  const onWelcome = currentScreen === ONBOARDING_SCREEN || currentScreen === SIGN_IN_SCREEN || String(currentScreen).startsWith('auth-');
 
   useEffect(() => startOrderNotifier(), []);
+
+  useEffect(() => {
+    if (onWelcome) useNotificationStore.setState({ toasts: [], toastBacklog: [], modals: [] });
+  }, [onWelcome]);
 
   const openOrder = (message: NotificationMessage) => {
     if (message.variant === 'modal') useNotificationStore.getState().dismissModal(message.id);
@@ -174,7 +182,7 @@ export const OrderNotifications: React.FC = () => {
           ))}
         </div>
       )}
-      {modal && <OrderDialog key={modal.id} message={modal} onOpen={openOrder} onClose={closeModal} />}
+      {modal && !onWelcome && <OrderDialog key={modal.id} message={modal} onOpen={openOrder} onClose={closeModal} />}
     </>
   );
 };
