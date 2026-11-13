@@ -124,6 +124,33 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
   return out;
 }
 
+// ---- The hero block (the first section of the home). Each field is optional: "" keeps the built-in content.
+export interface HeroOverride {
+  title: string;
+  subtitle: string;
+  ctaLabel: string;
+  ctaLink: string;
+  image: string;
+}
+
+const shortText = (v: unknown, max: number): string => (typeof v === "string" && v.length <= max ? v.trim() : "");
+
+// The hero content the admin set, or null when no field is set (the built-in hero shows). A bad field is dropped alone.
+export function readHeroOverride(raw: unknown): HeroOverride | null {
+  const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
+  const block = blocks.slice(0, 40).find((b) => b && typeof b === "object" && (b as { id?: unknown }).id === "hero") as { settings?: unknown } | undefined;
+  const s = block && block.settings && typeof block.settings === "object" ? (block.settings as Record<string, unknown>) : null;
+  if (!s) return null;
+  const hero: HeroOverride = {
+    title: shortText(s.title, 80),
+    subtitle: shortText(s.subtitle, 160),
+    ctaLabel: shortText(s.ctaLabel, 30),
+    ctaLink: typeof s.ctaLink === "string" && isSafeInternal(s.ctaLink) ? s.ctaLink : "",
+    image: readImage(s.image),
+  };
+  return Object.values(hero).some((v) => v !== "") ? hero : null;
+}
+
 // ---- Configurable product rows (the product-rails block). The admin sets them; the shop checks them again here.
 export const ROW_SOURCES = ["category", "brand", "bestsellers", "new"] as const;
 export type RowSource = (typeof ROW_SOURCES)[number];

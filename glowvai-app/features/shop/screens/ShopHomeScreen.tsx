@@ -327,7 +327,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     return dedupeRails(candidates);
   }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
 
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows } = useHomeLayout();
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride } = useHomeLayout();
   // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
   const configuredRows = useMemo(() => {
     const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
@@ -365,16 +365,16 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
       return (
         <>
       <section className="shop-home-showcase">
-        <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" width={1891} height={831} fetchPriority="high" decoding="async" />
+        <img src={heroOverride?.image || HERO_IMAGE} alt={heroOverride?.image && heroOverride.title ? heroOverride.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
         <div className="shop-home-showcase-copy">
           <p className="shop-home-showcase-tag">Discover. Shop. Glow.</p>
-          <h1>Glow your way.</h1>
+          <h1>{heroOverride?.title || 'Glow your way.'}</h1>
           <p className="shop-home-showcase-sub">
-            {deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.'}
+            {heroOverride?.subtitle || (deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.')}
           </p>
           <div className="shop-home-showcase-actions">
-            <button type="button" className="shop-home-btn-dark" onClick={() => navigate('shop-browse')}>
-              Shop now
+            <button type="button" className="shop-home-btn-dark" onClick={() => (heroOverride?.ctaLink ? window.location.assign(heroOverride.ctaLink) : navigate('shop-browse'))}>
+              {heroOverride?.ctaLabel || 'Shop now'}
               <ArrowRight size={16} />
             </button>
             <button type="button" className="shop-home-btn-light" onClick={() => navigate('scan-camera')}>
