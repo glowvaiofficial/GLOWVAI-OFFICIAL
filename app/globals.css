@@ -201,3 +201,78 @@
   [role="progressbar"] > div { background: Highlight; forced-color-adjust: none; }
   a, button { forced-color-adjust: auto; }
 }
+
+/* ------------------------------------------------------------------
+   Page layout: one gutter, one max width, nothing wider than the screen.
+   Phone 16px, tablet 24px, desktop 32px; content stops at 1200px.
+   ------------------------------------------------------------------ */
+:root {
+  --gv-gutter: 16px;
+  --gv-max: 1200px;
+  --gv-sticky-cta: 72px;
+}
+@media (min-width: 720px) {
+  :root { --gv-gutter: 24px; }
+}
+@media (min-width: 1024px) {
+  :root { --gv-gutter: 32px; }
+}
+
+@layer utilities {
+  /* A page column: the shared gutter on both sides, centred, never wider than --gv-max. */
+  .gv-page {
+    width: 100%;
+    max-width: var(--gv-max);
+    margin-inline: auto;
+    padding-inline: var(--gv-gutter);
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  /* Keeps the last content above a fixed bottom bar (the phone sticky CTA). */
+  .gv-clear-sticky-cta {
+    padding-bottom: calc(var(--gv-sticky-cta) + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 768px) {
+    .gv-clear-sticky-cta { padding-bottom: 0; }
+  }
+  /* A table that is wider than its panel scrolls inside the panel, never the page. */
+  .gv-table-scroll {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Every element sizes from its border box, and flex or grid children may shrink below their content width. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+img, video, canvas, svg, iframe {
+  max-width: 100%;
+}
+img, video {
+  height: auto;
+}
+table {
+  max-width: 100%;
+}
+[class*="grid"] > *, [class*="flex"] > * {
+  min-width: 0;
+}
+
+/* Phones: text fields are 16px or larger, so iOS does not zoom the page when a field is focused. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  /* Buttons and links that act as buttons are at least 44px high to touch. */
+  button,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+  }
+}

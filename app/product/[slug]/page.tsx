@@ -1,10 +1,14 @@
 import React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Section, SectionTitle, focusRing } from "@/components/home/shared";
 import { ProductBuyBox } from "@/components/product/ProductBuyBox";
-import { getProducts, getProductBySlug, getRelatedProducts, computeDiscountPercent } from "@/lib/catalog";
+import { getProducts, getProductBySlug, getProduct, getRelatedProducts, computeDiscountPercent } from "@/lib/catalog";
+import { buildProductShareMetadata } from "@/lib/shop/productShareMeta";
+import { loadPublishedProductForShare } from "@/lib/shop/liveProductShare";
+import { LiveProductShare } from "./LiveProductShare";
 import { formatPrice, getAssetPath } from "@/lib/utils";
 import { BRAND_NAME, siteConfig } from "@/config/site";
 import { CheckCircle2, ScanLine } from "lucide-react";
@@ -20,42 +24,50 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: ProductPageProps) {
+// A static catalog product, by its slug or (for old links) its id.
+function resolveStaticProduct(key: string) {
+  return getProductBySlug(key) ?? getProduct(key);
+}
+
+// Live products come from Firestore. A failed read shows the page without its own picture rather than a broken page.
+const LIVE_KEY_RE = /^[A-Za-z0-9_-]{1,140}$/;
+async function loadLiveProductOrNull(key: string) {
+  if (!LIVE_KEY_RE.test(key)) return null;
+  try {
+    return await loadPublishedProductForShare(key);
+  } catch (error) {
+    console.error("product share page: live product read failed", error);
+    return null;
+  }
+}
+
+const absoluteImage = (src: string | undefined) => (src ? (/^https?:\/\//.test(src) ? src : getAbsoluteUrl(src)) : null);
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
-  if (!product) return {};
-
-  const titleClean = (product.seo.title || product.name).replace(/\s*\|\s*GLOW VAI/gi, "");
-  const canonicalUrl = getAbsoluteUrl(`/product/${product.slug}`);
-  const ogImageUrl = product.images[0] ? getAbsoluteUrl(product.images[0]) : `${SITE_URL}/opengraph-image`;
-
-  return {
-    title: titleClean,
-    description: product.seo.description || product.description,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      type: "website",
-      title: `${titleClean} | ${BRAND_NAME}`,
+  const product = resolveStaticProduct(slug);
+  if (product) {
+    return buildProductShareMetadata({
+      key: product.slug,
+      name: product.name,
+      brand: product.brand ?? "",
       description: product.seo.description || product.description,
-      url: canonicalUrl,
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: product.name,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${titleClean} | ${BRAND_NAME}`,
-      description: product.seo.description || product.description,
-      images: [ogImageUrl],
-    },
-  };
+      price: product.price,
+      image: absoluteImage(product.images[0]),
+      imageAlt: product.name,
+    });
+  }
+  const live = await loadLiveProductOrNull(slug);
+  if (!live) return {};
+  return buildProductShareMetadata({
+    key: live.id,
+    name: live.name,
+    brand: live.brand,
+    description: live.description,
+    price: live.price,
+    image: live.image,
+    imageAlt: live.name,
+  });
 }
 
 import { buildProductSchema, buildBreadcrumbSchema } from "@/lib/seo/schema";
@@ -63,10 +75,12 @@ import { JsonLd } from "@/components/seo/JsonLd";
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = resolveStaticProduct(slug);
 
   if (!product) {
-    notFound();
+    const live = await loadLiveProductOrNull(slug);
+    if (!live) notFound();
+    return <LiveProductShare product={live} />;
   }
 
   const related = getRelatedProducts(product.slug, 3);

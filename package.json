@@ -41,6 +41,7 @@
     "test:orders-paging": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/orders-paging/*.test.ts\"",
     "test:privacy": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/privacy/*.test.ts\"",
     "test:first-visit": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/first-visit/*.test.ts\"",
+    "test:layout": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/layout/*.test.ts\"",
     "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],

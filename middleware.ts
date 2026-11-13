@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { legacyShopProductPath } from "./lib/shop/productShare";
 
 // Guards the admin console. A request to /admin2006/console is only forwarded when the browser holds a valid admin
 // session cookie, signed with SESSION_SECRET. Edge-safe: it uses Web Crypto, not node:crypto.
@@ -25,6 +26,12 @@ async function isValidSession(token: string | undefined, secret: string): Promis
 }
 
 export async function middleware(req: NextRequest) {
+  // Old shop links (/shop?product=<id>) move to the product page, which has the product's own link preview.
+  if (req.nextUrl.pathname === "/shop") {
+    const target = legacyShopProductPath(req.nextUrl.searchParams);
+    if (target) return NextResponse.redirect(new URL(target, req.url), 307);
+    return NextResponse.next();
+  }
   const secret = process.env.SESSION_SECRET;
   const ok = Boolean(secret) && (await isValidSession(req.cookies.get(COOKIE)?.value, secret as string));
   if (!ok) return NextResponse.redirect(new URL("/admin2006", req.url));
@@ -32,5 +39,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin2006/console/:path*"],
+  matcher: ["/shop", "/admin2006/console/:path*"],
 };

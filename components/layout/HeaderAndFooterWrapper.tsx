@@ -43,7 +43,8 @@ export function HeaderAndFooterWrapper({ children, city }: HeaderAndFooterWrappe
       <ReferralCapture />
       <AnnouncementBar city={city} />
       <Navbar />
-      <main id="main" className="flex-1">{children}</main>
+      {/* The phone sticky CTA is fixed to the bottom edge: the page keeps clear of it. */}
+      <main id="main" className="flex-1 gv-clear-sticky-cta">{children}</main>
       <Footer />
       <StickyCtaBar />
       <WhatsAppButton />
