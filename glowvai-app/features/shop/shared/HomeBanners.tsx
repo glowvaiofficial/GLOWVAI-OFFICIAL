@@ -18,15 +18,29 @@ type HomeBanner = {
 
 const isInternal = (link: string) => link.startsWith('/') && !link.startsWith('//');
 
+// A staff preview link carries ?preview=<token> (minted by the admin panel). The page then shows the draft, and says so.
+const readPreviewToken = (): string | null => {
+  try {
+    return new URLSearchParams(window.location.search).get('preview');
+  } catch {
+    return null;
+  }
+};
+
 export const HomeBanners: React.FC = () => {
   const [banners, setBanners] = useState<HomeBanner[]>([]);
+  const [previewing, setPreviewing] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/shop/home', { credentials: 'same-origin' })
+    const token = readPreviewToken();
+    const url = token ? `/api/shop/home?preview=${encodeURIComponent(token)}` : '/api/shop/home';
+    fetch(url, { credentials: 'same-origin', cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (alive && data && Array.isArray(data.sections)) setBanners(data.sections as HomeBanner[]);
+        if (!alive || !data || !Array.isArray(data.sections)) return;
+        setBanners(data.sections as HomeBanner[]);
+        setPreviewing(Boolean(token && data.preview));
       })
       .catch(() => {
         // No banners is a normal state: the page keeps its usual content.
@@ -36,10 +50,18 @@ export const HomeBanners: React.FC = () => {
     };
   }, []);
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0 && !previewing) return null;
 
   return (
     <section className="shop-home-banners" aria-label="Offers and announcements" style={{ display: 'grid', gap: 12, padding: '12px 16px' }}>
+      {previewing && (
+        <p role="status" style={{ margin: 0, borderRadius: 10, background: '#fff4d6', color: '#6b4a00', padding: '8px 12px', fontSize: 13, fontWeight: 700 }}>
+          Staff preview: these banners are a draft and are not live for customers yet.
+        </p>
+      )}
+      {banners.length === 0 && previewing && (
+        <p style={{ margin: 0, color: '#6b7280', fontSize: 14 }}>The draft has no banners open right now.</p>
+      )}
       {banners.map((b) => (
         <a
           key={b.id}
