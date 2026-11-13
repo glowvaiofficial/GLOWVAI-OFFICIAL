@@ -1,25 +1,17 @@
-// The product share link and the rules that go with it. Pure (no server or browser APIs), so the shop app, the product
-// page and the tests all use the same URL.
-//
-// Share links point at /product/<key>. The key is the catalog slug for the static product pages, or the Firestore
-// product id for live products. Link crawlers (WhatsApp, Slack, iMessage) read only the server-rendered HTML of that
-// page, so its metadata carries the product's own title, description and picture.
-export const SHARE_ORIGIN = "https://glowvai.in";
+// The link to one product, shared by the product page's share button. Pure, so the browser and the tests build the same
+// URL. It points at the server-rendered product page (app/product/[slug]), whose metadata carries the product's own
+// picture, name and price for link previews. Old /shop?product=ID links still open the product in the app (App.tsx).
+export const CANONICAL_SITE_URL = "https://glowvai.in";
 
-const KEY_RE = /^[A-Za-z0-9_-]{1,140}$/;
-
-export function productSharePath(key: string): string {
-  return `/product/${encodeURIComponent(key)}`;
+export function productShareUrl(productId: string): string {
+  return `${CANONICAL_SITE_URL}/product/${encodeURIComponent(productId)}`;
 }
 
-export function productShareUrl(key: string): string {
-  return `${SHARE_ORIGIN}${productSharePath(key)}`;
-}
-
-// Old links were /shop?product=<id>. Returns the product page they should go to, or null when the request is not one of
-// those links. A request marked src=share is the product page's own hand-off to the shop app, so it is not redirected.
+// Old links were /shop?product=<id>. Returns the product page they should go to (middleware.ts redirects there), or null
+// when the request is not one of those links. A request marked src=share is the product page's own hand-off to the
+// shop app, so it is not redirected.
 export function legacyShopProductPath(params: URLSearchParams): string | null {
   const id = params.get("product");
-  if (!id || !KEY_RE.test(id) || params.get("src") === "share") return null;
-  return productSharePath(id);
+  if (!id || !/^[A-Za-z0-9_-]{1,140}$/.test(id) || params.get("src") === "share") return null;
+  return `/product/${encodeURIComponent(id)}`;
 }

@@ -13,7 +13,7 @@ import { CoinsRedeemCard } from './CoinsRedeemCard';
 
 // Step 2 of checkout: the items and the delivery address. Back goes to the cart.
 export const CheckoutReviewScreen: React.FC = () => {
-  const { navigate } = useApp();
+  const { navigate, goBack } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const slotId = useCheckoutSession((s) => s.slotId);
@@ -27,7 +27,7 @@ export const CheckoutReviewScreen: React.FC = () => {
   if (cartItems.length === 0) {
     return (
       <main className="commerce-screen commerce-review is-empty">
-        <FlowHeader title="Review order" onBack={() => navigate('cart-tab')} />
+        <FlowHeader title="Review order" onBack={goBack} />
         <div className="commerce-body">
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
@@ -35,7 +35,7 @@ export const CheckoutReviewScreen: React.FC = () => {
             </span>
             <h2>Your cart is empty</h2>
             <p>Add a product before you check out.</p>
-            <button className="commerce-primary" onClick={() => navigate('home')}>
+            <button className="commerce-primary" onClick={goBack}>
               Start shopping
             </button>
           </div>
@@ -58,7 +58,7 @@ export const CheckoutReviewScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-review has-aside">
-      <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={() => navigate('cart-tab')} />
+      <FlowHeader title="Review order" subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}`} onBack={goBack} />
       <CheckoutSteps step={2} />
       <CoinsRedeemCard items={cartItems} />
 

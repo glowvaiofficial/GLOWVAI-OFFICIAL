@@ -3,8 +3,10 @@ import { useId } from 'react';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import type { LanguageCode } from '@/lib/shop/settings/rules';
 import { useLanguageStore, useT } from '../../core/i18n/store';
+import { useApp } from '../../context/useApp';
 import type { MessageKey } from '../../core/i18n/messages';
 import './settings.css';
+import './settings-spacing.css';
 
 const DATE_LOCALE: Record<LanguageCode, string> = { en: 'en-IN', hi: 'hi-IN', te: 'te-IN' };
 
@@ -29,6 +31,10 @@ interface SettingsPageProps {
 // The frame for every settings screen. Full page on phones; a panel next to the section list on large screens.
 export const SettingsPage = ({ title, subtitle, embedded = false, onBack, children }: SettingsPageProps) => {
   const t = useT();
+  const { goBack } = useApp();
+  // Every full-page settings screen has a back control. Without one a screen named by the caller goes back the same way
+  // as the browser Back button (to the Settings hub it was opened from).
+  const back = onBack ?? goBack;
   if (embedded) {
     return (
       <section className="settings-panel" aria-labelledby="settings-panel-title">
@@ -40,8 +46,8 @@ export const SettingsPage = ({ title, subtitle, embedded = false, onBack, childr
   return (
     <div className="settings-page">
       <header className="settings-header">
-        {onBack && (
-          <button type="button" className="settings-back" onClick={onBack} aria-label={t('common.back')}>
+        {!embedded && (
+          <button type="button" className="settings-back" onClick={back} aria-label={t('common.back')}>
             <ArrowLeft size={20} strokeWidth={2.2} aria-hidden="true" />
           </button>
         )}

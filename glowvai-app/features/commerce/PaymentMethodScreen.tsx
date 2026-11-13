@@ -15,7 +15,7 @@ const TIP_OPTIONS = [0, 10, 20, 30];
 // Step 3 of checkout: choose how to pay. Cash on delivery places the order; online payment (UPI, card, netbanking)
 // goes through Razorpay on the processing screen. The bill, tip and primary button sit in the summary panel.
 export const PaymentMethodScreen: React.FC = () => {
-  const { navigate, customerDetails } = useApp();
+  const { navigate, goBack, customerDetails } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const address = useDeliveryAddress();
@@ -46,7 +46,7 @@ export const PaymentMethodScreen: React.FC = () => {
     const noItems = cartItems.length === 0;
     return (
       <main className="commerce-screen commerce-payment is-empty">
-        <FlowHeader title="Choose payment" onBack={() => navigate(noItems ? 'cart-tab' : 'checkout-review')} />
+        <FlowHeader title="Choose payment" onBack={goBack} />
         <div className="commerce-body">
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">{noItems ? <ShoppingBag size={34} /> : <MapPin size={34} />}</span>
@@ -98,7 +98,7 @@ export const PaymentMethodScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen commerce-payment has-aside">
-      <FlowHeader title="Choose payment" subtitle={`Delivering to ${address.label} · ${address.pincode}`} onBack={() => navigate('checkout-review')} />
+      <FlowHeader title="Choose payment" subtitle={`Delivering to ${address.label} · ${address.pincode}`} onBack={goBack} />
       <CheckoutSteps step={3} />
 
       <div className="commerce-body commerce-split">

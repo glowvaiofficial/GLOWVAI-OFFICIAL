@@ -36,11 +36,22 @@ export interface SkincareProduct {
 
 // Live product list, filled from the database (collection "products", status PUBLISHED). Starts empty.
 let liveProducts: SkincareProduct[] = [];
+// False until the first real answer (a loaded list, or a list from the cache). Lets screens tell "still loading" from "none listed".
+let liveReady = false;
 const listeners = new Set<() => void>();
 
 export function setLiveCatalog(items: SkincareProduct[]): void {
   liveProducts = items;
+  liveReady = true;
   listeners.forEach((notify) => notify());
+}
+
+export function getCatalogReady(): boolean {
+  return liveReady;
+}
+
+export function useCatalogReady(): boolean {
+  return useSyncExternalStore(subscribeLiveCatalog, getCatalogReady, getCatalogReady);
 }
 
 export function subscribeLiveCatalog(notify: () => void): () => void {
