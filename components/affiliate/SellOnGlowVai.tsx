@@ -28,7 +28,7 @@ export function SellOnGlowVai({ entry }: { entry: SellerEntry }) {
         )}
       </div>
       <p className="mt-6 text-sm text-ink-muted">
-        Questions about selling? <Link href="/contact" className={`underline underline-offset-4 rounded ${focusRing}`}>Contact GlowVai</Link>.
+        Questions about selling? <Link href="/contact" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>Contact GlowVai</Link>.
       </p>
     </Section>
   );

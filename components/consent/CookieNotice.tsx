@@ -84,7 +84,7 @@ export function CookieNotice() {
       <h2 className="font-display font-semibold text-sm md:text-base text-ink">Analytics, your choice</h2>
       <p className="mt-1 md:mt-1.5 text-xs md:text-sm leading-snug md:leading-relaxed text-ink-muted line-clamp-2 md:line-clamp-none">
         We use analytics to see which pages help people. We never send your name, phone, email or photos.{" "}
-        <Link href="/privacy#cookies" className="text-brand underline underline-offset-[3px] font-medium">
+        <Link href="/privacy#cookies" className="gv-link-inline text-brand underline underline-offset-[3px] font-medium">
           Privacy policy
         </Link>
         .

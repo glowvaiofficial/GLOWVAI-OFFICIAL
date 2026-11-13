@@ -3,9 +3,9 @@
 
 /* One width for the header row and the screen column, so the logo and the cart line up with the content on every screen.
    --shell-max is the column width and --shell-gutter the inner side padding that screens and the header both use. */
-.glowvai-root .app-viewport{ --shell-max: 720px; --shell-gutter: 24px; }
+.glowvai-root .app-viewport{ --shell-max: 720px; --shell-gutter: var(--gv-gutter); }
 @media (min-width: 1024px){
-  .glowvai-root .app-viewport{ --shell-max: 1200px; }
+  .glowvai-root .app-viewport{ --shell-max: var(--gv-max); }
   /* The home uses the full window up to 1600px (features/shop/styles/shop-home.css), so the header widens with it. */
   .glowvai-root .app-viewport:has(> .screen-content > .shop-home){ --shell-max: 1600px; }
 }

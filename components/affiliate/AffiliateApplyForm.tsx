@@ -193,7 +193,7 @@ export function AffiliateApplyForm() {
         </label>
         {err("compliance")}
         <p className="mt-3 text-sm text-ink-muted">
-          Read the <Link href="/affiliate/terms" className={`underline underline-offset-4 rounded ${focusRing}`}>affiliate terms</Link>.
+          Read the <Link href="/affiliate/terms" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>affiliate terms</Link>.
         </p>
       </div>
 

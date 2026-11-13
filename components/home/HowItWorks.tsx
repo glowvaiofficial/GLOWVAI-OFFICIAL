@@ -81,7 +81,7 @@ export function HowItWorks() {
         </Link>
         <a
           href="#what-we-check"
-          className="font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="gv-link-inline font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           How the scan works
         </a>

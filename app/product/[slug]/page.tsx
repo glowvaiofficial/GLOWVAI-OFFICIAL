@@ -146,11 +146,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>Home</Link>
+              <Link href="/" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>Home</Link>
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <Link href="/shop" className={`underline underline-offset-4 rounded ${focusRing}`}>Shop</Link>
+              <Link href="/shop" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>Shop</Link>
             </li>
             <li aria-hidden="true">/</li>
             <li className="text-ink font-medium">{product.name}</li>

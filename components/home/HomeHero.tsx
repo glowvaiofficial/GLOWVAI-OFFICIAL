@@ -17,7 +17,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
       aria-labelledby="hero-title"
       className="bg-paper pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-8 lg:pb-8 lg:min-h-[calc(100svh-120px)] flex items-center overflow-hidden"
     >
-      <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12">
+      <div className="w-full gv-page">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           <div className="lg:col-span-7">
             <h1
@@ -43,7 +43,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
                 href="/shop"
                 data-track="shop_cta_click"
                 data-track-location="hero"
-                className={`inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+                className={`inline-flex min-h-11 items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
               >
                 <span>or browse the shop</span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />

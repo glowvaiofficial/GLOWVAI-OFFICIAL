@@ -90,7 +90,7 @@ export const PhoneSignInScreen: React.FC = () => {
         </p>
         <p className="login-legal-copy">
           By continuing, you accept the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a><br />
-          and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+          and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="gv-link-inline">Privacy Policy</a>
         </p>
       </section>
     </main>

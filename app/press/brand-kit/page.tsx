@@ -23,7 +23,7 @@ const colours = [
 ];
 
 export default function BrandKitPage() {
-  const link = `underline underline-offset-4 rounded ${focusRing}`;
+  const link = `gv-link-inline underline underline-offset-4 rounded ${focusRing}`;
   return (
     <div className="bg-paper text-ink">
       <InfoHero id="kit-title" eyebrow="Press" title="Brand kit." intro="Use these files when you write about GLOW VAI. Please do not change the logo colours or shape." />

@@ -86,13 +86,13 @@ export default function VendorSignInPage() {
 
       <div className="mt-6 space-y-2 text-[14px]">
         <p>
-          <Link href="/vendor/forgot-password" className="font-semibold text-[#0057FB] underline underline-offset-2">
+          <Link href="/vendor/forgot-password" className="gv-link-inline font-semibold text-[#0057FB] underline underline-offset-2">
             Forgot password?
           </Link>
         </p>
         <p className="text-ink-muted">
           New to GlowVai?{" "}
-          <Link href="/vendor/create-account" className="font-semibold text-[#0057FB] underline underline-offset-2">
+          <Link href="/vendor/create-account" className="gv-link-inline font-semibold text-[#0057FB] underline underline-offset-2">
             Create a store account
           </Link>
         </p>

@@ -72,10 +72,10 @@ export function Navbar() {
           isScrolled ? "min-h-16" : "min-h-16 lg:min-h-[76px]"
         )}
       >
-        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
+        <div className="w-full gv-page flex items-center justify-between gap-4">
           <Link
             href="/"
-            className={cn("-ml-1 p-1 rounded-lg", focusRing)}
+            className={cn("-ml-1 p-1 rounded-lg min-h-11 inline-flex items-center", focusRing)}
             aria-label={`${BRAND_NAME} home`}
           >
             <GlowVaiLogo />

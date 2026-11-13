@@ -168,7 +168,7 @@ export function FeedbackSection() {
                 </Button>
                 <p className="text-[13px] text-ink-light">
                   We will not share your details. See our{" "}
-                  <Link href="/privacy" className="underline underline-offset-[3px]">
+                  <Link href="/privacy" className="gv-link-inline underline underline-offset-[3px]">
                     Privacy policy
                   </Link>
                   .
@@ -186,7 +186,7 @@ export function FeedbackSection() {
       </Section>
 
       <section aria-labelledby="journal-title" className="bg-paper pb-14 sm:pb-[72px]">
-        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 border-t border-ink/20 pt-10">
+        <div className="gv-page border-t border-ink/20 pt-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-x-12 gap-y-6 items-center">
             <div className="md:col-span-4 space-y-2">
               <h2 id="journal-title" className="font-display font-semibold text-2xl leading-tight text-ink">
@@ -216,7 +216,7 @@ export function FeedbackSection() {
                 <div className="pt-1">
                   <Link
                     href="/journal/how-to-read-a-skincare-label"
-                    className={`inline-flex items-center gap-2 font-semibold text-sm text-ink hover:text-brand transition-colors ${focusRing}`}
+                    className={`inline-flex min-h-11 items-center gap-2 font-semibold text-sm text-ink hover:text-brand transition-colors ${focusRing}`}
                   >
                     <span>Read the guide</span>
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />

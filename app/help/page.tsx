@@ -27,7 +27,7 @@ const topics = [
 ];
 
 export default function HelpPage() {
-  const link = `underline underline-offset-4 rounded ${focusRing}`;
+  const link = `gv-link-inline underline underline-offset-4 rounded ${focusRing}`;
   return (
     <div className="bg-paper text-ink">
       <InfoHero id="help-title" eyebrow="Help center" title="How can we help?" intro="Pick a topic, or write to the team that handles it. We reply on working days." />

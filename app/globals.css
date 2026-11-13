@@ -205,6 +205,7 @@
 /* ------------------------------------------------------------------
    Page layout: one gutter, one max width, nothing wider than the screen.
    Phone 16px, tablet 24px, desktop 32px; content stops at 1200px.
+   The site (navbar, footer, every page), the shop shell and the shop screens (--ds-gutter in glowvai.css) read these.
    ------------------------------------------------------------------ */
 :root {
   --gv-gutter: 16px;
@@ -227,6 +228,11 @@
     padding-inline: var(--gv-gutter);
     box-sizing: border-box;
     min-width: 0;
+  }
+  /* A text link inside a sentence or a heading: the vertical padding makes its tap area 44px tall on phones. Inline padding
+     does not change the line height, so the text does not move. */
+  .gv-link-inline {
+    padding-block: 1rem;
   }
   /* Keeps the last content above a fixed bottom bar (the phone sticky CTA). */
   .gv-clear-sticky-cta {

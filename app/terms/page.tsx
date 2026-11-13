@@ -28,7 +28,7 @@ const sections = [
   { id: "law", title: "9. Governing law and disputes" },
 ];
 
-const link = `text-ink underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
+const link = `gv-link-inline text-ink underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
 
 export default function TermsPage() {
   return (
