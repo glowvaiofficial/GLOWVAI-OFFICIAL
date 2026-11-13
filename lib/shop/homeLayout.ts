@@ -79,6 +79,7 @@ export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
   "help-gift": 3,
   categories: 8,
   deals: 8,
+  promos: 4,
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
