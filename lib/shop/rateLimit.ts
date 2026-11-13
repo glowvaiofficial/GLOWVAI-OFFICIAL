@@ -8,20 +8,21 @@
 // too, so it costs the same. A route that checks both the IP and the user costs two reads and two writes per request.
 // The owner should keep the limits on those routes low to stay inside the free quota.
 //
-// Stored data is minimal: the document id is the SHA-256 of the key, and the document holds only count, windowStart and
-// expiresAt (numbers). No raw IP address, uid, phone number or key is written anywhere.
+// Stored data is minimal: the document id is the SHA-256 of the key, and the document holds only count and windowStart
+// (numbers) and expiresAt (a Firestore Timestamp). No raw IP address, uid, phone number or key is written anywhere.
 //
-// Cleanup: every document carries expiresAt (windowStart + windowMs). No scheduled job is needed. An expired document is
-// reset in place the next time its key is checked. A Firestore TTL policy on `expiresAt` can delete the stale documents
-// as well; that is optional.
+// Cleanup: every document carries expiresAt (windowStart + windowMs), written as a Firestore Timestamp. The Firestore TTL
+// policy on the `rateLimits` collection, field `expiresAt`, deletes the stale documents, so no scheduled job is needed.
+// The policy is set up in the Firebase console, not by this code. An expired document is also reset in place the next time
+// its key is checked, so a missing policy only costs storage, not correctness.
 //
 // Failure: any Firestore error, or a check slower than STORE_TIMEOUT_MS, fails OPEN. The in-memory limiter decides
 // instead, so a request is never refused because the store is down. The log line names the error type only, never the
 // key, the IP or the uid.
 //
-// Nothing here imports server-only modules (the firebase-admin import is type-only and is erased), so it can be tested alone.
+// Nothing here imports server-only modules (firebase-admin/firestore is a plain Node module and needs no app to be initialised), so it can be tested alone.
 import { createHash } from "node:crypto";
-import type { Firestore, Transaction } from "firebase-admin/firestore";
+import { Timestamp, type Firestore, type Transaction } from "firebase-admin/firestore";
 
 export const RATE_LIMIT_COLLECTION = "rateLimits";
 export const STORE_TIMEOUT_MS = 2000;
@@ -38,12 +39,22 @@ export interface RateLimitResult {
   retryAfterSeconds: number;
 }
 
-// The only fields ever written to Firestore.
+// The window maths works in epoch milliseconds.
 export interface RateLimitDoc {
   count: number;
   windowStart: number;
   expiresAt: number;
 }
+
+// The only fields ever written to Firestore. expiresAt is a Timestamp so the TTL policy can act on it.
+export interface StoredRateLimitDoc {
+  count: number;
+  windowStart: number;
+  expiresAt: Timestamp;
+}
+
+// What a stored document becomes after a read: only the fields the window maths needs.
+type StoredFields = Partial<Pick<RateLimitDoc, "count" | "windowStart">>;
 
 export function hashKey(key: string): string {
   return createHash("sha256").update(key).digest("hex");
@@ -102,12 +113,16 @@ export function decide(doc: RateLimitDoc, max: number, windowMs: number, now: nu
 
 // ---- Shared limiter (Firestore). One transaction: read the document, move the window on if needed, add one, write back.
 
+export function toStoredDoc(doc: RateLimitDoc): StoredRateLimitDoc {
+  return { count: doc.count, windowStart: doc.windowStart, expiresAt: Timestamp.fromMillis(doc.expiresAt) };
+}
+
 export async function firestoreCheck(db: Firestore, input: RateLimitInput, now: number): Promise<RateLimitResult> {
   const ref = db.collection(RATE_LIMIT_COLLECTION).doc(hashKey(input.key));
   const next = await db.runTransaction(async (tx: Transaction) => {
     const snap = await tx.get(ref);
-    const doc = nextWindow(snap.exists ? (snap.data() as Partial<RateLimitDoc>) : undefined, input.windowMs, now);
-    tx.set(ref, doc);
+    const doc = nextWindow(snap.exists ? (snap.data() as StoredFields) : undefined, input.windowMs, now);
+    tx.set(ref, toStoredDoc(doc));
     return doc;
   });
   return decide(next, input.max, input.windowMs, now);
