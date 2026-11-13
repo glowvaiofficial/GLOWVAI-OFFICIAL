@@ -78,6 +78,7 @@ export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
   trust: 3,
   "help-gift": 3,
   categories: 8,
+  deals: 8,
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -102,6 +103,35 @@ function readItem(raw: unknown, keepBadLink = false): BlockItem | null {
   return { label, sub, link, image: readImage(d.image) };
 }
 
+// A deals item names a product by its id (the link). The image is not used, so it is always "".
+const DEAL_PRODUCT_ID = /^[A-Za-z0-9-]{1,128}$/;
+
+function readDealItem(raw: unknown): BlockItem | null {
+  if (!raw || typeof raw !== "object") return null;
+  const d = raw as Record<string, unknown>;
+  const label = typeof d.label === "string" && d.label.trim().length > 0 && d.label.length <= 40 ? d.label : null;
+  const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
+  const link = typeof d.link === "string" && DEAL_PRODUCT_ID.test(d.link) ? d.link : null;
+  if (label === null || sub === null || link === null) return null;
+  return { label, sub, link, image: "" };
+}
+
+// The products the deals rail shows when the admin has chosen some: the published ones, in the admin's order, each once.
+// Ids that are not in the catalogue (not published, or gone) are skipped. The caller passes the published catalogue.
+export function pickDeals<T extends { id: string }>(items: readonly { link: string }[], catalog: readonly T[], limit = BLOCK_ITEM_LIMITS.deals ?? 8): T[] {
+  const byId = new Map(catalog.map((p) => [p.id, p] as const));
+  const out: T[] = [];
+  const seen = new Set<string>();
+  for (const item of items) {
+    const product = byId.get(item.link);
+    if (!product || seen.has(product.id)) continue;
+    seen.add(product.id);
+    out.push(product);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 // The content of each block that has any. Blocks with no items are left out, so they keep their placeholder.
 export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, BlockSettings>> {
   const out: Partial<Record<HomeBlockId, BlockSettings>> = {};
@@ -115,7 +145,8 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
     if (!s) continue;
     const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
     // Bad items are dropped first, then the limit applies, so a bad item never takes a valid one's place.
-    const items = Array.isArray(s.items) ? s.items.map((i) => readItem(i, id === "categories")).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
+    const readOne = id === "deals" ? readDealItem : (i: unknown) => readItem(i, id === "categories");
+    const items = Array.isArray(s.items) ? s.items.map(readOne).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
     if (items.length === 0) continue;
     out[id] = {
       title: typeof s.title === "string" && s.title.length <= 60 ? s.title : "",

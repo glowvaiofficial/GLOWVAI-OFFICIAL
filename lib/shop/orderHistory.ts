@@ -18,6 +18,14 @@ export function parsePageLimit(value: unknown): number {
   return Math.min(ORDER_PAGE_MAX, Math.max(1, n));
 }
 
+// Customer-facing status from the shop status, with any admin decision (saved in admin_orders) applied on top.
+export function customerStatus(shopStatus: string, overlay: Record<string, unknown> | undefined): string {
+  const fulfilment = String(overlay?.fulfilment ?? "");
+  if (fulfilment === "CANCELLED") return "CANCELLED";
+  if (fulfilment === "DELIVERED") return "DELIVERED";
+  return shopStatus || "PLACED";
+}
+
 export type OrderTone = "active" | "delivered" | "cancelled";
 
 export function toneOfStatus(status: unknown): OrderTone {
