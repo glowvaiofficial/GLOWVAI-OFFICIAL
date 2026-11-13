@@ -27,7 +27,7 @@ export function MiniBannersPlaceholder() {
   if (!usePlaceholdersVisible()) return null;
   return (
     <section className="hp-section" aria-label="Featured promotions">
-      <div className="hp-grid">
+      <div className="hp-grid is-three">
         {['Mini banner 1', 'Mini banner 2', 'Mini banner 3'].map((t) => (
           <div key={t} className="hp-card"><Tag>Placeholder</Tag><strong>{t}</strong><span>Picture and link set in the designer.</span></div>
         ))}
@@ -84,7 +84,7 @@ export function ReorderPlaceholder() {
   return (
     <section className="hp-section" aria-label="Buy it again">
       <div className="hp-head"><h2 className="hp-title">Buy it again</h2><p className="hp-sub">Shows your past orders after you sign in.</p></div>
-      <div className="hp-grid">{[1, 2, 3].map((i) => <div key={i} className="hp-skel" aria-hidden="true" />)}</div>
+      <div className="hp-grid is-three">{[1, 2, 3].map((i) => <div key={i} className="hp-skel" aria-hidden="true" />)}</div>
     </section>
   );
 }
@@ -105,7 +105,7 @@ export function TrustBlockPlaceholder() {
   if (!usePlaceholdersVisible()) return null;
   return (
     <section className="hp-section" aria-label="Why shop with us">
-      <div className="hp-grid">
+      <div className="hp-grid is-three">
         {['Delivery promise', 'Quality promise', 'Returns promise'].map((t) => (
           <div key={t} className="hp-card"><Tag>Placeholder</Tag><strong>{t}</strong><span>Wording set by the team.</span></div>
         ))}
@@ -119,7 +119,7 @@ export function HelpGiftPlaceholder() {
   if (!usePlaceholdersVisible()) return null;
   return (
     <section className="hp-section" aria-label="Help, gifts and referrals">
-      <div className="hp-grid">
+      <div className="hp-grid is-three">
         <div className="hp-card"><Tag>Placeholder</Tag><strong>Need help?</strong><span>Support channels set by the team.</span></div>
         <div className="hp-card"><Tag>Placeholder</Tag><strong>Gift cards</strong><span>Gift card banner.</span></div>
         <div className="hp-card"><Tag>Placeholder</Tag><strong>Refer and earn</strong><span>Referral banner.</span></div>
