@@ -1,6 +1,7 @@
 import React from 'react';
 import { auth } from './core/config/firebase';
 import { AppProvider } from './context/AppContext';
+import { ThemeLoader } from './core/theme/ThemeLoader';
 import { useApp } from './context/useApp';
 import { AndroidStatusBar } from './components/common/AndroidStatusBar';
 import { BottomNavBar } from './components/common/BottomNavBar';
@@ -185,6 +186,7 @@ export const App: React.FC = () => {
   if (!ready) return <div className="app-viewport glowvai-boot" aria-busy="true" />;
   return (
     <AppProvider>
+      <ThemeLoader />
       <AppContent />
     </AppProvider>
   );
