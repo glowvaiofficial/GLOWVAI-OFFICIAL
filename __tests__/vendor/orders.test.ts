@@ -170,6 +170,35 @@ describe("VendorOrder projection privacy", () => {
   });
 });
 
+describe("VendorOrder timeline", () => {
+  test("lists the recorded milestones as {at, label} and leaks no event text, rider or staff details", () => {
+    const p = toVendorOrder(
+      accepted({
+        status: "OUT_FOR_DELIVERY",
+        vendorPackedAt: NOW + 1_000,
+        outForDeliveryAt: NOW + 2_000,
+        events: [{ at: NOW + 2_000, actor: "Rider Ravi 9876543210", event: "Out for delivery" }],
+      }),
+      { uid: "v1", isOffer: false },
+    );
+    assert.deepEqual(p.timeline, [
+      { at: NOW, label: "Accepted" },
+      { at: NOW + 1_000, label: "Packed" },
+      { at: NOW + 2_000, label: "Handed to delivery partner" },
+    ]);
+    for (const entry of p.timeline) assert.deepEqual(Object.keys(entry).sort(), ["at", "label"]);
+    assertPrivate(p);
+    assert.equal(JSON.stringify(p.timeline).includes("Ravi"), false);
+    assert.equal(JSON.stringify(p.timeline).includes("Out for delivery"), false);
+  });
+
+  test("an order with no recorded milestones has an empty timeline", () => {
+    const p = toVendorOrder(shopOrder({ vendorId: "VAPP-v1", vendorUid: "v1", vendorStatus: "PENDING", status: "PLACED" }), { uid: "v1", isOffer: false });
+    assert.deepEqual(p.timeline, []);
+    assertPrivate(p);
+  });
+});
+
 describe("stock and packing checks", () => {
   test("missingStock reports need and have per product", () => {
     const missing = missingStock(shopOrder(), [
