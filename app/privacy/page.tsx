@@ -28,7 +28,7 @@ const sections = [
   { id: "your-rights", title: "9. Exercise your data rights" },
 ];
 
-const link = `text-ink underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
+const link = `gv-link-inline text-ink underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
 
 export default function PrivacyPage() {
   return (

@@ -95,7 +95,7 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
           <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
             <ol className="flex items-center gap-2">
               <li>
-                <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>
+                <Link href="/" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>
                   Home
                 </Link>
               </li>

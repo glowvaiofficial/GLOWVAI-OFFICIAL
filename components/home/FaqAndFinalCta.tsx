@@ -22,13 +22,13 @@ export function FaqHome() {
                 rel="noopener noreferrer"
                 data-track="whatsapp_click"
                 data-track-location="faq"
-                className={`font-medium text-ink underline underline-offset-[3px] rounded ${focusRing}`}
+                className={`font-medium text-ink gv-link-inline underline underline-offset-[3px] rounded ${focusRing}`}
               >
                 Chat on WhatsApp
               </a>
             </p>
             <p>
-              <a href="mailto:contact@glowvai.in" className={`font-medium text-ink underline underline-offset-[3px] rounded ${focusRing}`}>
+              <a href="mailto:contact@glowvai.in" className={`font-medium text-ink gv-link-inline underline underline-offset-[3px] rounded ${focusRing}`}>
                 Email contact@glowvai.in
               </a>
             </p>
@@ -70,7 +70,7 @@ export function FaqHome() {
 export function FinalCta() {
   return (
     <Section id="start" tone="ink" labelledBy="final-title" pad="open" bleed>
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 text-center">
+      <div className="gv-page text-center">
         <h2
           id="final-title"
           className="font-display font-semibold text-[clamp(2.5rem,1.5rem+4.5vw,5.5rem)] leading-[1] tracking-[-0.03em] max-w-[18ch] mx-auto"
@@ -96,7 +96,7 @@ export function FinalCta() {
             rel="noopener noreferrer"
             data-track="whatsapp_click"
             data-track-location="final_cta"
-            className="font-medium text-white underline underline-offset-[5px] decoration-white/40 hover:decoration-white rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-white"
+            className="gv-link-inline font-medium text-white underline underline-offset-[5px] decoration-white/40 hover:decoration-white rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-white"
           >
             or chat on WhatsApp
           </a>
@@ -148,7 +148,7 @@ export function FinalCta() {
         </div>
         <p className="mt-6 font-mono text-[13px] text-white/70">
           Free &middot; Photos stored privately &middot;{" "}
-          <a href="tel:+918977855998" className="text-white underline underline-offset-[3px] rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white">
+          <a href="tel:+918977855998" className="gv-link-inline text-white underline underline-offset-[3px] rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white">
             +91 89778 55998
           </a>
         </p>

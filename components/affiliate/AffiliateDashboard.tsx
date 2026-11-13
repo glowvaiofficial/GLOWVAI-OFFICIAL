@@ -67,7 +67,7 @@ export function AffiliateDashboard() {
           <div className="sm:col-span-2">
             <dt className="text-ink-muted">Channel link</dt>
             <dd className="break-all">
-              <a href={a.profile.channelUrl} target="_blank" rel="noopener noreferrer nofollow" className={`underline underline-offset-4 rounded ${focusRing}`}>{a.profile.channelUrl}</a>
+              <a href={a.profile.channelUrl} target="_blank" rel="noopener noreferrer nofollow" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>{a.profile.channelUrl}</a>
             </dd>
           </div>
         )}

@@ -95,7 +95,7 @@ function NewsletterForm() {
         />
         <span>
           I agree to receive emails from {BRAND_NAME}. Read our{" "}
-          <Link href="/privacy" className="text-brand underline underline-offset-[3px]">
+          <Link href="/privacy" className="gv-link-inline text-brand underline underline-offset-[3px]">
             Privacy policy
           </Link>
           .
@@ -122,7 +122,7 @@ export function Footer() {
     <footer className="bg-paper-deep border-t border-ink/10">
       {/* Trust row */}
       <div className="border-b border-ink/15">
-        <ul className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-6 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+        <ul className="gv-page py-6 grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
           {[
             { Icon: ScanLine, t: "Free face scan", d: "About 30 seconds" },
             { Icon: Truck, t: "Delivery by rider", d: "About 15 min in covered areas" },
@@ -140,10 +140,10 @@ export function Footer() {
         </ul>
       </div>
 
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 pt-14">
+      <div className="gv-page pt-14">
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 pb-12 items-start">
           <div className="col-span-2 lg:col-span-4 space-y-5">
-            <Link href="/" className={`inline-flex items-center gap-2.5 rounded ${focusRing}`} aria-label={`${BRAND_NAME} home`}>
+            <Link href="/" className={`inline-flex min-h-11 items-center gap-2.5 rounded ${focusRing}`} aria-label={`${BRAND_NAME} home`}>
               <div className="relative w-8 h-8 rounded-[8px] overflow-hidden shrink-0">
                 <Image
                   src={getAssetPath("/logo/glowvai-logo.svg")}
@@ -160,13 +160,13 @@ export function Footer() {
             </p>
             <ul className="space-y-2.5 text-[15px]">
               <li>
-                <a href="mailto:contact@glowvai.in" className={`inline-flex items-center gap-2 text-ink hover:text-brand rounded ${focusRing}`}>
+                <a href="mailto:contact@glowvai.in" className={`inline-flex min-h-11 items-center gap-2 text-ink hover:text-brand rounded ${focusRing}`}>
                   <Mail className="w-4 h-4 shrink-0" aria-hidden="true" />
                   <span>contact@glowvai.in</span>
                 </a>
               </li>
               <li>
-                <a href="tel:+918977855998" className={`inline-flex items-center gap-2 text-ink hover:text-brand rounded ${focusRing}`}>
+                <a href="tel:+918977855998" className={`inline-flex min-h-11 items-center gap-2 text-ink hover:text-brand rounded ${focusRing}`}>
                   <Phone className="w-4 h-4 shrink-0" aria-hidden="true" />
                   <span>+91 89778 55998</span>
                 </a>

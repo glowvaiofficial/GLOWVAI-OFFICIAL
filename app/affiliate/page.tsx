@@ -61,7 +61,7 @@ export default function AffiliatePage() {
           <li>Disclose that you are a GlowVai affiliate, and make no medical claims or promises of results.</li>
         </ul>
         <p className="mt-6 text-[15px]">
-          Read the full <Link href="/affiliate/terms" className={`underline underline-offset-4 rounded ${focusRing}`}>affiliate terms</Link>.
+          Read the full <Link href="/affiliate/terms" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>affiliate terms</Link>.
         </p>
       </Section>
     </div>

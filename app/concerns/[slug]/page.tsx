@@ -35,7 +35,7 @@ export default async function ConcernLandingPage({ params }: { params: Promise<{
   const c = concernBySlug(slug);
   if (!c) notFound();
   const products = filterProducts({ concern: c.key });
-  const link = `underline underline-offset-4 rounded ${focusRing}`;
+  const link = `gv-link-inline underline underline-offset-4 rounded ${focusRing}`;
 
   return (
     <div className="bg-paper text-ink">

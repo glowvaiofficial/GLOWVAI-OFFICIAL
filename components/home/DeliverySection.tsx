@@ -122,7 +122,7 @@ export function DeliverySection() {
             max={15}
             value={minute}
             onChange={(e) => setMinute(Number(e.target.value))}
-            className={`mt-2 w-full max-w-[320px] accent-[#1447E6] rounded ${focusRing}`}
+            className={`mt-2 h-11 w-full max-w-[320px] accent-[#1447E6] rounded ${focusRing}`}
           />
           <div className="mt-10 grid grid-cols-2 gap-4">
             <figure className="space-y-2">
@@ -186,7 +186,7 @@ export function DeliverySection() {
           </ol>
           <Link
             href="/delivery"
-            className={`mt-5 inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+            className={`mt-5 inline-flex min-h-11 items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
           >
             <span>See delivery details</span>
             <ArrowRight className="w-4 h-4" aria-hidden="true" />

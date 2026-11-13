@@ -29,7 +29,7 @@ export function ShopByConcernSection() {
             href="/face-analysis"
             data-track="scan_cta_click"
             data-track-location="concerns_link"
-            className={`mt-6 inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+            className={`mt-6 inline-flex min-h-11 items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
           >
             <span>Not sure? Take the 30-second scan</span>
             <ArrowRight className="w-4 h-4" aria-hidden="true" />

@@ -122,7 +122,7 @@ export function WhatScanChecks() {
           <aside aria-label="Privacy" className="mt-10 border-l-[3px] border-ink pl-5 max-w-[62ch]">
             <p className="text-ink">
               {PRIVACY_LEAD}{" "}
-              <a href={`mailto:${PRIVACY_EMAIL}`} className={`underline underline-offset-[3px] rounded ${focusRing}`}>
+              <a href={`mailto:${PRIVACY_EMAIL}`} className={`gv-link-inline underline underline-offset-[3px] rounded ${focusRing}`}>
                 {PRIVACY_EMAIL}
               </a>
               .
@@ -135,7 +135,7 @@ export function WhatScanChecks() {
                 </li>
               ))}
             </ul>
-            <Link href="/privacy" className={`mt-4 inline-block font-medium text-ink underline underline-offset-[3px] rounded ${focusRing}`}>
+            <Link href="/privacy" className={`mt-4 inline-block min-h-11 font-medium text-ink underline underline-offset-[3px] rounded ${focusRing}`}>
               Read the privacy policy
             </Link>
           </aside>
@@ -145,7 +145,7 @@ export function WhatScanChecks() {
               href="/face-analysis"
               data-track="scan_cta_click"
               data-track-location="markers_link"
-              className={`inline-flex items-center gap-2 font-medium text-brand underline underline-offset-[3px] rounded ${focusRing}`}
+              className={`inline-flex min-h-11 items-center gap-2 font-medium text-brand underline underline-offset-[3px] rounded ${focusRing}`}
             >
               <span>Start the free scan</span>
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

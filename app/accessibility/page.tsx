@@ -25,7 +25,7 @@ export default function AccessibilityPage() {
             { title: "Screen readers", body: "Pages use headings, labels and landmarks. Images that matter have descriptions." },
             { title: "Colour and contrast", body: "Text meets AA contrast. Meaning is never shown by colour alone." },
             { title: "Motion", body: "If your device asks for reduced motion, animations stop." },
-            { title: "Tell us about a problem", body: <a className={`underline underline-offset-4 rounded ${focusRing}`} href={`mailto:${mail}?subject=Accessibility`}>{mail}</a> },
+            { title: "Tell us about a problem", body: <a className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`} href={`mailto:${mail}?subject=Accessibility`}>{mail}</a> },
             { title: "Automated checks", body: "Our latest automated audit scored 100 for accessibility on most pages. Automated checks do not find everything." },
           ]}
         />

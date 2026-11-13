@@ -81,7 +81,7 @@ export default async function JournalArticlePage({ params }: Props) {
     "publisher": { "@id": ORG_ID },
   };
 
-  const link = `underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
+  const link = `gv-link-inline underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`;
 
   return (
     <article className="bg-paper text-ink">

@@ -8,7 +8,7 @@ export function InfoHero({ eyebrow, title, intro, id }: { eyebrow: string; title
       <nav aria-label="Breadcrumb" className="mb-8 text-sm text-ink-muted">
         <ol className="flex items-center gap-2">
           <li>
-            <Link href="/" className={`underline underline-offset-4 rounded ${focusRing}`}>
+            <Link href="/" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>
               Home
             </Link>
           </li>
@@ -32,7 +32,7 @@ export function RuledList({ items }: { items: { title: string; body: React.React
         <li key={it.title} className="border-b border-ink/20 py-5 md:pr-8">
           <h3 className="font-display font-semibold text-xl text-ink">
             {it.href ? (
-              <Link href={it.href} className={`underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+              <Link href={it.href} className={`gv-link-inline underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
                 {it.title}
               </Link>
             ) : (

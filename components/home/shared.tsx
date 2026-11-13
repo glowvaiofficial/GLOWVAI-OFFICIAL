@@ -36,7 +36,7 @@ export function Section({
         className
       )}
     >
-      {bleed ? children : <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12">{children}</div>}
+      {bleed ? children : <div className="gv-page">{children}</div>}
     </section>
   );
 }

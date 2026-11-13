@@ -36,7 +36,7 @@ export function StickyCtaBar() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-hidden={!visible}
     >
-      <div className="h-[72px] px-5 flex items-center justify-between gap-4">
+      <div className="h-[72px] px-[var(--gv-gutter)] flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="relative w-9 h-9 rounded-full overflow-hidden bg-paper-deep shrink-0 border border-ink/15">
             <Image

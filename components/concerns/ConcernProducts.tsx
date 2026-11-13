@@ -17,7 +17,7 @@ export function ConcernProducts({ products }: { products: Product[] }) {
     return (
       <p className="text-ink-muted">
         No products are listed for this concern yet.{" "}
-        <Link href="/shop" className={`underline underline-offset-4 rounded ${focusRing}`}>
+        <Link href="/shop" className={`gv-link-inline underline underline-offset-4 rounded ${focusRing}`}>
           Browse the full shop
         </Link>
         .

@@ -115,7 +115,7 @@ export function PromisesSection() {
           <p className="text-ink-muted max-w-[62ch]">{referralStrip.terms}</p>
         </div>
         <div className="md:col-span-3 md:text-right">
-          <Link href="/referral">
+          <Link href="/referral" className="block">
             <Button variant="dark" size="md" className="w-full md:w-auto">
               <span>{referralStrip.button}</span>
             </Button>

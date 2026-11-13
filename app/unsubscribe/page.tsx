@@ -108,11 +108,11 @@ function UnsubscribeContent() {
           )}
 
           <p className="mt-8 text-ink-muted">
-            <Link href="/" className={`underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+            <Link href="/" className={`gv-link-inline underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
               Back to the home page
             </Link>
             {" · "}
-            <Link href="/privacy" className={`underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+            <Link href="/privacy" className={`gv-link-inline underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
               Privacy policy
             </Link>
           </p>

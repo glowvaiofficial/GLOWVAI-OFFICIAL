@@ -71,7 +71,7 @@ export function FeaturedProducts() {
           </div>
           <Link
             href="/shop"
-            className={`hidden md:inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+            className={`hidden md:inline-flex min-h-11 items-center gap-2 font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
           >
             <span>View all products</span>
             <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -173,7 +173,7 @@ export function FeaturedProducts() {
         {brandSourcePlaceholder && <p className="mt-4 text-sm text-ink-light max-w-[62ch]">{brandSourcePlaceholder}</p>}
         <Link
           href="/shop"
-          className={`md:hidden mt-4 inline-flex items-center gap-2 font-medium text-ink underline underline-offset-[5px] rounded ${focusRing}`}
+          className={`md:hidden mt-4 inline-flex min-h-11 items-center gap-2 font-medium text-ink underline underline-offset-[5px] rounded ${focusRing}`}
         >
           <span>View all products</span>
           <ArrowRight className="w-4 h-4" aria-hidden="true" />

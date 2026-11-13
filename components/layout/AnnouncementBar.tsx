@@ -10,7 +10,7 @@ interface AnnouncementBarProps {
 export function AnnouncementBar({ city = "Vijayawada" }: AnnouncementBarProps) {
   return (
     <div className="bg-ink text-white text-[13px] relative z-50">
-      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 min-h-[40px] py-2 flex items-center justify-between gap-4">
+      <div className="gv-page min-h-[40px] py-2 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 min-w-0">
           {/* On phones the location is left out so the phone number and the scan link never collide. */}
           <span className="hidden sm:inline truncate">Delivering to {city}</span>
