@@ -36,7 +36,16 @@ const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearc
 const accountNow = (): AccountState => accountStateOf(auth?.currentUser);
 
 // Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
-const initialScreen = (): ScreenName => requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : startScreenFor(accountNow()) as ScreenName;
+// A staff preview (the admin designer opens this page with ?preview=...) opens the home page directly, never the intro.
+const isStaffPreview = (): boolean => {
+  try {
+    return new URLSearchParams(window.location.search).has('preview');
+  } catch {
+    return false;
+  }
+};
+
+const initialScreen = (): ScreenName => requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : isStaffPreview() ? 'shop-home' as ScreenName : startScreenFor(accountNow()) as ScreenName;
 
 const bagUnitsNow = (): number => Object.values(useCartStore.getState().items).reduce((n, item) => n + item.quantity, 0);
 
