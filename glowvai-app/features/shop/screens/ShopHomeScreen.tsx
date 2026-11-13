@@ -12,6 +12,7 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
+import { useHomeLayout, type HomeBlockId } from '../lib/useHomeLayout';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
@@ -344,7 +345,332 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     }
   };
 
+  const layoutOrder = useHomeLayout();
   const socials = configuredSocials(siteConfig.socials);
+
+  // Each homepage block. The order comes from the admin layout (useHomeLayout); the code of each block is unchanged.
+  const renderBlock = (id: HomeBlockId): React.ReactNode => {
+    switch (id) {
+    case 'hero':
+      return (
+        <>
+      <section className="shop-home-showcase">
+        <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" width={1891} height={831} fetchPriority="high" decoding="async" />
+        <div className="shop-home-showcase-copy">
+          <p className="shop-home-showcase-tag">Discover. Shop. Glow.</p>
+          <h1>Glow your way.</h1>
+          <p className="shop-home-showcase-sub">
+            {deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.'}
+          </p>
+          <div className="shop-home-showcase-actions">
+            <button type="button" className="shop-home-btn-dark" onClick={() => navigate('shop-browse')}>
+              Shop now
+              <ArrowRight size={16} />
+            </button>
+            <button type="button" className="shop-home-btn-light" onClick={() => navigate('scan-camera')}>
+              <ScanFace size={16} />
+              Skin scan
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {SHOW_FESTIVAL && <div key={mode} className={`shop-home-festival${festivalSwitched ? ' is-switched' : ''}`}>
+        <section className="zq-festival" aria-label={`Navratri ${festival.heroCopy}`}>
+          <button type="button" className="zq-festival-hero" onClick={() => navigate('shop-browse')}>
+            <img src={festival.heroImage} alt="" />
+            <span className="zq-festival-copy">
+              <small>Celebrate</small>
+              <strong>NAVRATRI</strong>
+              <em>{festival.heroCopy}</em>
+            </span>
+          </button>
+          <div className="zq-festival-grid">
+            {festival.categories.map((title, index) => (
+              <button key={title} type="button" onClick={() => navigate('shop-browse')}>
+                <span className="zq-category-photo" style={{ backgroundImage: `url(${festival.categoryAtlas})`, '--category-index': index } as React.CSSProperties} />
+                <b>{title}</b>
+                <ChevronRight size={14} />
+              </button>
+            ))}
+          </div>
+          <button type="button" className="zq-festival-promo" onClick={() => navigate('shop-browse')}>
+            <img src={festival.heroImage} alt="" width={1200} height={545} loading="lazy" decoding="async" />
+            <span>
+              <b>{festival.promoTitle}</b>
+              <small>{festival.promoCopy}</small>
+            </span>
+            <ChevronRight size={19} />
+          </button>
+        </section>
+      </div>}
+
+      <HomeBanners />
+        </>
+      );
+    case 'mini-banners':
+      return (
+        <>
+      <MiniBannersPlaceholder />
+        </>
+      );
+    case 'offers':
+      return (
+        <>
+      <OffersStripPlaceholder />
+        </>
+      );
+    case 'categories':
+      return (
+        <>
+      <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
+        <div className="shop-home-section-head">
+          <h2 id="shop-home-categories-title">Shop by category</h2>
+        </div>
+        <div className="shop-home-categories" aria-busy={loading}>
+          {HOME_CATEGORY_TILES.map(({ id }) => {
+            const tile = tiles.find((t) => t.id === id) ?? null;
+            return <CategoryCard key={id} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId: id })} />;
+          })}
+          <CategoryCard tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+        </div>
+      </section>
+
+        </>
+      );
+    case 'promos':
+      return (
+        <>
+      <section className="shop-home-promos" aria-label="Offers">
+        <button type="button" className="shop-home-promo is-dark" onClick={() => navigate('shop-browse')}>
+          <span className="shop-home-promo-kicker">Delivery</span>
+          <span className="shop-home-promo-title">Free delivery above ₹{FREE_DELIVERY_ABOVE}</span>
+          <span className="shop-home-promo-sub">Applied automatically at checkout.</span>
+          <span className="shop-home-promo-icon">
+            <Truck size={18} />
+          </span>
+        </button>
+        <button type="button" className="shop-home-promo is-light" onClick={() => navigate('cart-tab')}>
+          <span className="shop-home-promo-kicker">Coupon</span>
+          <span className="shop-home-promo-title">Flat ₹{COUPON_VALUES.GLOW50} off</span>
+          <span className="shop-home-promo-sub">Enter code GLOW50 in your cart.</span>
+          <span className="shop-home-promo-icon">
+            <Ticket size={18} />
+          </span>
+        </button>
+      </section>
+
+        </>
+      );
+    case 'deals':
+      return (
+        <>
+      {!failed && (
+        <section className="shop-home-section" aria-labelledby="shop-home-deals-title">
+          <div className="shop-home-section-head">
+            <div className="shop-home-section-titles">
+              <h2 id="shop-home-deals-title">Deals</h2>
+              <p>Products priced below their listed MRP</p>
+            </div>
+            <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
+              View all
+              <ChevronRight size={14} />
+            </button>
+          </div>
+          {loading ? (
+            <div className="shop-home-deals" aria-busy="true" aria-hidden="true">
+              {skeletonCards(4, true)}
+            </div>
+          ) : lists.DEAL_PRODUCTS.length > 0 ? (
+            <div className="shop-home-deals">
+              {lists.DEAL_PRODUCTS.map((product) => (
+                <DealCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <p className="shop-home-empty">No discounted products right now.</p>
+          )}
+        </section>
+      )}
+
+      <FlashDealsPlaceholder />
+        </>
+      );
+    case 'reorder':
+      return (
+        <>
+      <ReorderPlaceholder />
+        </>
+      );
+    case 'product-rails':
+      return (
+        <>
+      {failed ? (
+        <Notice
+          title="Products could not be loaded"
+          action={
+            <button type="button" className="shop-home-retry" onClick={() => feed.retry()}>
+              Try again
+            </button>
+          }
+        >
+          Check your connection and try again. Categories and offers above still work.
+        </Notice>
+      ) : noProducts ? (
+        <Notice title="No products are listed yet">Check back soon, or browse the full catalogue.</Notice>
+      ) : (
+        <>
+          {loading && skinState.recommendationsOn && <SkeletonRail title="Picked for your skin" />}
+          {loading && recentIds.length > 0 && <SkeletonRail title="Continue browsing" />}
+          {rails.map((rail) => (
+            <ProductRail key={rail.id} title={rail.title} products={rail.products} />
+          ))}
+          {loading && <SkeletonRail title="Top Rated" />}
+          {loading && <SkeletonRail title="Under ₹500" />}
+        </>
+      )}
+
+      <section className="shop-home-section" aria-labelledby="shop-home-concerns-title">
+        <div className="shop-home-section-head">
+          <h2 id="shop-home-concerns-title">Shop by Concern</h2>
+          <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
+            See All
+            <ChevronRight size={14} />
+          </button>
+        </div>
+        <div className="shop-home-concerns">
+          {CONCERNS.map(({ id, label, Icon }) => (
+            <button key={id} type="button" className="shop-home-concern" onClick={() => navigate('shop-browse', { concern: id })}>
+              <span className="shop-home-concern-icon">
+                <Icon size={14} />
+              </span>
+              <strong>{label}</strong>
+            </button>
+          ))}
+        </div>
+      </section>
+
+        </>
+      );
+    case 'brands':
+      return (
+        <>
+      <BrandStripPlaceholder />
+        </>
+      );
+    case 'trust':
+      return (
+        <>
+      <TrustBlockPlaceholder />
+        </>
+      );
+    case 'help-gift':
+      return (
+        <>
+      <HelpGiftPlaceholder />
+        </>
+      );
+    case 'footer':
+      return (
+        <>
+      <footer className="shop-home-footer" aria-label="Site footer">
+        <div className="shop-home-footer-inner">
+          <div className="shop-home-footer-brand">
+            <span className="shop-home-footer-logo">
+              <Sparkles size={16} aria-hidden="true" />
+              <strong>GlowVai</strong>
+            </span>
+            <p>Skincare, delivered.</p>
+            {socials.length > 0 && (
+              <ul className="shop-home-footer-social" aria-label="Social media">
+                {socials.map((s) => (
+                  <li key={s.label}>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer">
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <nav className="shop-home-footer-cols" aria-label="Footer links">
+            {HOME_FOOTER_GROUPS.map((group) => (
+              <section key={group.title} className="shop-home-footer-col">
+                <h3>{group.title}</h3>
+                <ul>
+                  {group.links.map((link) => (
+                    <li key={link.label}>
+                      {'href' in link ? (
+                        <a href={link.href}>{link.label}</a>
+                      ) : (
+                        <button type="button" onClick={() => navigate(link.screen, link.params)}>
+                          {link.label}
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </nav>
+        </div>
+        <div className="shop-home-footer-bottom">
+          <span>© 2026 GlowVai</span>
+        </div>
+      </footer>
+
+      {totalCount > 0 && (
+        <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>
+          <ShoppingBag size={16} />
+          <span>
+            {totalCount} item{totalCount > 1 ? 's' : ''}
+          </span>
+          <ChevronRight size={14} />
+        </button>
+      )}
+        </>
+      );
+      default:
+        return null;
+    }
+  };
+
+  const pinnedTail = (
+    <>
+      <section className="shop-home-scan" aria-labelledby="shop-home-scan-title">
+        <span className="shop-home-scan-tag">
+          <ScanFace size={12} />
+          FACE SCAN
+        </span>
+        <h2 id="shop-home-scan-title">
+          Find the routine that
+          <br />
+          <span>fits your skin</span>
+        </h2>
+        <p className="shop-home-scan-body">Take or upload one clear photo in even light. The check suggests a skin type and up to five visible concerns, then matches products to them.</p>
+        <p className="shop-home-scan-privacy">
+          <ShieldCheck size={15} aria-hidden="true" />
+          <span>{SCAN_PRIVACY}</span>
+        </p>
+        <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
+        <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
+          Start skin check
+          <ArrowRight size={16} />
+        </button>
+      </section>
+
+      <section className="shop-home-end">
+        <Sparkles size={32} />
+        <h2>You've seen it all!</h2>
+        <p>Browse the full catalogue</p>
+        <button type="button" className="shop-home-end-btn" onClick={() => navigate('shop-browse')}>
+          Explore full catalogue
+          <ArrowRight size={16} />
+        </button>
+      </section>
+
+    </>
+  );
 
   return (
     <div className={`shop-screen shop-home zq-mode-${mode}`}>
@@ -408,259 +734,11 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
 
       <SkinQuizBanner />
 
-      <section className="shop-home-showcase">
-        <img src={HERO_IMAGE} alt="GlowVAI skincare campaign" width={1891} height={831} fetchPriority="high" decoding="async" />
-        <div className="shop-home-showcase-copy">
-          <p className="shop-home-showcase-tag">Discover. Shop. Glow.</p>
-          <h1>Glow your way.</h1>
-          <p className="shop-home-showcase-sub">
-            {deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.'}
-          </p>
-          <div className="shop-home-showcase-actions">
-            <button type="button" className="shop-home-btn-dark" onClick={() => navigate('shop-browse')}>
-              Shop now
-              <ArrowRight size={16} />
-            </button>
-            <button type="button" className="shop-home-btn-light" onClick={() => navigate('scan-camera')}>
-              <ScanFace size={16} />
-              Skin scan
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {SHOW_FESTIVAL && <div key={mode} className={`shop-home-festival${festivalSwitched ? ' is-switched' : ''}`}>
-        <section className="zq-festival" aria-label={`Navratri ${festival.heroCopy}`}>
-          <button type="button" className="zq-festival-hero" onClick={() => navigate('shop-browse')}>
-            <img src={festival.heroImage} alt="" />
-            <span className="zq-festival-copy">
-              <small>Celebrate</small>
-              <strong>NAVRATRI</strong>
-              <em>{festival.heroCopy}</em>
-            </span>
-          </button>
-          <div className="zq-festival-grid">
-            {festival.categories.map((title, index) => (
-              <button key={title} type="button" onClick={() => navigate('shop-browse')}>
-                <span className="zq-category-photo" style={{ backgroundImage: `url(${festival.categoryAtlas})`, '--category-index': index } as React.CSSProperties} />
-                <b>{title}</b>
-                <ChevronRight size={14} />
-              </button>
-            ))}
-          </div>
-          <button type="button" className="zq-festival-promo" onClick={() => navigate('shop-browse')}>
-            <img src={festival.heroImage} alt="" width={1200} height={545} loading="lazy" decoding="async" />
-            <span>
-              <b>{festival.promoTitle}</b>
-              <small>{festival.promoCopy}</small>
-            </span>
-            <ChevronRight size={19} />
-          </button>
-        </section>
-      </div>}
-
-      <HomeBanners />
-      <MiniBannersPlaceholder />
-      <OffersStripPlaceholder />
-
-      <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
-        <div className="shop-home-section-head">
-          <h2 id="shop-home-categories-title">Shop by category</h2>
-        </div>
-        <div className="shop-home-categories" aria-busy={loading}>
-          {HOME_CATEGORY_TILES.map(({ id }) => {
-            const tile = tiles.find((t) => t.id === id) ?? null;
-            return <CategoryCard key={id} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId: id })} />;
-          })}
-          <CategoryCard tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
-        </div>
-      </section>
-
-      <section className="shop-home-promos" aria-label="Offers">
-        <button type="button" className="shop-home-promo is-dark" onClick={() => navigate('shop-browse')}>
-          <span className="shop-home-promo-kicker">Delivery</span>
-          <span className="shop-home-promo-title">Free delivery above ₹{FREE_DELIVERY_ABOVE}</span>
-          <span className="shop-home-promo-sub">Applied automatically at checkout.</span>
-          <span className="shop-home-promo-icon">
-            <Truck size={18} />
-          </span>
-        </button>
-        <button type="button" className="shop-home-promo is-light" onClick={() => navigate('cart-tab')}>
-          <span className="shop-home-promo-kicker">Coupon</span>
-          <span className="shop-home-promo-title">Flat ₹{COUPON_VALUES.GLOW50} off</span>
-          <span className="shop-home-promo-sub">Enter code GLOW50 in your cart.</span>
-          <span className="shop-home-promo-icon">
-            <Ticket size={18} />
-          </span>
-        </button>
-      </section>
-
-      {!failed && (
-        <section className="shop-home-section" aria-labelledby="shop-home-deals-title">
-          <div className="shop-home-section-head">
-            <div className="shop-home-section-titles">
-              <h2 id="shop-home-deals-title">Deals</h2>
-              <p>Products priced below their listed MRP</p>
-            </div>
-            <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
-              View all
-              <ChevronRight size={14} />
-            </button>
-          </div>
-          {loading ? (
-            <div className="shop-home-deals" aria-busy="true" aria-hidden="true">
-              {skeletonCards(4, true)}
-            </div>
-          ) : lists.DEAL_PRODUCTS.length > 0 ? (
-            <div className="shop-home-deals">
-              {lists.DEAL_PRODUCTS.map((product) => (
-                <DealCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <p className="shop-home-empty">No discounted products right now.</p>
-          )}
-        </section>
-      )}
-
-      {failed ? (
-        <Notice
-          title="Products could not be loaded"
-          action={
-            <button type="button" className="shop-home-retry" onClick={() => feed.retry()}>
-              Try again
-            </button>
-          }
-        >
-          Check your connection and try again. Categories and offers above still work.
-        </Notice>
-      ) : noProducts ? (
-        <Notice title="No products are listed yet">Check back soon, or browse the full catalogue.</Notice>
-      ) : (
-        <>
-          {loading && skinState.recommendationsOn && <SkeletonRail title="Picked for your skin" />}
-          {loading && recentIds.length > 0 && <SkeletonRail title="Continue browsing" />}
-          {rails.map((rail) => (
-            <ProductRail key={rail.id} title={rail.title} products={rail.products} />
-          ))}
-          {loading && <SkeletonRail title="Top Rated" />}
-          {loading && <SkeletonRail title="Under ₹500" />}
-        </>
-      )}
-
-      <section className="shop-home-section" aria-labelledby="shop-home-concerns-title">
-        <div className="shop-home-section-head">
-          <h2 id="shop-home-concerns-title">Shop by Concern</h2>
-          <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
-            See All
-            <ChevronRight size={14} />
-          </button>
-        </div>
-        <div className="shop-home-concerns">
-          {CONCERNS.map(({ id, label, Icon }) => (
-            <button key={id} type="button" className="shop-home-concern" onClick={() => navigate('shop-browse', { concern: id })}>
-              <span className="shop-home-concern-icon">
-                <Icon size={14} />
-              </span>
-              <strong>{label}</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="shop-home-scan" aria-labelledby="shop-home-scan-title">
-        <span className="shop-home-scan-tag">
-          <ScanFace size={12} />
-          FACE SCAN
-        </span>
-        <h2 id="shop-home-scan-title">
-          Find the routine that
-          <br />
-          <span>fits your skin</span>
-        </h2>
-        <p className="shop-home-scan-body">Take or upload one clear photo in even light. The check suggests a skin type and up to five visible concerns, then matches products to them.</p>
-        <p className="shop-home-scan-privacy">
-          <ShieldCheck size={15} aria-hidden="true" />
-          <span>{SCAN_PRIVACY}</span>
-        </p>
-        <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
-        <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
-          Start skin check
-          <ArrowRight size={16} />
-        </button>
-      </section>
-
-      <section className="shop-home-end">
-        <Sparkles size={32} />
-        <h2>You've seen it all!</h2>
-        <p>Browse the full catalogue</p>
-        <button type="button" className="shop-home-end-btn" onClick={() => navigate('shop-browse')}>
-          Explore full catalogue
-          <ArrowRight size={16} />
-        </button>
-      </section>
-
-      <FlashDealsPlaceholder />
-      <ReorderPlaceholder />
-      <BrandStripPlaceholder />
-      <TrustBlockPlaceholder />
-      <HelpGiftPlaceholder />
-
-      <footer className="shop-home-footer" aria-label="Site footer">
-        <div className="shop-home-footer-inner">
-          <div className="shop-home-footer-brand">
-            <span className="shop-home-footer-logo">
-              <Sparkles size={16} aria-hidden="true" />
-              <strong>GlowVai</strong>
-            </span>
-            <p>Skincare, delivered.</p>
-            {socials.length > 0 && (
-              <ul className="shop-home-footer-social" aria-label="Social media">
-                {socials.map((s) => (
-                  <li key={s.label}>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <nav className="shop-home-footer-cols" aria-label="Footer links">
-            {HOME_FOOTER_GROUPS.map((group) => (
-              <section key={group.title} className="shop-home-footer-col">
-                <h3>{group.title}</h3>
-                <ul>
-                  {group.links.map((link) => (
-                    <li key={link.label}>
-                      {'href' in link ? (
-                        <a href={link.href}>{link.label}</a>
-                      ) : (
-                        <button type="button" onClick={() => navigate(link.screen, link.params)}>
-                          {link.label}
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </nav>
-        </div>
-        <div className="shop-home-footer-bottom">
-          <span>© 2026 GlowVai</span>
-        </div>
-      </footer>
-
-      {totalCount > 0 && (
-        <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>
-          <ShoppingBag size={16} />
-          <span>
-            {totalCount} item{totalCount > 1 ? 's' : ''}
-          </span>
-          <ChevronRight size={14} />
-        </button>
-      )}
+      {layoutOrder.filter((id) => id !== 'footer').map((id) => (
+        <React.Fragment key={id}>{renderBlock(id)}</React.Fragment>
+      ))}
+      {pinnedTail}
+      {renderBlock('footer')}
     </div>
   );
 };
