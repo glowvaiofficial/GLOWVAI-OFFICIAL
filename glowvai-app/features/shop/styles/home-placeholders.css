@@ -1,39 +1,44 @@
-/* Home page sections. Phone: everything stacks vertically, one column. Tablet and desktop: the same blocks spread across
-   the width in horizontal rows. Colours come from the theme variables (--ds-brand, --ds-ink, --ds-muted, --ds-line). */
-.hp-section { padding: 8px 16px 4px; max-width: 1200px; margin: 0 auto; }
-.hp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+/* Home page sections, the usual e-commerce pattern.
+   Phone: swipeable horizontal rows (cards run past the screen edge), brand and icon grids of four per row, full-width banners.
+   Desktop: the same rows show four to six cards across the width, with no swiping needed.
+   Colours come from the theme variables (--ds-brand, --ds-ink, --ds-muted, --ds-line). */
+.hp-section { padding: 10px 0 4px; max-width: 1200px; margin: 0 auto; }
+.hp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 16px 10px; }
 .hp-title { margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--ds-ink); }
 .hp-sub { margin: 0; font-size: 13px; color: var(--ds-muted); }
 
-/* Phone (default): one column, stacked vertically. */
-.hp-grid, .hp-chips, .hp-brands { display: grid; gap: 12px; grid-template-columns: 1fr; }
-.hp-brands { grid-template-columns: repeat(3, 1fr); }
+/* Rows: one horizontal track on every screen size. Phone shows about 1.6 cards; desktop shows the whole row. */
+.hp-grid, .hp-chips {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 74%; gap: 12px;
+  overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 16px 6px; scrollbar-width: none;
+}
+.hp-grid::-webkit-scrollbar, .hp-chips::-webkit-scrollbar { display: none; }
+.hp-grid > *, .hp-chips > * { scroll-snap-align: start; }
+.hp-brands { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 16px; }
+
 .hp-card {
-  position: relative; min-height: 120px; border-radius: 16px; padding: 16px; display: flex; flex-direction: column;
+  position: relative; min-height: 132px; border-radius: 16px; padding: 14px; display: flex; flex-direction: column;
   justify-content: flex-end; gap: 4px; background: #eef3ff; border: 1px dashed var(--ds-line); color: var(--ds-ink);
 }
-.hp-card strong { font-size: 16px; }
-.hp-card span { font-size: 13px; color: var(--ds-muted); }
+.hp-card strong { font-size: 15px; }
+.hp-card span { font-size: 12px; color: var(--ds-muted); }
 .hp-tag {
-  position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 700; letter-spacing: .04em;
   text-transform: uppercase; background: #fff; color: var(--ds-muted); border-radius: 999px; padding: 3px 8px;
 }
 .hp-chip { display: flex; align-items: center; gap: 10px; border-radius: 14px; padding: 12px 14px; background: #fff; border: 1px solid var(--ds-line); }
-.hp-chip b { display: block; font-size: 14px; color: var(--ds-ink); }
-.hp-chip small { font-size: 12px; color: var(--ds-muted); }
-.hp-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--ds-brand); opacity: .18; flex: 0 0 auto; }
-.hp-brand { height: 74px; border-radius: 14px; background: #fff; border: 1px dashed var(--ds-line); display: grid; place-items: center; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
-.hp-timer { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ds-brand); font-size: 14px; }
-.hp-skel { height: 170px; border-radius: 16px; background: linear-gradient(90deg, #eef3ff, #f7f9ff, #eef3ff); }
+.hp-chip b { display: block; font-size: 13px; color: var(--ds-ink); }
+.hp-chip small { font-size: 11px; color: var(--ds-muted); }
+.hp-dot { width: 34px; height: 34px; border-radius: 50%; background: var(--ds-brand); opacity: .18; flex: 0 0 auto; }
+.hp-brand { aspect-ratio: 1 / 1; border-radius: 14px; background: #fff; border: 1px dashed var(--ds-line); display: grid; place-items: center; color: var(--ds-muted); font-size: 11px; font-weight: 700; }
+.hp-timer { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ds-brand); font-size: 13px; }
+.hp-skel { height: 180px; border-radius: 16px; background: linear-gradient(90deg, #eef3ff, #f7f9ff, #eef3ff); }
 
-/* Tablet and desktop: horizontal rows across the width. */
+/* Desktop: wider cards, more of the row visible at once. */
 @media (min-width: 720px) {
-  .hp-section { padding: 12px 24px 6px; }
-  .hp-grid, .hp-chips { grid-template-columns: repeat(3, 1fr); }
-  .hp-grid-4 { grid-template-columns: repeat(4, 1fr); }
-  .hp-brands { grid-template-columns: repeat(6, 1fr); }
-}
-@media (min-width: 1024px) {
-  .hp-grid-4 { grid-template-columns: repeat(4, 1fr); }
-  .hp-card { min-height: 160px; }
+  .hp-grid, .hp-chips { grid-auto-columns: calc((100% - 36px) / 4); overflow-x: hidden; padding: 0 24px 6px; }
+  .hp-grid.is-three, .hp-chips.is-three { grid-auto-columns: calc((100% - 24px) / 3); }
+  .hp-head { margin: 0 24px 10px; }
+  .hp-brands { grid-template-columns: repeat(6, 1fr); padding: 0 24px; }
+  .hp-card { min-height: 170px; }
 }
