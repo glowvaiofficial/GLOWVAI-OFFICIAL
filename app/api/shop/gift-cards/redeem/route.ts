@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { clientIp, customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { clientIp, customerFrom, db, json, limitByIp, limitByUserShared } from "@/lib/shop/server";
 import { takeAttempt, logActivity } from "@/lib/shop/privacy/store";
 import { REDEEM_MAX_ATTEMPTS, REDEEM_WINDOW_MS, normalizeGiftCode } from "@/lib/shop/giftCards/rules";
 import { creditGiftCard } from "@/lib/shop/giftCards/service";
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "gift-card-redeem", 30);
+  const userLimited = await limitByUserShared(customer.uid, "gift-card-redeem", 5, 15 * 60 * 1000, "Too many attempts. Try again in a few minutes.");
   if (userLimited) return userLimited;
 
   const now = Date.now();

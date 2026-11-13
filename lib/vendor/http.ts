@@ -3,7 +3,7 @@
 // Responses are JSON with Cache-Control: no-store. Unexpected errors are logged and answered with a friendly message.
 import "server-only";
 import { NextResponse, type NextRequest } from "next/server";
-import { clientIp, tooMany } from "@/lib/shop/server";
+import { clientIp, overLimit } from "@/lib/shop/server";
 import { vendorIdentity, type VendorIdentity } from "./auth";
 import { allowedOrigins, checkOrigin, corsHeaders, type OriginCheck } from "./cors";
 import { VendorError, errorBody, invalid } from "./errors";
@@ -59,6 +59,8 @@ interface RouteOptions {
   user: Limit;
   /** Only GET /me answers accounts whose email is not verified yet. */
   allowUnverified?: boolean;
+  /** Count the ip and user limits in the shared limiter (Upstash when configured). Off unless a route asks for it. */
+  shared?: boolean;
 }
 
 export function vendorRoute<P extends Record<string, string> = Record<string, never>>(
@@ -69,9 +71,9 @@ export function vendorRoute<P extends Record<string, string> = Record<string, ne
     const origin = originOf(req);
     try {
       if (origin.kind === "denied") throw new VendorError("ORIGIN_NOT_ALLOWED", 403);
-      if (tooMany(`ip:vendor-${opts.route}:${clientIp(req)}`, opts.ip.max, opts.ip.windowMs)) throw new VendorError("RATE_LIMITED", 429);
+      if (await overLimit(`ip:vendor-${opts.route}:${clientIp(req)}`, opts.ip.max, opts.ip.windowMs, opts.shared === true)) throw new VendorError("RATE_LIMITED", 429);
       const me = await vendorIdentity(req.headers.get("authorization"), { allowUnverified: opts.allowUnverified });
-      if (tooMany(`user:vendor-${opts.route}:${me.uid}`, opts.user.max, opts.user.windowMs)) throw new VendorError("RATE_LIMITED", 429);
+      if (await overLimit(`user:vendor-${opts.route}:${me.uid}`, opts.user.max, opts.user.windowMs, opts.shared === true)) throw new VendorError("RATE_LIMITED", 429);
       const params = ((await context?.params) ?? {}) as P;
       const body = await work({ req, me, params });
       return respond({ ...body, ok: true }, 200, origin);

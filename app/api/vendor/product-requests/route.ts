@@ -27,7 +27,7 @@ export const GET = vendorRoute({ route: "product-requests-get", ip: perMinute(60
 
 // Sends a request for a product that is not in the catalogue. At most DAILY_REQUEST_CAP per vendor per IST day; the cap
 // is counted in a per-day document inside the same transaction as the write, so two quick taps cannot both pass.
-export const POST = vendorRoute({ route: "product-requests-post", ip: perMinute(10), user: perMinute(10) }, async ({ req, me }) => {
+export const POST = vendorRoute({ route: "product-requests-post", ip: perMinute(10), user: perMinute(10), shared: true }, async ({ req, me }) => {
   const parsed = parseProductRequest(await readJson(req));
   if (!parsed.ok) throw invalid(parsed.error, { field: parsed.field });
   const input = parsed.value;

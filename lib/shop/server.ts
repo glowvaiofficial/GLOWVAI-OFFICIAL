@@ -7,6 +7,7 @@ import { getAuth, type Auth } from "firebase-admin/auth";
 import { getMessaging, type Messaging } from "firebase-admin/messaging";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { NextResponse, type NextRequest } from "next/server";
+import { checkRateLimit, memoryCheck, type RateLimitResult } from "./rateLimit";
 
 let app: App | undefined;
 
@@ -52,18 +53,10 @@ export async function customerFrom(req: NextRequest): Promise<{ uid: string; ano
   }
 }
 
-// Small per-instance limiter so one device cannot flood orders or tickets.
-const hits = new Map<string, number[]>();
+// Small per-instance limiter so one device cannot flood orders or tickets. Synchronous, so existing callers keep working.
+// The counters are shared with the async limiter in ./rateLimit (in-memory path) and keyed by SHA-256 hash.
 export function tooMany(key: string, max: number, windowMs: number): boolean {
-  const now = Date.now();
-  const list = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
-  if (list.length >= max) {
-    hits.set(key, list);
-    return true;
-  }
-  list.push(now);
-  hits.set(key, list);
-  return false;
+  return !memoryCheck(key, max, windowMs).allowed;
 }
 
 // Input helpers live in ./text (no server imports) so the vendor API's pure modules and tests can use them too.
@@ -87,4 +80,29 @@ export function limitByUser(uid: string, route: string, max: number, windowMs = 
   return tooMany(`user:${route}:${uid}`, max, windowMs)
     ? json({ ok: false, error: "Too many requests. Please wait a minute and try again." }, 429)
     : null;
+}
+
+// ---- Shared limiter (Upstash when configured, see ./rateLimit). Same keys and responses as the sync helpers above.
+
+function limited(result: RateLimitResult, message: string): NextResponse | null {
+  if (result.allowed) return null;
+  const res = json({ ok: false, error: message }, 429);
+  res.headers.set("Retry-After", String(result.retryAfterSeconds));
+  return res;
+}
+
+// Async check for any key, used by routes that need a custom limit. True when the request is over the limit.
+export async function overLimit(key: string, max: number, windowMs: number, shared: boolean): Promise<boolean> {
+  if (!shared) return tooMany(key, max, windowMs);
+  return !(await checkRateLimit({ key, max, windowMs })).allowed;
+}
+
+export async function limitByIpShared(req: NextRequest, route: string, max: number, windowMs = 60_000, message?: string): Promise<NextResponse | null> {
+  const result = await checkRateLimit({ key: `ip:${route}:${clientIp(req)}`, max, windowMs });
+  return limited(result, message ?? "Too many requests. Please try again later.");
+}
+
+export async function limitByUserShared(uid: string, route: string, max: number, windowMs = 60_000, message?: string): Promise<NextResponse | null> {
+  const result = await checkRateLimit({ key: `user:${route}:${uid}`, max, windowMs });
+  return limited(result, message ?? "Too many requests. Please try again later.");
 }

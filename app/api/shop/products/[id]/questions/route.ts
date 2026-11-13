@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
+import { customerFrom, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { PRODUCT_ID_PATTERN, reviewFailure } from "@/lib/shop/reviews";
 import { createQuestion, listApprovedQuestions } from "@/lib/shop/qna";
 import { validateQuestionText } from "@/lib/shop/qnaRules";
@@ -20,15 +20,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 // Asking a question. Anyone signed in (anonymous is fine) may ask, 3 an hour. The question is PENDING until a moderator
 // approves it. The product id is checked against the catalogue; the asker's name is read from their profile.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const ipLimited = limitByIp(req, "product-questions-post", 20);
+  const ipLimited = await limitByIpShared(req, "product-questions-post", 20, 60_000);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   const userLimited = limitByUser(customer.uid, "product-questions", 60);
   if (userLimited) return userLimited;
-  if (tooMany(`question:${customer.uid}`, 3, 60 * 60 * 1000)) {
-    return json({ ok: false, error: "You have asked several questions recently. Try again in an hour." }, 429);
-  }
+  const askLimited = await limitByUserShared(customer.uid, "question", 3, 60 * 60 * 1000, "You have asked several questions recently. Try again in an hour.");
+  if (askLimited) return askLimited;
 
   const { id } = await params;
   if (!PRODUCT_ID_PATTERN.test(id)) return json({ ok: false, error: "That product could not be found." }, 404);

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { createTopupLive, topupStatusLive } from "@/lib/shop/wallet/live";
 import { TOPUP_LIMITS } from "@/lib/shop/wallet-config";
 import { TOPUP_MESSAGES } from "@/lib/shop/wallet/rules";
@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
   if (process.env.WALLET_TOPUP_ENABLED !== "true") {
     return json({ ok: false, code: "NOT_AVAILABLE", error: "GlowVai Coins top-up is not available yet." }, 503);
   }
-  const ipLimited = limitByIp(req, "wallet-topup-create", TOPUP_LIMITS.createPerIpPerHour, HOUR);
+  const ipLimited = await limitByIpShared(req, "wallet-topup-create", TOPUP_LIMITS.createPerIpPerHour, HOUR);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "wallet-topup-create", TOPUP_LIMITS.createPerCustomerPerHour, HOUR);
+  const userLimited = await limitByUserShared(customer.uid, "wallet-topup-create", TOPUP_LIMITS.createPerCustomerPerHour, HOUR);
   if (userLimited) return userLimited;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
+import { customerFrom, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { PRODUCT_ID_PATTERN, createReview, editReview, reviewEligibility, reviewFailure } from "@/lib/shop/reviews";
 import { validateReviewInput } from "@/lib/shop/reviewRules";
 import { recordActivity } from "@/lib/shop/activity";
@@ -24,15 +24,14 @@ export async function GET(req: NextRequest) {
 }
 
 async function writeGate(req: NextRequest): Promise<{ uid: string } | Response> {
-  const ipLimited = limitByIp(req, "reviews-write", 30);
+  const ipLimited = await limitByIpShared(req, "reviews-write", 30, 60_000);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
   const userLimited = limitByUser(customer.uid, "reviews-own", 60);
   if (userLimited) return userLimited;
-  if (tooMany(`review-write:${customer.uid}`, 5, 60 * 60 * 1000)) {
-    return json({ ok: false, error: "You have sent several reviews recently. Try again in an hour." }, 429);
-  }
+  const reviewLimited = await limitByUserShared(customer.uid, "review-write", 5, 60 * 60 * 1000, "You have sent several reviews recently. Try again in an hour.");
+  if (reviewLimited) return reviewLimited;
   return { uid: customer.uid };
 }
 

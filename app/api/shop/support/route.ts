@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { randomBytes } from "node:crypto";
-import { customerFrom, db, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared, text } from "@/lib/shop/server";
 import { customerTicket } from "@/lib/shop/support";
 
 export const dynamic = "force-dynamic";
@@ -44,13 +44,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ipLimited = limitByIp(req, "support-post", 30);
+  const ipLimited = await limitByIpShared(req, "support-post", 30, 60_000);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "support", 60);
+  const userLimited = await limitByUserShared(customer.uid, "support-ticket", 5, 60 * 60 * 1000, "Too many requests. Try again later.");
   if (userLimited) return userLimited;
-  if (tooMany(`ticket:${customer.uid}`, 5, 60 * 60 * 1000)) return json({ ok: false, error: "Too many requests. Try again later." }, 429);
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);

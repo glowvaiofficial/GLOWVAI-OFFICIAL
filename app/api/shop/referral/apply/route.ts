@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByUserShared } from "@/lib/shop/server";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { applyReferralCode } from "@/lib/shop/growth/referrals";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "referral-apply", GROWTH_CONFIG.referral.applyPerUserPerDay, DAY_MS);
+  const userLimited = await limitByUserShared(customer.uid, "referral-apply", 10, DAY_MS, "Too many attempts. Try again tomorrow.");
   if (userLimited) return userLimited;
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

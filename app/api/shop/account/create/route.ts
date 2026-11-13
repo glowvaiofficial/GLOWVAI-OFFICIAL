@@ -1,17 +1,18 @@
 import { NextRequest } from "next/server";
-import { adminAuth, clientIp, db, json, tooMany } from "@/lib/shop/server";
-import { ACCOUNT_LIMITS, bodyPhoneMatches, phoneAccountClaims, planAccountWrite } from "@/lib/shop/account/rules";
+import { adminAuth, db, json, limitByIpShared, limitByUserShared } from "@/lib/shop/server";
+import { bodyPhoneMatches, phoneAccountClaims, planAccountWrite } from "@/lib/shop/account/rules";
 
 export const dynamic = "force-dynamic";
+
+const HOUR = 60 * 60 * 1000;
 
 // Creates the customer's account record (users/{uid}) after a phone sign-in. The uid and the phone number come only
 // from the verified ID token, which must be a phone-provider token. Calling it again returns the existing account and
 // never overwrites it. Nothing here logs the phone number or the token.
 export async function POST(req: NextRequest) {
   // Checked before the token, so a flood of bad requests costs nothing.
-  if (tooMany(`account-create:ip:${clientIp(req)}`, ACCOUNT_LIMITS.perIpPerHour, ACCOUNT_LIMITS.windowMs)) {
-    return json({ ok: false, error: "Too many attempts. Try again later." }, 429);
-  }
+  const ipLimited = await limitByIpShared(req, "account-create", 10, HOUR, "Too many attempts. Try again later.");
+  if (ipLimited) return ipLimited;
 
   const header = req.headers.get("authorization") ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
@@ -33,9 +34,8 @@ export async function POST(req: NextRequest) {
     return json({ ok: false, error: "The phone number does not match your sign-in." }, 400);
   }
 
-  if (tooMany(`account-create:uid:${checked.uid}`, ACCOUNT_LIMITS.perUidPerHour, ACCOUNT_LIMITS.windowMs)) {
-    return json({ ok: false, error: "Too many attempts. Try again later." }, 429);
-  }
+  const uidLimited = await limitByUserShared(checked.uid, "account-create", 5, HOUR, "Too many attempts. Try again later.");
+  if (uidLimited) return uidLimited;
 
   const ref = db().collection("users").doc(checked.uid);
   const now = Date.now();
