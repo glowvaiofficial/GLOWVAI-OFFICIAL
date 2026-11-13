@@ -287,6 +287,21 @@ function AdminCategoryTile({ item, onOpen }: { item: BlockItem; onOpen: () => vo
   );
 }
 
+// A promo card the admin set: same section and grid as the built-in promo cards. The picture sits behind the dark gradient of the category tiles.
+function AdminPromoCard({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
+  return (
+    <button type="button" className={`shop-home-promo is-dark${item.image ? ' has-picture' : ''}`} onClick={onOpen}>
+      {item.image && <img className="shop-home-promo-image" src={item.image} alt="" width={600} height={300} loading="lazy" decoding="async" />}
+      {item.image && <span className="shop-home-promo-shade" aria-hidden="true" />}
+      <span className="shop-home-promo-title">{item.label}</span>
+      {item.sub && <span className="shop-home-promo-sub">{item.sub}</span>}
+      <span className="shop-home-promo-icon">
+        <ArrowRight size={18} />
+      </span>
+    </button>
+  );
+}
+
 // For Her / For Him drives the shared shoppingPreference state (same as the legacy home).
 type Mode = 'women' | 'men';
 type ShopHomeScreenProps = { embedded?: boolean };
@@ -373,6 +388,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride } = useHomeLayout();
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
+  // The promo cards the admin published. None published means the built-in promo cards.
+  const adminPromos = blockSettings['promos']?.items ?? [];
   // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
   const configuredRows = useMemo(() => {
     const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
@@ -508,6 +525,10 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
       return (
         <>
       <section className="shop-home-promos" aria-label="Offers">
+        {adminPromos.length > 0 ? adminPromos.map((item, i) => (
+          <AdminPromoCard key={`${i}-${item.label}`} item={item} onOpen={() => (item.link ? window.location.assign(item.link) : navigate('shop-browse'))} />
+        )) : (
+          <>
         <button type="button" className="shop-home-promo is-dark" onClick={() => navigate('shop-browse')}>
           <span className="shop-home-promo-kicker">Delivery</span>
           <span className="shop-home-promo-title">Free delivery above ₹{FREE_DELIVERY_ABOVE}</span>
@@ -524,6 +545,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
             <Ticket size={18} />
           </span>
         </button>
+          </>
+        )}
       </section>
 
         </>
