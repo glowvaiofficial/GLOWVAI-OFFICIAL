@@ -253,6 +253,9 @@ type FestivalContent = {
   promoCopy: string;
 };
 
+// The Navratri block is off until a festival is scheduled. Set to true to show it again.
+const SHOW_FESTIVAL = false;
+
 // Navratri copy and images carried over from the legacy home.
 const FESTIVAL: Record<Mode, FestivalContent> = {
   women: {
@@ -424,7 +427,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </div>
       </section>
 
-      <div key={mode} className={`shop-home-festival${festivalSwitched ? ' is-switched' : ''}`}>
+      {SHOW_FESTIVAL && <div key={mode} className={`shop-home-festival${festivalSwitched ? ' is-switched' : ''}`}>
         <section className="zq-festival" aria-label={`Navratri ${festival.heroCopy}`}>
           <button type="button" className="zq-festival-hero" onClick={() => navigate('shop-browse')}>
             <img src={festival.heroImage} alt="" />
@@ -452,7 +455,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
             <ChevronRight size={19} />
           </button>
         </section>
-      </div>
+      </div>}
 
       <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
         <div className="shop-home-section-head">

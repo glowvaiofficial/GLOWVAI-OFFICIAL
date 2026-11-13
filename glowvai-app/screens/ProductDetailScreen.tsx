@@ -136,7 +136,7 @@ export const ProductDetailScreen: React.FC = () => {
           }}
         >
           <Zap size={13} fill="#19734F" />
-          <span>⚡ {product.deliveryMinutes} mins to Vijayawada</span>
+          {product.deliveryMinutes ? <span>⚡ {product.deliveryMinutes} mins to Vijayawada</span> : null}
         </div>
       </div>
 

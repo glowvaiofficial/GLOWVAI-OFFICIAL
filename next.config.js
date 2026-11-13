@@ -128,7 +128,7 @@ const nextConfig = {
                 { key: 'X-Content-Type-Options', value: 'nosniff' },
                 { key: 'X-Frame-Options', value: 'DENY' },
                 { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-                { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=(self)' },
+                { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=(self "https://checkout.razorpay.com" "https://api.razorpay.com")' },
               ],
             },
             {
@@ -160,12 +160,13 @@ const nextConfig = {
                 { key: 'X-Content-Type-Options', value: 'nosniff' },
                 { key: 'X-Frame-Options', value: 'DENY' },
                 { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-                { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=(self)' },
+                { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self), payment=(self "https://checkout.razorpay.com" "https://api.razorpay.com")' },
               ],
             },
             {
               source: '/((?!face-analysis|shop).*)',
-              headers: [{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' }],
+              // Camera is for this site only, so the face scan works when opened from the home page too.
+              headers: [{ key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(), payment=()' }],
             },
             {
               source: '/face-analysis',
