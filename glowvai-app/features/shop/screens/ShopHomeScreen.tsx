@@ -12,6 +12,7 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
+import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
@@ -459,6 +460,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
       </div>}
 
       <HomeBanners />
+      <MiniBannersPlaceholder />
+      <OffersStripPlaceholder />
 
       <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
         <div className="shop-home-section-head">
@@ -596,6 +599,12 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           <ArrowRight size={16} />
         </button>
       </section>
+
+      <FlashDealsPlaceholder />
+      <ReorderPlaceholder />
+      <BrandStripPlaceholder />
+      <TrustBlockPlaceholder />
+      <HelpGiftPlaceholder />
 
       <footer className="shop-home-footer" aria-label="Site footer">
         <div className="shop-home-footer-inner">
