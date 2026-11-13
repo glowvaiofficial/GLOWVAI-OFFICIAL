@@ -12,7 +12,7 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
-import { useHomeLayout, type HomeBlockId } from '../lib/useHomeLayout';
+import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, ReorderPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
@@ -244,6 +244,22 @@ function CategoryCard({ tile, onOpen, count, isAll = false }: { tile: HomeCatego
   );
 }
 
+// A category tile the admin set: same look as CategoryCard. The link opens the admin's page, or the shop browse page when empty.
+function AdminCategoryTile({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
+  return (
+    <button type="button" className="shop-home-category" onClick={onOpen} aria-label={item.sub ? `${item.label}, ${item.sub}` : item.label}>
+      <span className="shop-home-category-tile">
+        {item.image ? <img src={item.image} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <span className="shop-home-category-fallback" aria-hidden="true"><Sparkles size={28} /></span>}
+        <span className="shop-home-category-shade" aria-hidden="true" />
+        <span className="shop-home-category-meta">
+          <strong className="shop-home-category-label">{item.label}</strong>
+          {item.sub && <span className="shop-home-category-count">{item.sub}</span>}
+        </span>
+      </span>
+    </button>
+  );
+}
+
 // For Her / For Him drives the shared shoppingPreference state (same as the legacy home).
 type Mode = 'women' | 'men';
 type ShopHomeScreenProps = { embedded?: boolean };
@@ -328,6 +344,8 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
   }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
 
   const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride } = useHomeLayout();
+  // The category tiles the admin published. None published means the built-in tiles.
+  const adminCategories = blockSettings['categories']?.items ?? [];
   // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
   const configuredRows = useMemo(() => {
     const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
@@ -438,11 +456,17 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
           <h2 id="shop-home-categories-title">Shop by category</h2>
         </div>
         <div className="shop-home-categories" aria-busy={loading}>
-          {HOME_CATEGORY_TILES.map(({ id }) => {
-            const tile = tiles.find((t) => t.id === id) ?? null;
-            return <CategoryCard key={id} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId: id })} />;
-          })}
-          <CategoryCard tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+          {adminCategories.length > 0 ? adminCategories.map((item, i) => (
+            <AdminCategoryTile key={`${i}-${item.label}`} item={item} onOpen={() => (item.link ? window.location.assign(item.link) : navigate('shop-browse'))} />
+          )) : (
+            <>
+              {HOME_CATEGORY_TILES.map(({ id }) => {
+                const tile = tiles.find((t) => t.id === id) ?? null;
+                return <CategoryCard key={id} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId: id })} />;
+              })}
+              <CategoryCard tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+            </>
+          )}
         </div>
       </section>
 

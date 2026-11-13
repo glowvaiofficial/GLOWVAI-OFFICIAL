@@ -125,3 +125,33 @@ test("a block whose items are not an array is left out", () => {
   assert.equal(promoBlock("offers", { title: "", background: "", textColor: "", items: "nope" }), undefined);
   assert.equal(promoBlock("mini-banners", { title: "", background: "", textColor: "" }), undefined);
 });
+
+// ---- Category tiles (the categories block). Up to 8 tiles; a picture is optional; a bad link keeps the tile (it opens the browse page).
+const categoriesOf = (items: unknown) => readBlockSettings({ blocks: [{ id: "categories", enabled: true, position: 0, settings: { title: "", background: "", textColor: "", items } }] })["categories"]?.items;
+
+test("category tiles are read with their pictures", () => {
+  const items = categoriesOf([{ label: "Serums", sub: "12 products", link: "/shop/serums", image: PNG }, { label: "Masks", sub: "", link: "", image: "" }]);
+  assert.equal(items?.length, 2);
+  assert.deepEqual(items?.[0], { label: "Serums", sub: "12 products", link: "/shop/serums", image: PNG });
+  assert.equal(items?.[1].image, "");
+});
+
+test("more than 8 category tiles keeps the first 8", () => {
+  const items = categoriesOf(Array.from({ length: 10 }, (_, i) => ({ label: "Tile " + i, sub: "", link: "", image: "" })));
+  assert.equal(items?.length, 8);
+  assert.equal(items?.[7].label, "Tile 7");
+});
+
+test("a bad category link is dropped alone and the tile is kept", () => {
+  for (const bad of ["//evil.example", "/a\b", "https://example.com", "/has space"]) {
+    const items = categoriesOf([{ label: "Serums", sub: "", link: bad, image: "" }]);
+    assert.equal(items?.length, 1);
+    assert.equal(items?.[0].label, "Serums");
+    assert.equal(items?.[0].link, "");
+  }
+});
+
+test("empty category items give no override, so the built-in tiles show", () => {
+  assert.equal(categoriesOf([]), undefined);
+  assert.equal(categoriesOf([{ label: "", sub: "", link: "", image: "" }]), undefined);
+});
