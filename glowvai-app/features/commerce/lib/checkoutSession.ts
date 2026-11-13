@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import type { SubstitutionPreference } from '../../../core/services/shopTracking';
 
+// What the server says the bag is taken off. code is null for an automatic offer.
+export interface BagQuote {
+  source: 'builtin' | 'code' | 'auto';
+  code: string | null;
+  discount: number;
+  label: string;
+}
+
 export type PayChoice = 'gpay' | 'phonepe' | 'paytm' | 'bhim' | 'card' | 'cod';
 
 // Where the order placement is: idle (not started), running (the processing screen owns it) or finished (it has left
@@ -11,10 +19,10 @@ export type PlacementState = 'idle' | 'running' | 'finished';
 interface CheckoutSessionState {
   // A code from COUPON_VALUES in shared/pricing-rules.mjs, or null. Nothing is applied until the customer enters one.
   couponCode: string | null;
-  // The server's answer for an offer code (a promo from the admin): what it takes off this bag right now. Null for the
-  // built-in codes and when no offer code is applied.
-  couponQuote: { code: string; discount: number; label: string } | null;
-  setCouponQuote: (quote: { code: string; discount: number; label: string } | null) => void;
+  // The server's answer for this bag: the best discount right now (a built-in code, a typed offer code or an automatic
+  // offer). Null until the first answer arrives. Totals use this, never a number worked out on the phone.
+  bagQuote: BagQuote | null;
+  setBagQuote: (quote: BagQuote | null) => void;
   payChoice: PayChoice;
   // The customer has looked at the delivery address on the review step and confirmed it. Reset when the address changes.
   addressConfirmed: boolean;
@@ -46,8 +54,8 @@ interface CheckoutSessionState {
 
 export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   couponCode: null,
-  couponQuote: null,
-  setCouponQuote: (couponQuote) => set({ couponQuote }),
+  bagQuote: null,
+  setBagQuote: (bagQuote) => set({ bagQuote }),
   // Only cash on delivery can be placed until online payment is connected on the server.
   payChoice: 'cod',
   addressConfirmed: false,
@@ -58,7 +66,7 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   setSlotId: (slotId) => set({ slotId }),
   placement: 'idle',
   setPlacement: (placement) => set({ placement }),
-  setCouponCode: (couponCode) => set({ couponCode, couponQuote: null }),
+  setCouponCode: (couponCode) => set({ couponCode }),
   setPayChoice: () => set({ payChoice: 'cod' }),
   setAddressConfirmed: (addressConfirmed) => set({ addressConfirmed }),
   setTip: (tip) => set({ tip: Math.max(0, Math.min(500, Math.round(tip) || 0)) }),

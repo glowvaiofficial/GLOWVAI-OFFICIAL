@@ -5,7 +5,10 @@ export const OFFER_CODE_PATTERN = /^[A-Z0-9_-]{3,20}$/;
 
 export interface Offer {
   id: string;
-  code: string;
+  // The code a customer types. Null for an automatic offer, which needs no code.
+  code: string | null;
+  // Automatic offers apply to every eligible bag, with no code. The customer gets the best one.
+  automatic: boolean;
   name: string;
   type: "flat" | "percent";
   value: number;
@@ -32,7 +35,8 @@ const int = (v: unknown, min: number, max: number): number | null =>
 export function readOffer(id: string, raw: unknown): Offer | null {
   if (!raw || typeof raw !== "object") return null;
   const d = raw as Record<string, unknown>;
-  const code = normalizeCode(d.code);
+  const automatic = d.automatic === true;
+  const code = automatic ? null : normalizeCode(d.code);
   const name = typeof d.name === "string" && d.name.trim().length > 0 && d.name.length <= 60 ? d.name : null;
   const type = d.type === "flat" || d.type === "percent" ? d.type : null;
   const value = type === "percent" ? int(d.value, 1, 50) : type === "flat" ? int(d.value, 1, 5000) : null;
@@ -49,12 +53,12 @@ export function readOffer(id: string, raw: unknown): Offer | null {
   const endsAt = typeof d.endsAt === "number" && d.endsAt > 0 ? d.endsAt : null;
   const perCustomerLimit = d.perCustomerLimit === undefined ? 1 : int(d.perCustomerLimit, 1, 20);
   const totalLimit = d.totalLimit === null || d.totalLimit === undefined ? null : int(d.totalLimit, 1, 100000);
-  if (!code || !name || !type || value === null || minSubtotal === null || category === undefined || perCustomerLimit === null) return null;
+  if ((!automatic && !code) || (automatic && d.code !== null && d.code !== undefined && d.code !== "") || !name || !type || value === null || minSubtotal === null || category === undefined || perCustomerLimit === null) return null;
   if (totalLimit === undefined) return null;
   if (type === "flat" && hasMax) return null;
   if (type === "percent" && hasMax && maxDiscount === null) return null;
   if (startsAt !== null && endsAt !== null && endsAt <= startsAt) return null;
-  return { id, code, name, type, value, maxDiscount, minSubtotal, category, startsAt, endsAt, enabled: d.enabled === true, perCustomerLimit, totalLimit };
+  return { id, code, automatic, name, type, value, maxDiscount, minSubtotal, category, startsAt, endsAt, enabled: d.enabled === true, perCustomerLimit, totalLimit };
 }
 
 export interface OfferLine {
@@ -94,4 +98,25 @@ export function offerSentence(offer: Offer): string {
   const scope = offer.category ? ` on ${offer.category.toLowerCase()}` : "";
   const min = offer.minSubtotal > 0 ? ` on orders above ₹${offer.minSubtotal}` : "";
   return `${what}${scope}${min}.`;
+}
+
+// One candidate discount for a bag. source: a built-in code, a code the customer typed, or an automatic offer.
+export interface BagCandidate {
+  source: "builtin" | "code" | "auto";
+  code: string | null;
+  offerId: string | null;
+  discount: number;
+  label: string;
+}
+
+const PRIORITY: Record<BagCandidate["source"], number> = { builtin: 0, code: 1, auto: 2 };
+
+// The one discount the customer gets: the largest. When two are equal, a code the customer chose wins over an automatic one.
+export function chooseBest(candidates: BagCandidate[]): BagCandidate | null {
+  let best: BagCandidate | null = null;
+  for (const c of candidates) {
+    if (c.discount <= 0) continue;
+    if (!best || c.discount > best.discount || (c.discount === best.discount && PRIORITY[c.source] < PRIORITY[best.source])) best = c;
+  }
+  return best;
 }
