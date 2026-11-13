@@ -18,6 +18,8 @@ import { notifyOfferPool } from "@/lib/vendor/notify";
 import { applyCoins, maxRedeemable } from "./growth/coins";
 import { wrapTx, firestoreRepo } from "./growth/firestoreRepo";
 import { razorpayKeyId } from "./razorpay";
+import { evaluateOffer, normalizeCode, type OfferLine } from "./offers";
+import { findOfferByCode, offerUsage } from "./offerLookup";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 export class OrderBlocked extends Error {
@@ -112,9 +114,27 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
   if (!pre.ok) return fail(409, "OUT_OF_STOCK", pre.message);
 
   const subtotal = items.reduce((s, it) => s + Number(it.totalPrice), 0);
-  const couponValue = input.couponCode ? (COUPON_VALUES as Record<string, number>)[input.couponCode] : undefined;
-  if (input.couponCode && couponValue === undefined) return fail(400, "COUPON_INVALID", "That coupon code is not valid.");
-  const discountAmount = Math.min(couponValue ?? 0, subtotal);
+  // The two built-in codes keep their fixed value. Any other code is an admin offer (lib/shop/offers.ts), checked here.
+  let discountAmount = 0;
+  let storedCoupon: string | null = null;
+  if (input.couponCode) {
+    const builtIn = (COUPON_VALUES as Record<string, number>)[input.couponCode];
+    if (builtIn !== undefined) {
+      discountAmount = Math.min(builtIn, subtotal);
+      storedCoupon = input.couponCode;
+    } else {
+      const code = normalizeCode(input.couponCode);
+      const offer = code ? await findOfferByCode(store, code) : null;
+      if (!offer) return fail(400, "COUPON_INVALID", "That coupon code is not valid.");
+      const categoryById = new Map(productSnaps.map((s) => [s.id, String((s.data() as { category?: unknown } | undefined)?.category ?? "")]));
+      const offerLines: OfferLine[] = items.map((it) => ({ productId: String(it.productId), category: categoryById.get(String(it.productId)) ?? "", total: Number(it.totalPrice) }));
+      const usage = await offerUsage(store, offer.code, input.uid);
+      const verdict = evaluateOffer(offer, offerLines, now, usage);
+      if (!verdict.ok) return fail(400, "COUPON_INVALID", verdict.error);
+      discountAmount = verdict.discount;
+      storedCoupon = offer.code;
+    }
+  }
   const deliveryFee = deliveryFeeFor({ itemTotal: subtotal, area: address.area || address.city });
   // Optional tip for the delivery partner: a whole-rupee amount from 0 to 500, added to the bill.
   const tipRaw = input.tipRaw === undefined || input.tipRaw === null || input.tipRaw === "" ? 0 : Number(input.tipRaw);
@@ -182,7 +202,7 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     pricing: { subtotal, itemTotal: subtotal, deliveryFee, discountAmount, tip, coinsRedeemed, beautyProtectionTotal: 0, grandTotal },
     payment: { method: online ? "ONLINE" : "COD", status: "PENDING", transactionId, paymentId: null },
     status: online ? "PAYMENT_PENDING" : "PLACED",
-    couponCode: discountAmount > 0 ? input.couponCode : null,
+    couponCode: discountAmount > 0 ? storedCoupon : null,
     referralCodeUsed: null,
     referralProcessed: false,
     affiliateCode: input.affiliateCode ?? null,

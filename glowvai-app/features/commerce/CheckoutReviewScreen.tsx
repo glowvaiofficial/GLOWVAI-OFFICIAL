@@ -16,11 +16,12 @@ export const CheckoutReviewScreen: React.FC = () => {
   const { navigate, goBack } = useApp();
   const items = useCartStore((s) => s.items);
   const couponCode = useCheckoutSession((s) => s.couponCode);
+  const couponQuote = useCheckoutSession((s) => s.couponQuote);
   const slotId = useCheckoutSession((s) => s.slotId);
   const address = useDeliveryAddress();
 
   const cartItems = Object.values(items);
-  const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress);
+  const totals = computeCartTotals(cartItems, couponCode, address?.fullAddress, couponQuote && couponQuote.code === couponCode ? couponQuote.discount : null);
   // A delivery time is required too: the order says when it should arrive.
   const canContinue = Boolean(address?.serviceable) && Boolean(slotId);
 
