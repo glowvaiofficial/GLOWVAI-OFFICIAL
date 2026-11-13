@@ -52,7 +52,7 @@ export const PaymentProcessingScreen: React.FC = () => {
     }
     useCheckoutSession.getState().setPlacement('running');
 
-    const leave = (screen: 'checkout-review' | 'cart-tab' | 'login', params?: Record<string, unknown>) => {
+    const leave = (screen: 'checkout-review' | 'cart-tab' | 'customer-details', params?: Record<string, unknown>) => {
       useCheckoutSession.getState().setPlacement('finished');
       navigate(screen, params);
     };
@@ -100,7 +100,7 @@ export const PaymentProcessingScreen: React.FC = () => {
         return;
       }
       if (!customerDetails) {
-        leave('login', { returnTo: 'checkout-payment-method' });
+        leave('customer-details', { returnTo: 'checkout-payment-method' });
         return;
       }
 

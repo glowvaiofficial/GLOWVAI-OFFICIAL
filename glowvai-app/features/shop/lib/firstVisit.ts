@@ -1,4 +1,5 @@
-// First visit to the shop. Products open at once; the intro and the skin quiz are optional and are offered from a banner.
+// Shop home state: the skin quiz banner and the quiz answers. The first screen is decided by the account gate
+// (features/auth/accountGate.ts), not here. The intro and the quiz are optional and are offered from the banner.
 // Pure functions only (no React, no window at import time) so the decisions can be tested directly.
 
 export const QUIZ_DISMISSED_KEY = 'glowvai_quiz_dismissed';

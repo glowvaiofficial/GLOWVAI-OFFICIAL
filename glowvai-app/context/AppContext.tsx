@@ -23,16 +23,20 @@ import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 import { useCartStore } from '../core/state/cartStore';
 import { buildState, entryFromState, popDecision, restoreTarget, safeParams, sameEntry, type NavEntry } from './navHistory';
 import { currentScrollY, queueScrollRestore, rememberScroll } from './scrollMemory';
+import { accountStateOf, gateNavigation, startScreenFor, SIGN_IN_SCREEN, type AccountState } from '../features/auth/accountGate';
+import { ensureAccountRecord } from '../features/auth/accountService';
+import { holdAction } from '../features/auth/resumeAction';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
 const requestedQaScreen = (process.env.NODE_ENV !== 'production') ? new URLSearchParams(window.location.search).get('screen') as ScreenName | null : null;
-// Every visit opens the product list. The intro and the skin quiz are optional and are offered from a banner there
-// (features/shop/lib/firstVisit.ts), so nothing stands between a new visitor and the products.
-const firstScreen = (): ScreenName => 'shop-home';
+// The account decides the first screen (features/auth/accountGate.ts): a visitor with no phone account starts on the
+// onboarding screens, then sign-in; a signed-in account starts on the shop. Read when the provider mounts, which happens
+// after Firebase has restored the session (see App.tsx).
+const accountNow = (): AccountState => accountStateOf(auth?.currentUser);
 
 // Development only: any screen name can be opened directly with ?screen=<name> so each layout can be checked.
-const initialScreen: ScreenName = requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : firstScreen();
+const initialScreen = (): ScreenName => requestedQaScreen && (QA_SCREENS.includes(requestedQaScreen) || process.env.NODE_ENV !== 'production') ? requestedQaScreen : startScreenFor(accountNow()) as ScreenName;
 
 const bagUnitsNow = (): number => Object.values(useCartStore.getState().items).reduce((n, item) => n + item.quantity, 0);
 
@@ -40,7 +44,10 @@ const bagUnitsNow = (): number => Object.values(useCartStore.getState().items).r
 // now so that every later step has an earlier entry to come back to.
 const startEntry = (): NavEntry => {
   const saved = entryFromState(window.history.state);
-  const entry: NavEntry = saved ? restoreTarget(saved, bagUnitsNow()).entry : { screen: initialScreen, params: null, trail: [] };
+  const first: NavEntry = saved ? restoreTarget(saved, bagUnitsNow()).entry : { screen: initialScreen(), params: null, trail: [] };
+  // A saved step the account may not open goes to the sign-in screen (which returns to it after sign-in).
+  const allowed = gateNavigation(accountNow(), { screen: first.screen, params: first.params });
+  const entry: NavEntry = allowed.screen === first.screen ? first : { screen: allowed.screen, params: allowed.params, trail: first.trail };
   try {
     window.history.replaceState(buildState(window.history.state, entry), '', window.location.href);
   } catch {
@@ -62,6 +69,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // saved on the server (users/{uid}). Nothing is treated as signed in or verified on the device alone.
   const profile = useCustomerStore((s) => s.profile);
   const profileStatus = useCustomerStore((s) => s.profileStatus);
+  // Who is signed in: 'phone' once a phone account signs in on this device. An anonymous browsing session is 'none'.
+  const [account, setAccount] = useState<AccountState>(() => accountNow());
+  const [accountPhone, setAccountPhone] = useState<string | null>(() => auth?.currentUser?.phoneNumber ?? null);
   useEffect(() => {
     // Details used to be kept only in this browser; they now live on the server.
     try { window.localStorage.removeItem('glowvai:customer-details'); } catch { /* storage blocked */ }
@@ -70,7 +80,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       .catch(() => undefined);
   }, []);
 
-  const customerDetails: CustomerDetails | null = profile
+  // Details count once a name is saved: a new phone account has its number only, and checkout asks for the name.
+  const customerDetails: CustomerDetails | null = profile && profile.name
     ? { fullName: profile.name, phoneNumber: profile.phone, email: profile.email }
     : null;
   const skinFlags = { facialAnalysisCompleted: false, consentGiven: false };
@@ -134,8 +145,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!auth) return undefined;
     let lastUid: string | null = null;
     return onAuthStateChanged(auth, (signedIn) => {
+      const next = accountStateOf(signedIn);
+      setAccount(next);
+      setAccountPhone(next === 'phone' ? signedIn?.phoneNumber ?? null : null);
       if (!signedIn || signedIn.uid === lastUid) return;
       lastUid = signedIn.uid;
+      // A new session (the anonymous browsing session becomes the phone account): the server profile is read again.
+      useCustomerStore.getState().reset();
+      void useCustomerStore.getState().loadProfile();
+      // A phone account gets its record on the server once per device (the route is idempotent).
+      if (next === 'phone') void ensureAccountRecord(signedIn.uid);
       void refreshSavedAddresses();
       void syncWishlistWithAccount(wishlistRef.current).then((merged) => {
         if (merged) setWishlist(merged.slice(0, 200));
@@ -200,9 +219,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveParams(next.params);
   };
 
-  const navigate = (screen: ScreenName, params?: any) => {
+  const navigate = (requested: ScreenName, params?: any) => {
     const cur = navRef.current;
-    const nextParams = params !== undefined ? params : cur.params;
+    // The account gate decides where the step really goes: a screen that needs an account becomes the sign-in screen.
+    const target = gateNavigation(accountNow(), { screen: requested, params: params !== undefined ? params : cur.params });
+    const screen = target.screen as ScreenName;
+    const nextParams = target.params;
     // Opening the screen that is already on show (a tab tapped twice, a link to the current step) adds no history step,
     // so Back never has to pass through copies of the same screen.
     if (screen === cur.screen && JSON.stringify(safeParams(nextParams)) === JSON.stringify(safeParams(cur.params))) return;
@@ -244,8 +266,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         window.history.go(1);
         return;
       }
-      const { entry: next, fallback } = restoreTarget(target, bag);
-      if (fallback) window.history.replaceState(buildState(event.state, next), '', window.location.href);
+      const { entry: restored, fallback } = restoreTarget(target, bag);
+      // The account gate applies to a step restored from history too.
+      const allowed = gateNavigation(accountNow(), { screen: restored.screen, params: restored.params });
+      const next: NavEntry = allowed.screen === restored.screen ? restored : { screen: allowed.screen, params: allowed.params, trail: restored.trail };
+      if (fallback || next !== restored) window.history.replaceState(buildState(event.state, next), '', window.location.href);
       if (sameEntry(cur, next)) return;
       showEntry(next);
       queueScrollRestore(next.screen, next.params);
@@ -290,7 +315,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Cart operations
+  // Sends a visitor without a phone account to sign in. They return to this screen, and the held action runs after sign-in.
+  const requireSignIn = (resume?: () => void) => {
+    const cur = navRef.current;
+    if (resume) holdAction(resume);
+    navigate(SIGN_IN_SCREEN as ScreenName, { returnTo: cur.screen, returnParams: cur.params });
+  };
+
+  // Adding to the bag needs a phone account. Signed out, the add waits for sign-in.
   const addToCart = (product: Product, variantId?: string, withInsurance = false) => {
+    if (accountNow() !== 'phone') {
+      requireSignIn(() => addToCartNow(product, variantId, withInsurance));
+      return;
+    }
+    addToCartNow(product, variantId, withInsurance);
+  };
+
+  const addToCartNow = (product: Product, variantId?: string, withInsurance = false) => {
     const chosenVariantId = variantId || product.currentVariantId || product.variants[0].id;
     const chosenVariant = product.variants.find((variant) => variant.id === chosenVariantId);
     if (!chosenVariant?.inStock) {
@@ -338,7 +379,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   // Wishlist
+  // Saving to the wishlist needs a phone account. Signed out, the save waits for sign-in.
   const toggleWishlist = (productId: string) => {
+    if (accountNow() !== 'phone') {
+      requireSignIn(() => toggleWishlistNow(productId));
+      return;
+    }
+    toggleWishlistNow(productId);
+  };
+
+  const toggleWishlistNow = (productId: string) => {
     const exists = wishlist.includes(productId);
     if (!exists && wishlist.length >= 200) {
       showToast('Your wishlist is full. Remove an item to save another.');
@@ -392,6 +442,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         user,
         customerDetails,
         profileStatus,
+        accountSignedIn: account === 'phone',
+        accountPhone,
+        requireSignIn,
         saveCustomerDetails,
         currentAddress,
         selectAddress,

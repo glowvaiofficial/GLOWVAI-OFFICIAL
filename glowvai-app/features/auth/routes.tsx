@@ -5,7 +5,8 @@ import '../../responsive/auth-ported.css';
 import { WelcomeScreen } from './WelcomeScreen';
 import { OnboardingScreen } from '../../screens/OnboardingScreen';
 import { OnboardingSuccessScreen } from './OnboardingSuccessScreen';
-import { LoginScreen } from '../../screens/LoginScreen';
+import { PhoneSignInScreen } from './PhoneSignInScreen';
+import { OtpScreen } from './OtpScreen';
 import { ProfileSetupScreen } from './ProfileSetupScreen';
 import { SkinSurveyScreen } from './SkinSurveyScreen';
 import { ChangePhoneNumberScreen } from './ChangePhoneNumberScreen';
@@ -17,10 +18,10 @@ export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   // The optional intro (also reached from the shop banner and the settings hub). Its last step opens the skin quiz.
   'auth-onboarding': OnboardingScreen,
   'auth-onboarding-success': OnboardingSuccessScreen,
-  // No sign-in code is offered until SMS sign-in exists: these open the "Your details" step.
-  'auth-login': LoginScreen,
-  'auth-otp': LoginScreen,
-  'auth-verify-otp': LoginScreen,
+  // Sign-in with a mobile number and the SMS code. No name, email or skin questions at sign-up.
+  'auth-login': PhoneSignInScreen,
+  'auth-otp': OtpScreen,
+  'auth-verify-otp': OtpScreen,
   'auth-profile-setup': ProfileSetupScreen,
   'auth-skin-survey': SkinSurveyScreen,
   'auth-change-phone': ChangePhoneNumberScreen,

@@ -61,7 +61,7 @@ export const useCustomerStore = create<CustomerState>()((set, get) => ({
         ...(previous ?? { address: null, language: undefined }),
         name: input.name.trim(),
         phone: input.phone.replace(/\D/g, '').slice(-10),
-        phoneVerified: false,
+        phoneVerified: previous?.phoneVerified ?? false,
         email: (input.email ?? '').trim().toLowerCase(),
         address: input.address === undefined || input.address === null ? previous?.address ?? null : input.address,
         marketingOptIn: input.marketingOptIn ?? previous?.marketingOptIn ?? false,

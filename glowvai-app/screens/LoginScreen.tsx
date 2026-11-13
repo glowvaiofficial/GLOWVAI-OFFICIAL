@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Info, ScanFace, ShieldCheck, Sparkles, Truck } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { ScreenName } from '../context/contextDefinition';
+import { SignInHero } from '../features/auth/SignInHero';
 import '../responsive/entry-scan.css';
-
-const benefits = [
-  { id: 'analysis', label: <>AI Face<br />Analysis</>, icon: <ScanFace aria-hidden="true" /> },
-  { id: 'recommendations', label: <>Personalized<br />Recommendations</>, icon: <Sparkles aria-hidden="true" /> },
-  { id: 'delivery', label: <>Quick<br />Delivery</>, icon: <Truck aria-hidden="true" /> },
-  { id: 'insurance', label: <>Beauty<br />Insurance</>, icon: <ShieldCheck aria-hidden="true" /> },
-];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // "Your details": name, mobile number and an optional email, saved to the customer's account on the server
-// (POST /api/shop/profile). There is no sign-in code: SMS verification is not connected yet, and the screen says so.
+// (POST /api/shop/profile). The mobile number is the one the account signed in with, so it cannot be changed here.
 export const LoginScreen: React.FC = () => {
-  const { navigate, goBack, activeParams, customerDetails, saveCustomerDetails } = useApp();
+  const { navigate, goBack, activeParams, customerDetails, saveCustomerDetails, accountPhone } = useApp();
   const returnTo: ScreenName = activeParams?.returnTo || 'shop-home';
+  const verifiedPhone = accountPhone ? accountPhone.replace(/\D/g, '').slice(-10) : '';
   const [name, setName] = useState(customerDetails?.fullName || activeParams?.name || '');
-  const [phone, setPhone] = useState(String(customerDetails?.phoneNumber || activeParams?.phone || '').replace(/\D/g, '').slice(-10));
+  const [phone, setPhone] = useState(verifiedPhone || String(customerDetails?.phoneNumber || activeParams?.phone || '').replace(/\D/g, '').slice(-10));
   const [email, setEmail] = useState(customerDetails?.email || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,25 +46,7 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <main className="login-reference-screen is-details">
-      <section className="login-reference-hero" aria-label="Glowvai benefits">
-        <span className="login-orb login-orb-right" aria-hidden="true" />
-        <span className="login-orb login-orb-left" aria-hidden="true" />
-
-        <div className="login-brand-lockup">
-          <span className="login-brand-mark" aria-hidden="true"><span>g</span></span>
-          <div className="brand-wordmark login-wordmark">glowvai</div>
-          <p>The Beauty Destination<br />for Every Indian</p>
-        </div>
-
-        <div className="login-benefits">
-          {benefits.map((benefit) => (
-            <div className="login-benefit" key={benefit.id}>
-              <span>{benefit.icon}</span>
-              <p>{benefit.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <SignInHero />
 
       <section className="login-reference-sheet">
         <div className="login-sheet-copy">
@@ -97,6 +74,7 @@ export const LoginScreen: React.FC = () => {
               autoComplete="tel-national"
               maxLength={10}
               value={phone}
+              readOnly={Boolean(verifiedPhone)}
               onChange={(event) => {
                 setError(null);
                 setPhone(event.target.value.replace(/\D/g, ''));
@@ -112,7 +90,7 @@ export const LoginScreen: React.FC = () => {
 
           <p className="login-details-note">
             <Info aria-hidden="true" />
-            <span>We will verify your number by SMS once SMS sign-in is available.</span>
+            <span>{verifiedPhone ? 'Verified by SMS when you signed in.' : 'We use this number for deliveries and order updates.'}</span>
           </p>
 
           {error && (
