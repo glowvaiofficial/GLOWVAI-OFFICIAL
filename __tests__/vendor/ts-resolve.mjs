@@ -5,8 +5,13 @@ import { fileURLToPath } from "node:url";
 
 const root = new URL("../../", import.meta.url);
 
+// Next's server entry points are extension-less CommonJS files, which Node's ESM resolver cannot find by bare name.
+// Route handlers import them, so map those names to the real files. Only the two names used by app/api routes.
+const NEXT_ENTRY_ALIASES = { "next/server": "next/server.js", "next/headers": "next/headers.js" };
+
 export async function resolve(specifier, context, next) {
   let spec = specifier;
+  if (NEXT_ENTRY_ALIASES[spec]) return next(NEXT_ENTRY_ALIASES[spec], context);
   if (spec.startsWith("@/")) spec = new URL(spec.slice(2), root).href;
   const relative = spec.startsWith("./") || spec.startsWith("../") || spec.startsWith("file:");
   if (relative && !/\.[cm]?[jt]sx?$/.test(spec)) {

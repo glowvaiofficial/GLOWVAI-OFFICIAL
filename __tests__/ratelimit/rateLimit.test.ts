@@ -3,7 +3,7 @@
 // exactly what would be stored.
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
-import type { Firestore } from "firebase-admin/firestore";
+import { Timestamp, type Firestore } from "firebase-admin/firestore";
 import {
   RATE_LIMIT_COLLECTION,
   STORE_TIMEOUT_MS,
@@ -216,7 +216,9 @@ describe("hashed document ids and minimal stored data", () => {
     assert.equal(store.writes.length, 2);
     for (const w of store.writes) {
       assert.deepEqual(Object.keys(w.data).sort(), ["count", "expiresAt", "windowStart"]);
-      for (const v of Object.values(w.data)) assert.equal(typeof v, "number");
+      assert.equal(typeof w.data.count, "number");
+      assert.equal(typeof w.data.windowStart, "number");
+      assert.ok(w.data.expiresAt instanceof Timestamp, "expiresAt must be a Firestore Timestamp");
       const wire = JSON.stringify({ collection: w.collection, id: w.id, data: w.data });
       for (const secret of [ip, uid, "support-post", "support-ticket", "ip:", "user:"]) {
         assert.ok(!wire.includes(secret), `stored data must not contain ${secret}`);
@@ -224,11 +226,22 @@ describe("hashed document ids and minimal stored data", () => {
     }
   });
 
-  it("sets expiresAt to the window end so documents can be expired later", async () => {
+  it("writes expiresAt as a Firestore Timestamp at the window end, so the TTL policy can delete the document", async () => {
     await checkRateLimit({ key: "expiry:1", max: 5, windowMs: 90_000 }, store.asFirestore());
     const doc = store.docs.get(hashKey("expiry:1"));
     assert.ok(doc);
-    assert.equal(doc.expiresAt, (doc.windowStart as number) + 90_000);
+    assert.ok(doc.expiresAt instanceof Timestamp, "expiresAt must be a Timestamp, not a number");
+    assert.equal((doc.expiresAt as Timestamp).toMillis(), (doc.windowStart as number) + 90_000);
+    assert.equal(typeof doc.windowStart, "number");
+  });
+
+  it("replaces a document written with a numeric expiresAt by an older version with a Timestamp", async () => {
+    const id = hashKey("expiry:legacy");
+    store.docs.set(id, { count: 1, windowStart: 5_000, expiresAt: 65_000 });
+    await checkRateLimit({ key: "expiry:legacy", max: 5, windowMs: 60_000 }, store.asFirestore());
+    const doc = store.docs.get(id);
+    assert.ok(doc?.expiresAt instanceof Timestamp);
+    assert.equal(typeof doc.count, "number");
   });
 
   it("hashKey is a 64 character hex SHA-256 and does not echo its input", () => {
