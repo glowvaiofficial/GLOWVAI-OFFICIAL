@@ -1,10 +1,13 @@
-/* Home page sections: one layout for phone and desktop. Grids wrap by width, so the same blocks stack on a phone and
-   sit side by side on a desktop. Colours come from the theme variables (--ds-brand, --ds-ink, --ds-muted, --ds-line). */
+/* Home page sections. Phone: everything stacks vertically, one column. Tablet and desktop: the same blocks spread across
+   the width in horizontal rows. Colours come from the theme variables (--ds-brand, --ds-ink, --ds-muted, --ds-line). */
 .hp-section { padding: 8px 16px 4px; max-width: 1200px; margin: 0 auto; }
 .hp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
 .hp-title { margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--ds-ink); }
 .hp-sub { margin: 0; font-size: 13px; color: var(--ds-muted); }
-.hp-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+/* Phone (default): one column, stacked vertically. */
+.hp-grid, .hp-chips, .hp-brands { display: grid; gap: 12px; grid-template-columns: 1fr; }
+.hp-brands { grid-template-columns: repeat(3, 1fr); }
 .hp-card {
   position: relative; min-height: 120px; border-radius: 16px; padding: 16px; display: flex; flex-direction: column;
   justify-content: flex-end; gap: 4px; background: #eef3ff; border: 1px dashed var(--ds-line); color: var(--ds-ink);
@@ -15,12 +18,22 @@
   position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
   text-transform: uppercase; background: #fff; color: var(--ds-muted); border-radius: 999px; padding: 3px 8px;
 }
-.hp-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
 .hp-chip { display: flex; align-items: center; gap: 10px; border-radius: 14px; padding: 12px 14px; background: #fff; border: 1px solid var(--ds-line); }
 .hp-chip b { display: block; font-size: 14px; color: var(--ds-ink); }
 .hp-chip small { font-size: 12px; color: var(--ds-muted); }
 .hp-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--ds-brand); opacity: .18; flex: 0 0 auto; }
-.hp-brands { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
 .hp-brand { height: 74px; border-radius: 14px; background: #fff; border: 1px dashed var(--ds-line); display: grid; place-items: center; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
 .hp-timer { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ds-brand); font-size: 14px; }
 .hp-skel { height: 170px; border-radius: 16px; background: linear-gradient(90deg, #eef3ff, #f7f9ff, #eef3ff); }
+
+/* Tablet and desktop: horizontal rows across the width. */
+@media (min-width: 720px) {
+  .hp-section { padding: 12px 24px 6px; }
+  .hp-grid, .hp-chips { grid-template-columns: repeat(3, 1fr); }
+  .hp-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .hp-brands { grid-template-columns: repeat(6, 1fr); }
+}
+@media (min-width: 1024px) {
+  .hp-grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .hp-card { min-height: 160px; }
+}
