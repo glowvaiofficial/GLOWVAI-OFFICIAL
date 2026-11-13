@@ -21,7 +21,7 @@ import type { ShopProfileAddress } from '../core/services/shopApi';
 import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 import { useCartStore } from '../core/state/cartStore';
-import { buildState, entryFromState, popDecision, restoreTarget, sameEntry, type NavEntry } from './navHistory';
+import { buildState, entryFromState, popDecision, restoreTarget, safeParams, sameEntry, type NavEntry } from './navHistory';
 import { currentScrollY, queueScrollRestore, rememberScroll } from './scrollMemory';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
 
@@ -202,8 +202,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const navigate = (screen: ScreenName, params?: any) => {
     const cur = navRef.current;
+    const nextParams = params !== undefined ? params : cur.params;
+    // Opening the screen that is already on show (a tab tapped twice, a link to the current step) adds no history step,
+    // so Back never has to pass through copies of the same screen.
+    if (screen === cur.screen && JSON.stringify(safeParams(nextParams)) === JSON.stringify(safeParams(cur.params))) return;
     rememberScroll(cur.screen, cur.params, currentScrollY());
-    const next: NavEntry = { screen, params: params !== undefined ? params : cur.params, trail: [...cur.trail, cur.screen] };
+    const next: NavEntry = { screen, params: nextParams, trail: [...cur.trail, cur.screen] };
     writeEntry(next, 'push');
     showEntry(next);
   };

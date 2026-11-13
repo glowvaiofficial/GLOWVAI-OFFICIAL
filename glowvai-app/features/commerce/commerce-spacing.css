@@ -1,0 +1,12 @@
+/* Spacing for the bag, review and payment pages. On phones the total bar is pinned to the bottom of the screen, so the
+   content keeps clear of it. Sides follow the shell gutter (16px on phones, wider on desktop). Shared CSS is not changed. */
+@media (max-width: 899px) {
+  .glowvai-root .commerce-screen:has(> .commerce-sticky-bar) > .commerce-body {
+    padding-bottom: 112px;
+  }
+}
+
+.glowvai-root .commerce-screen > .commerce-body {
+  padding-left: var(--ds-gutter);
+  padding-right: var(--ds-gutter);
+}

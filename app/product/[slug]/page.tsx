@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,8 +21,21 @@ export async function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: ProductPageProps) {
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
+  // A product from the shop (Firestore) is described by its own first picture, name and price: this is the link that
+  // WhatsApp, iMessage and social previews read when the product is shared.
+  const shared = await loadSharedProduct(slug);
+  if (shared) {
+    const meta = buildProductShareMetadata(shared, { siteUrl: SITE_URL, brandName: BRAND_NAME, logoPath: "/logo/glowvai-logo-512.png" });
+    return {
+      title: meta.title,
+      description: meta.description,
+      alternates: { canonical: meta.canonical },
+      openGraph: meta.openGraph,
+      twitter: meta.twitter,
+    };
+  }
   const product = getProductBySlug(slug);
   if (!product) return {};
 
@@ -60,13 +74,51 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 import { buildProductSchema, buildBreadcrumbSchema } from "@/lib/seo/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { loadSharedProduct } from "@/lib/shop/productSharePage";
+import { buildProductShareMetadata, priceLabel } from "@/lib/shop/productShareMeta";
+
+// A shop product that is not in the static catalogue: its picture, name and price, with a way into the shop.
+function SharedProductPage({ product }: { product: NonNullable<Awaited<ReturnType<typeof loadSharedProduct>>> }) {
+  const price = priceLabel(product.price);
+  return (
+    <div className="bg-paper text-ink">
+      <Section pad="tight" labelledBy="product-title">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-10 items-start">
+          <div className="lg:col-span-7">
+            <div className="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden border border-ink/15 bg-paper-deep">
+              {product.picture && (
+                // Shop pictures are stored outside the site, so they are shown as plain images.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={product.picture} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+              )}
+            </div>
+          </div>
+          <div className="lg:col-span-5 space-y-6">
+            <p className="text-ink-muted">{product.brand}</p>
+            <h1 id="product-title" className="font-display font-semibold text-3xl">{product.name}</h1>
+            {price && <p className="font-semibold text-lg">{price}</p>}
+            {product.description && <p className="text-[17px] leading-relaxed text-ink-muted">{product.description}</p>}
+            <Link
+              href={`/shop?product=${encodeURIComponent(product.id)}`}
+              className={`inline-flex items-center justify-center min-h-[48px] px-5 rounded-[10px] bg-ink text-paper font-semibold ${focusRing}`}
+            >
+              Open in the GlowVai shop
+            </Link>
+          </div>
+        </div>
+      </Section>
+    </div>
+  );
+}
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
 
   if (!product) {
-    notFound();
+    const shared = await loadSharedProduct(slug);
+    if (!shared) notFound();
+    return <SharedProductPage product={shared} />;
   }
 
   const related = getRelatedProducts(product.slug, 3);

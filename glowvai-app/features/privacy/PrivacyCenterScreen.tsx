@@ -125,7 +125,7 @@ export const PrivacyCenterScreen = () => {
               </p>
             </>
           ) : (
-            <p className="profile-card-sub">Loading your data...</p>
+            <p className="profile-card-sub">{error ? 'Your data could not be loaded. Try again later.' : 'Loading your data...'}</p>
           )}
           <button type="button" className="profile-button is-outline is-block" onClick={download} disabled={busy === 'export'}>
             <Download size={16} /> {busy === 'export' ? 'Preparing your file...' : 'Download my data (JSON)'}
