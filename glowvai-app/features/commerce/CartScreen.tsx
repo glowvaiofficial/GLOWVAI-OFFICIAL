@@ -83,7 +83,7 @@ export const CartScreen: React.FC = () => {
             </span>
             <h2>Your cart is empty</h2>
             <p>Add skincare and beauty essentials from the shop and they will show up here.</p>
-            <button className="commerce-primary" onClick={() => navigate('home')}>
+            <button className="commerce-primary" onClick={goBack}>
               Start shopping
             </button>
           </div>

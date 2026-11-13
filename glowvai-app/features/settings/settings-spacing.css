@@ -1,0 +1,11 @@
+/* Side and bottom spacing for the settings pages (hub, sub-screens, legal pages). Lives with the settings screens so
+   the shared layout CSS is not changed. Phones: 16px sides. Desktop: a wider, comfortable gutter. */
+.glowvai-root .settings-page {
+  padding: 16px 16px 40px;
+}
+
+@media (min-width: 900px) {
+  .glowvai-root .settings-page {
+    padding: 24px 32px 56px;
+  }
+}

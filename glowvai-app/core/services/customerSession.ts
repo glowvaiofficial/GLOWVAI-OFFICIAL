@@ -45,11 +45,23 @@ export async function getIdToken(forceRefresh = false): Promise<string> {
 
 const NETWORK_ERROR = 'We could not reach GlowVai. Check your connection and try again.';
 
+// A call that never answers must end, so a settings or account screen cannot stay on its loading state forever.
+const TOKEN_TIMEOUT_MS = 15_000;
+const REQUEST_TIMEOUT_MS = 20_000;
+const withTimeout = <T,>(work: Promise<T>, ms: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(Object.assign(new Error('Timed out'), { code: 'app/timeout' })), ms);
+    work.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+
 // Calls a shop server route with the customer's ID token. Never throws: the result carries the server's message.
 export async function apiFetch<T = Record<string, unknown>>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   let token: string;
   try {
-    token = await getIdToken();
+    token = await withTimeout(getIdToken(), TOKEN_TIMEOUT_MS);
   } catch (err) {
     const code = (err as { code?: string })?.code ?? '';
     // Anonymous sign-in is switched off for the project: the owner enables it in the Firebase console.
@@ -67,14 +79,14 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
     const device = currentDeviceId();
     if (device) headers.set('X-GlowVai-Device', device);
     if (init.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-    return fetch(path, { ...init, headers, cache: 'no-store' });
+    return fetch(path, { ...init, headers, cache: 'no-store', signal: init.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   };
 
   let response: Response;
   try {
     response = await send(token);
     // An expired token is refreshed once.
-    if (response.status === 401) response = await send(await getIdToken(true));
+    if (response.status === 401) response = await send(await withTimeout(getIdToken(true), TOKEN_TIMEOUT_MS));
   } catch {
     return { ok: false, status: 0, data: null, error: NETWORK_ERROR };
   }
