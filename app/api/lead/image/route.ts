@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/security/rateLimit";
-import { verifySessionToken } from "@/lib/session";
+import { SessionConfigError, verifySessionToken } from "@/lib/session";
 import { storage } from "@/lib/storage";
 
 export const maxDuration = 30; // 30s timeout for image uploads
@@ -11,7 +11,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limited.retryAfter) } });
   }
   const sessionCookie = req.cookies.get("gv_session")?.value;
-  const verification = verifySessionToken(sessionCookie || "");
+  let verification: { valid: boolean; sessionId?: string };
+  try {
+    verification = verifySessionToken(sessionCookie || "");
+  } catch (err) {
+    if (err instanceof SessionConfigError) {
+      console.error("Scan image upload unavailable: session secret not configured");
+      return NextResponse.json(
+        { error: "Image upload is unavailable: server session configuration is missing." },
+        { status: 503 }
+      );
+    }
+    throw err;
+  }
 
   const body = await req.json().catch(() => null);
   if (!body || !body.image_base64) {

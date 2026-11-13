@@ -18,6 +18,21 @@ function limited(ip: string) {
   return h.n > 10;
 }
 
+// Logs the error class only. The message can carry lead data, so it is never logged.
+function errorName(err: unknown): string {
+  return err instanceof Error ? err.name : typeof err;
+}
+
+// The lead is written to the sheet before the session cookie is set. A cookie failure (for example a missing
+// SESSION_SECRET) must never turn a saved lead into an error, so this helper never throws.
+async function trySetLeadCookie(sessionId: string): Promise<void> {
+  try {
+    await setSessionCookie(sessionId);
+  } catch (err) {
+    console.error("Lead session cookie not set (PII omitted):", errorName(err));
+  }
+}
+
 function parseUA(ua: string) {
   const device = /mobile|android|iphone/i.test(ua)
     ? "mobile"
@@ -134,7 +149,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await setSessionCookie(session_id);
+    await trySetLeadCookie(session_id);
 
     // Queue customer lead report email if email provided
     if (d.email && d.email.includes("@")) {
@@ -180,18 +195,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, session_id, sessionId: session_id });
   } catch (err) {
     console.error("Error creating lead record (PII omitted):", String(err).slice(0, 100));
-    await setSessionCookie(session_id);
+    await trySetLeadCookie(session_id);
     return NextResponse.json({ ok: true, session_id, sessionId: session_id });
   }
 }
 
 export async function PATCH(req: NextRequest) {
   const sessionCookie = req.cookies.get("gv_session")?.value;
-  const verification = verifySessionToken(sessionCookie || "");
+  let verification: { valid: boolean; sessionId?: string };
+  try {
+    verification = verifySessionToken(sessionCookie || "");
+  } catch (err) {
+    // A missing or short SESSION_SECRET means no session can be verified. That is an unauthenticated request here.
+    console.error("Lead PATCH session check failed (PII omitted):", errorName(err));
+    verification = { valid: false };
+  }
 
   if (!verification.valid || !verification.sessionId) {
     return NextResponse.json(
-      { error: "Unauthorized session or expired token" },
+      { error: "Unauthorized: session is missing, invalid or expired. Start the scan again." },
       { status: 401 }
     );
   }
