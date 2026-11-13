@@ -71,7 +71,7 @@ export function FlashDealsPlaceholder() {
   return (
     <section className="hp-section" aria-label="Deals of the day">
       <div className="hp-head"><h2 className="hp-title">Deals of the day</h2><span className="hp-timer">Ends in {h}:{m}:{s}</span></div>
-      <div className="hp-grid">
+      <div className="hp-grid hp-grid-4">
         {[1, 2, 3, 4].map((i) => <div key={i} className="hp-skel" aria-hidden="true" />)}
       </div>
     </section>
