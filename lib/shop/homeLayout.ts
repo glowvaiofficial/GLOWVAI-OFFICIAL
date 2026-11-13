@@ -77,6 +77,7 @@ export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
   brands: 12,
   trust: 3,
   "help-gift": 3,
+  categories: 8,
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -90,12 +91,13 @@ const IMAGE_DATA = /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/]+=*$/;
 // A picture is kept only as a small base64 data URL of an allowed type. Anything else means no picture (the item stays).
 const readImage = (v: unknown): string => (typeof v === "string" && v.length <= IMAGE_MAX && IMAGE_DATA.test(v) ? v : "");
 
-function readItem(raw: unknown): BlockItem | null {
+// keepBadLink: a bad link is dropped alone (the item stays and opens the shop browse page). Used by the category tiles.
+function readItem(raw: unknown, keepBadLink = false): BlockItem | null {
   if (!raw || typeof raw !== "object") return null;
   const d = raw as Record<string, unknown>;
   const label = typeof d.label === "string" && d.label.trim().length > 0 && d.label.length <= 40 ? d.label : null;
   const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
-  const link = typeof d.link === "string" && isSafeInternal(d.link) ? d.link : null;
+  const link = typeof d.link === "string" && isSafeInternal(d.link) ? d.link : keepBadLink ? "" : null;
   if (label === null || sub === null || link === null) return null;
   return { label, sub, link, image: readImage(d.image) };
 }
@@ -113,7 +115,7 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
     if (!s) continue;
     const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
     // Bad items are dropped first, then the limit applies, so a bad item never takes a valid one's place.
-    const items = Array.isArray(s.items) ? s.items.map(readItem).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
+    const items = Array.isArray(s.items) ? s.items.map((i) => readItem(i, id === "categories")).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
     if (items.length === 0) continue;
     out[id] = {
       title: typeof s.title === "string" && s.title.length <= 60 ? s.title : "",
