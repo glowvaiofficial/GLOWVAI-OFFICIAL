@@ -10,7 +10,7 @@ export const DEFAULT_BLOCK_ORDER: HomeBlockId[] = [
   'hero', 'mini-banners', 'offers', 'categories', 'promos', 'deals', 'reorder', 'product-rails', 'brands', 'trust', 'help-gift', 'footer',
 ];
 
-export interface BlockItem { label: string; sub: string; link: string }
+export interface BlockItem { label: string; sub: string; link: string; image: string }
 export interface BlockSettings { title: string; background: string; textColor: string; items: BlockItem[] }
 export interface ProductRowView { title: string; source: 'category' | 'brand' | 'bestsellers' | 'new'; value: string; limit: number }
 export interface HomeLayoutView { order: HomeBlockId[]; settings: Partial<Record<HomeBlockId, BlockSettings>>; rows: ProductRowView[] }

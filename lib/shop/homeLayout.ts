@@ -60,6 +60,7 @@ export interface BlockItem {
   label: string;
   sub: string;
   link: string;
+  image: string; // a data URL picture (webp, jpeg or png), or "" for none
 }
 
 export interface BlockSettings {
@@ -83,6 +84,12 @@ const HEX = /^#[0-9a-fA-F]{6}$/;
 const isSafeInternal = (link: string): boolean =>
   link === "" || (link.startsWith("/") && !link.startsWith("//") && !link.includes("\\") && !/[\u0000-\u001f\s]/.test(link) && link.length <= 200);
 
+const IMAGE_MAX = 200_000;
+const IMAGE_DATA = /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/]+=*$/;
+
+// A picture is kept only as a small base64 data URL of an allowed type. Anything else means no picture (the item stays).
+const readImage = (v: unknown): string => (typeof v === "string" && v.length <= IMAGE_MAX && IMAGE_DATA.test(v) ? v : "");
+
 function readItem(raw: unknown): BlockItem | null {
   if (!raw || typeof raw !== "object") return null;
   const d = raw as Record<string, unknown>;
@@ -90,7 +97,7 @@ function readItem(raw: unknown): BlockItem | null {
   const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
   const link = typeof d.link === "string" && isSafeInternal(d.link) ? d.link : null;
   if (label === null || sub === null || link === null) return null;
-  return { label, sub, link };
+  return { label, sub, link, image: readImage(d.image) };
 }
 
 // The content of each block that has any. Blocks with no items are left out, so they keep their placeholder.
