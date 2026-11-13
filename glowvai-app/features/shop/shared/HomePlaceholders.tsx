@@ -11,7 +11,7 @@ function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'c
   return (
     <section className="hp-section" aria-label={aria}>
       {title && <div className="hp-head"><h2 className="hp-title">{title}</h2></div>}
-      <div className={kind === 'tiles' ? 'hp-brands' : kind === 'chips' ? 'hp-grid is-three' : 'hp-grid is-three'} style={{ ...style }}>
+      <div className={kind === 'tiles' ? 'hp-brands' : kind === 'chips' ? 'hp-chips' : 'hp-grid is-three'} style={{ ...style }}>
         {settings.items.map((item, i) => {
           const pic = item.image || '';
           const inner = kind === 'tiles' ? (
