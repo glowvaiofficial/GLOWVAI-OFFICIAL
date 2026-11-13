@@ -344,7 +344,7 @@ export const ShopProductScreen: React.FC = () => {
           <small>
             {inCartCount > 0
               ? `${inCartCount} in your cart`
-              : `${discount > 0 ? `${discount}% OFF · ` : ''}Delivered in ${product.deliveryMinutes} mins`}
+              : [discount > 0 ? `${discount}% OFF` : '', product.deliveryMinutes ? `Delivered in ${product.deliveryMinutes} mins` : ''].filter(Boolean).join(' · ')}
           </small>
         </div>
         <button type="button" className="shop-btn-primary shop-product-buybar-btn" onClick={handleAddToCart} disabled={!canBuy}>

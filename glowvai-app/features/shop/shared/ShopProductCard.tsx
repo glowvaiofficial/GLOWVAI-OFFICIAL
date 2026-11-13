@@ -91,9 +91,11 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
             </>
           )}
         </div>
-        <small className="shop-product-delivery">
-          <Clock size={11} /> {product.deliveryMinutes} mins
-        </small>
+        {product.deliveryMinutes ? (
+          <small className="shop-product-delivery">
+            <Clock size={11} /> {product.deliveryMinutes} mins
+          </small>
+        ) : null}
       </div>
     </article>
   );

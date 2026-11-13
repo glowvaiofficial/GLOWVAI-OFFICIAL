@@ -89,10 +89,12 @@ export const useCartStore = create<CartStore>()(
           if (!catalogProd) {
             return { ...item, available: false };
           }
+          // A product sold in sizes (50ml, 100ml) carries its own price for each size. Use it, not the base price.
+          const sizePrice = catalogProd.sizes?.find((s) => s.size === item.size);
           return {
             ...item,
-            price: catalogProd.price,
-            mrp: catalogProd.mrp,
+            price: sizePrice ? sizePrice.price : catalogProd.price,
+            mrp: sizePrice ? sizePrice.mrp : catalogProd.mrp,
             available: true,
           };
         });
