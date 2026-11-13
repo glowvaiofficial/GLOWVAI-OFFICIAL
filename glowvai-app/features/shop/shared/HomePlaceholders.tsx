@@ -1,5 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/home-placeholders.css';
+import type { BlockSettings } from '../lib/useHomeLayout';
+
+// Shows a block with the content the admin published. Used once the block has at least one item.
+function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'chips' | 'tiles'; settings: BlockSettings; fallbackTitle: string; aria: string }) {
+  const style: React.CSSProperties = {};
+  if (settings.background) style.background = settings.background;
+  if (settings.textColor) style.color = settings.textColor;
+  const title = settings.title || fallbackTitle;
+  return (
+    <section className="hp-section" aria-label={aria}>
+      {title && <div className="hp-head"><h2 className="hp-title">{title}</h2></div>}
+      <div className={kind === 'tiles' ? 'hp-brands' : kind === 'chips' ? 'hp-grid is-three' : 'hp-grid is-three'} style={{ ...style }}>
+        {settings.items.map((item, i) => {
+          const inner = kind === 'tiles' ? (
+            <span className="hp-brand" style={style}>{item.label}</span>
+          ) : kind === 'chips' ? (
+            <span className="hp-chip" style={style}><span className="hp-dot" /><span><b>{item.label}</b>{item.sub && <small>{item.sub}</small>}</span></span>
+          ) : (
+            <span className="hp-card" style={{ ...style, background: settings.background || undefined }}><strong>{item.label}</strong>{item.sub && <span>{item.sub}</span>}</span>
+          );
+          return item.link ? <a key={i} href={item.link} style={{ textDecoration: 'none', color: 'inherit' }}>{inner}</a> : <div key={i}>{inner}</div>;
+        })}
+      </div>
+    </section>
+  );
+}
 
 // Home page sections the GlowVai team fills in from the admin designer. Each one is a placeholder block until its content
 // is published. Placeholders show only in a staff preview (the preview link carries ?preview=...), so customers never see
@@ -23,8 +49,10 @@ export function usePlaceholdersVisible(): boolean {
 const Tag: React.FC<{ children: React.ReactNode }> = ({ children }) => <span className="hp-tag">{children}</span>;
 
 // 1. Mini banners: three equal promo slots under the hero.
-export function MiniBannersPlaceholder() {
-  if (!usePlaceholdersVisible()) return null;
+export function MiniBannersPlaceholder({ settings }: { settings?: BlockSettings }) {
+  const visible = usePlaceholdersVisible();
+  if (settings && settings.items.length > 0) return <LiveBlock kind='cards' settings={settings} fallbackTitle='' aria='Featured promotions' />;
+  if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Featured promotions">
       <div className="hp-grid is-three">
@@ -37,8 +65,10 @@ export function MiniBannersPlaceholder() {
 }
 
 // 2. Offers strip: coupons, cashback and bank offers, as chips.
-export function OffersStripPlaceholder() {
-  if (!usePlaceholdersVisible()) return null;
+export function OffersStripPlaceholder({ settings }: { settings?: BlockSettings }) {
+  const visible = usePlaceholdersVisible();
+  if (settings && settings.items.length > 0) return <LiveBlock kind='chips' settings={settings} fallbackTitle='' aria='Offers' />;
+  if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Offers">
       <div className="hp-chips">
@@ -79,7 +109,7 @@ export function FlashDealsPlaceholder() {
 }
 
 // 4. Buy it again: the customer's past products (signed-in only; placeholder until then).
-export function ReorderPlaceholder() {
+export function ReorderPlaceholder({ settings: _settings }: { settings?: BlockSettings } = {}) {
   if (!usePlaceholdersVisible()) return null;
   return (
     <section className="hp-section" aria-label="Buy it again">
@@ -90,8 +120,10 @@ export function ReorderPlaceholder() {
 }
 
 // 5. Top brands strip.
-export function BrandStripPlaceholder() {
-  if (!usePlaceholdersVisible()) return null;
+export function BrandStripPlaceholder({ settings }: { settings?: BlockSettings }) {
+  const visible = usePlaceholdersVisible();
+  if (settings && settings.items.length > 0) return <LiveBlock kind='tiles' settings={settings} fallbackTitle='Top brands' aria='Top brands' />;
+  if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Top brands">
       <div className="hp-head"><h2 className="hp-title">Top brands</h2></div>
@@ -101,8 +133,10 @@ export function BrandStripPlaceholder() {
 }
 
 // 6. Trust block: delivery, quality and returns, in three equal blocks.
-export function TrustBlockPlaceholder() {
-  if (!usePlaceholdersVisible()) return null;
+export function TrustBlockPlaceholder({ settings }: { settings?: BlockSettings }) {
+  const visible = usePlaceholdersVisible();
+  if (settings && settings.items.length > 0) return <LiveBlock kind='cards' settings={settings} fallbackTitle='' aria='Why shop with us' />;
+  if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Why shop with us">
       <div className="hp-grid is-three">
@@ -115,8 +149,10 @@ export function TrustBlockPlaceholder() {
 }
 
 // 7. Help strip and gift or referral card.
-export function HelpGiftPlaceholder() {
-  if (!usePlaceholdersVisible()) return null;
+export function HelpGiftPlaceholder({ settings }: { settings?: BlockSettings }) {
+  const visible = usePlaceholdersVisible();
+  if (settings && settings.items.length > 0) return <LiveBlock kind='cards' settings={settings} fallbackTitle='' aria='Help, gifts and referrals' />;
+  if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Help, gifts and referrals">
       <div className="hp-grid is-three">

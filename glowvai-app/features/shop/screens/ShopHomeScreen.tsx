@@ -345,7 +345,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     }
   };
 
-  const layoutOrder = useHomeLayout();
+  const { order: layoutOrder, settings: blockSettings } = useHomeLayout();
   const socials = configuredSocials(siteConfig.socials);
 
   // Each homepage block. The order comes from the admin layout (useHomeLayout); the code of each block is unchanged.
@@ -411,13 +411,13 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     case 'mini-banners':
       return (
         <>
-      <MiniBannersPlaceholder />
+      <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />
         </>
       );
     case 'offers':
       return (
         <>
-      <OffersStripPlaceholder />
+      <OffersStripPlaceholder settings={blockSettings['offers']} />
         </>
       );
     case 'categories':
@@ -555,19 +555,19 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     case 'brands':
       return (
         <>
-      <BrandStripPlaceholder />
+      <BrandStripPlaceholder settings={blockSettings['brands']} />
         </>
       );
     case 'trust':
       return (
         <>
-      <TrustBlockPlaceholder />
+      <TrustBlockPlaceholder settings={blockSettings['trust']} />
         </>
       );
     case 'help-gift':
       return (
         <>
-      <HelpGiftPlaceholder />
+      <HelpGiftPlaceholder settings={blockSettings['help-gift']} />
         </>
       );
     case 'footer':
