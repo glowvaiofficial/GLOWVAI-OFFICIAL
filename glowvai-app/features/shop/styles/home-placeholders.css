@@ -37,7 +37,7 @@
 /* Desktop: wider cards, more of the row visible at once. */
 @media (min-width: 720px) {
   .hp-grid, .hp-chips { grid-auto-columns: calc((100% - 36px) / 4); overflow-x: hidden; padding: 0 24px 6px; }
-  .hp-grid.is-three, .hp-chips.is-three { grid-auto-columns: calc((100% - 24px) / 3); }
+  .hp-grid.is-three, .hp-chips { grid-auto-columns: calc((100% - 24px) / 3); }
   .hp-head { margin: 0 24px 10px; }
   .hp-brands { grid-template-columns: repeat(6, 1fr); padding: 0 24px; }
   .hp-card { min-height: 170px; }
