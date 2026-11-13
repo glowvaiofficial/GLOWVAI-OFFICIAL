@@ -54,3 +54,65 @@ function orderOf(blocks: HomeLayoutBlock[]): HomeBlockId[] {
     .filter((id) => id !== "footer");
   return [...shown, "footer"];
 }
+
+// ---- Per-block content (stage 3). The admin sets it; the shop checks it again here.
+export interface BlockItem {
+  label: string;
+  sub: string;
+  link: string;
+}
+
+export interface BlockSettings {
+  title: string;
+  background: string;
+  textColor: string;
+  items: BlockItem[];
+}
+
+// The most items each block can show. Blocks not listed take no items.
+export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
+  "mini-banners": 3,
+  offers: 3,
+  brands: 12,
+  trust: 3,
+  "help-gift": 3,
+};
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
+
+const isSafeInternal = (link: string): boolean =>
+  link === "" || (link.startsWith("/") && !link.startsWith("//") && !link.includes("\\") && !/[\u0000-\u001f\s]/.test(link) && link.length <= 200);
+
+function readItem(raw: unknown): BlockItem | null {
+  if (!raw || typeof raw !== "object") return null;
+  const d = raw as Record<string, unknown>;
+  const label = typeof d.label === "string" && d.label.trim().length > 0 && d.label.length <= 40 ? d.label : null;
+  const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
+  const link = typeof d.link === "string" && isSafeInternal(d.link) ? d.link : null;
+  if (label === null || sub === null || link === null) return null;
+  return { label, sub, link };
+}
+
+// The content of each block that has any. Blocks with no items are left out, so they keep their placeholder.
+export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, BlockSettings>> {
+  const out: Partial<Record<HomeBlockId, BlockSettings>> = {};
+  const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
+  for (const b of blocks.slice(0, 40)) {
+    if (!b || typeof b !== "object") continue;
+    const d = b as Record<string, unknown>;
+    if (!(HOME_BLOCK_IDS as readonly string[]).includes(d.id as string)) continue;
+    const id = d.id as HomeBlockId;
+    const s = d.settings && typeof d.settings === "object" ? (d.settings as Record<string, unknown>) : null;
+    if (!s) continue;
+    const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
+    const items = Array.isArray(s.items) ? s.items.slice(0, limit).map(readItem).filter((x): x is BlockItem => x !== null) : [];
+    if (items.length === 0) continue;
+    out[id] = {
+      title: typeof s.title === "string" && s.title.length <= 60 ? s.title : "",
+      background: typeof s.background === "string" && HEX.test(s.background) ? s.background : "",
+      textColor: typeof s.textColor === "string" && HEX.test(s.textColor) ? s.textColor : "",
+      items,
+    };
+  }
+  return out;
+}
