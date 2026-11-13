@@ -1,132 +1,144 @@
-// Tests for lib/shop/rateLimit.ts. No network: fetch is stubbed for every shared-limiter call.
+// Tests for lib/shop/rateLimit.ts. No network and no real Firestore: a small in-memory fake stands in for the Firestore
+// handle (collection().doc() and runTransaction with get/set), and the fake records every write so the tests can check
+// exactly what would be stored.
 import { afterEach, beforeEach, describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import { checkRateLimit, hashKey, memoryCheck } from "../../lib/shop/rateLimit";
+import type { Firestore } from "firebase-admin/firestore";
+import {
+  RATE_LIMIT_COLLECTION,
+  STORE_TIMEOUT_MS,
+  checkRateLimit,
+  decide,
+  hashKey,
+  memoryCheck,
+  nextWindow,
+  type RateLimitDoc,
+} from "../../lib/shop/rateLimit";
 
-const URL_ENV = "https://example-upstash.invalid";
-const TOKEN_ENV = "test-token-not-real";
+type DocRef = { id: string; collection: string };
+type Write = { collection: string; id: string; data: Record<string, unknown> };
 
-type Call = { url: string; init: RequestInit };
+// Minimal stand-in for the Firestore admin handle used by lib/shop/rateLimit.ts.
+class FakeFirestore {
+  readonly collections: string[] = [];
+  readonly writes: Write[] = [];
+  readonly docs = new Map<string, Record<string, unknown>>();
+  failWith: Error | null = null;
+  hang = false;
+  transactions = 0;
 
-let savedUrl: string | undefined;
-let savedToken: string | undefined;
-let calls: Call[];
-let originalFetch: typeof globalThis.fetch;
+  collection(name: string) {
+    this.collections.push(name);
+    return { doc: (id: string): DocRef => ({ id, collection: name }) };
+  }
 
-function setUpstashEnv(on: boolean) {
-  if (on) {
-    process.env.UPSTASH_REDIS_REST_URL = URL_ENV;
-    process.env.UPSTASH_REDIS_REST_TOKEN = TOKEN_ENV;
-  } else {
-    delete process.env.UPSTASH_REDIS_REST_URL;
-    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  async runTransaction<T>(fn: (tx: unknown) => Promise<T>): Promise<T> {
+    if (this.failWith) throw this.failWith;
+    if (this.hang) return new Promise<T>(() => {});
+    this.transactions += 1;
+    const pending: Array<{ ref: DocRef; data: Record<string, unknown> }> = [];
+    const tx = {
+      get: async (ref: DocRef) => {
+        const data = this.docs.get(ref.id);
+        return { exists: data !== undefined, data: () => (data ? { ...data } : undefined) };
+      },
+      set: (ref: DocRef, data: Record<string, unknown>) => {
+        pending.push({ ref, data });
+      },
+    };
+    const result = await fn(tx);
+    for (const p of pending) {
+      this.docs.set(p.ref.id, p.data);
+      this.writes.push({ collection: p.ref.collection, id: p.ref.id, data: p.data });
+    }
+    return result;
+  }
+
+  asFirestore(): Firestore {
+    return this as unknown as Firestore;
   }
 }
 
-// Stubs fetch with a pipeline reply: INCR returns `count`, EXPIRE returns 1.
-function stubPipeline(count: number) {
-  globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
-    calls.push({ url: String(url), init: init ?? {} });
-    return new Response(JSON.stringify([{ result: count }, { result: 1 }]), { status: 200 });
-  }) as typeof globalThis.fetch;
-}
+let store: FakeFirestore;
 
 beforeEach(() => {
-  savedUrl = process.env.UPSTASH_REDIS_REST_URL;
-  savedToken = process.env.UPSTASH_REDIS_REST_TOKEN;
-  calls = [];
-  originalFetch = globalThis.fetch;
-  setUpstashEnv(false);
+  store = new FakeFirestore();
 });
 
 afterEach(() => {
-  globalThis.fetch = originalFetch;
-  if (savedUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
-  else process.env.UPSTASH_REDIS_REST_URL = savedUrl;
-  if (savedToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
-  else process.env.UPSTASH_REDIS_REST_TOKEN = savedToken;
   mock.restoreAll();
 });
 
 describe("backend selection", () => {
-  it("uses the in-memory limiter and never calls fetch when Upstash is not configured", async () => {
-    globalThis.fetch = (async () => {
-      throw new Error("fetch must not be called");
-    }) as typeof globalThis.fetch;
+  it("uses the in-memory limiter and never touches Firestore when no store is passed", async () => {
     const r = await checkRateLimit({ key: "sel:none:1", max: 2, windowMs: 60_000 });
-    assert.equal(r.allowed, true);
-    assert.equal(r.remaining, 1);
+    assert.deepEqual(r, { allowed: true, remaining: 1, retryAfterSeconds: 0 });
+    const n = await checkRateLimit({ key: "sel:null:1", max: 2, windowMs: 60_000 }, null);
+    assert.equal(n.allowed, true);
+    assert.equal(store.transactions, 0);
   });
 
-  it("uses the in-memory limiter when only one of the two Upstash variables is set", async () => {
-    process.env.UPSTASH_REDIS_REST_URL = URL_ENV;
-    stubPipeline(1);
-    const r = await checkRateLimit({ key: "sel:half:1", max: 2, windowMs: 60_000 });
-    assert.equal(r.allowed, true);
-    assert.equal(calls.length, 0);
-  });
-
-  it("calls the Upstash pipeline endpoint with the bearer token when both variables are set", async () => {
-    setUpstashEnv(true);
-    stubPipeline(1);
-    await checkRateLimit({ key: "sel:shared:1", max: 5, windowMs: 60_000 });
-    assert.equal(calls.length, 1);
-    assert.equal(calls[0].url, `${URL_ENV}/pipeline`);
-    assert.equal(calls[0].init.method, "POST");
-    assert.equal((calls[0].init.headers as Record<string, string>).Authorization, `Bearer ${TOKEN_ENV}`);
-    const commands = JSON.parse(String(calls[0].init.body));
-    assert.equal(commands[0][0], "INCR");
-    assert.equal(commands[1][0], "EXPIRE");
-    assert.equal(commands[0][1], commands[1][1], "INCR and EXPIRE act on the same key");
+  it("uses one Firestore transaction in the rateLimits collection when a store is passed", async () => {
+    await checkRateLimit({ key: "sel:fs:1", max: 5, windowMs: 60_000 }, store.asFirestore());
+    assert.equal(store.transactions, 1);
+    assert.equal(RATE_LIMIT_COLLECTION, "rateLimits");
+    assert.deepEqual(store.collections, ["rateLimits"]);
+    assert.equal(store.writes.length, 1);
+    assert.equal(store.writes[0].collection, "rateLimits");
   });
 });
 
-describe("window and remaining maths", () => {
-  it("counts from the shared INCR result: allowed with remaining = max - count", async () => {
-    setUpstashEnv(true);
-    stubPipeline(2);
-    const r = await checkRateLimit({ key: "maths:shared:ok", max: 5, windowMs: 60_000 });
-    assert.deepEqual(r, { allowed: true, remaining: 3, retryAfterSeconds: 0 });
+describe("window maths", () => {
+  const windowMs = 60_000;
+
+  it("starts a new window at the first hit, with expiresAt at the window end", () => {
+    assert.deepEqual(nextWindow(undefined, windowMs, 5_000), { count: 1, windowStart: 5_000, expiresAt: 65_000 });
   });
 
-  it("allows the request that reaches the max exactly and refuses the next one", async () => {
-    setUpstashEnv(true);
-    stubPipeline(5);
-    const atMax = await checkRateLimit({ key: "maths:shared:edge", max: 5, windowMs: 60_000 });
-    assert.equal(atMax.allowed, true);
-    assert.equal(atMax.remaining, 0);
-    stubPipeline(6);
-    const over = await checkRateLimit({ key: "maths:shared:edge", max: 5, windowMs: 60_000 });
-    assert.equal(over.allowed, false);
-    assert.equal(over.remaining, 0);
+  it("keeps the window start and adds one while the window is live", () => {
+    const stored: RateLimitDoc = { count: 3, windowStart: 5_000, expiresAt: 65_000 };
+    assert.deepEqual(nextWindow(stored, windowMs, 30_000), { count: 4, windowStart: 5_000, expiresAt: 65_000 });
   });
 
-  it("gives retryAfterSeconds as the seconds left in the current fixed window", async (t) => {
-    setUpstashEnv(true);
-    const windowMs = 3_600_000;
-    // 10 full windows, then 1,000,000 ms into the eleventh: 2,600,000 ms (2,600 s) of the window remain.
-    const now = 10 * windowMs + 1_000_000;
-    t.mock.method(Date, "now", () => now);
-    stubPipeline(7);
-    const r = await checkRateLimit({ key: "maths:shared:retry", max: 5, windowMs });
-    assert.equal(r.allowed, false);
-    assert.equal(r.retryAfterSeconds, 2600);
+  it("resets the count once the window has passed", () => {
+    const stored: RateLimitDoc = { count: 9, windowStart: 5_000, expiresAt: 65_000 };
+    assert.deepEqual(nextWindow(stored, windowMs, 65_000), { count: 1, windowStart: 65_000, expiresAt: 125_000 });
   });
 
-  it("keys the window by its start, so a new window starts a fresh count", async (t) => {
-    setUpstashEnv(true);
-    const windowMs = 60_000;
-    let clock = 5 * windowMs + 1;
+  it("treats a damaged or future-dated document as a fresh window", () => {
+    assert.equal(nextWindow({ count: "x" as unknown as number, windowStart: 5_000 }, windowMs, 6_000).count, 1);
+    assert.equal(nextWindow({ count: 4, windowStart: 9_000 }, windowMs, 6_000).count, 1);
+  });
+
+  it("allows the request that reaches max and refuses the next one, with seconds left in the window", () => {
+    assert.deepEqual(decide({ count: 5, windowStart: 0, expiresAt: windowMs }, 5, windowMs, 1_000), {
+      allowed: true,
+      remaining: 0,
+      retryAfterSeconds: 0,
+    });
+    // windowStart 1,000 ms, windowMs 60,000 ms, now 31,000 ms: 30,000 ms left, so 30 s.
+    assert.deepEqual(decide({ count: 6, windowStart: 1_000, expiresAt: 61_000 }, 5, windowMs, 31_000), {
+      allowed: false,
+      remaining: 0,
+      retryAfterSeconds: 30,
+    });
+  });
+
+  it("through Firestore: counts per key, refuses over max, and starts again after the window", async (t) => {
+    let clock = 10 * windowMs;
     t.mock.method(Date, "now", () => clock);
-    stubPipeline(1);
-    await checkRateLimit({ key: "maths:window", max: 5, windowMs });
-    clock = 6 * windowMs + 1;
-    stubPipeline(1);
-    await checkRateLimit({ key: "maths:window", max: 5, windowMs });
-    const first = String(JSON.parse(String(calls[0].init.body))[0][1]);
-    const second = String(JSON.parse(String(calls[1].init.body))[0][1]);
-    assert.notEqual(first, second);
+    const fs = store.asFirestore();
+    const a = await checkRateLimit({ key: "maths:fs:1", max: 2, windowMs }, fs);
+    const b = await checkRateLimit({ key: "maths:fs:1", max: 2, windowMs }, fs);
+    const c = await checkRateLimit({ key: "maths:fs:1", max: 2, windowMs }, fs);
+    assert.deepEqual(a, { allowed: true, remaining: 1, retryAfterSeconds: 0 });
+    assert.deepEqual(b, { allowed: true, remaining: 0, retryAfterSeconds: 0 });
+    assert.equal(c.allowed, false);
+    assert.equal(c.remaining, 0);
+    assert.equal(c.retryAfterSeconds, 60);
+    clock += windowMs;
+    const d = await checkRateLimit({ key: "maths:fs:1", max: 2, windowMs }, fs);
+    assert.deepEqual(d, { allowed: true, remaining: 1, retryAfterSeconds: 0 });
   });
 
   it("in-memory: refuses past the max, reports remaining and a retryAfter from the oldest hit", () => {
@@ -135,88 +147,88 @@ describe("window and remaining maths", () => {
     assert.deepEqual(memoryCheck(key, 3, 60_000, t0), { allowed: true, remaining: 2, retryAfterSeconds: 0 });
     assert.deepEqual(memoryCheck(key, 3, 60_000, t0 + 1), { allowed: true, remaining: 1, retryAfterSeconds: 0 });
     assert.deepEqual(memoryCheck(key, 3, 60_000, t0 + 2), { allowed: true, remaining: 0, retryAfterSeconds: 0 });
-    // 10 s later the oldest hit is still 50 s from expiring.
     assert.deepEqual(memoryCheck(key, 3, 60_000, t0 + 10_000), { allowed: false, remaining: 0, retryAfterSeconds: 50 });
-    // Once the oldest hit has aged out, one slot is free again.
     assert.equal(memoryCheck(key, 3, 60_000, t0 + 60_001).allowed, true);
   });
 });
 
 describe("fail open and fallback", () => {
-  it("falls back to the in-memory limiter when fetch throws, and still enforces the limit there", async (t) => {
-    setUpstashEnv(true);
+  it("falls back to the in-memory limiter when Firestore throws, and still enforces the limit there", async (t) => {
     const warn = t.mock.method(console, "warn", () => {});
-    globalThis.fetch = (async () => {
-      throw new TypeError("network down");
-    }) as typeof globalThis.fetch;
+    store.failWith = new Error("unavailable");
     const key = "failopen:throw:1";
-    const first = await checkRateLimit({ key, max: 1, windowMs: 60_000 });
-    assert.equal(first.allowed, true, "an Upstash error does not refuse the request");
-    const second = await checkRateLimit({ key, max: 1, windowMs: 60_000 });
+    const first = await checkRateLimit({ key, max: 1, windowMs: 60_000 }, store.asFirestore());
+    assert.equal(first.allowed, true, "a Firestore error does not refuse the request");
+    const second = await checkRateLimit({ key, max: 1, windowMs: 60_000 }, store.asFirestore());
     assert.equal(second.allowed, false, "the in-memory limiter still counts");
     assert.equal(warn.mock.callCount(), 2);
+    assert.equal(store.writes.length, 0, "nothing is written when the transaction fails");
   });
 
-  it("falls back on a non-2xx reply and on an error element in the pipeline result", async (t) => {
-    setUpstashEnv(true);
+  it("gives up after the store timeout and falls back when Firestore never answers", async (t) => {
     t.mock.method(console, "warn", () => {});
-    globalThis.fetch = (async () => new Response("nope", { status: 503 })) as typeof globalThis.fetch;
-    const a = await checkRateLimit({ key: "failopen:status:1", max: 5, windowMs: 60_000 });
-    assert.equal(a.allowed, true);
-    globalThis.fetch = (async () => new Response(JSON.stringify([{ error: "WRONGTYPE" }, { result: 1 }]), { status: 200 })) as typeof globalThis.fetch;
-    const b = await checkRateLimit({ key: "failopen:error:1", max: 5, windowMs: 60_000 });
-    assert.equal(b.allowed, true);
-  });
-
-  it("gives up after 2 seconds and falls back when Upstash never answers", async (t) => {
-    setUpstashEnv(true);
-    t.mock.method(console, "warn", () => {});
-    globalThis.fetch = ((_url: unknown, init: RequestInit) =>
-      new Promise((_resolve, reject) => {
-        init.signal?.addEventListener("abort", () => {
-          const err = new Error("aborted");
-          err.name = "AbortError";
-          reject(err);
-        });
-      })) as typeof globalThis.fetch;
+    store.hang = true;
     const started = Date.now();
-    const r = await checkRateLimit({ key: "failopen:timeout:1", max: 5, windowMs: 60_000 });
+    const r = await checkRateLimit({ key: "failopen:timeout:1", max: 5, windowMs: 60_000 }, store.asFirestore());
     const took = Date.now() - started;
     assert.equal(r.allowed, true);
-    assert.ok(took >= 1900 && took < 3000, `expected about 2 s, took ${took} ms`);
+    assert.ok(took >= STORE_TIMEOUT_MS - 100 && took < STORE_TIMEOUT_MS + 1000, `expected about ${STORE_TIMEOUT_MS} ms, took ${took} ms`);
   });
 
-  it("logs the failure without the key, the IP or the uid", async (t) => {
-    setUpstashEnv(true);
+  it("logs only the error type or code, never the key, the IP, the uid or the error message", async (t) => {
     const warn = t.mock.method(console, "warn", () => {});
-    globalThis.fetch = (async () => {
-      throw new TypeError("boom");
-    }) as typeof globalThis.fetch;
-    await checkRateLimit({ key: "ip:orders-post:203.0.113.99", max: 5, windowMs: 60_000 });
+    store.failWith = new Error("failed for ip:orders-post:203.0.113.99 and user uid-ABC123xyz");
+    await checkRateLimit({ key: "ip:orders-post:203.0.113.99", max: 5, windowMs: 60_000 }, store.asFirestore());
+    const coded = Object.assign(new Error("secret text 203.0.113.99"), { code: 14 });
+    store.failWith = coded;
+    await checkRateLimit({ key: "user:orders-post:uid-ABC123xyz", max: 5, windowMs: 60_000 }, store.asFirestore());
     const logged = warn.mock.calls.map((c) => String(c.arguments[0])).join("\n");
-    assert.ok(logged.includes("ratelimit"));
-    assert.ok(!logged.includes("203.0.113.99"));
-    assert.ok(!logged.includes("orders-post"));
+    assert.ok(logged.includes("[ratelimit]"));
+    assert.ok(logged.includes("Error"));
+    assert.ok(logged.includes("firestore_14"));
+    for (const secret of ["203.0.113.99", "uid-ABC123xyz", "orders-post", "secret text"]) {
+      assert.ok(!logged.includes(secret), `log must not contain ${secret}`);
+    }
   });
 });
 
-describe("hashed keys", () => {
-  it("never sends a raw IP address or uid to Upstash, only SHA-256 of the key", async () => {
-    setUpstashEnv(true);
-    stubPipeline(1);
+describe("hashed document ids and minimal stored data", () => {
+  it("uses the SHA-256 of the key as the document id, never the raw key, IP or uid", async () => {
     const ip = "203.0.113.77";
     const uid = "uid-ABC123xyz";
-    await checkRateLimit({ key: `ip:orders-post:${ip}`, max: 60, windowMs: 3_600_000 });
-    await checkRateLimit({ key: `user:orders-post:${uid}`, max: 20, windowMs: 3_600_000 });
-    assert.equal(calls.length, 2);
-    for (const c of calls) {
-      const wire = `${c.url} ${JSON.stringify(c.init.body)}`;
-      assert.ok(!wire.includes(ip), "raw IP must not be sent");
-      assert.ok(!wire.includes(uid), "raw uid must not be sent");
-      assert.ok(!wire.includes("orders-post"), "route name is part of the hashed key only");
+    await checkRateLimit({ key: `ip:orders-post:${ip}`, max: 60, windowMs: 3_600_000 }, store.asFirestore());
+    await checkRateLimit({ key: `user:orders-post:${uid}`, max: 20, windowMs: 3_600_000 }, store.asFirestore());
+    const ids = [...store.docs.keys()];
+    assert.equal(ids.length, 2);
+    for (const id of ids) {
+      assert.match(id, /^[0-9a-f]{64}$/);
+      assert.ok(!id.includes(ip) && !id.includes(uid) && !id.includes("orders-post"));
     }
-    const hash = createHash("sha256").update(`ip:orders-post:${ip}`).digest("hex");
-    assert.ok(String(calls[0].init.body).includes(hash), "the key is the SHA-256 of the logical key");
+    assert.ok(ids.includes(hashKey(`ip:orders-post:${ip}`)));
+    assert.ok(ids.includes(hashKey(`user:orders-post:${uid}`)));
+  });
+
+  it("writes only count, windowStart and expiresAt, and no raw key, IP, uid or route name anywhere", async () => {
+    const ip = "198.51.100.23";
+    const uid = "uid-ZZZ999qqq";
+    await checkRateLimit({ key: `ip:support-post:${ip}`, max: 30, windowMs: 60_000 }, store.asFirestore());
+    await checkRateLimit({ key: `user:support-ticket:${uid}`, max: 5, windowMs: 3_600_000 }, store.asFirestore());
+    assert.equal(store.writes.length, 2);
+    for (const w of store.writes) {
+      assert.deepEqual(Object.keys(w.data).sort(), ["count", "expiresAt", "windowStart"]);
+      for (const v of Object.values(w.data)) assert.equal(typeof v, "number");
+      const wire = JSON.stringify({ collection: w.collection, id: w.id, data: w.data });
+      for (const secret of [ip, uid, "support-post", "support-ticket", "ip:", "user:"]) {
+        assert.ok(!wire.includes(secret), `stored data must not contain ${secret}`);
+      }
+    }
+  });
+
+  it("sets expiresAt to the window end so documents can be expired later", async () => {
+    await checkRateLimit({ key: "expiry:1", max: 5, windowMs: 90_000 }, store.asFirestore());
+    const doc = store.docs.get(hashKey("expiry:1"));
+    assert.ok(doc);
+    assert.equal(doc.expiresAt, (doc.windowStart as number) + 90_000);
   });
 
   it("hashKey is a 64 character hex SHA-256 and does not echo its input", () => {

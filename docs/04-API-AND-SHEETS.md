@@ -13,7 +13,7 @@
 | POST | /api/data-request | DataRequests | DPDP privacy requests |
 
 ## Rules for every route
-Zod validation, honeypot field "website", per-IP rate limit (Upstash Redis in production),
+Zod validation, honeypot field "website", per-IP rate limit (Firestore counter in production),
 Origin check, 4KB body limit (the image route has its own limit), no request bodies in logs.
 
 ## Google Sheets Structure (Tabs & Headers)
@@ -28,4 +28,4 @@ Origin check, 4KB body limit (the image route has its own limit), no request bod
 Next.js adds `secret` (`SHEETS_SECRET`) to the JSON body. Actions: `create`, `update_lead`, `upload_image`, `append`. The script fails closed if no secret property exists.
 
 ## Env vars
-`SHEETS_WEBAPP_URL`, `SHEETS_SECRET`, `SESSION_SECRET`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `NEXT_PUBLIC_SITE_URL`.
+`SHEETS_WEBAPP_URL`, `SHEETS_SECRET`, `SESSION_SECRET`, `NEXT_PUBLIC_SITE_URL`.

@@ -83,7 +83,7 @@ export interface RouteOptions {
   ip?: Limit;
   /** Per signed-in partner. */
   partner?: Limit;
-  /** Count ip and partner limits in the shared limiter (Upstash when configured). Off unless a route asks for it. */
+  /** Count ip and partner limits in the shared limiter (Firestore counter). Off unless a route asks for it. */
   shared?: boolean;
 }
 
