@@ -197,7 +197,7 @@ export function readHeroOverride(raw: unknown): HeroOverride | null {
 }
 
 // ---- Configurable product rows (the product-rails block). The admin sets them; the shop checks them again here.
-export const ROW_SOURCES = ["category", "brand", "bestsellers", "new"] as const;
+export const ROW_SOURCES = ["category", "brand", "bestsellers", "new", "price-band", "price-drop"] as const;
 export type RowSource = (typeof ROW_SOURCES)[number];
 
 export interface ProductRow {
@@ -218,9 +218,27 @@ function readRow(raw: unknown): ProductRow | null {
   const value = typeof d.value === "string" ? d.value : null;
   const limit = typeof d.limit === "number" && Number.isInteger(d.limit) && d.limit >= ROW_LIMITS.minLimit && d.limit <= ROW_LIMITS.maxLimit ? d.limit : null;
   if (!title || !source || value === null || limit === null) return null;
+  if (source === "price-band") {
+    const band = parsePriceBand(value);
+    return band ? { title, source, value: `${band.min}-${band.max}`, limit } : null;
+  }
   if (needsValue && (value.trim().length === 0 || value.length > 60)) return null;
   if (!needsValue && value !== "") return null;
   return { title, source, value: needsValue ? value.trim() : "", limit };
+}
+
+// A price band value is "min-max" in whole rupees: both 0 to 50000, min less than max. Anything else is null.
+export const PRICE_BAND_MIN = 0;
+export const PRICE_BAND_MAX = 50000;
+const PRICE_BAND = /^(\d{1,5})-(\d{1,5})$/;
+
+export function parsePriceBand(value: string): { min: number; max: number } | null {
+  const m = PRICE_BAND.exec(value.trim());
+  if (!m) return null;
+  const min = Number(m[1]);
+  const max = Number(m[2]);
+  if (min < PRICE_BAND_MIN || max > PRICE_BAND_MAX || min >= max) return null;
+  return { min, max };
 }
 
 // The rows set on the product-rails block, in order. Empty when none are set: the shop then shows its default rows.

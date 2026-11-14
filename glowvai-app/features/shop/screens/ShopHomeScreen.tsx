@@ -18,7 +18,7 @@ import { HeaderCartButton } from '../shared/HeaderCartButton';
 import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { fetchReorderItems } from '../../../core/services/shopApi';
-import { pickDeals } from '../../../../lib/shop/homeLayout';
+import { parsePriceBand, pickDeals } from '../../../../lib/shop/homeLayout';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
@@ -397,7 +397,13 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const configuredRows = useMemo(() => {
     const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
     layoutRows.forEach((r, i) => {
-      const pool = r.source === 'category' ? catalog.filter((p) => p.category === r.value) : r.source === 'brand' ? catalog.filter((p) => p.brand === r.value) : r.source === 'bestsellers' ? lists.TOP_RATED : [...catalog].reverse();
+      const band = r.source === 'price-band' ? parsePriceBand(r.value) : null;
+      const pool = r.source === 'category' ? catalog.filter((p) => p.category === r.value)
+        : r.source === 'brand' ? catalog.filter((p) => p.brand === r.value)
+        : r.source === 'bestsellers' ? lists.TOP_RATED
+        : r.source === 'price-band' ? (band ? catalog.filter((p) => p.price >= band.min && p.price <= band.max) : [])
+        : r.source === 'price-drop' ? catalog.filter((p) => p.originalPrice > p.price)
+        : [...catalog].reverse();
       if (pool.length >= 4) out.push({ id: 'row-' + i, title: r.title, products: pool.slice(0, r.limit) });
     });
     return out;
