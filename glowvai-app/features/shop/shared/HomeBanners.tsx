@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react';
 
 type HomeBanner = {
   id: string;
-  kind: 'banner' | 'offer' | 'festival';
+  kind: 'banner' | 'offer' | 'festival' | 'sponsored';
   title: string;
   subtitle: string;
   ctaLabel: string;
@@ -126,6 +126,9 @@ export const HomeBanners: React.FC = () => {
                 }}
               >
                 <span style={{ display: 'grid', gap: 4, maxWidth: 360 }}>
+                  {b.kind === 'sponsored' && (
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', opacity: 0.85 }}>Sponsored</span>
+                  )}
                   <strong style={{ fontSize: 20, lineHeight: 1.2 }}>{b.title}</strong>
                   {b.subtitle && <span style={{ fontSize: 14, opacity: 0.92 }}>{b.subtitle}</span>}
                   {b.ctaLabel && (

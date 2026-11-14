@@ -86,3 +86,77 @@ test("at most twenty sections are read", () => {
   const many = Array.from({ length: 30 }, (_, i) => good({ id: `section-${String(i).padStart(3, "0")}`, position: i % 900 }));
   assert.equal(activeSections(many, NOW).length, 20);
 });
+
+// ---- Sponsored spotlight: one live sponsored section at a time.
+
+test("a sponsored section is accepted as its own kind", () => {
+  const s = readSection(good({ id: "spotlight-glow", kind: "sponsored" }));
+  assert.ok(s);
+  assert.equal(s.kind, "sponsored");
+  assert.equal(s.title, "Diwali glow sale");
+});
+
+test("a sponsored section takes the same checks as a banner (link, colours, id)", () => {
+  assert.equal(readSection(good({ kind: "sponsored", link: "https://evil.example" })), null);
+  assert.equal(readSection(good({ kind: "sponsored", background: "red" })), null);
+  assert.equal(readSection(good({ kind: "sponsored", id: "Bad Id!" })), null);
+  assert.equal(readSection(good({ kind: "sponsored", title: "" })), null);
+});
+
+test("only one sponsored section is shown: the live one with the earliest start", () => {
+  const list = [
+    good({ id: "sponsor-later", kind: "sponsored", position: 0, startsAt: NOW - 1000 }),
+    good({ id: "sponsor-earliest", kind: "sponsored", position: 5, startsAt: NOW - 5000 }),
+    good({ id: "sponsor-middle", kind: "sponsored", position: 1, startsAt: NOW - 3000 }),
+  ];
+  assert.deepEqual(activeSections(list, NOW).map((s) => s.id), ["sponsor-earliest"]);
+});
+
+test("sponsored ties on start time go to the first in position order", () => {
+  const list = [
+    good({ id: "sponsor-second", kind: "sponsored", position: 4, startsAt: NOW - 1000 }),
+    good({ id: "sponsor-first", kind: "sponsored", position: 2, startsAt: NOW - 1000 }),
+  ];
+  assert.deepEqual(activeSections(list, NOW).map((s) => s.id), ["sponsor-first"]);
+});
+
+test("a sponsored section with no start time counts as already started", () => {
+  const list = [
+    good({ id: "sponsor-timed", kind: "sponsored", position: 0, startsAt: NOW - 1000 }),
+    good({ id: "sponsor-open", kind: "sponsored", position: 1, startsAt: null }),
+  ];
+  assert.deepEqual(activeSections(list, NOW).map((s) => s.id), ["sponsor-open"]);
+});
+
+test("a scheduled or ended sponsored section does not take the slot", () => {
+  const list = [
+    good({ id: "sponsor-scheduled", kind: "sponsored", position: 0, startsAt: NOW + 60_000 }),
+    good({ id: "sponsor-ended", kind: "sponsored", position: 0, startsAt: NOW - 90_000, endsAt: NOW - 1 }),
+    good({ id: "sponsor-live", kind: "sponsored", position: 3, startsAt: NOW - 1000 }),
+  ];
+  assert.deepEqual(activeSections(list, NOW).map((s) => s.id), ["sponsor-live"]);
+});
+
+test("other kinds are unaffected by the sponsored rule and keep position order", () => {
+  const list = [
+    good({ id: "banner-one", kind: "banner", position: 0 }),
+    good({ id: "sponsor-a", kind: "sponsored", position: 1, startsAt: NOW - 2000 }),
+    good({ id: "sponsor-b", kind: "sponsored", position: 2, startsAt: NOW - 1000 }),
+    good({ id: "offer-one", kind: "offer", position: 3 }),
+    good({ id: "festival-one", kind: "festival", position: 4 }),
+    good({ id: "banner-two", kind: "banner", position: 5 }),
+  ];
+  assert.deepEqual(
+    activeSections(list, NOW).map((s) => s.id),
+    ["banner-one", "sponsor-a", "offer-one", "festival-one", "banner-two"],
+  );
+});
+
+test("with no sponsored section, banners, offers and festivals show exactly as before", () => {
+  const list = [
+    good({ id: "festival-one", kind: "festival", position: 2 }),
+    good({ id: "banner-one", kind: "banner", position: 0 }),
+    good({ id: "offer-one", kind: "offer", position: 1 }),
+  ];
+  assert.deepEqual(activeSections(list, NOW).map((s) => s.kind), ["banner", "offer", "festival"]);
+});

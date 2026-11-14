@@ -5,7 +5,8 @@
 // Times are epoch milliseconds. A section shows when it is enabled, its start has passed (null = already started), and
 // its end has not passed (null = never ends). So a banner set to start at 12:00 goes live at 12:00 by itself.
 
-export const HOME_SECTION_KINDS = ["banner", "offer", "festival"] as const;
+// A "sponsored" section is a spotlight for one partner. Only one sponsored section is shown at a time (see activeSections).
+export const HOME_SECTION_KINDS = ["banner", "offer", "festival", "sponsored"] as const;
 export type HomeSectionKind = (typeof HOME_SECTION_KINDS)[number];
 
 export interface HomeSection {
@@ -88,10 +89,18 @@ export function readSection(raw: unknown): HomeSection | null {
 }
 
 // The sections a customer may see right now, in order. Invalid stored entries are skipped.
+// At most one sponsored section is shown: the live one with the earliest startsAt (no start time counts as earliest,
+// since it has already started). Ties go to the first one in position order. Other sponsored sections are dropped.
 export function activeSections(stored: unknown, now: number): HomeSection[] {
   if (!Array.isArray(stored)) return [];
   const parsed = stored.slice(0, HOME_LIMITS.maxSections).map(readSection).filter((s): s is HomeSection => s !== null);
-  return parsed
+  const live = parsed
     .filter((s) => s.enabled && (s.startsAt === null || s.startsAt <= now) && (s.endsAt === null || s.endsAt > now))
     .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
+  let spotlight: HomeSection | null = null;
+  for (const s of live) {
+    if (s.kind !== "sponsored") continue;
+    if (spotlight === null || (s.startsAt ?? -Infinity) < (spotlight.startsAt ?? -Infinity)) spotlight = s;
+  }
+  return live.filter((s) => s.kind !== "sponsored" || s === spotlight);
 }
