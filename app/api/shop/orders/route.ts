@@ -157,8 +157,11 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
-  const userLimited = await limitByUserShared(customer.uid, "orders-post", 20, 60 * 60 * 1000, "Too many orders in a short time. Try again later.");
-  if (userLimited) return userLimited;
+  // Customer limits: at most 10 order attempts a day, and at most 3 in any 10 minutes (a burst guard).
+  const userBurst = await limitByUserShared(customer.uid, "orders-post-burst", 3, 10 * 60 * 1000, "You are placing orders too quickly. Wait a few minutes and try again.");
+  if (userBurst) return userBurst;
+  const userDaily = await limitByUserShared(customer.uid, "orders-post-daily", 10, 24 * 60 * 60 * 1000, "You have reached 10 orders for today. Try again tomorrow.");
+  if (userDaily) return userDaily;
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return json({ ok: false, error: "Invalid request." }, 400);
