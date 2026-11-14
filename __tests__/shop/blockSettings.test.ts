@@ -155,3 +155,30 @@ test("empty category items give no override, so the built-in tiles show", () => 
   assert.equal(categoriesOf([]), undefined);
   assert.equal(categoriesOf([{ label: "", sub: "", link: "", image: "" }]), undefined);
 });
+
+// ---- Trust promises: up to 3 promises, each with a title, a line, an optional internal link and an optional icon.
+const trustItems = (items: unknown[]) => readBlockSettings({ blocks: [{ id: "trust", enabled: true, position: 0, settings: { title: "", background: "", textColor: "", items } }] })["trust"];
+const promise = (over: Record<string, unknown> = {}) => ({ label: "Free returns", sub: "7 days", link: "/returns", image: "", ...over });
+
+test("trust promises read with their icons (a valid picture is kept, a bad one is dropped alone)", () => {
+  const got = trustItems([promise({ image: PNG }), promise({ label: "Genuine", link: "", image: "https://example.com/i.png" })]);
+  assert.equal(got?.items.length, 2);
+  assert.equal(got?.items[0].image, PNG);
+  assert.equal(got?.items[1].image, "");
+  assert.equal(got?.items[1].link, "");
+});
+
+test("trust keeps at most 3 promises, the first 3", () => {
+  const got = trustItems([1, 2, 3, 4, 5].map((i) => promise({ label: "Promise " + i })));
+  assert.deepEqual(got?.items.map((x) => x.label), ["Promise 1", "Promise 2", "Promise 3"]);
+});
+
+test("a trust promise with a bad link is dropped, and the rest stay", () => {
+  const got = trustItems([promise({ label: "Bad", link: "https://evil.example" }), promise({ label: "Also bad", link: "returns" }), promise({ label: "Good" })]);
+  assert.deepEqual(got?.items.map((x) => x.label), ["Good"]);
+});
+
+test("an empty trust list gives no override, so the built-in block shows", () => {
+  assert.equal(trustItems([]), undefined);
+  assert.equal(readBlockSettings({ blocks: [{ id: "trust", enabled: true, position: 0, settings: { title: "", background: "", textColor: "", items: [promise({ label: "" })] } }] })["trust"], undefined);
+});
