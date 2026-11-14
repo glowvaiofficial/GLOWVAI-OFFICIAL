@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_HOME_LAYOUT, HOME_BLOCK_IDS, readHomeLayout, readProductRows } from "@/lib/shop/homeLayout";
+import { DEFAULT_HOME_LAYOUT, HOME_BLOCK_IDS, parsePriceBand, readHomeLayout, readProductRows } from "@/lib/shop/homeLayout";
 
 test("nothing saved gives the default order, footer last", () => {
   assert.deepEqual(readHomeLayout(undefined), [...HOME_BLOCK_IDS]);
@@ -77,4 +77,34 @@ test("more than six rows keeps the first six; no rows gives none", () => {
   const seven = Array.from({ length: 7 }, (_, i) => ({ title: "Row " + i, source: "new", value: "", limit: 4 }));
   assert.equal(readProductRows(rowsDoc(seven)).length, 6);
   assert.deepEqual(readProductRows({ blocks: [] }), []);
+});
+
+test("a valid price band is kept with its value", () => {
+  const got = readProductRows(rowsDoc([
+    { title: "Under 200", source: "price-band", value: "0-199", limit: 6 },
+    { title: "Mid", source: "price-band", value: " 200-499 ", limit: 4 },
+  ]));
+  assert.deepEqual(got.map((r) => [r.source, r.value]), [["price-band", "0-199"], ["price-band", "200-499"]]);
+});
+
+test("a reversed, equal, out-of-range or malformed price band is dropped", () => {
+  const got = readProductRows(rowsDoc([
+    { title: "Reversed", source: "price-band", value: "499-200", limit: 4 },
+    { title: "Equal", source: "price-band", value: "200-200", limit: 4 },
+    { title: "Too high", source: "price-band", value: "0-50001", limit: 4 },
+    { title: "Negative", source: "price-band", value: "-5-100", limit: 4 },
+    { title: "Words", source: "price-band", value: "cheap", limit: 4 },
+    { title: "Good", source: "price-band", value: "0-50000", limit: 4 },
+  ]));
+  assert.deepEqual(got.map((r) => r.title), ["Good"]);
+  assert.equal(parsePriceBand("0-199")?.max, 199);
+  assert.equal(parsePriceBand("199-0"), null);
+});
+
+test("price drop is kept with an empty value and dropped with a value", () => {
+  const got = readProductRows(rowsDoc([
+    { title: "Drops", source: "price-drop", value: "", limit: 6 },
+    { title: "Drops with a value", source: "price-drop", value: "0-199", limit: 6 },
+  ]));
+  assert.deepEqual(got.map((r) => [r.title, r.source, r.value]), [["Drops", "price-drop", ""]]);
 });

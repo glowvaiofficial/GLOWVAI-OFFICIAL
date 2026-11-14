@@ -12,7 +12,7 @@ export const DEFAULT_BLOCK_ORDER: HomeBlockId[] = [
 
 export interface BlockItem { label: string; sub: string; link: string; image: string }
 export interface BlockSettings { title: string; background: string; textColor: string; items: BlockItem[] }
-export interface ProductRowView { title: string; source: 'category' | 'brand' | 'bestsellers' | 'new'; value: string; limit: number }
+export interface ProductRowView { title: string; source: 'category' | 'brand' | 'bestsellers' | 'new' | 'price-band' | 'price-drop'; value: string; limit: number }
 export interface HeroOverride { title: string; subtitle: string; ctaLabel: string; ctaLink: string; image: string }
 // The footer details the admin set: each URL is '' (hidden) or a checked https address; companyLine is '' or plain text.
 export interface FooterDetails { appStoreUrl: string; playStoreUrl: string; instagramUrl: string; facebookUrl: string; youtubeUrl: string; linkedinUrl: string; xUrl: string; companyLine: string }
