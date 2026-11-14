@@ -133,6 +133,9 @@ export function pickDeals<T extends { id: string }>(items: readonly { link: stri
   return out;
 }
 
+// The page a help or gift card opens when the admin set it no link.
+export const HELP_CARD_DEFAULT_LINK = "/contact";
+
 // The content of each block that has any. Blocks with no items are left out, so they keep their placeholder.
 export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, BlockSettings>> {
   const out: Partial<Record<HomeBlockId, BlockSettings>> = {};
@@ -147,7 +150,14 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
     const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
     // Bad items are dropped first, then the limit applies, so a bad item never takes a valid one's place.
     const readOne = id === "deals" ? readDealItem : (i: unknown) => readItem(i, id === "categories");
-    const items = Array.isArray(s.items) ? s.items.map(readOne).filter((x): x is BlockItem => x !== null).slice(0, limit) : [];
+    // A help or gift card with no link opens the support page.
+    const items = Array.isArray(s.items)
+      ? s.items
+          .map(readOne)
+          .filter((x): x is BlockItem => x !== null)
+          .map((it) => (id === "help-gift" && it.link === "" ? { ...it, link: HELP_CARD_DEFAULT_LINK } : it))
+          .slice(0, limit)
+      : [];
     if (items.length === 0) continue;
     out[id] = {
       title: typeof s.title === "string" && s.title.length <= 60 ? s.title : "",
