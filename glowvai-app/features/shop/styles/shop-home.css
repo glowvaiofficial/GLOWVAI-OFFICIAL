@@ -187,6 +187,10 @@
 .glowvai-root .shop-home .shop-home-footer-social a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
 .glowvai-root .shop-home .shop-home-footer-social a:hover{ background: rgba(255, 255, 255, .14); text-decoration: underline; }
 .glowvai-root .shop-home .shop-home-footer-brand a:focus-visible{ outline-color: #fff; }
+.glowvai-root .shop-home .shop-home-footer-store{ display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+.glowvai-root .shop-home .shop-home-footer-store a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid #fff; border-radius: 8px; background: #000; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
+.glowvai-root .shop-home .shop-home-footer-store a:hover{ background: #222; text-decoration: underline; }
+.glowvai-root .shop-home .shop-home-footer-company{ margin: 4px 0 0; }
 .glowvai-root .shop-home .shop-home-footer-cols{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding: 28px var(--gv-gutter) 8px; }
 .glowvai-root .shop-home .shop-home-footer-col h3{ margin: 0 0 6px; color: var(--ds-brand-dark); font-family: var(--font-heading); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .glowvai-root .shop-home .shop-home-footer-col ul{ display: grid; margin: 0; padding: 0; list-style: none; }

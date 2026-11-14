@@ -14,13 +14,17 @@ export interface BlockItem { label: string; sub: string; link: string; image: st
 export interface BlockSettings { title: string; background: string; textColor: string; items: BlockItem[] }
 export interface ProductRowView { title: string; source: 'category' | 'brand' | 'bestsellers' | 'new'; value: string; limit: number }
 export interface HeroOverride { title: string; subtitle: string; ctaLabel: string; ctaLink: string; image: string }
-export interface HomeLayoutView { order: HomeBlockId[]; settings: Partial<Record<HomeBlockId, BlockSettings>>; rows: ProductRowView[]; hero: HeroOverride | null }
+// The footer details the admin set: each URL is '' (hidden) or a checked https address; companyLine is '' or plain text.
+export interface FooterDetails { appStoreUrl: string; playStoreUrl: string; instagramUrl: string; facebookUrl: string; youtubeUrl: string; linkedinUrl: string; xUrl: string; companyLine: string }
+export const EMPTY_FOOTER_DETAILS: FooterDetails = { appStoreUrl: '', playStoreUrl: '', instagramUrl: '', facebookUrl: '', youtubeUrl: '', linkedinUrl: '', xUrl: '', companyLine: '' };
+export interface HomeLayoutView { order: HomeBlockId[]; settings: Partial<Record<HomeBlockId, BlockSettings>>; rows: ProductRowView[]; hero: HeroOverride | null; footer: FooterDetails }
 
 export function useHomeLayout(): HomeLayoutView {
   const [order, setOrder] = useState<HomeBlockId[]>(DEFAULT_BLOCK_ORDER);
   const [settings, setSettings] = useState<Partial<Record<HomeBlockId, BlockSettings>>>({});
   const [rows, setRows] = useState<ProductRowView[]>([]);
   const [hero, setHero] = useState<HeroOverride | null>(null);
+  const [footer, setFooter] = useState<FooterDetails>(EMPTY_FOOTER_DETAILS);
   useEffect(() => {
     let alive = true;
     let token: string | null = null;
@@ -38,6 +42,7 @@ export function useHomeLayout(): HomeLayoutView {
         if (data.settings && typeof data.settings === 'object') setSettings(data.settings as Partial<Record<HomeBlockId, BlockSettings>>);
         if (Array.isArray(data.rows)) setRows(data.rows as ProductRowView[]);
         if (data.hero && typeof data.hero === 'object') setHero(data.hero as HeroOverride);
+        if (data.footer && typeof data.footer === 'object') setFooter({ ...EMPTY_FOOTER_DETAILS, ...(data.footer as Partial<FooterDetails>) });
       })
       .catch(() => {
         // The built-in order stays.
@@ -46,5 +51,5 @@ export function useHomeLayout(): HomeLayoutView {
       alive = false;
     };
   }, []);
-  return { order, settings, rows, hero };
+  return { order, settings, rows, hero, footer };
 }
