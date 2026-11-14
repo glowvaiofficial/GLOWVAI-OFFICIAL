@@ -32,9 +32,10 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const STOCKED_BRANDS = Array.from(new Set(catalog.map((p) => p.brand))).sort();
   // Brand options come from the live products; the other groups are fixed.
   const filterGroups = FILTER_GROUPS.map((g) => (g.key === 'brand' ? { ...g, options: ['All', ...STOCKED_BRANDS] } : g));
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack, activeParams } = useApp();
 
-  const [query, setQuery] = useState('');
+  // A query handed over from the home voice search starts the search.
+  const [query, setQuery] = useState<string>(() => (typeof activeParams?.q === 'string' ? activeParams.q : ''));
   const [isListening, setIsListening] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);

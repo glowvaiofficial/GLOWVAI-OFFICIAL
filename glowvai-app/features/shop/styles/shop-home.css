@@ -28,6 +28,24 @@
 .glowvai-root .shop-home .shop-home-search-input{ display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; height: 100%; padding: 0; border: 0; background: none; color: var(--home-muted); font-size: 14px; text-align: left; }
 .glowvai-root .shop-home .shop-home-search-input span{ overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .glowvai-root .shop-home .shop-home-search-input svg{ flex-shrink: 0; color: var(--home-ink); }
+/* Rotating hint: a soft fade between hints. Reduced motion gets one static hint (no class change, no transition). */
+.glowvai-root .shop-home .shop-home-hint{ display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity 400ms ease; }
+.glowvai-root .shop-home .shop-home-hint:not(.is-visible){ opacity: 0; }
+/* Voice search: a round mic beside the search field. Listening turns it solid with a visible label. */
+.glowvai-root .shop-home .shop-home-voice-wrap{ position: relative; display: inline-flex; flex-shrink: 0; }
+.glowvai-root .shop-home .shop-home-voice{ display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; height: 38px; min-width: 38px; padding: 0; border: 0; border-radius: 19px; background: #fff; color: var(--home-brand); font-size: 13px; font-weight: 800; }
+.glowvai-root .shop-home .shop-home-voice:hover{ background: var(--home-sky); }
+.glowvai-root .shop-home .shop-home-voice.is-listening{ justify-content: flex-start; padding: 0 12px; background: var(--home-brand); color: #fff; }
+.glowvai-root .shop-home .shop-home-voice.is-listening{ animation: shop-home-voice-pulse 1.4s ease-in-out infinite; }
+.glowvai-root .shop-home .shop-home-voice-msg{ position: absolute; top: calc(100% + 4px); right: 0; z-index: 2; max-width: 280px; padding: 6px 10px; border-radius: 10px; background: #fff; color: var(--home-ink); font-size: 12px; box-shadow: 0 2px 10px rgba(7, 27, 77, 0.12); }
+@keyframes shop-home-voice-pulse{ 0%, 100%{ box-shadow: 0 0 0 0 rgba(20, 71, 230, 0.35); } 50%{ box-shadow: 0 0 0 6px rgba(20, 71, 230, 0); } }
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .shop-home .shop-home-hint{ transition: none; }
+  .glowvai-root .shop-home .shop-home-voice.is-listening{ animation: none; }
+}
+/* Top bar actions: cart count and profile. */
+.glowvai-root .shop-home .shop-home-top-actions{ display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
+.glowvai-root .shop-home .shop-home-cart{ width: 40px; height: 40px; }
 .glowvai-root .shop-home .shop-home-ai-btn{ display: inline-flex; flex-shrink: 0; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border: 0; border-radius: 14px; background: var(--home-sky); color: var(--home-brand); font-size: 13px; font-weight: 800; }
 
 /* Quick links repeat the bottom tab bar (phone) and the web header (tablet and desktop), so they are not shown. */
@@ -230,6 +248,7 @@
 @media (min-width: 1024px){
   .glowvai-root .screen-content > .shop-home{ max-width: 1600px; margin: 0 auto; }
   .glowvai-root .shop-home .shop-home-search,
+  .glowvai-root .shop-home .shop-home-top-actions,
   .glowvai-root .shop-home .shop-home-profile{ display: none; }
   .glowvai-root .shop-home .shop-home-top{ display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 24px; }
   .glowvai-root .shop-home .shop-home-topbar{ flex: 1; min-height: 0; margin-bottom: 0; }

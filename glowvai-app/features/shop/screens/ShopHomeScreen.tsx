@@ -12,6 +12,9 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeBanners } from '../shared/HomeBanners';
+import { SearchHint } from '../shared/SearchHint';
+import { VoiceSearchButton } from '../shared/VoiceSearchButton';
+import { HeaderCartButton } from '../shared/HeaderCartButton';
 import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { fetchReorderItems } from '../../../core/services/shopApi';
@@ -782,16 +785,20 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
               </button>
             )}
           </div>
-          <button type="button" className="shop-home-profile" onClick={() => navigate('profile-tab')} aria-label="Profile">
-            <User size={18} />
-          </button>
+          <div className="shop-home-top-actions">
+            <HeaderCartButton onOpen={() => navigate('cart-tab')} />
+            <button type="button" className="shop-home-profile" onClick={() => navigate('profile-tab')} aria-label="Profile">
+              <User size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="shop-home-search">
           <button type="button" className="shop-home-search-input" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
             <Search size={18} />
-            <span>Search "Niacinamide, Sunscreen & more"</span>
+            <SearchHint />
           </button>
+          <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
           <button type="button" className="shop-home-ai-btn" onClick={() => navigate('scan-camera')} aria-label="Open skin scan">
             <ScanFace size={14} />
             Skin scan
