@@ -3,7 +3,8 @@ import '../styles/home-placeholders.css';
 import type { BlockSettings } from '../lib/useHomeLayout';
 
 // Shows a block with the content the admin published. Used once the block has at least one item.
-function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'chips' | 'tiles'; settings: BlockSettings; fallbackTitle: string; aria: string }) {
+// 'promises' is the trust block: the picture is a small icon at the top of the card, not a background photo.
+function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'chips' | 'tiles' | 'promises'; settings: BlockSettings; fallbackTitle: string; aria: string }) {
   const style: React.CSSProperties = {};
   if (settings.background) style.background = settings.background;
   if (settings.textColor) style.color = settings.textColor;
@@ -23,6 +24,9 @@ function LiveBlock({ kind, settings, fallbackTitle, aria }: { kind: 'cards' | 'c
           ) : kind === 'chips' ? (
             // The label sits next to the picture, so the picture is decorative (empty alt).
             <span className="hp-chip" style={style}>{pic ? <img className="hp-dot hp-dot-img" src={pic} alt="" /> : <span className="hp-dot" />}<span><b>{item.label}</b>{item.sub && <small>{item.sub}</small>}</span></span>
+          ) : kind === 'promises' ? (
+            // The icon sits above the title. Its label is printed on the card, so the icon is decorative (empty alt).
+            <span className="hp-card hp-card-promise" style={{ ...style, background: settings.background || undefined }}>{pic && <img className="hp-promise-icon" src={pic} alt="" />}<strong>{item.label}</strong>{item.sub && <span>{item.sub}</span>}</span>
           ) : pic ? (
             // The label is printed on the card, so the background picture is decorative. The gradient keeps the text readable.
             <span className="hp-card hp-card-pic" style={{ backgroundImage: `linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.05) 65%), url("${pic}")` }}><strong>{item.label}</strong>{item.sub && <span>{item.sub}</span>}</span>
@@ -144,7 +148,7 @@ export function BrandStripPlaceholder({ settings }: { settings?: BlockSettings }
 // 6. Trust block: delivery, quality and returns, in three equal blocks.
 export function TrustBlockPlaceholder({ settings }: { settings?: BlockSettings }) {
   const visible = usePlaceholdersVisible();
-  if (settings && settings.items.length > 0) return <LiveBlock kind='cards' settings={settings} fallbackTitle='' aria='Why shop with us' />;
+  if (settings && settings.items.length > 0) return <LiveBlock kind='promises' settings={settings} fallbackTitle='' aria='Why shop with us' />;
   if (!visible) return null;
   return (
     <section className="hp-section" aria-label="Why shop with us">
