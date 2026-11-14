@@ -25,7 +25,7 @@
   .glowvai-root .app-viewport{ max-width: none; max-height: none; height: auto; min-height: 100dvh; overflow: visible; box-shadow: none; background: var(--bg); }
   .glowvai-root .android-status-bar{ display: none !important; }
   .glowvai-root .bottom-commerce-shell{ display: none; }
-  .glowvai-root .web-header{ display: block; position: sticky; top: 0; z-index: 120; border-bottom: 1px solid var(--border); background: var(--surface-elevated); box-shadow: 0 2px 12px rgba(24,44,80,.04); }
+  .glowvai-root .web-header{ display: block; position: sticky; top: 0; z-index: 120; border-bottom: 1px solid var(--border-light); background: #fffdf9; }
   .glowvai-root .screen-content{ flex: 1 0 auto; overflow: visible; }
   .glowvai-root .screen-content > *{ width: 100%; max-width: var(--shell-max); margin-inline: auto; }
 }
@@ -40,30 +40,34 @@
 .glowvai-root .web-header-back{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; padding: 0 4px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .glowvai-root .web-header-back:hover{ color: var(--text-primary); }
 
-.glowvai-root .web-header-brand{ flex: 0 0 auto; min-height: 44px; padding: 0 6px; border: 0; border-radius: 8px; background: none; color: var(--commerce-blue); font-family: var(--font-brand); font-size: 26px; font-weight: 600; letter-spacing: -.055em; line-height: 1; cursor: pointer; }
+.glowvai-root .web-header-brand{ flex: 0 0 auto; min-height: 44px; padding: 0 6px; border: 0; border-radius: 8px; background: none; color: var(--ds-ink); font-family: var(--font-brand); font-size: 26px; font-weight: 600; letter-spacing: -.055em; line-height: 1; cursor: pointer; }
 
-/* Search sits in the middle like other quick-commerce sites; it opens the search screen. */
-.glowvai-root .web-header-search{ display: flex; flex: 1 1 auto; min-width: 0; max-width: 560px; height: 44px; align-items: center; gap: 10px; margin-inline: 8px auto; padding: 0 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text-muted); font: 500 14px/1 var(--font-body); text-align: left; cursor: text; }
-.glowvai-root .web-header-search:hover{ border-color: var(--primary-border); background: var(--surface-elevated); }
+/* Search sits in the middle like other quick-commerce sites; it opens the search screen. Soft pill, no shadow. */
+.glowvai-root .web-header-search{ display: flex; flex: 1 1 auto; min-width: 0; max-width: 560px; height: 44px; align-items: center; gap: 10px; margin-inline: 8px auto; padding: 0 18px; border: 1px solid #e6e9f0; border-radius: var(--ds-pill); background: #f5f7fb; color: var(--text-secondary); font: 500 14px/1 var(--font-body); text-align: left; cursor: text; }
+.glowvai-root .web-header-search:hover{ border-color: #c9d3e6; background: #fff; }
 .glowvai-root .web-header-search svg{ flex: 0 0 auto; color: var(--text-secondary); }
 .glowvai-root .web-header-search span{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .web-header-search:active{ transform: none; }
 
 .glowvai-root .web-header-nav{ display: flex; flex: 0 0 auto; align-items: center; gap: 2px; }
 .glowvai-root .web-header-nav button{ position: relative; display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 10px; background: none; color: var(--text-secondary); font: 600 14px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
-.glowvai-root .web-header-nav button:hover{ background: var(--surface); color: var(--text-primary); }
-.glowvai-root .web-header-nav button.is-active{ background: var(--primary-light); color: var(--primary); }
+.glowvai-root .web-header-nav button:hover{ background: #f4f6fa; color: var(--text-primary); }
+/* Current page: brand blue text with a short underline at the bottom of the tab, no filled pill. */
+.glowvai-root .web-header-nav button[aria-current="page"]{ color: var(--ds-brand); }
+.glowvai-root .web-header-nav button[aria-current="page"]::after{ position: absolute; right: 12px; bottom: 6px; left: 12px; height: 2px; border-radius: 2px; background: var(--ds-brand); content: ''; }
 
-.glowvai-root .web-header-cart{ display: inline-flex; flex: 0 0 auto; min-width: 112px; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--commerce-blue); color: #fff; font: 700 14px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
-.glowvai-root .web-header-cart:hover{ background: #0050e0; }
-.glowvai-root .web-header-cart.has-items{ background: #16883a; }
-.glowvai-root .web-header-cart.has-items:hover{ background: #12752f; }
+/* The cart is the one strong accent in the header: brand blue, with a count badge on the icon. */
+.glowvai-root .web-header-cart{ display: inline-flex; flex: 0 0 auto; min-width: 112px; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--ds-brand); color: #fff; font: 700 14px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
+.glowvai-root .web-header-cart:hover{ background: var(--ds-brand-dark); }
+.glowvai-root .web-header-cart-icon{ position: relative; display: inline-grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; }
+.glowvai-root .web-header-cart-count{ position: absolute; top: -7px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #fff; color: var(--ds-brand); font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--ds-brand); }
 .glowvai-root .web-header-cart-copy{ display: grid; gap: 3px; text-align: left; }
 .glowvai-root .web-header-cart-copy b{ font-size: 13px; font-weight: 800; line-height: 1; }
 .glowvai-root .web-header-cart-copy small{ font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; opacity: .95; }
 
 .glowvai-root .web-header button:focus-visible,
-.glowvai-root .web-header a:focus-visible{ outline: 3px solid var(--primary); outline-offset: 2px; }
+.glowvai-root .web-header a:focus-visible{ outline: 3px solid var(--ds-brand); outline-offset: 2px; }
+.glowvai-root .web-header-back:hover span:last-child{ text-decoration: underline; }
 
 /* Tablet: the tab labels and the site link text collapse to icons so the search keeps its room. */
 @media (min-width: 720px) and (max-width: 1099px){
