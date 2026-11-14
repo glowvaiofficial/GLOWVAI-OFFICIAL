@@ -57,7 +57,7 @@ export function dedupeRails(rails: RailCandidate[]): { id: string; title: string
   return out;
 }
 
-const SOCIAL_LABELS: Record<string, string> = { instagram: 'Instagram', twitter: 'X', youtube: 'YouTube', linkedin: 'LinkedIn' };
+const SOCIAL_LABELS: Record<string, string> = { instagram: 'Instagram', twitter: 'X', youtube: 'YouTube', linkedin: 'LinkedIn', facebook: 'Facebook' };
 
 // Social links only for the networks that have an https address configured (an empty value is left out).
 export function configuredSocials(socials: Record<string, string | undefined>): { label: string; url: string }[] {
@@ -65,6 +65,19 @@ export function configuredSocials(socials: Record<string, string | undefined>): 
     const url = socials[key]?.trim() ?? '';
     return /^https:\/\//.test(url) ? [{ label, url }] : [];
   });
+}
+
+// The social addresses to show: a footer detail the admin set takes the place of that network's configured link; an
+// empty footer detail keeps the configured link, so no existing link disappears.
+export function mergeFooterSocials(configured: Record<string, string | undefined>, footer: { instagramUrl: string; facebookUrl: string; youtubeUrl: string; linkedinUrl: string; xUrl: string }): Record<string, string | undefined> {
+  return {
+    ...configured,
+    instagram: footer.instagramUrl || configured.instagram,
+    facebook: footer.facebookUrl || configured.facebook,
+    youtube: footer.youtubeUrl || configured.youtube,
+    linkedin: footer.linkedinUrl || configured.linkedin,
+    twitter: footer.xUrl || configured.twitter,
+  };
 }
 
 export type FooterLink ={ label: string; screen: ScreenName; params?: Record<string, string> } | { label: string; href: string };

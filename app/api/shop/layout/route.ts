@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
-import { readBlockSettings, readHeroOverride, readHomeLayout, readProductRows } from "@/lib/shop/homeLayout";
+import { readBlockSettings, readFooterDetails, readHeroOverride, readHomeLayout, readProductRows } from "@/lib/shop/homeLayout";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
 import { activePreset, orderWithPreset } from "@/lib/shop/presets";
 import { loadPresets } from "@/lib/shop/presetLookup";
@@ -27,10 +27,11 @@ export async function GET(req: NextRequest) {
     const settings = readBlockSettings(source);
     const rows = readProductRows(source);
     const hero = readHeroOverride(source);
-    const res = json({ ok: true, blocks, settings, rows, hero, preview: isPreview });
+    const footer = readFooterDetails(source);
+    const res = json({ ok: true, blocks, settings, rows, hero, footer, preview: isPreview });
     res.headers.set("Cache-Control", isPreview ? "private, no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
     return res;
   } catch {
-    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, preview: isPreview });
+    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, footer: readFooterDetails(undefined), preview: isPreview });
   }
 }

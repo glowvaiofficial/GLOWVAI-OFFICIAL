@@ -230,3 +230,68 @@ export function readProductRows(raw: unknown): ProductRow[] {
   if (!block || block.enabled !== true || !block.settings || !Array.isArray(block.settings.rows)) return [];
   return block.settings.rows.slice(0, ROW_LIMITS.maxRows).map(readRow).filter((r): r is ProductRow => r !== null);
 }
+
+// ---- The footer details (the footer block's settings.footer). The admin sets them; the shop checks them again here.
+// Each URL is "" (hidden) or an https address on an allowed host (the host itself or a subdomain of it). Anything else
+// is dropped and the field reads as "".
+export interface FooterDetails {
+  appStoreUrl: string;
+  playStoreUrl: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  youtubeUrl: string;
+  linkedinUrl: string;
+  xUrl: string;
+  companyLine: string;
+}
+
+export const FOOTER_URL_HOSTS = ["apple.com", "google.com", "instagram.com", "facebook.com", "youtube.com", "linkedin.com", "x.com", "twitter.com"] as const;
+const FOOTER_URL_MAX = 300;
+const COMPANY_LINE_MAX = 160;
+
+const allowedFooterUrl = (v: unknown): string => {
+  if (typeof v !== "string") return "";
+  const url = v.trim();
+  if (url === "" || url.length > FOOTER_URL_MAX) return "";
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+    const hostOk = (FOOTER_URL_HOSTS as readonly string[]).some((h) => host === h || host.endsWith("." + h));
+    if (u.protocol !== "https:" || u.username !== "" || u.password !== "" || !hostOk) return "";
+    return url;
+  } catch {
+    return "";
+  }
+};
+
+const companyLineOf = (v: unknown): string => (typeof v === "string" && v.trim().length <= COMPANY_LINE_MAX ? v.trim() : "");
+
+const EMPTY_FOOTER: FooterDetails = {
+  appStoreUrl: "",
+  playStoreUrl: "",
+  instagramUrl: "",
+  facebookUrl: "",
+  youtubeUrl: "",
+  linkedinUrl: "",
+  xUrl: "",
+  companyLine: "",
+};
+
+// The footer details from the layout document (the whole siteContent/homeLayout data). All fields "" when missing or invalid.
+export function readFooterDetails(raw: unknown): FooterDetails {
+  const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
+  const block = blocks.slice(0, 40).find((b) => b && typeof b === "object" && (b as { id?: unknown }).id === "footer") as { settings?: unknown } | undefined;
+  const settings = block && block.settings && typeof block.settings === "object" ? (block.settings as Record<string, unknown>) : null;
+  const f = settings && settings.footer && typeof settings.footer === "object" ? (settings.footer as Record<string, unknown>) : null;
+  if (!f) return { ...EMPTY_FOOTER };
+  return {
+    appStoreUrl: allowedFooterUrl(f.appStoreUrl),
+    playStoreUrl: allowedFooterUrl(f.playStoreUrl),
+    instagramUrl: allowedFooterUrl(f.instagramUrl),
+    facebookUrl: allowedFooterUrl(f.facebookUrl),
+    youtubeUrl: allowedFooterUrl(f.youtubeUrl),
+    linkedinUrl: allowedFooterUrl(f.linkedinUrl),
+    xUrl: allowedFooterUrl(f.xUrl),
+    companyLine: companyLineOf(f.companyLine),
+  };
+}

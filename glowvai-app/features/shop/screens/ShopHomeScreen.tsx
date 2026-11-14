@@ -22,7 +22,7 @@ import { pickDeals } from '../../../../lib/shop/homeLayout';
 import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
 import { readRecentlyViewed } from '../lib/recentlyViewed';
 import { rememberScroll } from '../../../context/scrollMemory';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, categoryTiles, configuredSocials, dedupeRails } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, categoryTiles, configuredSocials, dedupeRails, mergeFooterSocials } from '../lib/homeModel';
 import type { HomeCategoryTile, RailCandidate } from '../lib/homeModel';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import type { ScreenName } from '../../../context/contextDefinition';
@@ -388,7 +388,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     return dedupeRails(candidates);
   }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
 
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride } = useHomeLayout();
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout();
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
   // The promo cards the admin published. None published means the built-in promo cards.
@@ -426,7 +426,11 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
     }
   };
 
-  const socials = configuredSocials(siteConfig.socials);
+  const socials = configuredSocials(mergeFooterSocials(siteConfig.socials, footerDetails));
+  const storeLinks = [
+    { label: 'App Store', url: footerDetails.appStoreUrl },
+    { label: 'Google Play', url: footerDetails.playStoreUrl },
+  ].filter((s) => s.url !== '');
 
   // Each homepage block. The order comes from the admin layout (useHomeLayout); the code of each block is unchanged.
   const renderBlock = (id: HomeBlockId): React.ReactNode => {
@@ -674,6 +678,17 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
               <strong>GlowVai</strong>
             </span>
             <p>Skincare, delivered.</p>
+            {storeLinks.length > 0 && (
+              <ul className="shop-home-footer-store" aria-label="Get the app">
+                {storeLinks.map((s) => (
+                  <li key={s.label}>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer">
+                      {s.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
             {socials.length > 0 && (
               <ul className="shop-home-footer-social" aria-label="Social media">
                 {socials.map((s) => (
@@ -709,6 +724,7 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </div>
         <div className="shop-home-footer-bottom">
           <span>© 2026 GlowVai</span>
+          {footerDetails.companyLine !== '' && <p className="shop-home-footer-company">{footerDetails.companyLine}</p>}
         </div>
       </footer>
 
