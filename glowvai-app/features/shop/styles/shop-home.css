@@ -10,14 +10,21 @@
 
 /* Top bar, search */
 .glowvai-root .shop-home .shop-home-top{ padding: 16px var(--gv-gutter) 0; }
+/* Phones and tablets: the top bar is a clean warm-white band that sits on the pearl page, divided by a hairline. */
+@media (max-width: 1023px){
+  .glowvai-root .shop-home .shop-home-top{ padding-bottom: 14px; background: #fffdf9; border-bottom: 1px solid var(--border-light); }
+}
 .glowvai-root .shop-home .shop-home-topbar{ display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-bottom: 14px; }
 .glowvai-root .shop-home .shop-home-location{ min-width: 0; flex: 1; }
 .glowvai-root .shop-home .shop-home-eta{ display: inline-flex; align-items: center; gap: 4px; color: var(--home-brand); font-size: 14px; font-weight: 800; }
 .glowvai-root .shop-home .shop-home-location-btn{ display: flex; max-width: 100%; align-items: center; gap: 2px; margin-top: 2px; padding: 0; border: 0; background: none; color: var(--home-muted); font-size: 13px; font-weight: 600; text-align: left; }
 .glowvai-root .shop-home .shop-home-location-btn span{ overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .glowvai-root .shop-home .shop-home-location-btn.is-static{ cursor: default; }
-.glowvai-root .shop-home .shop-home-profile{ display: grid; flex-shrink: 0; width: 40px; height: 40px; place-items: center; border: 1px solid var(--home-line); border-radius: 50%; background: #fff; color: var(--home-ink); }
-.glowvai-root .shop-home .shop-home-search{ display: flex; align-items: center; gap: 8px; height: 52px; margin-bottom: 0; padding: 0 7px 0 14px; border: 1px solid var(--home-line); border-radius: 16px; background: #fff; box-shadow: 0 8px 26px rgba(10, 55, 160, .06); }
+.glowvai-root .shop-home .shop-home-profile{ display: grid; flex-shrink: 0; width: 40px; height: 40px; place-items: center; border: 1px solid #e3e8f2; border-radius: 50%; background: #fff; color: var(--home-ink); }
+.glowvai-root .shop-home .shop-home-profile:hover{ border-color: #c9d3e6; background: #f5f7fb; }
+/* One soft search field: pill shape, light fill, no shadow. */
+.glowvai-root .shop-home .shop-home-search{ display: flex; align-items: center; gap: 8px; height: 52px; margin-bottom: 0; padding: 0 7px 0 18px; border: 1px solid #e6e9f0; border-radius: var(--ds-pill); background: #f5f7fb; box-shadow: none; }
+.glowvai-root .shop-home .shop-home-search:hover{ border-color: #c9d3e6; background: #fff; }
 .glowvai-root .shop-home .shop-home-search-input{ display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; height: 100%; padding: 0; border: 0; background: none; color: var(--home-muted); font-size: 14px; text-align: left; }
 .glowvai-root .shop-home .shop-home-search-input span{ overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .glowvai-root .shop-home .shop-home-search-input svg{ flex-shrink: 0; color: var(--home-ink); }

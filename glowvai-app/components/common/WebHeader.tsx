@@ -56,7 +56,10 @@ export const WebHeader: React.FC = () => {
           aria-current={activeTab === 'cart' ? 'page' : undefined}
           aria-label={cart.count > 0 ? `Cart, ${itemsLabel(cart.count)}, ${cart.totalLabel}` : 'Cart, empty'}
         >
-          <ShoppingCart size={20} aria-hidden="true" />
+          <span className="web-header-cart-icon" aria-hidden="true">
+            <ShoppingCart size={20} />
+            {cart.count > 0 && <b className="web-header-cart-count">{cart.count > 99 ? '99+' : cart.count}</b>}
+          </span>
           {cart.count > 0 ? (
             <span className="web-header-cart-copy">
               <b>{itemsLabel(cart.count)}</b>
