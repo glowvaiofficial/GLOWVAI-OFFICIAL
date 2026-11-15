@@ -828,3 +828,13 @@
 @media (min-width: 1024px){
   .glowvai-root{ --ds-gap: 20px; --ds-section: 44px; --ds-h1: 32px; --ds-h2: 24px; --ds-body: 15px; }
 }
+
+/* Touch targets: small controls reach at least 40px without changing how they look. */
+.glowvai-root .gvh .gvh-heart::after,
+.glowvai-root .gvh .gvh-add::after{ content: ''; position: absolute; inset: -4px; }
+.glowvai-root .gvh .gvh-add{ position: relative; }
+.glowvai-root .shop-chip{ min-height: 40px; }
+.glowvai-root .shop-product-qty button{ min-width: 40px; min-height: 40px; }
+.glowvai-root .shop-search-mic{ min-width: 40px; min-height: 40px; justify-content: center; }
+.glowvai-root .commerce-product-add{ min-width: 40px; }
+.glowvai-root .login-reference-screen button{ min-width: 40px; }
