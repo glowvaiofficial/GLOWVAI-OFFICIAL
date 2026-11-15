@@ -9,6 +9,17 @@
 
 import { getBackendBaseUrl, getCloudBackendUrl } from '../../../core/services/apiConfig';
 import {
+  QUALITY_CODES,
+  chooseDisplayMetrics,
+  concernsFromMetrics,
+  hasNewMetrics,
+  parseQualityFailure,
+  placeholderConcerns,
+  qualityMessage,
+  skinScoreCaption,
+  type QualityCode,
+} from './scanDisplay';
+import {
   CONCERN_LABELS,
   SKIN_TYPE_LABELS,
   composeAnalysisResult,
@@ -18,6 +29,7 @@ import {
 } from '../../../core/services/skinModelService';
 
 export type ScanFailureReason =
+  | QualityCode
   | 'photo_missing'
   | 'backend_unreachable'
   | 'invalid_response'
@@ -44,6 +56,8 @@ interface PredictResponse {
   concerns?: Partial<Record<ConcernKey, { present?: boolean; score?: number }>>;
   /** Live GlowVAI CNN server (/api/v1/scan/analyze): 0-100 health per metric, higher = healthier. */
   metrics?: Record<string, { score?: number }>;
+  /** New scan API: overall score 0-100 with metrics_used / metrics_total. */
+  skin_score?: unknown;
   inferenceLatencyMs?: number;
 }
 
@@ -79,6 +93,8 @@ async function postWithTimeout(url: string, body: FormData, outer?: AbortSignal)
 
 /** Maps the backend /predict payload onto the shared SkinAnalysisResult. */
 function toAnalysisResult(data: PredictResponse, scanId: string, startMs: number): SkinAnalysisResult {
+  const quality = parseQualityFailure(data);
+  if (quality) throw new ScanError(quality, qualityMessage(quality)!.body);
   const hasConcerns = !!data.concerns && typeof data.concerns === 'object';
   const hasMetrics = !!data.metrics && typeof data.metrics === 'object';
   if (data.success === false || (!hasConcerns && !hasMetrics)) {
@@ -86,8 +102,11 @@ function toAnalysisResult(data: PredictResponse, scanId: string, startMs: number
   }
 
   const concernProbs = {} as Record<ConcernKey, number>;
+  const fromNew = hasNewMetrics(data.metrics) ? concernsFromMetrics(data.metrics) : null;
   for (const key of CONCERN_LABELS) {
-    if (hasConcerns) {
+    if (fromNew) {
+      concernProbs[key] = fromNew.probs[key] ?? 0;
+    } else if (hasConcerns) {
       const score = data.concerns![key]?.score;
       if (typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > 1) {
         throw new ScanError('invalid_response', `Analysis service omitted a valid score for ${key}.`);
@@ -108,7 +127,7 @@ function toAnalysisResult(data: PredictResponse, scanId: string, startMs: number
     : null;
   const skinTypeConfidence = Number.isFinite(data.skinTypeConfidence) ? Number(data.skinTypeConfidence) : 0;
 
-  return composeAnalysisResult({
+  const composed = composeAnalysisResult({
     scanId: data.scanId ?? scanId,
     skinType,
     skinTypeConfidence,
@@ -119,6 +138,11 @@ function toAnalysisResult(data: PredictResponse, scanId: string, startMs: number
       ? Number(data.inferenceLatencyMs)
       : Date.now() - startMs,
   });
+  if (!fromNew) {
+    const hiddenConcerns = placeholderConcerns(data.metrics, hasConcerns);
+    return hiddenConcerns.length ? { ...composed, hiddenConcerns } : composed;
+  }
+  return { ...composed, metrics: chooseDisplayMetrics(data.metrics), skinScore: skinScoreCaption(data.skin_score), hiddenConcerns: fromNew.hidden };
 }
 
 /**
@@ -150,6 +174,10 @@ export async function analyzeFaceImage(
 
     if (response.status === 404 && route === 'analyze') continue; // older server: try /predict
     if (!response.ok) {
+      // A failed photo-quality gate may come as a 4xx with an error code: show the retake screen, not a network error.
+      const body = await response.json().catch(() => null);
+      const quality = parseQualityFailure(body);
+      if (quality) throw new ScanError(quality, qualityMessage(quality)!.body);
       lastError = new Error(`HTTP ${response.status} from ${base}`);
       break;
     }

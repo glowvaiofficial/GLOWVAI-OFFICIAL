@@ -94,7 +94,10 @@
 .glowvai-root .scan-preview-image{ width: 100%; height: 100%; object-fit: cover; }
 .glowvai-root .scan-preview-empty{ display: grid; flex: 1; place-items: center; color: var(--ds-muted); }
 .glowvai-root .scan-alert{ display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--error-border); border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 650; line-height: 1.45; }
-.glowvai-root .scan-alert-warn{ border-color: var(--warning-border); background: var(--warning-bg); color: var(--warning); }
+.glowvai-root .scan-alert-warn{ border-color: var(--ds-line); background: var(--ds-sky); color: var(--ds-ink); }
+.glowvai-root .scan-skin-score{ display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: #fff; box-shadow: var(--ds-shadow); }
+.glowvai-root .scan-skin-score-num{ color: var(--ds-brand); font-family: var(--font-heading); font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.glowvai-root .scan-skin-score > div{ display: flex; flex-direction: column; gap: 2px; }
 
 /* Analyzing */
 .glowvai-root .scan-analyzing-body{ align-items: center; justify-content: center; text-align: center; }
@@ -120,7 +123,7 @@
 .glowvai-root .scan-concern-name{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .scan-severity{ padding: 3px 10px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-muted); font-size: 11px; font-weight: 750; white-space: nowrap; }
 .glowvai-root .scan-severity-mild{ background: var(--ds-sky); color: var(--ds-brand); }
-.glowvai-root .scan-severity-moderate{ background: var(--warning-bg); color: var(--warning); }
+.glowvai-root .scan-severity-moderate{ background: var(--ds-sky); color: var(--ds-ink); }
 .glowvai-root .scan-severity-pronounced{ background: var(--ds-danger-bg); color: var(--ds-danger); }
 .glowvai-root .scan-severity-none{ background: var(--ds-success-bg); color: var(--ds-success); }
 .glowvai-root .scan-concern-item:not(.is-present) .scan-meter-fill{ background: #9db8f0; }
