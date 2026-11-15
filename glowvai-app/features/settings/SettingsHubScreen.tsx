@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../core/config/firebase';
 import { forgetDeviceToken } from '../../core/notifications/push';
-import { signOutThisDevice } from '../auth/signOutCleanup';
+import { restartAfterSignOut, signOutThisDevice } from '../auth/signOutCleanup';
 import { stopWishlistSync } from '../shop/lib/wishlistSync';
 import { useApp } from '../../context/useApp';
 import { useCustomerStore } from '../../core/state/customerStore';
@@ -73,8 +73,8 @@ export const SettingsHubScreen = () => {
         resetCustomer: () => useCustomerStore.getState().reset(),
         store: localStorageOrNull(),
       });
-      // A fresh page start gives this device a new session and reloads the account from the server.
-      window.location.assign('/shop');
+      // A fresh page start drops the old account's state held in memory (wishlist, bag) and gives this device a new session.
+      restartAfterSignOut(window.location);
     } catch {
       setSigningOut(false);
       setSignOutError(t('common.error'));

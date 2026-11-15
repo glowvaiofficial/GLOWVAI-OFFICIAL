@@ -7,6 +7,8 @@
 // 3. Account-specific data kept in browser storage is removed: wishlist (and its pending changes), bag, saved addresses,
 //    profile answers, scan result, skin quiz answers, recently viewed, order-update markers and any pending referral.
 //    Settings that belong to the device (language, device id, product cache, scroll position) are kept.
+// 4. The page starts again at the shop (restartAfterSignOut), so the wishlist, bag and anything else the old account
+//    left in memory are dropped too, and the next session starts fresh. Every sign-out button does this.
 
 export const ACCOUNT_LOCAL_KEYS: readonly string[] = [
   'glowvai_wishlist_v1',
@@ -79,4 +81,14 @@ export async function signOutThisDevice(steps: SignOutSteps): Promise<void> {
   steps.stopSync?.();
   clearAccountLocalData(steps.store);
   steps.resetCustomer();
+}
+
+// Where the page starts again after a sign-out.
+export const SIGNED_OUT_START = '/shop';
+
+// Starts the page again at the shop. Clearing storage alone leaves the old account's wishlist and bag in memory until
+// the next page load, so every sign-out ends with this. `location` is passed in so the step can be tested without a
+// browser; null (no window) does nothing.
+export function restartAfterSignOut(location: Pick<Location, 'assign'> | null): void {
+  location?.assign(SIGNED_OUT_START);
 }

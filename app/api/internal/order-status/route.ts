@@ -4,18 +4,28 @@ import { env } from "@/lib/env";
 import { sendServerGA4Purchase, sendServerGA4Refund } from "@/lib/analytics/mp";
 import { queueEmail } from "@/lib/email/send";
 import { createUnsubscribeToken } from "@/lib/email/tokens";
+import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 
-export const dynamic = "force-static";
+// Reads the request headers (signature, timestamp) and body of each call, so it must never be rendered once at build time.
+export const dynamic = "force-dynamic";
 
 /**
  * GLOW VAI Internal Order Status Webhook.
  * Receives order status updates from Google Apps Script onOrderStatusEdit trigger.
  * Performs HMAC-SHA256 signature verification and 5-minute timestamp window check.
+ * A per-IP limit runs first, so unsigned floods are turned away before the body is read or any HMAC is computed.
  */
+
+const LIMIT_PER_MINUTE = 60;
 
 const processedPurchases = new Set<string>();
 
 export async function POST(req: NextRequest) {
+  const limit = rateLimit(`internal-order-status:${clientIp(req)}`, LIMIT_PER_MINUTE, 60_000);
+  if (!limit.ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
+  }
+
   const secret = env.INTERNAL_WEBHOOK_SECRET;
   if (!secret) {
     return NextResponse.json({ error: "Webhook is not configured" }, { status: 503 });
