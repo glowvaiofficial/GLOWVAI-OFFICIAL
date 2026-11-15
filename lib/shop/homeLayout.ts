@@ -2,6 +2,8 @@
 // The admin sets this; the shop only reads it. Unknown ids are dropped, duplicates keep their first place, the footer is
 // always last and always on. With nothing saved, the default order is used.
 
+import { readAccent } from "./accents";
+
 export const HOME_BLOCK_IDS = [
   "hero",
   "mini-banners",
@@ -61,6 +63,8 @@ export interface BlockItem {
   sub: string;
   link: string;
   image: string; // a data URL picture (webp, jpeg or png), or "" for none
+  // "#RRGGBB" (upper case) when the admin set a valid accent; left out otherwise (use the default palette, accents.ts).
+  accent?: string;
 }
 
 export interface BlockSettings {
@@ -68,7 +72,15 @@ export interface BlockSettings {
   background: string;
   textColor: string;
   items: BlockItem[];
+  // The section accent (title, chips, "See all"): "#RRGGBB" (upper case), or left out for the default.
+  accent?: string;
 }
+
+// { accent } for a valid "#RRGGBB" (any case, served upper case); nothing for "", missing or anything else.
+const accentPart = (v: unknown): { accent?: string } => {
+  const accent = readAccent(v);
+  return accent ? { accent } : {};
+};
 
 // The most items each block can show. Blocks not listed take no items.
 export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
@@ -101,7 +113,7 @@ function readItem(raw: unknown, keepBadLink = false): BlockItem | null {
   const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
   const link = typeof d.link === "string" && isSafeInternal(d.link) ? d.link : keepBadLink ? "" : null;
   if (label === null || sub === null || link === null) return null;
-  return { label, sub, link, image: readImage(d.image) };
+  return { label, sub, link, image: readImage(d.image), ...accentPart(d.accent) };
 }
 
 // A deals item names a product by its id (the link). The image is not used, so it is always "".
@@ -114,7 +126,7 @@ function readDealItem(raw: unknown): BlockItem | null {
   const sub = typeof d.sub === "string" && d.sub.length <= 80 ? d.sub : null;
   const link = typeof d.link === "string" && DEAL_PRODUCT_ID.test(d.link) ? d.link : null;
   if (label === null || sub === null || link === null) return null;
-  return { label, sub, link, image: "" };
+  return { label, sub, link, image: "", ...accentPart(d.accent) };
 }
 
 // The products the deals rail shows when the admin has chosen some: the published ones, in the admin's order, each once.
@@ -164,7 +176,24 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
       background: typeof s.background === "string" && HEX.test(s.background) ? s.background : "",
       textColor: typeof s.textColor === "string" && HEX.test(s.textColor) ? s.textColor : "",
       items,
+      ...accentPart(s.accent),
     };
+  }
+  return out;
+}
+
+// The section accent of every block that has a valid one, including blocks with no items (which readBlockSettings leaves
+// out so they keep their placeholder), such as product rows, built-in category tiles or deals, and the hero.
+export function readSectionAccents(raw: unknown): Partial<Record<HomeBlockId, string>> {
+  const out: Partial<Record<HomeBlockId, string>> = {};
+  const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
+  for (const b of blocks.slice(0, 40)) {
+    if (!b || typeof b !== "object") continue;
+    const d = b as Record<string, unknown>;
+    if (!isBlockId(d.id) || out[d.id] !== undefined) continue;
+    const s = d.settings && typeof d.settings === "object" ? (d.settings as Record<string, unknown>) : null;
+    const accent = s ? readAccent(s.accent) : "";
+    if (accent) out[d.id] = accent;
   }
   return out;
 }
@@ -176,6 +205,8 @@ export interface HeroOverride {
   ctaLabel: string;
   ctaLink: string;
   image: string;
+  // "#RRGGBB" (upper case) when the admin set a valid hero accent; left out otherwise.
+  accent?: string;
 }
 
 const shortText = (v: unknown, max: number): string => (typeof v === "string" && v.length <= max ? v.trim() : "");
@@ -202,6 +233,8 @@ export function readHeroOverride(raw: unknown): HeroOverride | null {
     ctaLabel: shortText(s.ctaLabel, 30),
     ctaLink: typeof s.ctaLink === "string" && isSafeInternal(s.ctaLink) ? s.ctaLink : "",
     image: readImage(s.image),
+    // The hero's own accent (settings.hero.accent), else the hero section accent (settings.accent).
+    ...accentPart(readAccent(nested.accent) || settings.accent),
   };
   return Object.values(hero).some((v) => v !== "") ? hero : null;
 }

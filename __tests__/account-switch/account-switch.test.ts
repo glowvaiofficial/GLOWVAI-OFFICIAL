@@ -25,6 +25,8 @@ import {
 import {
   ACCOUNT_LOCAL_KEYS,
   clearAccountLocalData,
+  restartAfterSignOut,
+  SIGNED_OUT_START,
   signOutThisDevice,
 } from "../../glowvai-app/features/auth/signOutCleanup";
 
@@ -179,6 +181,35 @@ describe("sign-out on this device", () => {
       assert.match(source, /stopSync: stopWishlistSync/, file);
     }
     assert.match(read("glowvai-app/core/notifications/push.ts"), /await removePushToken\(token\)/);
+  });
+
+  it("starts the page again at the shop, so the old wishlist and bag in memory are dropped", () => {
+    const went: string[] = [];
+    restartAfterSignOut({
+      assign: (url: string | URL) => {
+        went.push(String(url));
+      },
+    });
+    assert.deepEqual(went, [SIGNED_OUT_START]);
+    assert.equal(SIGNED_OUT_START, "/shop");
+    restartAfterSignOut(null);
+  });
+
+  it("every sign-out button restarts the page after the cleanup, even when the Firebase sign-out failed", () => {
+    const hub = read("glowvai-app/features/settings/SettingsHubScreen.tsx");
+    assert.ok(hub.indexOf("await signOutThisDevice(") < hub.indexOf("restartAfterSignOut(window.location)"));
+
+    const devices = read("glowvai-app/features/privacy/DevicesScreen.tsx");
+    const start = devices.indexOf("const endLocalSession = async");
+    const end = devices.indexOf("\n  };", start);
+    const body = devices.slice(start, end);
+    // After the try/catch, so it runs on both paths.
+    const restartAt = body.indexOf("restartAfterSignOut(window.location)");
+    assert.ok(restartAt > body.indexOf("} catch {"));
+    assert.ok(restartAt > body.lastIndexOf("clearAccountLocalData(deviceStorage())"));
+    // Both device-screen sign-outs (this device, and all others) go through it.
+    const calls = devices.match(/await endLocalSession\(\)/g) ?? [];
+    assert.equal(calls.length, 2);
   });
 });
 

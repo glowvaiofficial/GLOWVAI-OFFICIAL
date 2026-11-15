@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
-import { chooseLayoutSource, readBlockSettings, readFooterDetails, readHeroOverride, readHomeLayout, readLayoutDevice, readProductRows } from "@/lib/shop/homeLayout";
+import { chooseLayoutSource, readBlockSettings, readFooterDetails, readHeroOverride, readHomeLayout, readLayoutDevice, readProductRows, readSectionAccents } from "@/lib/shop/homeLayout";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
 import { activePreset, orderWithPreset } from "@/lib/shop/presets";
 import { loadPresets } from "@/lib/shop/presetLookup";
@@ -11,6 +11,8 @@ export const dynamic = "force-dynamic";
 // only. Limit: 120 requests a minute per IP address.
 // ?device=desktop serves the desktop layout (siteContent/homeLayout field desktop), or the mobile one when no desktop
 // layout is saved (fallback: true). No device, or device=mobile, serves the mobile layout exactly as before.
+// Accents (lib/shop/accents.ts): items, block settings and the hero carry a valid "#RRGGBB" accent, or none. sectionAccents
+// lists every block's valid section accent, also for blocks served without settings (no items, so they keep their default).
 export async function GET(req: NextRequest) {
   const limited = limitByIp(req, "shop-home-layout", 120);
   if (limited) return limited;
@@ -32,10 +34,11 @@ export async function GET(req: NextRequest) {
     const rows = readProductRows(source);
     const hero = readHeroOverride(source);
     const footer = readFooterDetails(footerSource);
-    const res = json({ ok: true, blocks, settings, rows, hero, footer, preview: isPreview, device, fallback });
+    const sectionAccents = readSectionAccents(source);
+    const res = json({ ok: true, blocks, settings, rows, hero, footer, sectionAccents, preview: isPreview, device, fallback });
     res.headers.set("Cache-Control", isPreview ? "private, no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
     return res;
   } catch {
-    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, footer: readFooterDetails(undefined), preview: isPreview, device, fallback: device === "desktop" });
+    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, footer: readFooterDetails(undefined), sectionAccents: {}, preview: isPreview, device, fallback: device === "desktop" });
   }
 }
