@@ -5,7 +5,7 @@ import { useApp } from '../../context/useApp';
 import { auth } from '../../core/config/firebase';
 import { forgetDeviceToken } from '../../core/notifications/push';
 import { useCustomerStore } from '../../core/state/customerStore';
-import { clearAccountLocalData, signOutThisDevice as signOutThisDeviceSteps } from '../auth/signOutCleanup';
+import { clearAccountLocalData, restartAfterSignOut, signOutThisDevice as signOutThisDeviceSteps } from '../auth/signOutCleanup';
 import { stopWishlistSync } from '../shop/lib/wishlistSync';
 import { ProfileHeader } from '../profile/ProfileShared';
 import '../profile/profile.css';
@@ -53,7 +53,8 @@ export const DevicesScreen = () => {
   }, [load]);
 
   // Ends the session in this browser the same way as Settings > Sign out: this device's push token is removed while still
-  // signed in, then the account's data kept on this device is cleared (see features/auth/signOutCleanup.ts).
+  // signed in, the account's data kept on this device is cleared, and the page starts again at the shop so the old
+  // wishlist and bag held in memory are dropped too (see features/auth/signOutCleanup.ts).
   const endLocalSession = async () => {
     try {
       await signOutThisDeviceSteps({
@@ -69,6 +70,7 @@ export const DevicesScreen = () => {
       stopWishlistSync();
       clearAccountLocalData(deviceStorage());
     }
+    restartAfterSignOut(window.location);
   };
 
   const signOutThisDevice = async () => {
@@ -82,10 +84,8 @@ export const DevicesScreen = () => {
         return;
       }
     }
+    // The page starts again at the shop; the buttons stay disabled until it does.
     await endLocalSession();
-    setBusy(null);
-    showToast('This device is signed out.');
-    void load();
   };
 
   const signOutOthers = async () => {
@@ -97,10 +97,8 @@ export const DevicesScreen = () => {
       showToast(res.error || 'Other devices could not be signed out. Try again.');
       return;
     }
+    // Other devices are signed out, and this one too: the page starts again at the shop.
     await endLocalSession();
-    setBusy(null);
-    showToast('Other devices are signed out. This device has been signed out too.');
-    void load();
   };
 
   const forget = async (id: string) => {
