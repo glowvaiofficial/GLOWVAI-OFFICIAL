@@ -364,7 +364,8 @@
 .glowvai-root .shop-desk .shop-desk-live-dot{ display: block; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: var(--acc-soft, #eef3ff); object-fit: cover; }
 .glowvai-root .shop-desk span.shop-desk-live-dot{ box-shadow: inset 0 0 0 12px var(--acc-soft, #eef3ff); background: var(--acc, var(--desk-brand)); }
 /* Brand tiles. */
-.glowvai-root .shop-desk .shop-desk-live-tile{ display: grid; aspect-ratio: 3 / 2; box-sizing: border-box; place-items: center; overflow: hidden; padding: 20px; border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); text-align: center; box-shadow: 0 1px 2px rgba(20, 27, 52, .04); }
+/* Capped at 220 px wide, so a block with one or two brands shows logo-sized tiles, not a full-width picture. */
+.glowvai-root .shop-desk .shop-desk-live-tile{ display: grid; width: 100%; max-width: 220px; aspect-ratio: 3 / 2; box-sizing: border-box; place-items: center; overflow: hidden; padding: 20px; border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); text-align: center; box-shadow: 0 1px 2px rgba(20, 27, 52, .04); }
 .glowvai-root .shop-desk .shop-desk-live-tile img{ max-width: 100%; max-height: 100%; object-fit: contain; }
 .glowvai-root .shop-desk .shop-desk-live-tile strong{ color: var(--acc-ink, var(--desk-ink)); font-size: 15px; font-weight: 700; letter-spacing: .02em; overflow-wrap: anywhere; }
 /* The membership banner (help and gifts, first item): deep navy, a badge, the title in a light shade of its accent, and a
