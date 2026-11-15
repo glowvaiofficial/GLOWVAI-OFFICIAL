@@ -12,6 +12,8 @@ import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { setSubstitutionPreference } from '../../core/services/shopTracking';
 import { fetchShopConfig, verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
+import { confirmPayment } from './lib/paymentRecheck';
+import { fetchOrderTracking } from '../../core/services/shopTracking';
 import { markOrderSeen } from '../../core/notifications/markSeen';
 import { useCustomer, useDeliveryAddress } from './components/shared';
 
@@ -130,17 +132,34 @@ export const PaymentProcessingScreen: React.FC = () => {
           const config = await fetchShopConfig();
           const emi = config.ok && config.data?.payments?.emi?.available === true;
           const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone }, { emi });
-          const verified = await verifyOnlinePayment(paid);
-          if (!verified.ok || !verified.data?.orderId) throw new Error(verified.error || 'The payment could not be confirmed.');
+          // Money may already be taken here. A lost verify answer is retried and then the order itself is read, so a
+          // network drop is never shown as a failed payment. The bag is cleared only once the order is confirmed.
+          const outcome = await confirmPayment(decision.orderId, {
+            verify: async () => {
+              const r = await verifyOnlinePayment(paid);
+              return { ok: r.ok, status: r.status, orderId: r.data?.orderId ?? null, error: r.error };
+            },
+            readOrderStatus: async (id) => {
+              const r = await fetchOrderTracking(id);
+              return { ok: r.ok, status: r.status, orderStatus: r.data?.tracking?.status ?? null };
+            },
+            wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+          });
+          if (outcome.kind !== 'placed') {
+            // The order stays as it is on the server; the bag is kept, and the message says to check My orders first.
+            if (outcome.kind === 'unconfirmed') void useCustomerStore.getState().loadOrders();
+            fail(outcome.message, 'online');
+            return;
+          }
           useCartStore.getState().clearCart();
           useCheckoutSession.getState().setPlacement('finished');
           // The confirmation screen shows this order, so the order-status popup must not announce it again.
-          markOrderSeen(verified.data.orderId, 'PLACED');
+          markOrderSeen(outcome.orderId, 'PLACED');
           // The preference is saved on the placed order. A failure here does not undo the order: it can be changed later.
-          void setSubstitutionPreference(verified.data.orderId, useCheckoutSession.getState().substitutionPreference);
+          void setSubstitutionPreference(outcome.orderId, useCheckoutSession.getState().substitutionPreference);
           void useCustomerStore.getState().loadOrders();
           navigate('checkout-payment-success', {
-            orderId: verified.data.orderId,
+            orderId: outcome.orderId,
             amount: decision.payment.amount / 100,
             method: 'online',
             confirmed: true,
