@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
-import { chooseLayoutSource, readBlockSettings, readFooterDetails, readHeroOverride, readHomeLayout, readLayoutDevice, readProductRows, readSectionAccents } from "@/lib/shop/homeLayout";
+import { chooseLayoutSource, readBlockSettings, readFooterDetails, readHeaderSettings, readHeroOverride, readHomeLayout, readLayoutDevice, readMaintenance, readProductRows, readSectionAccents } from "@/lib/shop/homeLayout";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
 import { activePreset, orderWithPreset } from "@/lib/shop/presets";
 import { loadPresets } from "@/lib/shop/presetLookup";
@@ -35,10 +35,13 @@ export async function GET(req: NextRequest) {
     const hero = readHeroOverride(source);
     const footer = readFooterDetails(footerSource);
     const sectionAccents = readSectionAccents(source);
-    const res = json({ ok: true, blocks, settings, rows, hero, footer, sectionAccents, preview: isPreview, device, fallback });
+    // Header settings are shared (mobile layout); maintenance is doc level. Both fall back to "unset" values, never throw.
+    const headerSettings = readHeaderSettings(footerSource);
+    const maintenance = readMaintenance(data);
+    const res = json({ ok: true, blocks, settings, rows, hero, footer, headerSettings, maintenance, sectionAccents, preview: isPreview, device, fallback });
     res.headers.set("Cache-Control", isPreview ? "private, no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
     return res;
   } catch {
-    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, footer: readFooterDetails(undefined), sectionAccents: {}, preview: isPreview, device, fallback: device === "desktop" });
+    return json({ ok: true, blocks: readHomeLayout(undefined), settings: {}, hero: null, footer: readFooterDetails(undefined), headerSettings: readHeaderSettings(undefined), maintenance: readMaintenance(undefined), sectionAccents: {}, preview: isPreview, device, fallback: device === "desktop" });
   }
 }

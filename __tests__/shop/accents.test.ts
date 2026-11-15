@@ -135,6 +135,6 @@ test("Mobile and Desktop layouts carry accents the same way", () => {
 
 test("the layout route serves the section accents, also on its error fallback", () => {
   assert.match(routeSource, /const sectionAccents = readSectionAccents\(source\);/);
-  assert.match(routeSource, /footer, sectionAccents, preview: isPreview, device, fallback \}/);
+  assert.match(routeSource, /footer, headerSettings, maintenance, sectionAccents, preview: isPreview, device, fallback \}/);
   assert.match(routeSource, /sectionAccents: \{\}, preview/);
 });

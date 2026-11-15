@@ -6,15 +6,23 @@ import { readAccent } from "./accents";
 
 export const HOME_BLOCK_IDS = [
   "hero",
+  "festival-strip",
   "mini-banners",
   "offers",
+  "bank-offers",
+  "cashback",
   "categories",
   "promos",
   "deals",
+  "sponsored",
   "reorder",
   "product-rails",
+  "recommended",
+  "recently-viewed",
   "brands",
+  "partners",
   "trust",
+  "stories",
   "help-gift",
   "footer",
 ] as const;
@@ -43,9 +51,23 @@ export function readHomeLayout(raw: unknown): HomeBlockId[] {
     seen.add(d.id);
     parsed.push({ id: d.id, enabled: d.enabled === true, position: typeof d.position === "number" ? d.position : 999 });
   }
-  // Blocks the stored list does not mention yet are added at their default place, switched on.
-  for (const def of DEFAULT_HOME_LAYOUT) if (!seen.has(def.id)) parsed.push({ ...def, position: def.position + 500 });
-  return orderOf(parsed);
+  // Blocks the stored list does not mention yet (an older layout) are added switched on, at their default place: right
+  // after the nearest block before them in the default order (else at the end). Existing blocks keep their order.
+  const sorted = [...parsed].sort((a, b) => a.position - b.position || HOME_BLOCK_IDS.indexOf(a.id) - HOME_BLOCK_IDS.indexOf(b.id));
+  HOME_BLOCK_IDS.forEach((id, di) => {
+    if (seen.has(id)) return;
+    let at = sorted.length;
+    for (let k = di - 1; k >= 0; k--) {
+      const idx = sorted.findIndex((b) => b.id === HOME_BLOCK_IDS[k]);
+      if (idx >= 0) {
+        at = idx + 1;
+        break;
+      }
+    }
+    sorted.splice(at, 0, { id, enabled: true, position: 0 });
+    seen.add(id);
+  });
+  return orderOf(sorted.map((b, i) => ({ ...b, position: i })));
 }
 
 function orderOf(blocks: HomeLayoutBlock[]): HomeBlockId[] {
@@ -74,6 +96,8 @@ export interface BlockSettings {
   items: BlockItem[];
   // The section accent (title, chips, "See all"): "#RRGGBB" (upper case), or left out for the default.
   accent?: string;
+  // Only on the data-driven blocks (recently-viewed, recommended): how many products to show, 4 to 12 (default 8).
+  maxItems?: number;
 }
 
 // { accent } for a valid "#RRGGBB" (any case, served upper case); nothing for "", missing or anything else.
@@ -92,7 +116,20 @@ export const BLOCK_ITEM_LIMITS: Partial<Record<HomeBlockId, number>> = {
   categories: 8,
   deals: 8,
   promos: 4,
+  "festival-strip": 6,
+  "bank-offers": 4,
+  cashback: 3,
+  partners: 12,
+  stories: 8,
+  sponsored: 1,
 };
+
+// Blocks the shop fills from its own data: no items. Listed in `settings` whenever they are on.
+export const DATA_BLOCK_IDS = ["recently-viewed", "recommended"] as const;
+const isDataBlockId = (id: HomeBlockId): boolean => (DATA_BLOCK_IDS as readonly string[]).includes(id);
+export const DATA_MAX_ITEMS = { min: 4, max: 12, fallback: 8 } as const;
+const readMaxItems = (v: unknown): number =>
+  typeof v === "number" && Number.isInteger(v) && v >= DATA_MAX_ITEMS.min && v <= DATA_MAX_ITEMS.max ? v : DATA_MAX_ITEMS.fallback;
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -158,6 +195,19 @@ export function readBlockSettings(raw: unknown): Partial<Record<HomeBlockId, Blo
     if (!(HOME_BLOCK_IDS as readonly string[]).includes(d.id as string)) continue;
     const id = d.id as HomeBlockId;
     const s = d.settings && typeof d.settings === "object" ? (d.settings as Record<string, unknown>) : null;
+    if (isDataBlockId(id)) {
+      // Data-driven blocks have no items. They are listed whenever they are on, with defaults for anything unset.
+      if (d.enabled !== true || out[id] !== undefined) continue;
+      out[id] = {
+        title: s && typeof s.title === "string" && s.title.length <= 60 ? s.title : "",
+        background: s && typeof s.background === "string" && HEX.test(s.background) ? s.background : "",
+        textColor: s && typeof s.textColor === "string" && HEX.test(s.textColor) ? s.textColor : "",
+        items: [],
+        maxItems: readMaxItems(s?.maxItems),
+        ...accentPart(s?.accent),
+      };
+      continue;
+    }
     if (!s) continue;
     const limit = BLOCK_ITEM_LIMITS[id] ?? 0;
     // Bad items are dropped first, then the limit applies, so a bad item never takes a valid one's place.
@@ -355,6 +405,54 @@ export function readFooterDetails(raw: unknown): FooterDetails {
     xUrl: allowedFooterUrl(f.xUrl),
     companyLine: companyLineOf(f.companyLine),
   };
+}
+
+// ---- The header settings (search hints and delivery-mode switch). Doc level on the mobile layout, shared by both devices.
+// The admin sets them; the shop checks them again here. Empty arrays when unset; invalid entries are dropped.
+export interface HeaderSettings {
+  searchHints: string[];
+  deliveryModes: { label: string; link: string }[];
+  showDeliveryModes: boolean;
+}
+
+export function readHeaderSettings(raw: unknown): HeaderSettings {
+  const h = raw && typeof raw === "object" ? (raw as { headerSettings?: unknown }).headerSettings : undefined;
+  const o = h && typeof h === "object" && !Array.isArray(h) ? (h as Record<string, unknown>) : {};
+  const searchHints = (Array.isArray(o.searchHints) ? o.searchHints.slice(0, 40) : [])
+    .map((v) => (typeof v === "string" ? v.trim() : ""))
+    .filter((v) => v.length >= 1 && v.length <= 40 && !/[\r\n\t<>]/.test(v))
+    .slice(0, 8);
+  const deliveryModes = (Array.isArray(o.deliveryModes) ? o.deliveryModes.slice(0, 40) : [])
+    .map((v) => {
+      if (!v || typeof v !== "object") return null;
+      const m = v as Record<string, unknown>;
+      const label = typeof m.label === "string" ? m.label.trim() : "";
+      const link = typeof m.link === "string" ? m.link : "";
+      if (label.length < 1 || label.length > 16 || /[\r\n\t<>]/.test(label) || link === "" || !isSafeInternal(link)) return null;
+      return { label, link };
+    })
+    .filter((m): m is { label: string; link: string } => m !== null)
+    .slice(0, 4);
+  return { searchHints, deliveryModes, showDeliveryModes: o.showDeliveryModes === true };
+}
+
+// ---- Maintenance mode. Doc level on siteContent/homeLayout (field "maintenance"), not part of draft or published, shared by
+// both devices. enabled is false when unset or invalid. Never throws.
+export const MAINTENANCE_DEFAULT_MESSAGE = "We are updating GlowVai. Please check back in a few minutes.";
+
+export interface Maintenance {
+  enabled: boolean;
+  message: string;
+  until: number | null;
+}
+
+export function readMaintenance(doc: unknown): Maintenance {
+  const m = doc && typeof doc === "object" ? (doc as { maintenance?: unknown }).maintenance : undefined;
+  const o = m && typeof m === "object" && !Array.isArray(m) ? (m as Record<string, unknown>) : null;
+  if (!o || o.enabled !== true) return { enabled: false, message: MAINTENANCE_DEFAULT_MESSAGE, until: null };
+  const message = typeof o.message === "string" && o.message.trim().length > 0 && o.message.trim().length <= 140 ? o.message.trim() : MAINTENANCE_DEFAULT_MESSAGE;
+  const until = typeof o.until === "number" && Number.isInteger(o.until) && o.until > 0 ? o.until : null;
+  return { enabled: true, message, until };
 }
 
 // ---- Device layouts. siteContent/homeLayout keeps draft and published as the MOBILE layout (also the default). An

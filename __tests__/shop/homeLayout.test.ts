@@ -17,7 +17,7 @@ test("stored order is followed and switched-off blocks are removed", () => {
     ],
   });
   assert.equal(got[0], "deals");
-  assert.equal(got[1], "hero");
+  assert.ok(got.indexOf("deals") < got.indexOf("hero"));
   assert.ok(!got.includes("offers"));
   assert.equal(got[got.length - 1], "footer");
 });
