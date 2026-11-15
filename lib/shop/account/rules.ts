@@ -113,8 +113,14 @@ export function phoneAccountClaims(claims: DecodedClaims): PhoneTokenCheck {
 // ---- Profile phone -------------------------------------------------------------------------------------------------
 
 // A verified number changes only through sign-in with the new number, so a profile save cannot clear the verification.
+// Compares as 10-digit numbers: phone sign-in stores "+91XXXXXXXXXX" while the profile form sends "XXXXXXXXXX".
 export function phoneChangeAllowed(verified: boolean, storedPhone: string, requestedPhone: string): boolean {
-  return !verified || storedPhone === requestedPhone;
+  return !verified || tenDigits(storedPhone) === tenDigits(requestedPhone);
+}
+
+function tenDigits(v: string): string {
+  const digits = v.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, "");
+  return /^[6-9]\d{9}$/.test(digits) ? digits : v;
 }
 
 // A request body may repeat the phone number (the mobile app sends it). When it does, it must be the verified claim's

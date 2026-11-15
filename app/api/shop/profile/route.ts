@@ -64,7 +64,9 @@ export async function POST(req: NextRequest) {
     phoneLocked = false;
     const existing = await tx.get(ref);
     const before = (existing.data() ?? {}) as Record<string, unknown>;
-    if (!phoneChangeAllowed(before.phoneVerified === true, typeof before.phone === "string" ? before.phone : "", input.phone)) {
+    const storedPhone = typeof before.phone === "string" ? before.phone : "";
+    const verifiedPhone = before.phoneVerified === true;
+    if (!phoneChangeAllowed(verifiedPhone, storedPhone, input.phone)) {
       phoneLocked = true;
       return;
     }
@@ -80,7 +82,9 @@ export async function POST(req: NextRequest) {
       now,
     );
     const prevEmail = typeof before.email === "string" ? before.email : "";
-    if (before.phone !== input.phone && existing.exists) changed.push("phone_updated");
+    // A verified number keeps its stored form (+91...); only an unverified one is replaced by what the form sends.
+    const phoneToStore = verifiedPhone && storedPhone ? storedPhone : input.phone;
+    if (indianMobile(storedPhone) !== indianMobile(phoneToStore) && existing.exists) changed.push("phone_updated");
     if (prevEmail !== input.email && existing.exists) changed.push("email_updated");
     if (
       prevConsents.marketing !== consents.marketing ||
@@ -95,7 +99,7 @@ export async function POST(req: NextRequest) {
       {
         uid: customer.uid,
         name: input.name,
-        phone: input.phone,
+        phone: phoneToStore,
         email: input.email || FieldValue.delete(),
         // The address is only written when the request carries one. A save without it keeps the stored address.
         ...(input.address ? { address: input.address } : {}),
