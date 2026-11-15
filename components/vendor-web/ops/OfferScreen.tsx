@@ -259,6 +259,10 @@ export function OfferScreen({ orderId }: { orderId: string }) {
             <Link href={`/vendor/orders/${encodeURIComponent(orderId)}/pack`} className="font-semibold text-[#0057FB]">
               Pack this order
             </Link>
+          ) : order.status === "PACKED" || order.status === "READY_FOR_PICKUP" ? (
+            <Link href={`/vendor/orders/${encodeURIComponent(orderId)}/pack`} className="font-semibold text-[#0057FB]">
+              {order.status === "PACKED" ? "Mark ready for pickup" : "Ready for pickup: view progress"}
+            </Link>
           ) : (
             <p className="text-[15px] text-ink">This order is {order.cancelled ? "cancelled" : "no longer waiting for packing"}.</p>
           )}

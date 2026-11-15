@@ -34,11 +34,8 @@ export const SUBSTITUTION_COPY: Record<"ALLOW_SUBSTITUTE" | "NO_SUBSTITUTE" | "C
   CALL_ME: { label: "Call the customer first", hint: "Do not change anything before the GlowVai team has called the customer." },
 };
 
-export const TIMELINE_LABELS: Record<"ACCEPTED" | "PACKED" | "HANDED_TO_RIDER", string> = {
-  ACCEPTED: "Accepted",
-  PACKED: "Packed",
-  HANDED_TO_RIDER: "Handed to rider",
-};
+export const READY_SUCCESS = "Order marked ready for pickup.";
+export const READY_NOTE = "Ready for pickup means the parcel is waiting at your store. GlowVai arranges the delivery partner; no rider is assigned yet.";
 
 export type StoreStateName =
   | "NO_APPLICATION"

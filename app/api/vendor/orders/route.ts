@@ -14,7 +14,7 @@ const OFFERS_LIMIT = 30;
 const CHANGES_LIMIT = 60;
 // On a full load, staff cancellations (admin_orders overlay) are checked for this many of my open orders.
 const OVERLAY_CHECK_LIMIT = 10;
-const OPEN_STATUSES = new Set(["VENDOR_ACCEPTED", "PACKED"]);
+const OPEN_STATUSES = new Set(["VENDOR_ACCEPTED", "PACKED", "READY_FOR_PICKUP"]);
 
 const byNewest = (a: VendorOrder, b: VendorOrder) => b.updatedAt - a.updatedAt;
 

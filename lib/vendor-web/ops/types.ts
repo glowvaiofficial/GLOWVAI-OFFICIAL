@@ -15,8 +15,20 @@ export interface OpsOrderItem {
 }
 
 export interface OpsTimelineStep {
-  stage: "ACCEPTED" | "PACKED" | "HANDED_TO_RIDER";
+  /** Fixed label from the server, for example "Packed" or "Ready for pickup". */
+  label: string;
   at: number | null;
+}
+
+export interface OpsReturn {
+  returnId: string;
+  orderId: string;
+  type: string;
+  reason: string;
+  status: string;
+  items: { productId: string; title: string; quantity: number }[];
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface OpsOrder {
@@ -32,6 +44,7 @@ export interface OpsOrder {
   updatedAt: number;
   acceptedAt?: number;
   packedAt?: number;
+  readyAt?: number;
   customerFirstName?: string;
   cancelled: boolean;
   cancellationReason?: string;

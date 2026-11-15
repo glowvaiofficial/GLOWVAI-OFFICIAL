@@ -13,6 +13,7 @@ import { fetchInventory, saveInventory, type InventoryResponse } from "@/lib/ven
 import { messageFor } from "@/lib/vendor-web/ops/copy";
 import { chunkForSave, checkEdit, isLowStock, parseStockInput, STOCK_MAX, SAVE_BATCH_MAX, type SaveItem } from "@/lib/vendor-web/ops/inventory";
 import type { InventoryLine, VariantView } from "@/lib/vendor-web/ops/types";
+import { UNSAVED_MESSAGE, canSave, shouldWarnOnLeave } from "@/lib/vendor-web/ops/unsaved";
 
 type Mode = "edit" | "count";
 
@@ -73,6 +74,30 @@ export function InventoryScreen() {
     if (mode === "count") return e.stock !== String(line.stock);
     return e.stock !== String(line.stock) || e.isAvailable !== line.isAvailable || e.price !== priceText(line);
   });
+
+  const warn = shouldWarnOnLeave(dirtyIds.length, busy);
+  // Browser close, refresh or address change, and clicks on in-app links, ask before dropping unsaved edits.
+  useEffect(() => {
+    if (!warn) return;
+    const onBeforeUnload = (ev: BeforeUnloadEvent) => {
+      ev.preventDefault();
+      ev.returnValue = "";
+    };
+    const onClick = (ev: MouseEvent) => {
+      const a = (ev.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || a.target === "_blank" || a.origin !== window.location.origin || a.pathname === window.location.pathname) return;
+      if (!window.confirm(UNSAVED_MESSAGE)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("click", onClick, true);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("click", onClick, true);
+    };
+  }, [warn]);
 
   function setEdit(line: InventoryLine, patch: Partial<RowEdit>) {
     setEdits((prev) => ({ ...prev, [line.productId]: { ...editFor(line), ...patch } }));
@@ -282,11 +307,12 @@ export function InventoryScreen() {
       <div className="fixed inset-x-0 bottom-0 z-10 border-t border-black/10 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <span className="text-[14px] text-ink-muted">
-            {dirtyIds.length === 0 ? "No changes" : `${dirtyIds.length} changed`}
+            {dirtyIds.length === 0 ? "No changes" : `${dirtyIds.length} unsaved ${dirtyIds.length === 1 ? "change" : "changes"}`}
           </span>
           <Button
             loading={busy}
-            disabled={busy || dirtyIds.length === 0}
+            disabled={!canSave(dirtyIds.length, busy)}
+            aria-label={mode === "count" ? "Save counts" : "Save stock changes"}
             onClick={() => void save()}
           >
             {mode === "count" ? "Save counts" : "Save changes"}
