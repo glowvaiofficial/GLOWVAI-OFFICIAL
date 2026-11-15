@@ -50,8 +50,6 @@
 
 /* Quick links repeat the bottom tab bar (phone) and the web header (tablet and desktop), so they are not shown. */
 .glowvai-root .shop-home .shop-home-chips{ display: none; }
-.glowvai-root .shop-home .shop-home-mode{ margin-top: 10px; }
-.glowvai-root .shop-home .shop-home-mode .zq-mode-toggle button{ min-height: 44px; font-size: 14px; font-weight: 700; }
 
 /* Hero */
 .glowvai-root .shop-home .shop-home-showcase{ position: relative; min-height: 236px; margin: 12px var(--gv-gutter) 0; overflow: hidden; border-radius: 22px; background: #c8d9ff; }
@@ -65,16 +63,6 @@
 .glowvai-root .shop-home .shop-home-btn-dark{ display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--home-ink); color: #fff; font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-btn-light{ display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 18px; border: 1px solid rgba(7, 27, 77, .2); border-radius: 999px; background: rgba(255, 255, 255, .8); color: var(--home-ink); font-size: 13px; font-weight: 700; }
 
-/* Festival (For Her / For Him). Markup is shared with the legacy home; its base styles are the zq-* rules in ../../../glowvai.css.
-   The block only animates when the customer switches mode, not each time the home opens again (Back). */
-.glowvai-root .shop-home{ --mode-accent: #ef2f72; --mode-deep: #aa0c43; --mode-soft: #fff1f5; }
-.glowvai-root .shop-home.zq-mode-men{ --mode-accent: #075df7; --mode-deep: #073784; --mode-soft: #edf5ff; }
-.glowvai-root .shop-home .shop-home-festival{ margin: 14px var(--gv-gutter) 0; }
-.glowvai-root .shop-home .shop-home-festival.is-switched{ animation: navratri-mode-in 420ms cubic-bezier(.2,.8,.2,1) both; }
-.glowvai-root .shop-home .shop-home-festival .zq-festival{ padding: 0; }
-@media (prefers-reduced-motion: reduce){
-  .glowvai-root .shop-home .shop-home-festival.is-switched{ animation: none; }
-}
 
 /* Section heads and rails */
 .glowvai-root .shop-home .shop-home-section{ margin-top: 28px; }
@@ -176,7 +164,7 @@
 
 /* Footer: a deep brand blue brand band, then a warm off-white area with the link columns (two on phones, four on desktop),
    a thin divider and the copyright line. Headings use two sizes only (18px brand name, 12px column titles). */
-.glowvai-root .shop-home .shop-home-footer{ --footer-paper: #faf7f2; margin-top: 40px; background: var(--footer-paper); color: var(--ds-ink); font-family: var(--font-body); }
+.glowvai-root .shop-home .shop-home-footer{ --footer-paper: #f6f8fc; margin-top: 40px; background: var(--footer-paper); color: var(--ds-ink); font-family: var(--font-body); }
 .glowvai-root .shop-home .shop-home-footer-inner{ display: grid; gap: 0; }
 .glowvai-root .shop-home .shop-home-footer-brand{ display: grid; align-content: start; gap: 10px; padding: 28px var(--gv-gutter); background: var(--ds-brand-dark); color: #fff; }
 .glowvai-root .shop-home .shop-home-footer-logo{ display: inline-flex; align-items: center; gap: 8px; }
@@ -237,14 +225,6 @@
   .glowvai-root .shop-home .shop-home-footer-brand{ padding: 32px var(--gv-gutter); }
   .glowvai-root .shop-home .shop-home-footer-cols{ grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-top: 32px; }
   .glowvai-root .shop-home .shop-home-cart-pill{ display: none; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-hero{ height: 260px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy{ top: 64px; left: 32px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy strong{ font-size: 44px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-copy em{ font-size: 13px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid{ gap: 12px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid button b{ min-height: 46px; padding: 12px 10px 4px; font-size: 12px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-promo{ height: 64px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-promo b{ font-size: 13px; }
 }
 
 /* Desktop: 32px gutter, the page centred up to 1600px, the header carries search and links, six category tiles, a
@@ -258,14 +238,10 @@
   .glowvai-root .shop-home .shop-home-topbar{ flex: 1; min-height: 0; margin-bottom: 0; }
   .glowvai-root .shop-home .shop-home-eta{ font-size: 15px; }
   .glowvai-root .shop-home .shop-home-location-btn{ font-size: 14px; }
-  .glowvai-root .shop-home .shop-home-mode{ flex: 0 0 340px; width: 340px; max-width: 340px; margin-top: 0; }
   .glowvai-root .shop-home .shop-home-showcase{ min-height: 360px; margin-top: 20px; border-radius: 28px; }
   .glowvai-root .shop-home .shop-home-showcase-copy{ min-height: 360px; padding: 48px 56px; }
   .glowvai-root .shop-home .shop-home-showcase h1{ font-size: 64px; }
   .glowvai-root .shop-home .shop-home-showcase-sub{ font-size: 18px; }
-  .glowvai-root .shop-home .shop-home-festival{ margin-top: 20px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-hero{ height: 220px; }
-  .glowvai-root .shop-home .shop-home-festival .zq-festival-grid{ grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .glowvai-root .shop-home .shop-home-categories-section{ margin-top: 40px; }
   .glowvai-root .shop-home .shop-home-categories{ grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
   .glowvai-root .shop-home .shop-home-promos{ gap: 16px; margin-top: 20px; }

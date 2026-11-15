@@ -80,19 +80,8 @@ export function MobileMenu({
           onClick={onClose}
           className="flex items-center gap-2 select-none"
         >
-          <div className="relative w-7 h-7 rounded-[7px] overflow-hidden shrink-0">
-            <Image
-              src={getAssetPath("/logo/glowvai-logo.svg")}
-              alt="GLOW VAI Logo"
-              fill
-              sizes="28px"
-              className="object-contain"
-            />
-          </div>
+          <Image src={getAssetPath("/brand/glowvai-wordmark.png")} alt="GLOW VAI" width={113} height={30} className="h-[30px] w-auto" />
           <div className="flex items-baseline gap-1.5">
-            <span className="font-display font-bold text-[24px] leading-none tracking-[-0.02em] text-brand">
-              GLOW VAI
-            </span>
             <span className="text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
               Quick commerce
             </span>

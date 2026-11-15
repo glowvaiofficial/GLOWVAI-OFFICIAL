@@ -1,7 +1,7 @@
 /* Product reviews. Shared shop classes (.shop-screen, .shop-header, .shop-icon-btn, .shop-btn-*, .shop-empty) live in ../shop.css.
    Phone: rating summary, product, then the reviews area. Desktop: reviews area left, sticky summary panel right. */
 
-.glowvai-root .shop-reviews{ --shop-reviews-star: #f59e0b; }
+.glowvai-root .shop-reviews{ --shop-reviews-star: #4F46E5; }
 .glowvai-root .shop-reviews img{ display: block; }
 
 .glowvai-root .shop-reviews-body{ display: grid; gap: var(--ds-gap); padding: 16px var(--ds-gutter) 24px; }

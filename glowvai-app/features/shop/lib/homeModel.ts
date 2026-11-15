@@ -3,6 +3,7 @@
 
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ScreenName } from '../../../context/contextDefinition';
+import type { HomeBlockId } from './useHomeLayout';
 import { isTrialProduct } from '../shared/shopUtils';
 
 export type HomeCategoryId = SkincareProduct['category'];
@@ -119,3 +120,69 @@ export const HOME_FOOTER_GROUPS: FooterGroup[] = [
     ],
   },
 ];
+
+// ---- Price-point tiles, bestsellers and new launches: all from the live catalogue (full-size products only).
+
+export const PRICE_POINTS = [299, 499, 999] as const;
+
+export interface PricePointTile {
+  max: number;
+  label: string;
+  count: number;
+  // A product under the limit whose photo the tile shows (the best rated one).
+  sample: SkincareProduct | null;
+}
+
+const fullSize = (catalog: SkincareProduct[]) => catalog.filter((p) => !isTrialProduct(p));
+
+// One tile per price point that has at least one product under it. A price point with none is left out (nothing empty).
+export function pricePointTiles(catalog: SkincareProduct[]): PricePointTile[] {
+  const products = fullSize(catalog);
+  return PRICE_POINTS.flatMap((max) => {
+    const under = products.filter((p) => p.price > 0 && p.price < max);
+    if (under.length === 0) return [];
+    const best = [...under].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0];
+    return [{ max, label: `Under ₹${max}`, count: under.length, sample: best ?? null }];
+  });
+}
+
+// Best rated first (then most reviewed). Trial samples are left out.
+export function bestsellerList(catalog: SkincareProduct[]): SkincareProduct[] {
+  return fullSize(catalog).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
+}
+
+// The newest listings first (the catalogue lists new products last).
+export function newLaunchList(catalog: SkincareProduct[]): SkincareProduct[] {
+  return fullSize(catalog).reverse();
+}
+
+// ---- Home order: one structure for the phone and the PC home (design spec section 5).
+
+export type HomeModuleId = HomeBlockId | 'price-points' | 'bestsellers' | 'new-launches' | 'concerns' | 'recent' | 'scan';
+
+// Each module and the admin block that switches it on: a block the admin left out of the layout hides its modules.
+// Catalogue modules follow the product block. The order is fixed by the spec; the content comes from the admin and the catalogue.
+const HOME_SEQUENCE: { id: HomeModuleId; needs?: HomeBlockId }[] = [
+  { id: 'hero', needs: 'hero' },
+  { id: 'categories', needs: 'categories' },
+  { id: 'offers', needs: 'offers' },
+  { id: 'promos', needs: 'promos' },
+  { id: 'deals', needs: 'deals' },
+  { id: 'price-points', needs: 'product-rails' },
+  { id: 'bestsellers', needs: 'product-rails' },
+  { id: 'new-launches', needs: 'product-rails' },
+  { id: 'product-rails', needs: 'product-rails' },
+  { id: 'concerns', needs: 'product-rails' },
+  { id: 'brands', needs: 'brands' },
+  { id: 'mini-banners', needs: 'mini-banners' },
+  { id: 'reorder', needs: 'reorder' },
+  { id: 'recent', needs: 'product-rails' },
+  { id: 'help-gift', needs: 'help-gift' },
+  { id: 'trust', needs: 'trust' },
+  { id: 'scan' },
+  { id: 'footer', needs: 'footer' },
+];
+
+export function homeSequence(layoutOrder: readonly HomeBlockId[]): HomeModuleId[] {
+  return HOME_SEQUENCE.filter((m) => !m.needs || layoutOrder.includes(m.needs)).map((m) => m.id);
+}

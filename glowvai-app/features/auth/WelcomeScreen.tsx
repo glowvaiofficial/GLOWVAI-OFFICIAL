@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/useApp';
 import { safeHapticImpact } from '../../core/utils/haptics';
+import { BrandLogo } from '../../shared/BrandLogo';
 import { storage } from '../../core/utils/storage';
 import { logScreenMount, logTouch } from '../../core/utils/touchDoctor';
 const slideAiScan = '/glowvai/features/auth/assets/slide-ai-face-scan.png';
@@ -92,7 +93,7 @@ export const WelcomeScreen: React.FC = () => {
   return (
     <section className="auth-welcome">
       <div className="auth-welcome-brand">
-        <span className="auth-brand-wordmark">glowvai</span>
+        <span className="auth-brand-wordmark"><BrandLogo height={34} /></span>
       </div>
 
       <div className="auth-slider" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>

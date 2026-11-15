@@ -32,11 +32,11 @@ export default function BrandKitPage() {
           <div>
             <h2 className="font-display font-semibold text-2xl">Logo</h2>
             <div className="mt-4 relative h-40 rounded-[10px] bg-white border border-ink/15">
-              <Image src="/logo/glowvai-logo-512.png" alt="GLOW VAI logo" fill sizes="400px" className="object-contain p-6" />
+              <Image src="/brand/glowvai-logo-full.png" alt="GLOW VAI logo" fill sizes="400px" className="object-contain p-6" />
             </div>
             <p className="mt-4 flex gap-6">
-              <a className={link} href="/logo/glowvai-logo.svg" download>Download SVG</a>
-              <a className={link} href="/logo/glowvai-logo-512.png" download>Download PNG</a>
+              <a className={link} href="/brand/glowvai-wordmark-white.png" download>Download white PNG</a>
+              <a className={link} href="/brand/icon-512.png" download>Download icon PNG</a>
             </p>
           </div>
           <div>

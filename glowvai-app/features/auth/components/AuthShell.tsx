@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { BrandLogo } from '../../../shared/BrandLogo';
 
 interface AuthShellProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ interface AuthShellProps {
 export const AuthShell: React.FC<AuthShellProps> = ({ children, footer, onBack, topRight }) => (
   <section className="auth-screen">
     <aside className="auth-brand-panel" aria-hidden="true" hidden>
-      <span className="auth-brand-wordmark">glowvai</span>
+      <span className="auth-brand-wordmark"><BrandLogo height={52} white /></span>
       <p className="auth-brand-copy">AI skin check, skincare and doorstep delivery in one place.</p>
     </aside>
     {(onBack || topRight) && (

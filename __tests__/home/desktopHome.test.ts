@@ -12,7 +12,7 @@ const desktopSource = read("glowvai-app/features/shop/screens/ShopDesktopHome.ts
 const homeSource = read("glowvai-app/features/shop/screens/ShopHomeScreen.tsx");
 const desktopCss = read("glowvai-app/features/shop/styles/shop-desktop-home.css");
 
-const BLOCK_IDS = ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer"];
+const BLOCK_IDS = ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer", "price-points", "bestsellers", "new-launches", "concerns", "recent", "scan"];
 
 describe("which home the website shows", () => {
   test("1024px and wider is desktop, narrower is mobile", () => {
@@ -63,15 +63,15 @@ describe("the layout request", () => {
 });
 
 describe("the desktop home", () => {
-  test("renders the desktop layout, in the admin's order, with all 12 blocks", () => {
+  test("renders the desktop layout in the spec order, with every block and module", () => {
     assert.match(desktopSource, /useHomeLayout\('desktop'\)/);
-    assert.ok(desktopSource.includes("layoutOrder.filter((id) => id !== 'footer').map("));
+    assert.ok(desktopSource.includes("homeSequence(layoutOrder).filter((id) => id !== 'footer').map("));
     for (const id of BLOCK_IDS) assert.match(desktopSource, new RegExp("case '" + id + "':"), "block " + id + " is missing");
     assert.ok(desktopSource.indexOf("{pinnedTail}") < desktopSource.indexOf("{renderBlock('footer')}"));
   });
 
-  test("has the wide header: logo, delivery, search, login or account, cart, and the category tabs", () => {
-    for (const marker of ['className="shop-desk-logo"', 'className="shop-desk-delivery"', 'className="shop-desk-search"', "'Account' : 'Login'", 'className="shop-desk-cart"', 'className="shop-desk-tabs"']) {
+  test("has the wide header: logo, delivery, search, scan, orders, login or account, cart, and the category tabs", () => {
+    for (const marker of ['className="shop-desk-logo"', 'className="shop-desk-delivery"', 'className="shop-desk-search"', "'Account' : 'Login'", 'className="shop-desk-cart"', 'className="shop-desk-tabs"', 'className="shop-desk-scan-pill"', "navigate('orders-list')"]) {
       assert.ok(desktopSource.includes(marker), marker);
     }
   });
@@ -116,26 +116,26 @@ describe("desktop rows fill evenly", () => {
 describe("desktop accents", () => {
   test("an item's own valid accent wins, otherwise the palette in order", async () => {
     const { ACCENT_PALETTE, effectiveAccent, isAccent } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
-    assert.deepEqual(ACCENT_PALETTE.map((a) => a.hex), ["#8B5CF6", "#4F8EF7", "#F4A261", "#6BAF92", "#E85D8F", "#F26B5B", "#C8A96A", "#1F2A44"]);
+    assert.deepEqual(ACCENT_PALETTE.map((a) => a.hex), ["#7C3AED", "#0EA5E9", "#14B8A6", "#84CC16", "#F43F5E", "#C026D3", "#4F46E5", "#1E293B"]);
     assert.equal(effectiveAccent("#12ab34", 0), "#12AB34");
     for (const bad of ["", "red", "#123", "#12345g", "123456", null, undefined, 5]) assert.equal(isAccent(bad), false, String(bad));
-    assert.equal(effectiveAccent("", 0), "#8B5CF6");
-    assert.equal(effectiveAccent("nope", 9), "#4F8EF7");
+    assert.equal(effectiveAccent("", 0), "#7C3AED");
+    assert.equal(effectiveAccent("nope", 9), "#0EA5E9");
   });
 
   test("categories map by name first, then the palette", async () => {
     const { categoryAccent } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
-    assert.equal(categoryAccent("Serums", null, 5), "#8B5CF6");
-    assert.equal(categoryAccent("moisturizers", null, 0), "#4F8EF7");
-    assert.equal(categoryAccent("Sunscreen", null, 0), "#F4A261");
-    assert.equal(categoryAccent("Cleansers", null, 0), "#6BAF92");
-    assert.equal(categoryAccent("Treatments", null, 0), "#E85D8F");
-    assert.equal(categoryAccent("Coupons", null, 0), "#F26B5B");
-    assert.equal(categoryAccent("Brands", null, 0), "#C8A96A");
-    assert.equal(categoryAccent("Shop all", null, 0), "#1F2A44");
-    assert.equal(categoryAccent("All", null, 0), "#1F2A44");
+    assert.equal(categoryAccent("Serums", null, 5), "#7C3AED");
+    assert.equal(categoryAccent("moisturizers", null, 0), "#0EA5E9");
+    assert.equal(categoryAccent("Sunscreen", null, 0), "#14B8A6");
+    assert.equal(categoryAccent("Cleansers", null, 0), "#84CC16");
+    assert.equal(categoryAccent("Treatments", null, 0), "#F43F5E");
+    assert.equal(categoryAccent("Coupons", null, 0), "#C026D3");
+    assert.equal(categoryAccent("Brands", null, 0), "#4F46E5");
+    assert.equal(categoryAccent("Shop all", null, 0), "#1E293B");
+    assert.equal(categoryAccent("All", null, 0), "#1E293B");
     assert.equal(categoryAccent("Serums", "#000000", 0), "#000000");
-    assert.equal(categoryAccent("Lip care", null, 2), "#F4A261");
+    assert.equal(categoryAccent("Lip care", null, 2), "#14B8A6");
   });
 
   test("a section's accent falls back to its default; text on tints stays readable", async () => {
@@ -168,7 +168,7 @@ describe("desktop motion respects reduced motion", () => {
 
 describe("desktop layout follows the home design", () => {
   test("header tabs, greeting, chips, flash deals and the help banner are there", () => {
-    for (const marker of ['className="shop-desk-greet"', "Track Order", 'className="shop-desk-chips"', "For You", "All Categories", "/api/shop/flash-sales", "Ends in", 'className="shop-desk-plus"', "aria-roledescription=\"carousel\""]) {
+    for (const marker of ['className="shop-desk-greet"', "Track Order", "All categories", "/api/shop/flash-sales", "Ends in", 'className="shop-desk-plus"', "aria-roledescription=\"carousel\""]) {
       assert.ok(desktopSource.includes(marker), marker);
     }
   });

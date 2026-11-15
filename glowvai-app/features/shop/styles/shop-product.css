@@ -107,5 +107,5 @@
 .shop-variant.is-out { cursor: not-allowed; opacity: 0.6; }
 .shop-product-stock { margin: 6px 0 0; font-size: 13px; font-weight: 700; }
 .shop-product-stock.is-in { color: var(--ds-success); }
-.shop-product-stock.is-low { color: #b54708; }
+.shop-product-stock.is-low { color: #B42318; }
 .shop-product-stock.is-out { color: #b42318; }

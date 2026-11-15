@@ -8,7 +8,12 @@ import {
   HOME_FOOTER_GROUPS,
   categoryTiles,
   configuredSocials,
+  PRICE_POINTS,
+  bestsellerList,
   dedupeRails,
+  homeSequence,
+  newLaunchList,
+  pricePointTiles,
   type FooterLink,
 } from "../../glowvai-app/features/shop/lib/homeModel";
 import type { SkincareProduct } from "../../glowvai-app/core/data/indianSkincareCatalog";
@@ -54,7 +59,9 @@ describe("home section order", () => {
     ["categories", 'aria-labelledby="shop-home-categories-title"'],
     ["offers", "<PromosBlock"],
     ["deals", 'aria-labelledby="shop-home-deals-title"'],
-    ["product rails", "rails).map("],
+    ["price points", "<PricePoints"],
+    ["bestsellers", 'title="Bestsellers"'],
+    ["concerns", "<ConcernGrid"],
     ["face scan", 'aria-labelledby="shop-home-scan-title"'],
     ["end card", 'className="shop-home-end"'],
     ["footer", "<footer"],
@@ -71,11 +78,12 @@ describe("home section order", () => {
       assert.ok(at > last, name + " must be in the header area, in order");
       last = at;
     }
-    assert.ok(homeSource.includes("layoutOrder.filter((id) => id !== 'footer').map("));
-    for (const id of ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer"]) {
+    assert.ok(homeSource.includes("homeSequence(layoutOrder).filter((id) => id !== 'footer').map("));
+    for (const id of ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer", "price-points", "bestsellers", "new-launches", "concerns", "recent", "scan"]) {
       assert.match(homeSource, new RegExp("case '" + id + "':"), "block " + id + " is missing");
     }
     assert.ok(homeSource.indexOf("const pinnedTail") < homeSource.indexOf("{pinnedTail}"));
+    assert.ok(homeSource.includes("const scanCard") && homeSource.includes("return scanCard;"));
     assert.ok(homeSource.includes("{pinnedTail}") && homeSource.includes("{renderBlock('footer')}"));
   });
 
@@ -216,5 +224,84 @@ describe("social links", () => {
 
   test("no social links when none are configured", () => {
     assert.deepEqual(configuredSocials({}), []);
+  });
+});
+
+describe("home order (phone and PC share it)", () => {
+  const ALL = ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer"] as const;
+
+  test("modules follow the spec order whatever order the admin layout lists", () => {
+    const expected = ["hero", "categories", "offers", "promos", "deals", "price-points", "bestsellers", "new-launches", "product-rails", "concerns", "brands", "mini-banners", "reorder", "recent", "help-gift", "trust", "scan", "footer"];
+    assert.deepEqual(homeSequence(ALL), expected);
+    assert.deepEqual(homeSequence([...ALL].reverse()), expected);
+  });
+
+  test("a block the admin leaves out hides its modules; the catalogue modules follow the product block", () => {
+    const seq = homeSequence(ALL.filter((id) => id !== "offers" && id !== "product-rails"));
+    assert.ok(!seq.includes("offers"));
+    for (const id of ["price-points", "bestsellers", "new-launches", "product-rails", "concerns", "recent"]) assert.ok(!seq.includes(id as never), id);
+    assert.ok(seq.includes("scan") && seq.includes("hero"));
+  });
+
+  test("the phone and PC homes both render from homeSequence", () => {
+    const desktop = readFileSync(join(root, "glowvai-app/features/shop/screens/ShopDesktopHome.tsx"), "utf8");
+    assert.match(desktop, /homeSequence\(layoutOrder\)/);
+    assert.match(homeSource, /homeSequence\(layoutOrder\)/);
+  });
+});
+
+describe("price points, bestsellers and new launches", () => {
+  const catalog = [
+    product("a", "Serums", { price: 199, rating: 4.1 }),
+    product("b", "Serums", { price: 450, rating: 4.8 }),
+    product("c", "Cleansers", { price: 700, rating: 4.5 }),
+    product("d", "Cleansers", { price: 1500, rating: 3.9 }),
+    product("t", "Serums", { price: 99, name: "Serum trial pack", rating: 5 }),
+  ];
+
+  test("the price points are 299, 499 and 999", () => {
+    assert.deepEqual([...PRICE_POINTS], [299, 499, 999]);
+  });
+
+  test("each tile counts the full-size products under its price; trial packs are left out", () => {
+    const tiles = pricePointTiles(catalog);
+    assert.deepEqual(tiles.map((t) => [t.label, t.count]), [["Under ₹299", 1], ["Under ₹499", 2], ["Under ₹999", 3]]);
+    assert.equal(tiles[1].sample?.id, "b");
+  });
+
+  test("a price point with no product under it has no tile", () => {
+    assert.deepEqual(pricePointTiles([product("x", "Serums", { price: 1500 })]), []);
+    assert.deepEqual(pricePointTiles([]), []);
+  });
+
+  test("bestsellers are best rated first, new launches newest first, both without trial packs", () => {
+    assert.deepEqual(bestsellerList(catalog).map((p) => p.id), ["b", "c", "a", "d"]);
+    assert.deepEqual(newLaunchList(catalog).map((p) => p.id), ["d", "c", "b", "a"]);
+  });
+});
+
+describe("old-version leftovers are gone", () => {
+  const css = readFileSync(join(root, "glowvai-app/features/shop/styles/shop-home.css"), "utf8");
+  const desktopCss = readFileSync(join(root, "glowvai-app/features/shop/styles/shop-desktop-home.css"), "utf8");
+  const desktop = readFileSync(join(root, "glowvai-app/features/shop/screens/ShopDesktopHome.tsx"), "utf8");
+
+  test("no For Her / For Him mode on the homes", () => {
+    for (const text of [homeSource, desktop, css, desktopCss]) assert.doesNotMatch(text, /zq-mode|shop-home-festival|Women<|Men<|For Her|For Him/);
+  });
+
+  test("no emoji in the home sources", () => {
+    const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{FE0F}]/u;
+    const parts = readFileSync(join(root, "glowvai-app/features/shop/mobile/MobileHomeParts.tsx"), "utf8");
+    for (const text of [homeSource, desktop, parts]) assert.doesNotMatch(text, emoji);
+  });
+
+  test("the real logo is used, not the typed wordmark or the old mark", () => {
+    const parts = readFileSync(join(root, "glowvai-app/features/shop/mobile/MobileHomeParts.tsx"), "utf8");
+    for (const text of [homeSource, desktop, parts]) assert.doesNotMatch(text, /glowvai-logo\.svg/);
+    assert.match(parts, /<BrandLogo/);
+    assert.match(desktop, /<BrandLogo/);
+    const brand = readFileSync(join(root, "glowvai-app/shared/BrandLogo.tsx"), "utf8");
+    assert.match(brand, /\/brand\/glowvai-wordmark-white\.png/);
+    assert.match(brand, /\/brand\/glowvai-wordmark\.png/);
   });
 });

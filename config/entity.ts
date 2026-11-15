@@ -24,7 +24,6 @@ export interface EntityConfig {
     telephoneSchema: string;
     areaServed: string;
     foundingLocation: string;
-    logoSvg: string;
     logoPng512: string;
     logoPng512Url: string;
     ogImage: string;
@@ -69,9 +68,8 @@ export const entityConfig: EntityConfig = {
     telephoneSchema: "+918977855998",
     areaServed: "IN",
     foundingLocation: "Andhra Pradesh, India",
-    logoSvg: "/logo/glowvai-logo.svg",
-    logoPng512: "/logo/glowvai-logo-512.png",
-    logoPng512Url: `${SITE_URL}/logo/glowvai-logo-512.png`,
+    logoPng512: "/brand/icon-512.png",
+    logoPng512Url: `${SITE_URL}/brand/icon-512.png`,
     ogImage: "/opengraph-image",
     ogImageUrl: `${SITE_URL}/opengraph-image`,
   },

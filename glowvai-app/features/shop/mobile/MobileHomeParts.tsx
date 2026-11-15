@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgePercent, Bell, ChevronDown, Crown, Droplets, Flower2, Gift, Headset, Heart, LayoutGrid, Leaf, MapPin, Minus, Plus, RotateCcw, Search, ShieldCheck, Sparkles, Star, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
+import { ArrowRight, BadgePercent, ChevronDown, Crown, Droplets, Flower2, Gift, Headset, Heart, LayoutGrid, Leaf, MapPin, Minus, Plus, RotateCcw, ScanFace, Search, ShieldCheck, Sparkles, Star, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
@@ -10,8 +10,10 @@ import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { HeaderCartButton } from '../shared/HeaderCartButton';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
 import { HERO_IMAGE, useHomeNavigate } from '../lib/homeCommon';
+import type { PricePointTile } from '../lib/homeModel';
 import type { BlockItem, BlockSettings, HeroOverride } from '../lib/useHomeLayout';
 import { HOME_TABS, ctaLabelForLink, endsInText, safeInternalLink, type HomeTab } from './homeChrome';
+import { BrandLogo } from '../../../shared/BrandLogo';
 import { accentVars, itemAccent, readableTextOn, tintOf } from './accentTheme';
 
 // The mobile-web home's pieces (styles in mobile-home.css, under .gvh). Content, pictures, order, on/off and accents come
@@ -61,8 +63,8 @@ export function MobileHomeHeader({
   return (
     <header className="gvh-header" style={{ '--tab-tint': tintOf(tab.accent, 0.2, '#F6F8FD'), '--tab-tint-2': tintOf(tab.accent, 0.08, '#F6F8FD') } as React.CSSProperties}>
       <div className="gvh-top">
-        <span className="gvh-logo" aria-label="GlowVai">
-          glowvai
+        <span className="gvh-logo">
+          <BrandLogo height={26} />
         </span>
         {embedded ? (
           <span className="gvh-location is-static">
@@ -87,12 +89,13 @@ export function MobileHomeHeader({
           <span className="gvh-cart-slot">
             <HeaderCartButton onOpen={() => navigate('cart-tab')} />
           </span>
-          <button type="button" className="gvh-icon" onClick={() => navigate('notifications-list')} aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}>
-            <Bell size={21} aria-hidden="true" />
-            {unread > 0 && <span className="gvh-dot" aria-hidden="true" />}
+          <button type="button" className="gvh-scan-pill" onClick={() => navigate('scan-camera')}>
+            <ScanFace size={16} aria-hidden="true" />
+            Skin scan
           </button>
-          <button type="button" className="gvh-avatar" onClick={() => navigate('profile-tab')} aria-label="Your account">
+          <button type="button" className="gvh-avatar" onClick={() => navigate('profile-tab')} aria-label={unread > 0 ? `Your account, ${unread} unread notifications` : 'Your account'}>
             {initial ? <span aria-hidden="true">{initial}</span> : <User size={18} aria-hidden="true" />}
+            {unread > 0 && <span className="gvh-dot" aria-hidden="true" />}
           </button>
         </div>
       </div>
@@ -310,6 +313,51 @@ export function SectionHead({ id, title, sub, accent, icon, badge, onSeeAll }: {
         </button>
       )}
     </div>
+  );
+}
+
+// ---------- Price points: Under ₹299 / ₹499 / ₹999 ----------
+
+export function PricePoints({ tiles, onOpen }: { tiles: PricePointTile[]; onOpen: (max: number) => void }) {
+  if (tiles.length === 0) return null;
+  return (
+    <section className="gvh-section gvh-prices-section" aria-label="Shop by price">
+      <div className="gvh-prices" style={{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))` }}>
+        {tiles.map((t, i) => (
+          <button key={t.max} type="button" className="gvh-price" style={varsStyle(itemAccent({ label: t.label }, i + 1))} onClick={() => onOpen(t.max)} aria-label={`${t.label}, ${t.count} ${t.count === 1 ? 'product' : 'products'}`}>
+            <span className="gvh-price-media">{t.sample && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
+            <b>{t.label}</b>
+            <small>{t.count} {t.count === 1 ? 'product' : 'products'}</small>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ---------- Shop by concern: accent tiles, two across ----------
+
+export function ConcernGrid({ concerns, onOpen, onAll }: { concerns: { id: string; label: string; Icon: LucideIcon }[]; onOpen: (id: string) => void; onAll: () => void }) {
+  return (
+    <section className="gvh-section" aria-labelledby="gvh-concerns-title">
+      <SectionHead id="gvh-concerns-title" title="Shop by concern" accent="#7C3AED" onSeeAll={onAll} />
+      <div className="gvh-concerns">
+        {concerns.map(({ id, label, Icon }, i) => (
+          <button key={id} type="button" className="gvh-concern-tile" style={varsStyle(itemAccent({ label }, i))} onClick={() => onOpen(id)}>
+            <span className="gvh-concern-icon" aria-hidden="true">
+              <Icon size={18} />
+            </span>
+            <span>{label}</span>
+          </button>
+        ))}
+        <button type="button" className="gvh-concern-tile is-all" style={varsStyle('#1E293B')} onClick={onAll}>
+          <span className="gvh-concern-icon" aria-hidden="true">
+            <LayoutGrid size={18} />
+          </span>
+          <span>All concerns</span>
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -572,8 +620,8 @@ export function PromosBlock({ settings, onOpenLink }: { settings?: BlockSettings
   }
   return (
     <section className="shop-home-promos gvh-promos" aria-label="Offers">
-      <PromoCard kicker="Coupon" title={`Flat ₹${COUPON_VALUES.GLOW50} OFF`} sub="Use code GLOW50 in your cart" accent="#1F2A44" index={0} Icon={Ticket} onOpen={() => navigate('cart-tab')} />
-      <PromoCard title="Free Delivery" sub={`On orders above ₹${FREE_DELIVERY_ABOVE}`} accent="#4F8EF7" index={1} Icon={Truck} onOpen={() => navigate('shop-browse')} />
+      <PromoCard kicker="Coupon" title={`Flat ₹${COUPON_VALUES.GLOW50} OFF`} sub="Use code GLOW50 in your cart" accent="#1E293B" index={0} Icon={Ticket} onOpen={() => navigate('cart-tab')} />
+      <PromoCard title="Free Delivery" sub={`On orders above ₹${FREE_DELIVERY_ABOVE}`} accent="#0EA5E9" index={1} Icon={Truck} onOpen={() => navigate('shop-browse')} />
     </section>
   );
 }

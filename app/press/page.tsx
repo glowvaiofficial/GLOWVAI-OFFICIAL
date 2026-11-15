@@ -34,10 +34,10 @@ const pressFacts = [
 const mediaAssets = [
   {
     title: "Official Brand Logos",
-    desc: "Primary vector SVG and high-resolution transparent PNG logos (light & dark variants).",
-    preview: "/logo/glowvai-logo.svg",
+    desc: "Wordmark, full logo and app icon as transparent PNG (blue and white variants).",
+    preview: "/brand/glowvai-logo-full.png",
     isSvg: true,
-    fileSize: "SVG / 512x512 PNG",
+    fileSize: "PNG, blue and white",
   },
   {
     title: "AI Face Scan Mockups",

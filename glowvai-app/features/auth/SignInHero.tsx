@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScanFace, ShieldCheck, Sparkles, Truck } from 'lucide-react';
+import { BrandLogo } from '../../shared/BrandLogo';
 import '../../responsive/entry-scan.css';
 
 const benefits = [
@@ -16,8 +17,7 @@ export const SignInHero: React.FC = () => (
     <span className="login-orb login-orb-left" aria-hidden="true" />
 
     <div className="login-brand-lockup">
-      <span className="login-brand-mark" aria-hidden="true"><span>g</span></span>
-      <div className="brand-wordmark login-wordmark">glowvai</div>
+      <div className="login-wordmark"><BrandLogo height={58} white /></div>
       <p>The Beauty Destination<br />for Every Indian</p>
     </div>
 

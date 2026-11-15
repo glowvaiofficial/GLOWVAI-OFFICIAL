@@ -7,26 +7,26 @@
 // - Renderers use items[i].accent || GLOWVAI_ACCENTS[i % 8]. Category tiles look the category name up first.
 
 export const GLOWVAI_ACCENTS = [
-  "#8B5CF6", // amethyst
-  "#4F8EF7", // sky
-  "#F4A261", // peach
-  "#6BAF92", // sage
-  "#E85D8F", // rose
-  "#F26B5B", // coral
-  "#C8A96A", // champagne
-  "#1F2A44", // ink
+  "#7C3AED", // amethyst
+  "#0EA5E9", // sky
+  "#14B8A6", // teal
+  "#84CC16", // lime
+  "#F43F5E", // rose
+  "#C026D3", // berry
+  "#4F46E5", // indigo
+  "#1E293B", // ink
 ] as const;
 
-export const ACCENT_NAMES = ["Amethyst", "Sky", "Peach", "Sage", "Rose", "Coral", "Champagne", "Ink"] as const;
+export const ACCENT_NAMES = ["Amethyst", "Sky", "Teal", "Lime", "Rose", "Berry", "Indigo", "Ink"] as const;
 
 export const ACCENT = {
   amethyst: GLOWVAI_ACCENTS[0],
   sky: GLOWVAI_ACCENTS[1],
-  peach: GLOWVAI_ACCENTS[2],
-  sage: GLOWVAI_ACCENTS[3],
+  teal: GLOWVAI_ACCENTS[2],
+  lime: GLOWVAI_ACCENTS[3],
   rose: GLOWVAI_ACCENTS[4],
-  coral: GLOWVAI_ACCENTS[5],
-  champagne: GLOWVAI_ACCENTS[6],
+  berry: GLOWVAI_ACCENTS[5],
+  indigo: GLOWVAI_ACCENTS[6],
   ink: GLOWVAI_ACCENTS[7],
 } as const;
 
@@ -38,19 +38,19 @@ export const CATEGORY_ACCENTS: Readonly<Record<string, string>> = {
   moisturizer: ACCENT.sky,
   moisturisers: ACCENT.sky,
   moisturiser: ACCENT.sky,
-  sunscreen: ACCENT.peach,
-  sunscreens: ACCENT.peach,
-  cleansers: ACCENT.sage,
-  cleanser: ACCENT.sage,
+  sunscreen: ACCENT.teal,
+  sunscreens: ACCENT.teal,
+  cleansers: ACCENT.lime,
+  cleanser: ACCENT.lime,
   treatments: ACCENT.rose,
   treatment: ACCENT.rose,
-  offers: ACCENT.coral,
-  offer: ACCENT.coral,
-  coupons: ACCENT.coral,
-  coupon: ACCENT.coral,
-  brands: ACCENT.champagne,
-  brand: ACCENT.champagne,
-  trust: ACCENT.champagne,
+  offers: ACCENT.berry,
+  offer: ACCENT.berry,
+  coupons: ACCENT.berry,
+  coupon: ACCENT.berry,
+  brands: ACCENT.indigo,
+  brand: ACCENT.indigo,
+  trust: ACCENT.indigo,
   all: ACCENT.ink,
   "shop all": ACCENT.ink,
 };

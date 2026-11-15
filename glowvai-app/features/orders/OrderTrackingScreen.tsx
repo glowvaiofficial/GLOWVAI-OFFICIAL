@@ -23,6 +23,7 @@ import { TRACKING_MAP_SUPPORTED, TrackingMap } from './components/TrackingMap';
 import { TrackingShareCard } from './components/TrackingShare';
 import { TrackingPromoCard, useTrackingPromos } from './components/TrackingPromos';
 import { OrdersEmpty, OrdersLoadState, formatOrderDate, statusLabel, useRequestedOrder } from './orderUtils';
+import { BrandLogo } from '../../shared/BrandLogo';
 import { RIDER_REFRESH_MS, riderRefreshDue, shouldFollowRider } from './trackingMapRules';
 import {
   canSuggestAddItems,
@@ -550,7 +551,8 @@ export const OrderTrackingScreen: React.FC = () => {
       </button>
       <div className="trk-head-copy">
         <span className="gvp-wordmark">
-          glowvai{layout === 'map' && <span className="trk-head-order"> order</span>}
+          <BrandLogo height={24} />
+          {layout === 'map' && <span className="trk-head-order"> order</span>}
         </span>
         <h1 className="trk-head-sub">Order #{order.orderId}</h1>
       </div>

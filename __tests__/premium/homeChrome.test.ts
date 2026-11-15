@@ -127,7 +127,7 @@ describe("accent colours stay readable", () => {
   test("mix and tint", () => {
     assert.equal(mix("#000000", "#FFFFFF", 0.5), "#808080");
     assert.equal(mix("bad", "#123456", 0.5), "#123456");
-    assert.equal(tintOf("#8B5CF6", 0, "#FFFFFF"), "#FFFFFF");
+    assert.equal(tintOf("#7C3AED", 0, "#FFFFFF"), "#FFFFFF");
   });
 
   test("text on any accent reaches 4.5:1", () => {
@@ -137,21 +137,21 @@ describe("accent colours stay readable", () => {
       assert.ok(contrastRatio("#FFFFFF", t.gradient[0]) >= 4.5, `white on gradient for ${accent}`);
       assert.ok(contrastRatio(accentTextOn(accent), "#FFFFFF") >= 4.5, `accent text on white for ${accent}`);
       const on = readableTextOn(accent);
-      assert.ok(on === "#FFFFFF" || on === "#1F2A44");
+      assert.ok(on === "#FFFFFF" || on === "#1E293B");
     }
   });
 
   test("a bad accent falls back to ink, never to a broken colour", () => {
-    assert.equal(accentTheme("red").accent, "#1F2A44");
+    assert.equal(accentTheme("red").accent, "#1E293B");
     assert.match(accentVars("#zzz")["--ac-tint"], /^#[0-9A-F]{6}$/);
   });
 
   test("section and item accents: the admin's, else the defaults", () => {
     assert.equal(sectionAccent("deals", "#abcdef"), "#ABCDEF");
-    assert.equal(sectionAccent("deals", ""), "#E85D8F");
-    assert.equal(sectionAccent("offers", "nope"), "#F26B5B");
+    assert.equal(sectionAccent("deals", ""), "#F43F5E");
+    assert.equal(sectionAccent("offers", "nope"), "#C026D3");
     assert.equal(itemAccent({ accent: "#112233", label: "Serums" }, 3), "#112233");
-    assert.equal(itemAccent({ label: "Serums" }, 3), "#8B5CF6");
+    assert.equal(itemAccent({ label: "Serums" }, 3), "#7C3AED");
     assert.equal(itemAccent({ label: "Something" }, 9), GLOWVAI_ACCENTS[1]);
   });
 });

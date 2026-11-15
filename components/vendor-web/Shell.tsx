@@ -108,7 +108,7 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
           <Link href="/vendor" className="flex min-h-[44px] items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo/glowvai-logo.svg" alt="GlowVai" width={28} height={28} />
+            <img src="/brand/glowvai-mark.png" alt="GlowVai" width={24} height={28} />
             <span className="truncate text-[15px] font-semibold">{storeName}</span>
           </Link>
           {session.authPhase === "signed-in" ? (
@@ -158,7 +158,7 @@ export function VendorAuthFrame({ title, subtitle, children }: { title: string; 
       <div className="mx-auto w-full max-w-md">
         <div className="mb-6 flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo/glowvai-logo.svg" alt="GlowVai" width={32} height={32} />
+          <img src="/brand/glowvai-mark.png" alt="GlowVai" width={27} height={32} />
           <span className="text-[15px] font-semibold">GlowVai store</span>
         </div>
         <div className="rounded-2xl border border-black/10 bg-white p-6 sm:p-7">
