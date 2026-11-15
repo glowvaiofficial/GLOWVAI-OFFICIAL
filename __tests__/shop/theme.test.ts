@@ -7,8 +7,8 @@ test("no stored theme gives the built-in defaults", () => {
 });
 
 test("valid colours and fonts are used", () => {
-  const t = readTheme({ brand: "#ff3366", ink: "#000000", muted: "#777777", line: "#eeeeee", headingFont: "syne", bodyFont: "manrope" });
-  assert.equal(t.brand, "#ff3366");
+  const t = readTheme({ brand: "#4f46e5", ink: "#000000", muted: "#777777", line: "#eeeeee", headingFont: "syne", bodyFont: "manrope" });
+  assert.equal(t.brand, "#4f46e5");
   assert.equal(t.headingFont, "syne");
 });
 
@@ -29,5 +29,14 @@ test("only the two allowed fonts are accepted", () => {
 test("the CSS variables are exactly the agreed names", () => {
   const vars = themeCssVariables(DEFAULT_THEME);
   assert.deepEqual(Object.keys(vars).sort(), ["--ds-brand", "--ds-ink", "--ds-line", "--ds-muted", "--font-body", "--font-heading"]);
-  assert.match(vars["--font-heading"], /Manrope/);
+  assert.match(vars["--font-heading"] ?? "", /system-ui/);
+});
+
+test("a warm (red/orange) brand colour is replaced by the default blue, and no web font stack is returned", () => {
+  assert.equal(readTheme({ brand: "#ff0000" }).brand, DEFAULT_THEME.brand);
+  assert.equal(readTheme({ brand: "#F4A261" }).brand, DEFAULT_THEME.brand);
+  assert.equal(readTheme({ brand: "#14b8a6" }).brand, "#14b8a6");
+  const vars = themeCssVariables(readTheme({ headingFont: "syne", bodyFont: "manrope" }));
+  assert.doesNotMatch(vars["--font-heading"] ?? "", /Syne|Manrope/);
+  assert.doesNotMatch(vars["--font-body"] ?? "", /Syne|Manrope/);
 });
