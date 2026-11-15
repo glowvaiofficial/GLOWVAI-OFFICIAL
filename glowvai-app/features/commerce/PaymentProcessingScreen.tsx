@@ -12,6 +12,8 @@ import { getLiveCatalog } from '../../core/data/indianSkincareCatalog';
 import { setSubstitutionPreference } from '../../core/services/shopTracking';
 import { fetchShopConfig, verifyOnlinePayment } from '../../core/services/shopApi';
 import { openRazorpayCheckout } from './lib/razorpayCheckout';
+import { attemptFor, orderSignature, replayDecision } from './lib/orderAttemptKey';
+import { choiceSummary, methodPrefillFor } from './lib/paymentChoice';
 import { confirmPayment } from './lib/paymentRecheck';
 import { fetchOrderTracking } from '../../core/services/shopTracking';
 import { markOrderSeen } from '../../core/notifications/markSeen';
@@ -34,6 +36,7 @@ export const PaymentProcessingScreen: React.FC = () => {
   const couponCode = useCheckoutSession((s) => s.couponCode);
   const bagQuote = useCheckoutSession((s) => s.bagQuote);
   const payMethod = useCheckoutSession((s) => s.payMethod);
+  const paymentChoice = useCheckoutSession((s) => s.paymentChoice);
   const tip = useCheckoutSession((s) => s.tip);
   const address = useDeliveryAddress();
   const customer = useCustomer();
@@ -114,24 +117,51 @@ export const PaymentProcessingScreen: React.FC = () => {
         return;
       }
 
+      // One Idempotency-Key per checkout attempt: the same request sent again (Try again after a lost answer or a closed
+      // payment window) gets the order the server already created, never a second one.
+      const session = useCheckoutSession.getState();
+      const attempt = attemptFor(
+        session.orderAttempt,
+        orderSignature({
+          items: allItems,
+          addressId: address.savedId ?? null,
+          address: { fullAddress: address.fullAddress, city: address.city, pincode: address.pincode, landmark: address.landmark ?? '' },
+          deliverySlot: session.slotId,
+          couponCode,
+          tip: session.tip,
+          coinsToRedeem: session.coinsToRedeem,
+          paymentMethod: toApiPaymentMethod(method),
+        })
+      );
+      session.setOrderAttempt(attempt);
       const result = await placeCartOrder({
         items: allItems,
         address,
         couponCode,
-        coinsToRedeem: useCheckoutSession.getState().coinsToRedeem,
-        tip: useCheckoutSession.getState().tip,
-        deliverySlot: useCheckoutSession.getState().slotId,
-        customerLocation: useCheckoutSession.getState().customerLocation,
+        coinsToRedeem: session.coinsToRedeem,
+        tip: session.tip,
+        deliverySlot: session.slotId,
+        customerLocation: session.customerLocation,
         paymentMethod: toApiPaymentMethod(method),
         customer: { name: customer.name, phone: customer.phone },
+        idempotencyKey: attempt.key,
       });
-      const decision = decidePlacement(method, result);
+      const replay = result.ok ? replayDecision(result.data) : null;
+      if (replay === 'reset') {
+        // The earlier order for this key can no longer be paid (its payment window closed or it was cancelled).
+        useCheckoutSession.getState().setOrderAttempt(null);
+        fail('Your earlier checkout has expired. Nothing more was charged. Review your order and place it again.', method);
+        return;
+      }
+      const decision = replay === 'placed' && result.data?.orderId
+        ? { kind: 'placed' as const, orderId: result.data.orderId, total: result.data.pricing?.grandTotal }
+        : decidePlacement(method, result);
 
       if (decision.kind === 'razorpay') {
         try {
           const config = await fetchShopConfig();
           const emi = config.ok && config.data?.payments?.emi?.available === true;
-          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone }, { emi });
+          const paid = await openRazorpayCheckout(decision.payment, { name: customer.name, contact: customer.phone }, { emi, method: methodPrefillFor(useCheckoutSession.getState().paymentChoice) });
           // Money may already be taken here. A lost verify answer is retried and then the order itself is read, so a
           // network drop is never shown as a failed payment. The bag is cleared only once the order is confirmed.
           const outcome = await confirmPayment(decision.orderId, {
@@ -153,6 +183,7 @@ export const PaymentProcessingScreen: React.FC = () => {
           }
           useCartStore.getState().clearCart();
           useCheckoutSession.getState().setPlacement('finished');
+          useCheckoutSession.getState().setOrderAttempt(null);
           // The confirmation screen shows this order, so the order-status popup must not announce it again.
           markOrderSeen(outcome.orderId, 'PLACED');
           // The preference is saved on the placed order. A failure here does not undo the order: it can be changed later.
@@ -183,6 +214,7 @@ export const PaymentProcessingScreen: React.FC = () => {
       if (decision.kind === 'placed') {
         useCartStore.getState().clearCart();
         useCheckoutSession.getState().setPlacement('finished');
+        useCheckoutSession.getState().setOrderAttempt(null);
         // The confirmation screen shows this order, so the order-status popup must not announce it again.
         markOrderSeen(decision.orderId, 'PLACED');
         void setSubstitutionPreference(decision.orderId, useCheckoutSession.getState().substitutionPreference);
@@ -190,7 +222,8 @@ export const PaymentProcessingScreen: React.FC = () => {
         navigate('checkout-payment-success', {
           orderId: decision.orderId,
           amount: decision.total ?? amount,
-          method: 'cod',
+          // 'online' only when an earlier attempt of this checkout was already paid (a replayed order).
+          method,
           confirmed: true,
         });
       } else {
@@ -233,7 +266,7 @@ export const PaymentProcessingScreen: React.FC = () => {
             </div>
             <div>
               <dt>Payment method</dt>
-              <dd>{method ? PAY_METHOD_LABEL[method] : 'Not chosen'}</dd>
+              <dd>{method ? (method === 'online' ? `${choiceSummary(paymentChoice).title} via Razorpay` : PAY_METHOD_LABEL[method]) : 'Not chosen'}</dd>
             </div>
           </dl>
 

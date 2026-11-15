@@ -236,8 +236,15 @@ export async function fetchOrdersPage(filter: string, cursor: string | null): Pr
   return apiFetch<{ orders: ShopOrder[]; nextCursor: string | null }>(`/api/shop/orders?${params.toString()}`);
 }
 
-export async function placeOrder(input: PlaceOrderInput & { tip?: number }): Promise<ApiResult<{ orderId: string; trackingId?: string; pricing: ShopOrderPricing; status: string; payment?: OnlinePaymentStart }>> {
-  return apiFetch('/api/shop/orders', post({ ...input, paymentMethod: input.paymentMethod ?? 'COD', couponCode: input.couponCode || undefined }));
+// idempotencyKey: one per checkout attempt (features/commerce/lib/orderAttemptKey.ts). The server returns the order it
+// already created for the same key instead of creating a second one, with replayed: true.
+export async function placeOrder(
+  input: PlaceOrderInput & { tip?: number },
+  options: { idempotencyKey?: string | null } = {},
+): Promise<ApiResult<{ orderId: string; trackingId?: string; pricing: ShopOrderPricing; status: string; payment?: OnlinePaymentStart; replayed?: boolean }>> {
+  const init = post({ ...input, paymentMethod: input.paymentMethod ?? 'COD', couponCode: input.couponCode || undefined });
+  if (options.idempotencyKey) init.headers = { 'Idempotency-Key': options.idempotencyKey };
+  return apiFetch('/api/shop/orders', init);
 }
 
 // Confirms a Razorpay payment with the server (signature checked there).

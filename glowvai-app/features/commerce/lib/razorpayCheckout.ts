@@ -2,6 +2,7 @@
 // The script comes from Razorpay's own host (allowed in the shop's script policy). Payment is confirmed on the server.
 import type { OnlinePaymentStart } from '../../../core/services/shopApi';
 import { checkoutMethodOptions } from '../../../shared/payment-options.mjs';
+import type { MethodPrefill } from './paymentChoice';
 
 export interface RazorpaySuccess {
   razorpay_order_id: string;
@@ -36,8 +37,9 @@ function loadScript(): Promise<void> {
 export async function openRazorpayCheckout(
   payment: OnlinePaymentStart,
   prefill: { name: string; contact: string },
-  // EMI is requested from Razorpay only when the server says it is available (RAZORPAY_EMI_ENABLED).
-  options: { emi: boolean } = { emi: false },
+  // EMI is requested from Razorpay only when the server says it is available (RAZORPAY_EMI_ENABLED). method opens the
+  // window on the option the customer picked (prefill.method, and prefill.bank for netbanking); they can still switch.
+  options: { emi: boolean; method?: MethodPrefill } = { emi: false },
 ): Promise<RazorpaySuccess> {
   await loadScript();
   return new Promise<RazorpaySuccess>((resolve, reject) => {
@@ -48,7 +50,12 @@ export async function openRazorpayCheckout(
       name: 'GlowVai',
       description: 'Skincare order',
       order_id: payment.razorpayOrderId,
-      prefill: { name: prefill.name, contact: prefill.contact },
+      prefill: {
+        name: prefill.name,
+        contact: prefill.contact,
+        ...(options.method?.method ? { method: options.method.method } : {}),
+        ...(options.method?.method === 'netbanking' && options.method.bank ? { bank: options.method.bank } : {}),
+      },
       theme: { color: '#0057FB' },
       handler: (response: RazorpaySuccess) => resolve(response),
       modal: { ondismiss: () => reject(new Error('DISMISSED')) },
