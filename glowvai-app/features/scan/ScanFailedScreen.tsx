@@ -3,6 +3,7 @@ import { AlertCircle, Camera, CheckCircle2, Image as ImageIcon, ShieldCheck } fr
 import { useApp } from '../../context/useApp';
 import { ScanHeader } from './components/ScanHeader';
 import type { ScanFailureReason } from './services/scanApi';
+import { qualityMessage, type QualityCode } from './services/scanDisplay';
 
 interface FailureCopy {
   headline: string;
@@ -10,7 +11,7 @@ interface FailureCopy {
   body: string;
 }
 
-const COPY: Record<ScanFailureReason | 'default', FailureCopy> = {
+const COPY: Record<Exclude<ScanFailureReason, QualityCode> | 'default', FailureCopy> = {
   photo_missing: {
     headline: 'Captured photo not found',
     title: 'Photo loading error',
@@ -55,7 +56,10 @@ export const ScanFailedScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
   const reason = (activeParams?.reason as ScanFailureReason | undefined) ?? 'default';
   const details = typeof activeParams?.details === 'string' ? activeParams.details : '';
-  const copy = COPY[reason] ?? COPY.default;
+  const quality = qualityMessage(reason);
+  const copy = quality
+    ? { headline: quality.title, title: 'This photo needs a retake', body: quality.body }
+    : COPY[reason as keyof typeof COPY] ?? COPY.default;
 
   return (
     <div className="scan-screen scan-failed-screen">
@@ -70,7 +74,7 @@ export const ScanFailedScreen: React.FC = () => {
             <p className="scan-error-title">{copy.title}</p>
             <p className="scan-lead">{copy.body}</p>
 
-            {reason !== 'default' && (
+            {reason !== 'default' && !quality && (
               <div className="scan-diagnostic">
                 <span className="scan-diagnostic-title">Details for support</span>
                 <span className="scan-diagnostic-row">Reason: {reason}</span>
@@ -92,7 +96,7 @@ export const ScanFailedScreen: React.FC = () => {
           <div className="scan-split-side">
             <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
               <Camera size={18} />
-              Try again
+              {quality ? 'Retake photo' : 'Try again'}
             </button>
             <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
               <ImageIcon size={18} />
