@@ -218,6 +218,100 @@
 .glowvai-root .gvp .gvp-review-line-copy small { color: var(--gvp-muted); font-size: 12.5px; }
 .glowvai-root .gvp .gvp-review-line-price { color: var(--gvp-ink); font-size: 15px; font-weight: 600; }
 
+/* Payment */
+.glowvai-root .gvp .gvp-pay { display: grid; gap: 12px; }
+.glowvai-root .gvp .gvp-pay > .gvp-section-head { margin-bottom: -2px; }
+.glowvai-root .gvp .gvp-pill { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; }
+.glowvai-root .gvp .gvp-pill.is-green { background: var(--gvp-green); color: #fff; }
+.glowvai-root .gvp .gvp-radio { display: inline-grid; flex: 0 0 auto; width: 22px; height: 22px; place-items: center; border: 2px solid #b9c4da; border-radius: 50%; background: #fff; }
+.glowvai-root .gvp .gvp-radio.is-on { border-color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-radio.is-on::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--gvp-blue); }
+.glowvai-root .gvp [role="radio"] { transition: border-color .15s ease, background .15s ease, box-shadow .15s ease; }
+.glowvai-root .gvp .gvp-reco { display: flex; width: 100%; align-items: center; gap: 14px; border-color: #cfdcf8; background: linear-gradient(135deg, #f1f6ff, #f8fbff); text-align: left; }
+.glowvai-root .gvp .gvp-reco.is-on,
+.glowvai-root .gvp .gvp-app-tile.is-on,
+.glowvai-root .gvp .gvp-bank-tile.is-on,
+.glowvai-root .gvp .gvp-option-row.is-card.is-on { border-color: var(--gvp-blue); background: var(--gvp-blue-tint); box-shadow: inset 0 0 0 1px var(--gvp-blue); }
+.glowvai-root .gvp .gvp-reco-icon { display: inline-grid; flex: 0 0 auto; width: 56px; height: 56px; place-items: center; border-radius: 16px; background: #fff; color: var(--gvp-blue); box-shadow: 0 2px 8px rgba(0, 87, 251, .12); }
+.glowvai-root .gvp .gvp-reco-copy { display: grid; flex: 1; min-width: 0; gap: 1px; }
+.glowvai-root .gvp .gvp-reco-copy b { display: inline-flex; align-items: center; gap: 6px; color: var(--gvp-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .gvp .gvp-reco-copy b svg { color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-reco-copy span { color: var(--gvp-muted); font-size: 13.5px; }
+.glowvai-root .gvp .gvp-reco-copy small { color: var(--gvp-muted); font-size: 12.5px; }
+.glowvai-root .gvp .gvp-app-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.glowvai-root .gvp .gvp-app-tile { display: grid; min-height: 108px; justify-items: center; align-content: center; gap: 2px; padding: 12px 4px; border: 1px solid var(--gvp-line); border-radius: 16px; background: #fff; text-align: center; }
+.glowvai-root .gvp .gvp-app-tile:hover,
+.glowvai-root .gvp .gvp-bank-tile:hover { border-color: #b9cdf7; }
+.glowvai-root .gvp .gvp-app-tile b { margin-top: 4px; color: var(--gvp-ink); font-size: 13px; font-weight: 500; }
+.glowvai-root .gvp .gvp-app-tile small { color: var(--gvp-muted); font-size: 11px; }
+.glowvai-root .gvp .gvp-mark { display: inline-grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; font-size: 16px; font-weight: 700; }
+.glowvai-root .gvp .gvp-mark .is-long { font-size: 10.5px; letter-spacing: -.01em; }
+.glowvai-root .gvp .gvp-mark.is-bank { width: 46px; height: 32px; border-radius: 8px; }
+.glowvai-root .gvp .gvp-caption { margin-top: -4px; color: var(--gvp-muted); font-size: 12.5px; }
+.glowvai-root .gvp .gvp-pay-section { padding: 0; overflow: hidden; }
+.glowvai-root .gvp .gvp-pay-section-head { display: flex; width: 100%; align-items: center; gap: 14px; padding: 16px; color: var(--gvp-ink); text-align: left; }
+.glowvai-root .gvp .gvp-pay-section-head > span { display: grid; flex: 1; min-width: 0; gap: 1px; }
+.glowvai-root .gvp .gvp-pay-section-head b { color: var(--gvp-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .gvp .gvp-pay-section-head small { color: var(--gvp-muted); font-size: 12.5px; }
+.glowvai-root .gvp .gvp-pay-section-head > svg:last-child { color: var(--gvp-muted); }
+.glowvai-root .gvp .gvp-cards-body { border-top: 1px solid var(--gvp-line); }
+.glowvai-root .gvp .gvp-networks { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding: 14px 16px; border-bottom: 1px solid var(--gvp-line); font-size: 14px; font-weight: 700; }
+.glowvai-root .gvp .gvp-networks .is-visa { color: #1a1f71; font-style: italic; letter-spacing: .02em; }
+.glowvai-root .gvp .gvp-networks .is-mc { color: #c4001a; }
+.glowvai-root .gvp .gvp-networks .is-rupay { color: #0c7a3e; font-style: italic; }
+.glowvai-root .gvp .gvp-option-row { display: flex; width: 100%; align-items: center; gap: 14px; padding: 14px 16px; color: var(--gvp-ink); text-align: left; }
+.glowvai-root .gvp .gvp-option-row.is-on:not(.is-card) { background: var(--gvp-blue-tint); }
+.glowvai-root .gvp .gvp-option-row.is-card { padding: 16px; }
+.glowvai-root .gvp .gvp-row-copy { display: grid; flex: 1; min-width: 0; gap: 1px; }
+.glowvai-root .gvp .gvp-row-copy b { color: var(--gvp-ink); font-size: 15.5px; font-weight: 600; }
+.glowvai-root .gvp .gvp-row-copy small { color: var(--gvp-muted); font-size: 12.5px; }
+.glowvai-root .gvp .gvp-dashed { display: inline-grid; flex: 0 0 auto; width: 52px; height: 52px; place-items: center; border: 1.5px dashed #b9c4da; border-radius: 12px; color: var(--gvp-blue); font-size: 24px; font-weight: 400; }
+.glowvai-root .gvp .gvp-bank-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 0 12px 14px; }
+.glowvai-root .gvp .gvp-bank-tile { display: grid; min-height: 84px; justify-items: center; align-content: center; gap: 6px; padding: 10px 2px; border: 1px solid var(--gvp-line); border-radius: 14px; background: #fff; }
+.glowvai-root .gvp .gvp-bank-tile small { color: var(--gvp-text); font-size: 11.5px; }
+.glowvai-root .gvp .gvp-switch { position: relative; flex: 0 0 auto; width: 52px; height: 32px; border-radius: 999px; background: #c9d1e0; transition: background .2s ease; }
+.glowvai-root .gvp .gvp-switch span { position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(11, 27, 58, .25); transition: transform .2s ease; }
+.glowvai-root .gvp .gvp-switch.is-on { background: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-switch.is-on span { transform: translateX(20px); }
+.glowvai-root .gvp .gvp-pay-section > .gvp-secure { margin: 0 12px 12px; }
+.glowvai-root .gvp .gvp-confirm-address { display: flex; align-items: center; gap: 12px; border-color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-confirm-address > svg { flex: 0 0 auto; color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-confirm-address > div { flex: 1; min-width: 0; }
+.glowvai-root .gvp .gvp-confirm-address b { color: var(--gvp-ink); font-size: 14.5px; }
+.glowvai-root .gvp .gvp-confirm-address p { color: var(--gvp-muted); font-size: 13px; overflow-wrap: anywhere; }
+.glowvai-root .gvp .gvp-fieldset { display: grid; gap: 10px; min-width: 0; margin: 0; }
+.glowvai-root .gvp .gvp-fieldset legend { float: left; width: 100%; margin-bottom: 10px; color: var(--gvp-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .gvp .gvp-choice-list { display: grid; gap: 8px; }
+.glowvai-root .gvp .gvp-choice { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--gvp-line); border-radius: 14px; cursor: pointer; }
+.glowvai-root .gvp .gvp-choice.is-on { border-color: var(--gvp-blue); background: var(--gvp-blue-tint); }
+.glowvai-root .gvp .gvp-choice:has(input:focus-visible) { outline: 2px solid var(--gvp-blue); outline-offset: 2px; }
+.glowvai-root .gvp .gvp-choice input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-choice b { display: block; color: var(--gvp-ink); font-size: 14px; font-weight: 500; }
+.glowvai-root .gvp .gvp-choice small { display: block; margin-top: 2px; color: var(--gvp-muted); font-size: 12.5px; line-height: 1.4; }
+.glowvai-root .gvp .gvp-details { display: flex; align-items: center; gap: 12px; }
+.glowvai-root .gvp .gvp-details > svg { flex: 0 0 auto; color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-details > div { flex: 1; min-width: 0; }
+.glowvai-root .gvp .gvp-details b { color: var(--gvp-ink); font-size: 15px; }
+.glowvai-root .gvp .gvp-details p { color: var(--gvp-muted); font-size: 13px; }
+.glowvai-root .gvp .gvp-tip { display: grid; gap: 8px; }
+.glowvai-root .gvp .gvp-tip h2,
+.glowvai-root .gvp .gvp-summary-title { color: var(--gvp-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .gvp .gvp-tip p { font-size: 12.5px; }
+.glowvai-root .gvp .gvp-tip-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.glowvai-root .gvp .gvp-tip-chip { min-height: 44px; border: 1px solid var(--gvp-line); border-radius: 12px; background: #fff; color: var(--gvp-ink); font-size: 14px; font-weight: 500; }
+.glowvai-root .gvp .gvp-tip-chip.is-on { border-color: var(--gvp-blue); background: var(--gvp-blue-tint); color: var(--gvp-blue); font-weight: 600; }
+.glowvai-root .gvp .gvp-summary-pay { display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--gvp-radius-sm); background: var(--gvp-sky); color: var(--gvp-blue); }
+.glowvai-root .gvp .gvp-summary-pay > svg { flex: 0 0 auto; margin-top: 2px; }
+.glowvai-root .gvp .gvp-summary-pay span { display: grid; gap: 2px; }
+.glowvai-root .gvp .gvp-summary-pay b { color: var(--gvp-ink); font-size: 14px; font-weight: 600; }
+.glowvai-root .gvp .gvp-summary-pay small { color: var(--gvp-muted); font-size: 12px; line-height: 1.45; }
+.glowvai-root .gvp .gvp-dialog .commerce-confirm-sheet { border-radius: 22px; font-family: var(--gvp-font); }
+.glowvai-root .gvp .gvp-dialog .commerce-confirm-actions .gvp-btn { flex: 1; min-height: 48px; font-size: 15px; }
+@media (max-width: 380px) {
+  .glowvai-root .gvp .gvp-bank-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .glowvai-root .gvp .gvp-app-grid { gap: 6px; }
+}
+
 /* Phone action bar: the primary button only, above the safe area. Hidden from 1024px, where the summary holds it. */
 .glowvai-root .gvp > .gvp-bar { display: block; padding: 10px var(--ds-gutter) calc(12px + var(--safe-bottom)); border-top: 0; background: linear-gradient(180deg, rgba(246, 248, 253, 0), var(--gvp-page) 30%); box-shadow: none; }
 .glowvai-root .gvp > .gvp-bar .gvp-btn { width: 100%; }
