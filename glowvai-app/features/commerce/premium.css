@@ -1,6 +1,6 @@
 /* Premium cart, checkout (delivery details), payment, processing and confirming screens. Everything sits under .gvp, so
    other screens are unchanged. Soft page, white cards with hairline borders, 16-20px corners, brand blue #0057FB for the
-   primary action, green for savings, Poppins (next/font, --font-poppins) with Manrope as the fallback.
+   primary action, green for savings, the system UI font stack (--gv-font).
    Phones follow the reference screens one to one; from 1024px the shared .commerce-split puts the content on the left
    and the sticky summary with the primary button on the right (responsive/commerce-ported.css). */
 
@@ -25,7 +25,7 @@
   --gvp-radius: 18px;
   --gvp-radius-sm: 14px;
   --gvp-shadow: 0 1px 2px rgba(11, 27, 58, .04), 0 8px 24px rgba(11, 27, 58, .05);
-  --gvp-font: var(--font-poppins, 'Poppins'), var(--font-body);
+  --gvp-font: var(--gv-font);
   background: var(--gvp-page);
   color: var(--gvp-text);
   font-family: var(--gvp-font);
