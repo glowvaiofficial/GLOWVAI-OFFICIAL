@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 import type { PortedScreenName } from '../../core/routes/names';
 import './auth.css';
 import '../../responsive/auth-ported.css';
-import { WelcomeScreen } from './WelcomeScreen';
 import { OnboardingScreen } from '../../screens/OnboardingScreen';
 import { OnboardingSuccessScreen } from './OnboardingSuccessScreen';
 import { PhoneSignInScreen } from './PhoneSignInScreen';
@@ -14,7 +13,7 @@ import { StudentVerificationScreen } from './StudentVerificationScreen';
 import { PermissionsScreen } from './PermissionsScreen';
 
 export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
-  'auth-welcome': WelcomeScreen,
+  'auth-welcome': OnboardingScreen,
   // The optional intro (also reached from the shop banner and the settings hub). Its last step opens the skin quiz.
   'auth-onboarding': OnboardingScreen,
   'auth-onboarding-success': OnboardingSuccessScreen,
