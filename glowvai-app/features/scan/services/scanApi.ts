@@ -1,7 +1,7 @@
 /**
  * Backend skin analysis client (default inference path on web).
  *
- * POSTs the captured face image to the CNN backend (POST /predict, the same
+ * POSTs the captured face image to the CNN backend (POST /api/v1/scan/analyze, falling back to /predict; the same
  * contract as the cnn_model FastAPI server). The primary base URL is tried
  * first, then the cloud backend. Any failure throws ScanError. No scores are
  * invented when the backend is unavailable.
@@ -42,8 +42,21 @@ interface PredictResponse {
   skinType?: string;
   skinTypeConfidence?: number;
   concerns?: Partial<Record<ConcernKey, { present?: boolean; score?: number }>>;
+  /** Live GlowVAI CNN server (/api/v1/scan/analyze): 0-100 health per metric, higher = healthier. */
+  metrics?: Record<string, { score?: number }>;
   inferenceLatencyMs?: number;
 }
+
+// The deployed CNN server answers on /api/v1/scan/analyze with the photo in field "image" (it has no /predict route,
+// checked 15 Nov 2026). /predict with field "file" stays as the fallback for older servers.
+const ANALYZE_PATH = '/api/v1/scan/analyze';
+const METRIC_FOR_CONCERN: Record<ConcernKey, string> = {
+  oiliness: 'sebum',
+  dryness: 'hydration',
+  redness: 'sensitivity',
+  uneven_tone: 'pigmentation',
+  visible_blemishes: 'acne',
+};
 
 /** Posts with a per-request timeout, also honouring an outer abort signal. */
 async function postWithTimeout(url: string, body: FormData, outer?: AbortSignal): Promise<Response> {
@@ -66,17 +79,27 @@ async function postWithTimeout(url: string, body: FormData, outer?: AbortSignal)
 
 /** Maps the backend /predict payload onto the shared SkinAnalysisResult. */
 function toAnalysisResult(data: PredictResponse, scanId: string, startMs: number): SkinAnalysisResult {
-  if (data.success === false || !data.concerns || typeof data.concerns !== 'object') {
+  const hasConcerns = !!data.concerns && typeof data.concerns === 'object';
+  const hasMetrics = !!data.metrics && typeof data.metrics === 'object';
+  if (data.success === false || (!hasConcerns && !hasMetrics)) {
     throw new ScanError('invalid_response', 'Analysis service returned an unexpected response.');
   }
 
   const concernProbs = {} as Record<ConcernKey, number>;
   for (const key of CONCERN_LABELS) {
-    const score = data.concerns[key]?.score;
-    if (typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > 1) {
-      throw new ScanError('invalid_response', `Analysis service omitted a valid score for ${key}.`);
+    if (hasConcerns) {
+      const score = data.concerns![key]?.score;
+      if (typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > 1) {
+        throw new ScanError('invalid_response', `Analysis service omitted a valid score for ${key}.`);
+      }
+      concernProbs[key] = score;
+    } else {
+      const health = data.metrics![METRIC_FOR_CONCERN[key]]?.score;
+      if (typeof health !== 'number' || !Number.isFinite(health) || health < 0 || health > 100) {
+        throw new ScanError('invalid_response', `Analysis service omitted a valid score for ${key}.`);
+      }
+      concernProbs[key] = Math.round((1 - health / 100) * 1000) / 1000;
     }
-    concernProbs[key] = score;
   }
 
   const skinTypeKey = typeof data.skinType === 'string' ? data.skinType.toLowerCase() : '';
@@ -112,21 +135,23 @@ export async function analyzeFaceImage(
   let lastError: unknown = null;
 
   for (const base of bases) {
+   for (const route of ['analyze', 'predict'] as const) {
     const form = new FormData();
-    form.append('file', file, 'face_capture.jpg');
+    form.append(route === 'analyze' ? 'image' : 'file', file, 'face_capture.jpg');
 
     let response: Response;
     try {
-      response = await postWithTimeout(`${base}/predict`, form, signal);
+      response = await postWithTimeout(`${base}${route === 'analyze' ? ANALYZE_PATH : '/predict'}`, form, signal);
     } catch (err) {
       if (signal?.aborted) throw err;
       lastError = err;
-      continue; // network error or timeout: try the next base
+      break; // network error or timeout: try the next base
     }
 
+    if (response.status === 404 && route === 'analyze') continue; // older server: try /predict
     if (!response.ok) {
       lastError = new Error(`HTTP ${response.status} from ${base}`);
-      continue;
+      break;
     }
 
     let data: PredictResponse;
@@ -136,6 +161,7 @@ export async function analyzeFaceImage(
       throw new ScanError('invalid_response', 'Analysis service returned a non-JSON response.');
     }
     return toAnalysisResult(data, scanId, startMs);
+   }
   }
 
   if (signal?.aborted) throw new ScanError('timeout', 'Analysis request was aborted.');
