@@ -1,5 +1,29 @@
 import { create } from 'zustand';
 import type { SubstitutionPreference } from '../../../core/services/shopTracking';
+import { payMethodFor, readPaymentChoice, type PaymentChoice } from './paymentChoice';
+import type { OrderAttemptKey } from './orderAttemptKey';
+
+// The current checkout attempt's Idempotency-Key, kept for this browser tab so a reload during payment still sends the
+// same key. sessionStorage may be missing or blocked: then the key lives in memory only.
+const ATTEMPT_KEY = 'glowvai_order_attempt';
+const readAttempt = (): OrderAttemptKey | null => {
+  try {
+    const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(ATTEMPT_KEY) : null;
+    const v = raw ? (JSON.parse(raw) as Partial<OrderAttemptKey>) : null;
+    return v && typeof v.key === 'string' && typeof v.signature === 'string' ? { key: v.key, signature: v.signature, placed: v.placed === true } : null;
+  } catch {
+    return null;
+  }
+};
+const writeAttempt = (attempt: OrderAttemptKey | null) => {
+  try {
+    if (typeof window === 'undefined') return;
+    if (attempt) window.sessionStorage.setItem(ATTEMPT_KEY, JSON.stringify(attempt));
+    else window.sessionStorage.removeItem(ATTEMPT_KEY);
+  } catch {
+    // Memory only.
+  }
+};
 
 // What the server says the bag is taken off. code is null for an automatic offer.
 export interface BagQuote {
@@ -32,6 +56,13 @@ interface CheckoutSessionState {
   // This is the source of truth for the method; navigation params only repeat it.
   payMethod: 'cod' | 'online';
   setPayMethod: (method: 'cod' | 'online') => void;
+  // The exact option on the Payment screen (UPI app, card, bank, wallets, or cash on delivery). Online options open the
+  // Razorpay window on that method; payMethod always follows it.
+  paymentChoice: PaymentChoice;
+  setPaymentChoice: (choice: PaymentChoice) => void;
+  // The checkout attempt's Idempotency-Key (orderAttemptKey.ts), or null before the first order request.
+  orderAttempt: OrderAttemptKey | null;
+  setOrderAttempt: (attempt: OrderAttemptKey | null) => void;
   // Optional tip for the delivery partner, in rupees (0, 10, 20, 30 or a custom amount up to 500).
   tip: number;
   // The delivery time the customer chose (an id from the slots the server offered), or null. The server checks it again.
@@ -62,7 +93,21 @@ export const useCheckoutSession = create<CheckoutSessionState>()((set) => ({
   payChoice: 'cod',
   addressConfirmed: false,
   payMethod: 'cod',
-  setPayMethod: (payMethod) => set({ payMethod }),
+  setPayMethod: (payMethod) =>
+    set((state) => ({
+      payMethod,
+      paymentChoice: payMethod === 'cod' ? { kind: 'cod' } : state.paymentChoice.kind === 'cod' ? { kind: 'upi', app: null } : state.paymentChoice,
+    })),
+  paymentChoice: { kind: 'cod' },
+  setPaymentChoice: (choice) => {
+    const paymentChoice = readPaymentChoice(choice);
+    set({ paymentChoice, payMethod: payMethodFor(paymentChoice) });
+  },
+  orderAttempt: readAttempt(),
+  setOrderAttempt: (orderAttempt) => {
+    writeAttempt(orderAttempt);
+    set({ orderAttempt });
+  },
   tip: 0,
   slotId: null,
   setSlotId: (slotId) => set({ slotId }),

@@ -1,51 +1,53 @@
-import React, { useRef, useState } from 'react';
-import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Mars, RotateCcw, ScanFace, Search, ShieldCheck, ShoppingBag, Sparkles, Ticket, Truck, User, Venus, Zap } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, Boxes, ChevronRight, ScanFace, ShieldCheck, ShoppingBag, Sparkles, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
+import { useCustomerStore } from '../../../core/state/customerStore';
+import { useInbox } from '../../../core/notifications/inboxStore';
 import { siteConfig } from '../../../../config/site';
-import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
-import { ShopProductCard } from '../shared/ShopProductCard';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
-import { HomeBanners } from '../shared/HomeBanners';
-import { SearchHint } from '../shared/SearchHint';
-import { VoiceSearchButton } from '../shared/VoiceSearchButton';
-import { HeaderCartButton } from '../shared/HeaderCartButton';
-import { useHomeDevice, useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
+import { useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId } from '../lib/useHomeLayout';
 import { useHomeData } from '../lib/useHomeData';
-import { CATEGORY_ACCENT, CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
+import { SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { ShopDesktopHome } from './ShopDesktopHome';
-import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
+import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, mergeFooterSocials } from '../lib/homeModel';
-import type { HomeCategoryTile } from '../lib/homeModel';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
-import type { ScreenName } from '../../../context/contextDefinition';
+import { getProductThumbUrl } from '../shared/shopUtils';
+import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
+import { itemAccent, sectionAccent } from '../mobile/accentTheme';
+import {
+  ALL_ICON,
+  BrandsBlock,
+  CardRail,
+  CategoryTile,
+  ConcernPicks,
+  EndsInPill,
+  FlashSaleRows,
+  GreetingCard,
+  HelpGiftBlock,
+  HeroCarousel,
+  MobileHomeHeader,
+  OffersBlock,
+  ProductRow,
+  PromosBlock,
+  SectionHead,
+  SkeletonRow,
+  TrendingBlock,
+  TrustBlock,
+  useFlashSales,
+  useOpenLink,
+  useTicker,
+} from '../mobile/MobileHomeParts';
 import '../styles/shop-home.css';
+import '../mobile/mobile-home.css';
 
-const QUICK_LINKS: { label: string; Icon: LucideIcon; screen: ScreenName; params?: Record<string, string> }[] = [
-  { label: 'All Categories', Icon: Boxes, screen: 'shop-browse' },
-  { label: 'Skin scan', Icon: ScanFace, screen: 'scan-camera' },
-  { label: 'Orders', Icon: RotateCcw, screen: 'orders-list' },
-  { label: 'Account', Icon: User, screen: 'profile-tab' },
-];
-
-// Quiet placeholder cards with the same size as the real cards (see the skel rules in shop-home.css), so the page does not
-// move when the products arrive.
-function skeletonCards(count: number, deal = false) {
-  return Array.from({ length: count }, (_, i) => (
-    <span key={i} className={deal ? 'shop-home-skel-card is-deal' : 'shop-home-skel-card'}>
-      <span className="shop-home-skel-media" />
-      <span className="shop-home-skel-line is-short" />
-      <span className="shop-home-skel-line" />
-      <span className="shop-home-skel-line is-short" />
-    </span>
-  ));
-}
+// Admin settings and items may carry an accent ("#RRGGBB", lib/shop/accents.ts); the layout types do not list it.
+type Accented = { accent?: string };
 
 function Notice({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="shop-home-notice" role="status">
+    <div className="shop-home-notice gvh-notice" role="status">
       <strong>{title}</strong>
       <p>{children}</p>
       {action}
@@ -53,240 +55,58 @@ function Notice({ title, children, action }: { title: string; children: React.Re
   );
 }
 
-function Rail({
-  title,
-  onSeeAll,
-  children,
-}: {
-  title: string;
-  onSeeAll?: () => void;
-  children: React.ReactNode;
-}) {
-  const railRef = useRef<HTMLDivElement>(null);
-
-  const scrollRail = (dir: 1 | -1) => {
-    const rail = railRef.current;
-    rail?.scrollBy({ left: dir * rail.clientWidth * 0.8, behavior: 'smooth' });
-  };
-
-  return (
-    <section className="shop-home-section">
-      <div className="shop-home-section-head">
-        <h2>{title}</h2>
-        <div className="shop-home-section-actions">
-          <button type="button" className="shop-home-arrow" onClick={() => scrollRail(-1)} aria-label={`Scroll ${title} left`}>
-            <ChevronLeft size={14} />
-          </button>
-          <button type="button" className="shop-home-arrow" onClick={() => scrollRail(1)} aria-label={`Scroll ${title} right`}>
-            <ChevronRight size={14} />
-          </button>
-          {onSeeAll && (
-            <button type="button" className="shop-home-see-all" onClick={onSeeAll}>
-              See All
-              <ChevronRight size={14} />
-            </button>
-          )}
-        </div>
-      </div>
-      <div ref={railRef} className="shop-home-rail">
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function ProductRail({ title, products }: { title: string; products: SkincareProduct[] }) {
-  const navigate = useHomeNavigate();
-
-  return (
-    <Rail title={title} onSeeAll={() => navigate('shop-browse')}>
-      {products.map((product) => (
-        <div key={product.id} className="shop-home-rail-item">
-          <ShopProductCard product={product} onOpen={(p) => navigate('shop-product', { productId: p.id })} />
-        </div>
-      ))}
-    </Rail>
-  );
-}
-
 // "Buy it again": the customer's recent products, from the live catalogue. Shows nothing when the customer is not signed in,
 // has no orders, or the request fails.
-function ReorderRail({ catalog }: { catalog: SkincareProduct[] }) {
+function ReorderRail({ catalog, accent }: { catalog: SkincareProduct[]; accent: string }) {
   const products = useReorderProducts(catalog);
-  if (products.length === 0) return null;
-  return <ProductRail title="Buy it again" products={products} />;
+  return <ProductRow title="Buy it again" sub="From your recent orders" products={products} accent={accent} />;
 }
 
-function SkeletonRail({ title }: { title: string }) {
-  return (
-    <section className="shop-home-section" aria-busy="true">
-      <div className="shop-home-section-head">
-        <h2>{title}</h2>
-      </div>
-      <div className="shop-home-rail" aria-hidden="true">
-        {skeletonCards(4)}
-      </div>
-      <span className="shop-home-sr">Loading products</span>
-    </section>
-  );
-}
-
-function DealCard({ product }: { product: SkincareProduct }) {
-  const navigate = useHomeNavigate();
-  const quantity = useCartStore((s) => s.items[product.id]?.quantity ?? 0);
-  const addItem = useCartStore((s) => s.addItem);
-  const discount = getDiscountPercent(product);
-
-  return (
-    <article className="shop-home-deal">
-      {discount > 0 && <span className="shop-home-deal-badge">{discount}% OFF</span>}
-      <button type="button" className="shop-home-deal-open" onClick={() => navigate('shop-product', { productId: product.id })}>
-        <span className="shop-home-deal-media">
-          <img src={getProductThumbUrl(product)} alt={product.name} width={400} height={400} loading="lazy" decoding="async" />
-        </span>
-        <small className="shop-home-deal-brand">{product.brand}</small>
-        <span className="shop-home-deal-name">{product.name}</span>
-        <span className="shop-home-deal-price">
-          <b>{formatRupee(product.price)}</b>
-          {product.originalPrice > product.price && <s>{formatRupee(product.originalPrice)}</s>}
-        </span>
-      </button>
-      <button
-        type="button"
-        className="shop-home-deal-add"
-        onClick={() => {
-          // Products with sizes or shades are chosen on their page.
-          if (product.variants?.length) {
-            navigate('shop-product', { productId: product.id });
-            return;
-          }
-          addItem({
-            productId: product.id,
-            name: product.name,
-            brand: product.brand,
-            image: getProductImageUrl(product),
-            price: product.price,
-            mrp: product.originalPrice,
-          });
-        }}
-      >
-        {product.variants?.length ? 'Choose +' : quantity > 0 ? `In cart · ${quantity}` : 'Add +'}
-      </button>
-    </article>
-  );
-}
-
-// A category tile: the category's own product photo under a colour fade, with its real product count. Before the catalogue
-// loads the count line is a placeholder of the same height; if the catalogue fails, the tile still opens the category.
-function CategoryCard({ tile, onOpen, count, isAll = false }: { tile: HomeCategoryTile | null; onOpen: () => void; count: string | null; isAll?: boolean }) {
-  const label = isAll ? 'All Products' : tile?.label ?? '';
-  const accent = (tile && CATEGORY_ACCENT[tile.id]) || '#1447e6';
-  const photo = tile?.sample ? getProductThumbUrl(tile.sample, 600) : null;
-  return (
-    <button type="button" className="shop-home-category" onClick={onOpen} aria-label={count ? `${label}, ${count}` : label}>
-      <span className="shop-home-category-tile" style={{ '--tile-accent': accent } as React.CSSProperties}>
-        {photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <span className="shop-home-category-fallback" aria-hidden="true">{isAll ? <Boxes size={28} /> : <Sparkles size={28} />}</span>}
-        <span className="shop-home-category-shade" aria-hidden="true" />
-        <span className="shop-home-category-meta">
-          <strong className="shop-home-category-label">{label}</strong>
-          {count === null ? <span className="shop-home-category-count is-placeholder" aria-hidden="true" /> : count && <span className="shop-home-category-count">{count}</span>}
-        </span>
-      </span>
-    </button>
-  );
-}
-
-// A category tile the admin set: same look as CategoryCard. The link opens the admin's page, or the shop browse page when empty.
-function AdminCategoryTile({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
-  return (
-    <button type="button" className="shop-home-category" onClick={onOpen} aria-label={item.sub ? `${item.label}, ${item.sub}` : item.label}>
-      <span className="shop-home-category-tile">
-        {item.image ? <img src={item.image} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <span className="shop-home-category-fallback" aria-hidden="true"><Sparkles size={28} /></span>}
-        <span className="shop-home-category-shade" aria-hidden="true" />
-        <span className="shop-home-category-meta">
-          <strong className="shop-home-category-label">{item.label}</strong>
-          {item.sub && <span className="shop-home-category-count">{item.sub}</span>}
-        </span>
-      </span>
-    </button>
-  );
-}
-
-// A promo card the admin set: same section and grid as the built-in promo cards. The picture sits behind the dark gradient of the category tiles.
-function AdminPromoCard({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
-  return (
-    <button type="button" className={`shop-home-promo is-dark${item.image ? ' has-picture' : ''}`} onClick={onOpen}>
-      {item.image && <img className="shop-home-promo-image" src={item.image} alt="" width={600} height={300} loading="lazy" decoding="async" />}
-      {item.image && <span className="shop-home-promo-shade" aria-hidden="true" />}
-      <span className="shop-home-promo-title">{item.label}</span>
-      {item.sub && <span className="shop-home-promo-sub">{item.sub}</span>}
-      <span className="shop-home-promo-icon">
-        <ArrowRight size={18} />
-      </span>
-    </button>
-  );
-}
-
-// For Her / For Him drives the shared shoppingPreference state (same as the legacy home).
-type Mode = 'women' | 'men';
 type ShopHomeScreenProps = { embedded?: boolean };
-type FestivalContent = {
-  heroCopy: string;
-  heroImage: string;
-  categoryAtlas: string;
-  categories: string[];
-  promoTitle: string;
-  promoCopy: string;
-};
 
-// The Navratri block is off until a festival is scheduled. Set to true to show it again.
-const SHOW_FESTIVAL = false;
-
-// Navratri copy and images carried over from the legacy home.
-const FESTIVAL: Record<Mode, FestivalContent> = {
-  women: {
-    heroCopy: 'Beauty · Gifting · Festive Picks',
-    heroImage: '/glowvai/assets/home/navratri-her-hero.png',
-    categoryAtlas: '/glowvai/assets/home/navratri-her-categories.png',
-    categories: ['Pooja Essentials', 'Skincare & Haircare', 'Makeup Essentials', 'Fragrances', 'Personal Care', 'Festive Gifts'],
-    promoTitle: 'Navratri Specials · Shop the edit',
-    promoCopy: 'Beauty · Skincare · Makeup · More',
-  },
-  men: {
-    heroCopy: 'Style · Grooming · Festive Picks',
-    heroImage: '/glowvai/assets/home/navratri-him-hero.png',
-    categoryAtlas: '/glowvai/assets/home/navratri-him-categories.png',
-    categories: ['Grooming & Skincare', 'Haircare', 'Fragrances', 'Shaving & Beard', 'Men’s Essentials', 'Festive Gifts'],
-    promoTitle: 'Navratri Specials · Shop the edit',
-    promoCopy: 'Grooming · Fragrances · More',
-  },
-};
-
+// The mobile-web home (screens under 1024px, and the home inside the skin report), drawn to the premium reference: a
+// header with the wordmark, location, search, notifications and account, concern tabs that tint the header in their
+// accent, a greeting card with the delivery estimate and Track Order, then the blocks in the order the admin published.
+// Content, pictures, on/off and accents come from the admin layout; empty admin slots show nothing (placeholders only in
+// a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
   const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout('mobile');
   const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, rails, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
-  // The promo cards the admin published. None published means the built-in promo cards.
-  const adminPromos = blockSettings['promos']?.items ?? [];
 
   const navigate = useHomeNavigate();
-  const { setShoppingPreference, shoppingPreference, currentAddress } = useApp();
+  const openLink = useOpenLink();
+  const { currentAddress, customerDetails, user, accountSignedIn } = useApp();
   const totalCount = useCartStore((s) => s.totalCount);
-  const mode: Mode = shoppingPreference === 'men' ? 'men' : 'women';
-  const festival = FESTIVAL[mode];
-  const [festivalSwitched, setFestivalSwitched] = useState(false);
+  const unread = useInbox((s) => s.unreadCount);
+  const orders = useCustomerStore((s) => s.orders);
+  const [tab, setTab] = useState<HomeTab>(() => homeTab('for-you'));
+
+  // "Track Order" needs the signed-in customer's orders; the list is loaded once if no screen has loaded it yet.
+  useEffect(() => {
+    if (accountSignedIn && useCustomerStore.getState().ordersStatus === 'idle') void useCustomerStore.getState().loadOrders();
+  }, [accountSignedIn]);
 
   // Location and delivery time come from the selected delivery address, so the ETA always matches the place shown.
-  const userLocation = [currentAddress?.area, currentAddress?.city].filter(Boolean).join(', ') || 'Set delivery location';
+  const area = [currentAddress?.area, currentAddress?.city].filter(Boolean).join(', ');
+  const userLocation = (currentAddress?.area || currentAddress?.city || '').trim() || 'Set location';
   const deliveryEta = currentAddress?.serviceable && currentAddress.deliveryMinutes > 0 ? currentAddress.deliveryMinutes : null;
+  const name = customerDetails?.fullName || user?.name || '';
+  const initial = (name.trim().match(/\p{L}/u)?.[0] ?? '').toUpperCase();
+  const onTheWay = useMemo(() => activeOrder(orders), [orders]);
 
-  const switchMode = (next: Mode) => {
-    if (next !== mode) {
-      setFestivalSwitched(true);
-      setShoppingPreference(next);
-    }
-  };
+  // Flash sales: the soonest-ending live sale puts its countdown on the deals title; each sale also gets its own row.
+  const sales = useFlashSales();
+  const now = useTicker(sales.length > 0, 30_000);
+  const soonest = soonestLiveSale(sales, now);
+
+  // A concern tab narrows the picks shown under the greeting.
+  const concernProducts = useMemo(() => (tab.concern ? catalog.filter((p) => matchesConcern(p, tab.concern)) : []), [catalog, tab.concern]);
+
+  const accentOf = (id: HomeBlockId) => sectionAccent(id, (blockSettings[id] as (BlockSettings & Accented) | undefined)?.accent);
+  const settingsOf = (id: HomeBlockId) => blockSettings[id] as (BlockSettings & Accented) | undefined;
+  const hasItems = (id: HomeBlockId) => (blockSettings[id]?.items.length ?? 0) > 0;
 
   const socials = configuredSocials(mergeFooterSocials(siteConfig.socials, footerDetails));
   const storeLinks = [
@@ -294,313 +114,190 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
     { label: 'Google Play', url: footerDetails.playStoreUrl },
   ].filter((s) => s.url !== '');
 
-  // Each homepage block. The order comes from the admin layout (useHomeLayout); the code of each block is unchanged.
+  // Each homepage block. The order comes from the admin layout (useHomeLayout).
   const renderBlock = (id: HomeBlockId): React.ReactNode => {
     switch (id) {
-    case 'hero':
-      return (
-        <>
-      <section className="shop-home-showcase">
-        <img src={heroOverride?.image || HERO_IMAGE} alt={heroOverride?.image && heroOverride.title ? heroOverride.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
-        <div className="shop-home-showcase-copy">
-          <p className="shop-home-showcase-tag">Discover. Shop. Glow.</p>
-          <h1>{heroOverride?.title || 'Glow your way.'}</h1>
-          <p className="shop-home-showcase-sub">
-            {heroOverride?.subtitle || (deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.')}
-          </p>
-          <div className="shop-home-showcase-actions">
-            <button type="button" className="shop-home-btn-dark" onClick={() => (heroOverride?.ctaLink ? window.location.assign(heroOverride.ctaLink) : navigate('shop-browse'))}>
-              {heroOverride?.ctaLabel || 'Shop now'}
-              <ArrowRight size={16} />
-            </button>
-            <button type="button" className="shop-home-btn-light" onClick={() => navigate('scan-camera')}>
-              <ScanFace size={16} />
-              Skin scan
-            </button>
-          </div>
-        </div>
-      </section>
+      case 'hero':
+        return <HeroCarousel hero={heroOverride as (HeroOverride & Accented) | null} deliveryEta={deliveryEta} accent={(heroOverride as (HeroOverride & Accented) | null)?.accent || accentOf('hero')} />;
+      case 'mini-banners':
+        // Shown as "Trending" tiles once the admin publishes items; a placeholder only in a staff preview.
+        return hasItems('mini-banners') ? <TrendingBlock settings={settingsOf('mini-banners')!} accent={accentOf('mini-banners')} onOpenLink={openLink} /> : <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />;
+      case 'offers':
+        return hasItems('offers') ? <OffersBlock settings={settingsOf('offers')!} accent={accentOf('offers')} onOpenLink={openLink} /> : <OffersStripPlaceholder settings={blockSettings['offers']} />;
+      case 'categories':
+        return (
+          <section className="gvh-section gvh-cats-section" aria-labelledby="shop-home-categories-title">
+            <SectionHead id="shop-home-categories-title" title={blockSettings['categories']?.title || 'Shop by category'} accent={accentOf('categories')} onSeeAll={() => navigate('shop-browse')} />
+            <div className="gvh-cats" aria-busy={loading}>
+              {adminCategories.length > 0
+                ? adminCategories.map((item: BlockItem, i) => (
+                    <CategoryTile key={`${i}-${item.label}`} label={item.label} sub={item.sub} image={item.image} accent={itemAccent(item as BlockItem & Accented, i)} onOpen={() => openLink(item.link)} />
+                  ))
+                : (
+                  <>
+                    {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
+                      const tile = tiles.find((t) => t.id === categoryId) ?? null;
+                      const count = loading || failed ? null : `${tile?.count ?? 0} ${tile?.count === 1 ? 'product' : 'products'}`;
+                      return (
+                        <CategoryTile
+                          key={categoryId}
+                          label={label}
+                          sub={count}
+                          image={tile?.sample ? getProductThumbUrl(tile.sample, 300) : null}
+                          accent={itemAccent({ label }, i)}
+                          onOpen={() => navigate('shop-category', { categoryId })}
+                        />
+                      );
+                    })}
+                    <CategoryTile label="Shop all" Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
+                  </>
+                )}
+            </div>
+          </section>
+        );
+      case 'promos':
+        return <PromosBlock settings={settingsOf('promos')} onOpenLink={openLink} />;
+      case 'deals':
+        return (
+          <>
+            {!failed && (
+              <section className="gvh-section" aria-labelledby="shop-home-deals-title">
+                <SectionHead
+                  id="shop-home-deals-title"
+                  title={blockSettings['deals']?.title || 'Flash Deals'}
+                  sub={adminDeals.length > 0 ? 'Picked by GlowVai' : 'Priced below their listed MRP'}
+                  accent={accentOf('deals')}
+                  icon={<Zap size={20} aria-hidden="true" className="gvh-zap" fill="currentColor" />}
+                  badge={soonest && dealProducts.length > 0 ? <EndsInPill endsAt={soonest.endsAt} now={now} /> : undefined}
+                  onSeeAll={() => navigate('shop-browse')}
+                />
+                {loading ? (
+                  <div className="gvh-rail" aria-busy="true">
+                    {[0, 1, 2, 3].map((i) => (
+                      <span key={i} className="gvh-card is-skel" aria-hidden="true">
+                        <span className="gvh-card-media" />
+                        <span className="gvh-skel-line is-short" />
+                        <span className="gvh-skel-line" />
+                      </span>
+                    ))}
+                    <span className="gvh-sr">Loading products</span>
+                  </div>
+                ) : dealProducts.length > 0 ? (
+                  <CardRail products={dealProducts} />
+                ) : (
+                  <p className="gvh-empty">No discounted products right now.</p>
+                )}
+              </section>
+            )}
+            <FlashSaleRows sales={sales} catalog={catalog} now={now} accent={accentOf('deals')} />
+            <FlashDealsPlaceholder />
+          </>
+        );
+      case 'reorder':
+        return <ReorderRail catalog={catalog} accent={accentOf('reorder')} />;
+      case 'product-rails':
+        return failed ? (
+          <Notice
+            title="Products could not be loaded"
+            action={
+              <button type="button" className="shop-home-retry gvh-retry" onClick={() => feed.retry()}>
+                Try again
+              </button>
+            }
+          >
+            Check your connection and try again. Categories and offers above still work.
+          </Notice>
+        ) : noProducts ? (
+          <Notice title="No products are listed yet">Check back soon, or browse the full catalogue.</Notice>
+        ) : (
+          <>
+            {loading && skinState.recommendationsOn && <SkeletonRow title="Picked for your skin" />}
+            {loading && recentIds.length > 0 && <SkeletonRow title="Continue browsing" />}
+            {(configuredRows.length > 0 ? configuredRows : rails).map((rail, i) => (
+              <ProductRow key={rail.id} title={rail.title} products={rail.products} accent={i === 0 ? accentOf('product-rails') : itemAccent(null, i + 1)} onSeeAll={() => navigate('shop-browse')} />
+            ))}
+            {loading && <SkeletonRow title="Top Rated" />}
+            {loading && <SkeletonRow title="Under ₹500" />}
+          </>
+        );
+      case 'brands':
+        return hasItems('brands') ? <BrandsBlock settings={settingsOf('brands')!} accent={accentOf('brands')} onOpenLink={openLink} /> : <BrandStripPlaceholder settings={blockSettings['brands']} />;
+      case 'trust':
+        return hasItems('trust') ? <TrustBlock settings={settingsOf('trust')!} accent={accentOf('trust')} onOpenLink={openLink} /> : <TrustBlockPlaceholder settings={blockSettings['trust']} />;
+      case 'help-gift':
+        return hasItems('help-gift') ? <HelpGiftBlock settings={settingsOf('help-gift')!} accent={accentOf('help-gift')} onOpenLink={openLink} /> : <HelpGiftPlaceholder settings={blockSettings['help-gift']} />;
+      case 'footer':
+        return (
+          <>
+            <footer className="shop-home-footer" aria-label="Site footer">
+              <div className="shop-home-footer-inner">
+                <div className="shop-home-footer-brand">
+                  <span className="shop-home-footer-logo">
+                    <Sparkles size={16} aria-hidden="true" />
+                    <strong>GlowVai</strong>
+                  </span>
+                  <p>Skincare, delivered.</p>
+                  {storeLinks.length > 0 && (
+                    <ul className="shop-home-footer-store" aria-label="Get the app">
+                      {storeLinks.map((s) => (
+                        <li key={s.label}>
+                          <a href={s.url} target="_blank" rel="noopener noreferrer">
+                            {s.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {socials.length > 0 && (
+                    <ul className="shop-home-footer-social" aria-label="Social media">
+                      {socials.map((s) => (
+                        <li key={s.label}>
+                          <a href={s.url} target="_blank" rel="noopener noreferrer">
+                            {s.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <nav className="shop-home-footer-cols" aria-label="Footer links">
+                  {HOME_FOOTER_GROUPS.map((group) => (
+                    <section key={group.title} className="shop-home-footer-col">
+                      <h3>{group.title}</h3>
+                      <ul>
+                        {group.links.map((link) => (
+                          <li key={link.label}>
+                            {'href' in link ? (
+                              <a href={link.href}>{link.label}</a>
+                            ) : (
+                              <button type="button" onClick={() => navigate(link.screen, link.params)}>
+                                {link.label}
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
+                </nav>
+              </div>
+              <div className="shop-home-footer-bottom">
+                <span>© 2026 GlowVai</span>
+                {footerDetails.companyLine !== '' && <p className="shop-home-footer-company">{footerDetails.companyLine}</p>}
+              </div>
+            </footer>
 
-      {SHOW_FESTIVAL && <div key={mode} className={`shop-home-festival${festivalSwitched ? ' is-switched' : ''}`}>
-        <section className="zq-festival" aria-label={`Navratri ${festival.heroCopy}`}>
-          <button type="button" className="zq-festival-hero" onClick={() => navigate('shop-browse')}>
-            <img src={festival.heroImage} alt="" />
-            <span className="zq-festival-copy">
-              <small>Celebrate</small>
-              <strong>NAVRATRI</strong>
-              <em>{festival.heroCopy}</em>
-            </span>
-          </button>
-          <div className="zq-festival-grid">
-            {festival.categories.map((title, index) => (
-              <button key={title} type="button" onClick={() => navigate('shop-browse')}>
-                <span className="zq-category-photo" style={{ backgroundImage: `url(${festival.categoryAtlas})`, '--category-index': index } as React.CSSProperties} />
-                <b>{title}</b>
+            {totalCount > 0 && (
+              <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>
+                <ShoppingBag size={16} />
+                <span>
+                  {totalCount} item{totalCount > 1 ? 's' : ''}
+                </span>
                 <ChevronRight size={14} />
               </button>
-            ))}
-          </div>
-          <button type="button" className="zq-festival-promo" onClick={() => navigate('shop-browse')}>
-            <img src={festival.heroImage} alt="" width={1200} height={545} loading="lazy" decoding="async" />
-            <span>
-              <b>{festival.promoTitle}</b>
-              <small>{festival.promoCopy}</small>
-            </span>
-            <ChevronRight size={19} />
-          </button>
-        </section>
-      </div>}
-
-      <HomeBanners />
-        </>
-      );
-    case 'mini-banners':
-      return (
-        <>
-      <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />
-        </>
-      );
-    case 'offers':
-      return (
-        <>
-      <OffersStripPlaceholder settings={blockSettings['offers']} />
-        </>
-      );
-    case 'categories':
-      return (
-        <>
-      <section className="shop-home-categories-section" aria-labelledby="shop-home-categories-title">
-        <div className="shop-home-section-head">
-          <h2 id="shop-home-categories-title">Shop by category</h2>
-        </div>
-        <div className="shop-home-categories" aria-busy={loading}>
-          {adminCategories.length > 0 ? adminCategories.map((item, i) => (
-            <AdminCategoryTile key={`${i}-${item.label}`} item={item} onOpen={() => (item.link ? window.location.assign(item.link) : navigate('shop-browse'))} />
-          )) : (
-            <>
-              {HOME_CATEGORY_TILES.map(({ id }) => {
-                const tile = tiles.find((t) => t.id === id) ?? null;
-                return <CategoryCard key={id} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId: id })} />;
-              })}
-              <CategoryCard tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
-            </>
-          )}
-        </div>
-      </section>
-
-        </>
-      );
-    case 'promos':
-      return (
-        <>
-      <section className="shop-home-promos" aria-label="Offers">
-        {adminPromos.length > 0 ? adminPromos.map((item, i) => (
-          <AdminPromoCard key={`${i}-${item.label}`} item={item} onOpen={() => (item.link ? window.location.assign(item.link) : navigate('shop-browse'))} />
-        )) : (
-          <>
-        <button type="button" className="shop-home-promo is-dark" onClick={() => navigate('shop-browse')}>
-          <span className="shop-home-promo-kicker">Delivery</span>
-          <span className="shop-home-promo-title">Free delivery above ₹{FREE_DELIVERY_ABOVE}</span>
-          <span className="shop-home-promo-sub">Applied automatically at checkout.</span>
-          <span className="shop-home-promo-icon">
-            <Truck size={18} />
-          </span>
-        </button>
-        <button type="button" className="shop-home-promo is-light" onClick={() => navigate('cart-tab')}>
-          <span className="shop-home-promo-kicker">Coupon</span>
-          <span className="shop-home-promo-title">Flat ₹{COUPON_VALUES.GLOW50} off</span>
-          <span className="shop-home-promo-sub">Enter code GLOW50 in your cart.</span>
-          <span className="shop-home-promo-icon">
-            <Ticket size={18} />
-          </span>
-        </button>
+            )}
           </>
-        )}
-      </section>
-
-        </>
-      );
-    case 'deals':
-      return (
-        <>
-      {!failed && (
-        <section className="shop-home-section" aria-labelledby="shop-home-deals-title">
-          <div className="shop-home-section-head">
-            <div className="shop-home-section-titles">
-              <h2 id="shop-home-deals-title">Deals</h2>
-              <p>{adminDeals.length > 0 ? 'Picked by GlowVAI' : 'Products priced below their listed MRP'}</p>
-            </div>
-            <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
-              View all
-              <ChevronRight size={14} />
-            </button>
-          </div>
-          {loading ? (
-            <div className="shop-home-deals" aria-busy="true" aria-hidden="true">
-              {skeletonCards(4, true)}
-            </div>
-          ) : dealProducts.length > 0 ? (
-            <div className="shop-home-deals">
-              {dealProducts.map((product) => (
-                <DealCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <p className="shop-home-empty">No discounted products right now.</p>
-          )}
-        </section>
-      )}
-
-      <FlashSaleStrip />
-      <FlashDealsPlaceholder />
-        </>
-      );
-    case 'reorder':
-      return (
-        <>
-      <ReorderRail catalog={catalog} />
-        </>
-      );
-    case 'product-rails':
-      return (
-        <>
-      {failed ? (
-        <Notice
-          title="Products could not be loaded"
-          action={
-            <button type="button" className="shop-home-retry" onClick={() => feed.retry()}>
-              Try again
-            </button>
-          }
-        >
-          Check your connection and try again. Categories and offers above still work.
-        </Notice>
-      ) : noProducts ? (
-        <Notice title="No products are listed yet">Check back soon, or browse the full catalogue.</Notice>
-      ) : (
-        <>
-          {loading && skinState.recommendationsOn && <SkeletonRail title="Picked for your skin" />}
-          {loading && recentIds.length > 0 && <SkeletonRail title="Continue browsing" />}
-          {(configuredRows.length > 0 ? configuredRows : rails).map((rail) => (
-            <ProductRail key={rail.id} title={rail.title} products={rail.products} />
-          ))}
-          {loading && <SkeletonRail title="Top Rated" />}
-          {loading && <SkeletonRail title="Under ₹500" />}
-        </>
-      )}
-
-      <section className="shop-home-section" aria-labelledby="shop-home-concerns-title">
-        <div className="shop-home-section-head">
-          <h2 id="shop-home-concerns-title">Shop by Concern</h2>
-          <button type="button" className="shop-home-see-all" onClick={() => navigate('shop-browse')}>
-            See All
-            <ChevronRight size={14} />
-          </button>
-        </div>
-        <div className="shop-home-concerns">
-          {CONCERNS.map(({ id, label, Icon }) => (
-            <button key={id} type="button" className="shop-home-concern" onClick={() => navigate('shop-browse', { concern: id })}>
-              <span className="shop-home-concern-icon">
-                <Icon size={14} />
-              </span>
-              <strong>{label}</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-
-        </>
-      );
-    case 'brands':
-      return (
-        <>
-      <BrandStripPlaceholder settings={blockSettings['brands']} />
-        </>
-      );
-    case 'trust':
-      return (
-        <>
-      <TrustBlockPlaceholder settings={blockSettings['trust']} />
-        </>
-      );
-    case 'help-gift':
-      return (
-        <>
-      <HelpGiftPlaceholder settings={blockSettings['help-gift']} />
-        </>
-      );
-    case 'footer':
-      return (
-        <>
-      <footer className="shop-home-footer" aria-label="Site footer">
-        <div className="shop-home-footer-inner">
-          <div className="shop-home-footer-brand">
-            <span className="shop-home-footer-logo">
-              <Sparkles size={16} aria-hidden="true" />
-              <strong>GlowVai</strong>
-            </span>
-            <p>Skincare, delivered.</p>
-            {storeLinks.length > 0 && (
-              <ul className="shop-home-footer-store" aria-label="Get the app">
-                {storeLinks.map((s) => (
-                  <li key={s.label}>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {socials.length > 0 && (
-              <ul className="shop-home-footer-social" aria-label="Social media">
-                {socials.map((s) => (
-                  <li key={s.label}>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <nav className="shop-home-footer-cols" aria-label="Footer links">
-            {HOME_FOOTER_GROUPS.map((group) => (
-              <section key={group.title} className="shop-home-footer-col">
-                <h3>{group.title}</h3>
-                <ul>
-                  {group.links.map((link) => (
-                    <li key={link.label}>
-                      {'href' in link ? (
-                        <a href={link.href}>{link.label}</a>
-                      ) : (
-                        <button type="button" onClick={() => navigate(link.screen, link.params)}>
-                          {link.label}
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </nav>
-        </div>
-        <div className="shop-home-footer-bottom">
-          <span>© 2026 GlowVai</span>
-          {footerDetails.companyLine !== '' && <p className="shop-home-footer-company">{footerDetails.companyLine}</p>}
-        </div>
-      </footer>
-
-      {totalCount > 0 && (
-        <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>
-          <ShoppingBag size={16} />
-          <span>
-            {totalCount} item{totalCount > 1 ? 's' : ''}
-          </span>
-          <ChevronRight size={14} />
-        </button>
-      )}
-        </>
-      );
+        );
       default:
         return null;
     }
@@ -608,7 +305,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
 
   const pinnedTail = (
     <>
-      <section className="shop-home-scan" aria-labelledby="shop-home-scan-title">
+      <section className="shop-home-scan gvh-scan" aria-labelledby="shop-home-scan-title">
         <span className="shop-home-scan-tag">
           <ScanFace size={12} />
           FACE SCAN
@@ -630,8 +327,8 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
         </button>
       </section>
 
-      <section className="shop-home-end">
-        <Sparkles size={32} />
+      <section className="shop-home-end gvh-end">
+        <Boxes size={28} aria-hidden="true" />
         <h2>You've seen it all!</h2>
         <p>Browse the full catalogue</p>
         <button type="button" className="shop-home-end-btn" onClick={() => navigate('shop-browse')}>
@@ -639,75 +336,22 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
           <ArrowRight size={16} />
         </button>
       </section>
-
     </>
   );
 
   return (
-    <div className={`shop-screen shop-home zq-mode-${mode}`}>
-      <header className="shop-home-top">
-        <div className="shop-home-topbar">
-          <div className="shop-home-location">
-            <span className="shop-home-eta">
-              <Zap size={16} fill="currentColor" />
-              {deliveryEta ? `${deliveryEta} MINS` : 'DELIVER TO'}
-            </span>
-            {embedded ? (
-              <span className="shop-home-location-btn is-static">
-                <span>{userLocation}</span>
-              </span>
-            ) : (
-              <button type="button" className="shop-home-location-btn" onClick={() => navigate('location-setup')}>
-                <span>{userLocation}</span>
-                <ChevronRight size={14} />
-              </button>
-            )}
-          </div>
-          <div className="shop-home-top-actions">
-            <HeaderCartButton onOpen={() => navigate('cart-tab')} />
-            <button type="button" className="shop-home-profile" onClick={() => navigate('profile-tab')} aria-label="Profile">
-              <User size={18} />
-            </button>
-          </div>
-        </div>
-
-        <div className="shop-home-search">
-          <button type="button" className="shop-home-search-input" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
-            <Search size={18} />
-            <SearchHint />
-          </button>
-          <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
-          <button type="button" className="shop-home-ai-btn" onClick={() => navigate('scan-camera')} aria-label="Open skin scan">
-            <ScanFace size={14} />
-            Skin scan
-          </button>
-        </div>
-
-        <div className="shop-home-chips" role="group" aria-label="Quick links">
-          {QUICK_LINKS.map(({ label, Icon, screen, params }) => (
-            <button key={label} type="button" className="shop-home-chip" onClick={() => navigate(screen, params)}>
-              <Icon size={16} />
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="shop-home-mode">
-          <div className="zq-mode-toggle" data-mode={mode} role="group" aria-label="Shopping mode">
-            <span className="zq-mode-thumb" aria-hidden="true" />
-            <button type="button" aria-pressed={mode === 'women'} onClick={() => switchMode('women')}>
-              <Venus size={17} />
-              <span>For Her</span>
-            </button>
-            <button type="button" aria-pressed={mode === 'men'} onClick={() => switchMode('men')}>
-              <Mars size={17} />
-              <span>For Him</span>
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="shop-screen shop-home gvh">
+      <MobileHomeHeader tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
 
       <SkinQuizBanner />
+
+      <GreetingCard
+        greeting={greetingLine(name)}
+        delivery={deliveryCell(deliveryEta, area)}
+        onTrack={onTheWay ? () => navigate('orders-tracking', { orderId: onTheWay.orderId }) : null}
+      />
+
+      <ConcernPicks tab={tab} products={concernProducts} onSeeAll={() => navigate('shop-browse', tab.concern ? { concern: tab.concern } : undefined)} />
 
       {layoutOrder.filter((id) => id !== 'footer').map((id) => (
         <React.Fragment key={id}>{renderBlock(id)}</React.Fragment>

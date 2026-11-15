@@ -47,15 +47,14 @@ const product = (
 describe("home section order", () => {
   // Each marker is a string that only appears where that section is rendered.
   const order: [string, string][] = [
-    ["mode switch", 'aria-label="Shopping mode"'],
+    ["header with concern tabs", "<MobileHomeHeader"],
     ["skin quiz banner", "<SkinQuizBanner />"],
-    ["hero", 'className="shop-home-showcase"'],
-    ["festival", "shop-home-festival"],
+    ["greeting card", "<GreetingCard"],
+    ["hero", "<HeroCarousel"],
     ["categories", 'aria-labelledby="shop-home-categories-title"'],
-    ["offers", 'aria-label="Offers"'],
+    ["offers", "<PromosBlock"],
     ["deals", 'aria-labelledby="shop-home-deals-title"'],
-    ["product rails", "rails.map("],
-    ["concerns", 'aria-labelledby="shop-home-concerns-title"'],
+    ["product rails", "rails).map("],
     ["face scan", 'aria-labelledby="shop-home-scan-title"'],
     ["end card", 'className="shop-home-end"'],
     ["footer", "<footer"],
@@ -64,7 +63,7 @@ describe("home section order", () => {
   test("the blocks are rendered from the published layout, in its order", () => {
     // The page renders each block by its id, in the order the admin layout gives (useHomeLayout). The header and the
     // skin quiz strip stay at the top; the skin scan and closing card sit after the blocks; the footer is last.
-    const pinnedTop = ["mode switch", "skin quiz banner"];
+    const pinnedTop = ["header with concern tabs", "skin quiz banner", "greeting card"];
     let last = -1;
     for (const [name, marker] of pinnedTop.map((n) => order.find(([k]) => k === n)!)) {
       const at = homeSource.indexOf(marker);
