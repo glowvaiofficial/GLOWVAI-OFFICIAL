@@ -9,3 +9,9 @@ export function isCookieNoticeHidden(pathname: string | null | undefined): boole
   if (pathname?.startsWith("/rider")) return true;
   return isVendorPath(pathname);
 }
+
+// The shop (/shop) uses the system font stack only, so the notice heading must not use the
+// marketing display font (Familjen Grotesk) there.
+export function isShopPath(pathname: string | null | undefined): boolean {
+  return pathname === "/shop" || !!pathname?.startsWith("/shop/");
+}

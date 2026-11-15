@@ -20,3 +20,11 @@ describe("cookie notice on vendor pages", () => {
     assert.equal(isCookieNoticeHidden("/rider/deliveries"), true);
   });
 });
+
+import { isShopPath } from "../../lib/consent/notice";
+describe("shop path detection for the notice font", () => {
+  test("matches /shop and its sub paths only", () => {
+    for (const p of ["/shop", "/shop/x"]) assert.equal(isShopPath(p), true, p);
+    for (const p of ["/", "/shopping", "/about", null, undefined]) assert.equal(isShopPath(p), false, String(p));
+  });
+});
