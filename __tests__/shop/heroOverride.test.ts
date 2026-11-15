@@ -54,3 +54,20 @@ test("no hero block gives null", () => {
   assert.equal(readHeroOverride({ blocks: [{ id: "offers", enabled: true, position: 0, settings: valid }] }), null);
   assert.equal(readHeroOverride(undefined), null);
 });
+
+// The admin saves the hero nested under settings.hero (admin src/data/layout.ts).
+test("a hero saved by the admin under settings.hero is read", () => {
+  assert.deepEqual(readHeroOverride(doc({ hero: valid })), valid);
+});
+
+test("nested fields win over flat ones, and a missing nested field falls back to the flat one", () => {
+  const out = readHeroOverride(doc({ hero: { title: "Nested title" }, title: "Flat title", subtitle: "Flat line" }));
+  assert.equal(out?.title, "Nested title");
+  assert.equal(out?.subtitle, "Flat line");
+});
+
+test("bad nested fields are still checked and dropped", () => {
+  const out = readHeroOverride(doc({ hero: { ...valid, ctaLink: "//evil.example" } }));
+  assert.equal(out?.ctaLink, "");
+  assert.equal(out?.title, valid.title);
+});

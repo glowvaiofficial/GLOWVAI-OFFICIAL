@@ -184,8 +184,18 @@ const shortText = (v: unknown, max: number): string => (typeof v === "string" &&
 export function readHeroOverride(raw: unknown): HeroOverride | null {
   const blocks = raw && typeof raw === "object" && Array.isArray((raw as { blocks?: unknown }).blocks) ? (raw as { blocks: unknown[] }).blocks : [];
   const block = blocks.slice(0, 40).find((b) => b && typeof b === "object" && (b as { id?: unknown }).id === "hero") as { settings?: unknown } | undefined;
-  const s = block && block.settings && typeof block.settings === "object" ? (block.settings as Record<string, unknown>) : null;
-  if (!s) return null;
+  const settings = block && block.settings && typeof block.settings === "object" ? (block.settings as Record<string, unknown>) : null;
+  if (!settings) return null;
+  // The admin saves the hero nested under settings.hero (admin src/data/layout.ts); older data kept the fields flat.
+  // Read the nested object first and fall back to the flat fields, field by field.
+  const nested = settings.hero && typeof settings.hero === "object" ? (settings.hero as Record<string, unknown>) : {};
+  const s: Record<string, unknown> = {
+    title: nested.title ?? settings.title,
+    subtitle: nested.subtitle ?? settings.subtitle,
+    ctaLabel: nested.ctaLabel ?? settings.ctaLabel,
+    ctaLink: nested.ctaLink ?? settings.ctaLink,
+    image: nested.image ?? settings.image,
+  };
   const hero: HeroOverride = {
     title: shortText(s.title, 80),
     subtitle: shortText(s.subtitle, 160),
