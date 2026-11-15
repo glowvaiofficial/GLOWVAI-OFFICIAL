@@ -11,7 +11,8 @@ import { HeaderCartButton } from '../shared/HeaderCartButton';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
 import { HERO_IMAGE, useHomeNavigate } from '../lib/homeCommon';
 import type { PricePointTile } from '../lib/homeModel';
-import type { BlockItem, BlockSettings, HeroOverride } from '../lib/useHomeLayout';
+import type { BlockItem, BlockSettings, HeaderSettings, HeroOverride } from '../lib/useHomeLayout';
+import { DeliveryModeSwitch } from '../shared/NewBlocks';
 import { HOME_TABS, ctaLabelForLink, endsInText, safeInternalLink, type HomeTab } from './homeChrome';
 import { BrandLogo } from '../../../shared/BrandLogo';
 import { accentVars, itemAccent, readableTextOn, tintOf } from './accentTheme';
@@ -45,6 +46,7 @@ const TAB_ICONS: Record<string, LucideIcon> = {
 };
 
 export function MobileHomeHeader({
+  header,
   tab,
   onTab,
   location,
@@ -52,6 +54,7 @@ export function MobileHomeHeader({
   unread,
   initial,
 }: {
+  header: HeaderSettings;
   tab: HomeTab;
   onTab: (tab: HomeTab) => void;
   location: string;
@@ -81,10 +84,11 @@ export function MobileHomeHeader({
         <div className="gvh-search">
           <button type="button" className="gvh-search-btn" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
             <Search size={18} aria-hidden="true" />
-            <SearchHint />
+            <SearchHint hints={header.searchHints} />
           </button>
           <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
         </div>
+        <DeliveryModeSwitch header={header} />
         <div className="gvh-actions">
           <span className="gvh-cart-slot">
             <HeaderCartButton onOpen={() => navigate('cart-tab')} />

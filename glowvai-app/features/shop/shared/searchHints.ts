@@ -19,3 +19,10 @@ export function nextHintIndex(current: number, length: number): number {
   if (length <= 0) return 0;
   return (current + 1) % length;
 }
+
+// The text for one search hint. Built-in hints complete "Search for ..."; an admin hint that already starts with "Search"
+// is shown as written.
+export function hintText(hint: string): string {
+  const h = hint.trim();
+  return /^search\b/i.test(h) ? h : `Search for ${h}...`;
+}

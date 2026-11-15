@@ -256,7 +256,7 @@ describe("home order (the designer's blocks set it)", () => {
 
   test("the scan card shows before the footer, or last without a footer block; unknown blocks draw nothing", () => {
     assert.deepEqual(homeSequence(["footer", "hero"]), ["scan", "footer", "hero"]);
-    assert.deepEqual(homeSequence(["hero", "festival-strip"]), ["hero", "scan"]);
+    assert.deepEqual(homeSequence(["hero", "not-a-block"]), ["hero", "scan"]);
     assert.ok(Object.keys(BLOCK_MODULES).includes("deals"));
   });
 

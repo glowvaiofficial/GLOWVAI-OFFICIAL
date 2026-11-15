@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { HINT_FADE_MS, HINT_INTERVAL_MS, SEARCH_HINTS, nextHintIndex } from './searchHints';
+import { HINT_FADE_MS, HINT_INTERVAL_MS, SEARCH_HINTS, hintText, nextHintIndex } from './searchHints';
 
 // The hint text inside the home search button. The button keeps its own aria-label, so the rotating text is
 // not read out and never changes the search. With reduced motion there is no rotation: one static hint.
-export function SearchHint() {
+export function SearchHint({ hints }: { hints?: readonly string[] } = {}) {
+  // Hints the admin set replace the built-in ones.
+  const list = hints && hints.length > 0 ? hints : null;
+  const count = list ? list.length : SEARCH_HINTS.length;
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -15,7 +18,7 @@ export function SearchHint() {
     const timer = window.setInterval(() => {
       setVisible(false);
       fadeTimer = window.setTimeout(() => {
-        setIndex((i) => nextHintIndex(i, SEARCH_HINTS.length));
+        setIndex((i) => nextHintIndex(i, count));
         setVisible(true);
       }, HINT_FADE_MS);
     }, HINT_INTERVAL_MS);
@@ -24,7 +27,8 @@ export function SearchHint() {
       window.clearInterval(timer);
       if (fadeTimer !== undefined) window.clearTimeout(fadeTimer);
     };
-  }, []);
+  }, [count]);
 
-  return <span className={`shop-home-hint${visible ? ' is-visible' : ''}`}>Search for {SEARCH_HINTS[index]}...</span>;
+  const i = index % count;
+  return <span className={`shop-home-hint${visible ? ' is-visible' : ''}`}>{list ? hintText(list[i]) : `Search for ${SEARCH_HINTS[i]}...`}</span>;
 }

@@ -108,6 +108,14 @@ const SECTION_DEFAULT: Record<HomeBlockId, string> = {
   trust: ACCENT.indigo,
   'help-gift': ACCENT.lime,
   footer: ACCENT.ink,
+  'festival-strip': ACCENT.indigo,
+  'bank-offers': ACCENT.indigo,
+  cashback: ACCENT.indigo,
+  partners: ACCENT.indigo,
+  stories: ACCENT.indigo,
+  sponsored: ACCENT.indigo,
+  'recently-viewed': ACCENT.indigo,
+  recommended: ACCENT.indigo,
 };
 
 /** The admin's section accent, else the block's own default. */

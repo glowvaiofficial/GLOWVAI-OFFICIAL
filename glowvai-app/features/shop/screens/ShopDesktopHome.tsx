@@ -16,12 +16,14 @@ import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
-import { useHomeLayout, type BlockItem, type BlockSettings, type HomeBlockId } from '../lib/useHomeLayout';
+import { ITEM_BLOCK_IDS, useHomeLayout, type BlockItem, type BlockSettings, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
+import { DeliveryModeSwitch, NewItemBlock } from '../shared/NewBlocks';
+import { skinMatchedPicks } from '../lib/firstVisit';
 import { useHomeData } from '../lib/useHomeData';
 import { balancedColumns } from '../lib/homeDevice';
 import { accentHex, accentVars, blockAccent, categoryAccent, effectiveAccent, isAccent, itemAccent, type AccentName } from '../lib/desktopAccents';
 import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, homeSequence, mergeFooterSocials, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
 import '../styles/shop-desktop-home.css';
@@ -62,6 +64,14 @@ const SECTION_ACCENT: Record<HomeBlockId | 'concerns' | 'scan' | 'for-you', Acce
   trust: 'indigo',
   'help-gift': 'indigo',
   footer: 'ink',
+  'festival-strip': 'indigo',
+  'bank-offers': 'indigo',
+  cashback: 'indigo',
+  partners: 'indigo',
+  stories: 'indigo',
+  sponsored: 'indigo',
+  'recently-viewed': 'indigo',
+  recommended: 'indigo',
   concerns: 'rose',
   scan: 'sky',
   'for-you': 'sky',
@@ -759,6 +769,16 @@ export const ShopDesktopHome: React.FC = () => {
   const layout = useHomeLayout('desktop');
   const { order: layoutOrder, settings: blockSettings, hero: heroOverride, footer: footerDetails, sectionAccents } = layout;
   const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData(layout);
+  const headerSettings = layout.header;
+  // Recently viewed and Recommended (designer blocks): both hide when empty and honour the block's maxItems (default 8).
+  const recentList = useMemo(() => {
+    const byId = new Map(catalog.map((p) => [p.id, p] as const));
+    return recentIds.map((id) => byId.get(id)).filter((p): p is SkincareProduct => Boolean(p)).slice(0, clampMaxItems(blockSettings['recently-viewed']?.maxItems));
+  }, [catalog, recentIds, blockSettings]);
+  const recommendedList = useMemo(
+    () => recommendedProducts(catalog, recentIds, skinState.recommendationsOn ? skinMatchedPicks(catalog, skinState.concerns, 12) : [], clampMaxItems(blockSettings['recommended']?.maxItems)),
+    [catalog, recentIds, skinState, blockSettings]
+  );
   const adminCategories = blockSettings['categories']?.items ?? [];
   const adminPromos = blockSettings['promos']?.items ?? [];
 
@@ -1020,6 +1040,10 @@ export const ShopDesktopHome: React.FC = () => {
         );
       case 'recent':
         return recentProducts.length > 0 ? <DeskProductRail icon={Clock} title="Recently viewed" accent={railAccent(3)} products={recentProducts} /> : null;
+      case 'recently-viewed':
+        return recentList.length > 0 ? <DeskProductRail icon={Clock} title={blockSettings['recently-viewed']?.title || 'Recently viewed'} accent={secAccent('recently-viewed')} products={recentList} /> : null;
+      case 'recommended':
+        return recommendedList.length > 0 ? <DeskProductRail icon={Sparkles} title={blockSettings['recommended']?.title || 'Recommended for you'} accent={secAccent('recommended')} products={recommendedList} /> : null;
       case 'scan':
         return scanCard;
       case 'brands':
@@ -1090,6 +1114,7 @@ export const ShopDesktopHome: React.FC = () => {
           </footer>
         );
       default:
+        if ((ITEM_BLOCK_IDS as readonly string[]).includes(id)) return <NewItemBlock id={id as ItemBlockId} settings={blockSettings[id as ItemBlockId]} wide onOpenLink={openLink} />;
         return null;
     }
   };
@@ -1151,10 +1176,11 @@ export const ShopDesktopHome: React.FC = () => {
             <div className="shop-desk-search">
               <button type="button" className="shop-desk-search-input" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
                 <Search size={18} aria-hidden="true" />
-                <SearchHint />
+                <SearchHint hints={headerSettings.searchHints} />
               </button>
               <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
             </div>
+            <DeliveryModeSwitch header={headerSettings} wide />
             <nav className="shop-desk-actions" aria-label="Account and cart">
               <button type="button" className="shop-desk-scan-pill" onClick={() => navigate('scan-camera')}>
                 <ScanFace size={18} aria-hidden="true" />
