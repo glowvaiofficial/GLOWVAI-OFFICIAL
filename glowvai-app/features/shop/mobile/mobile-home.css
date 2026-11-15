@@ -1,0 +1,266 @@
+/* Mobile-web home (screens under 1024px), drawn to the premium reference (design-reference/10-home.png). Everything is
+   scoped to .gvh so the desktop home and the other shop screens are unchanged. Accents arrive as CSS variables
+   (--ac, --ac-tint, --ac-ring, --ac-text, --ac-g1, --ac-g2) worked out in accentTheme.ts, so admin colours stay readable.
+   16px side gutter on phones, 24px from 720px. Rows scroll sideways inside themselves; the page never does. */
+
+@property --tab-tint { syntax: '<color>'; inherits: true; initial-value: #e6eeff; }
+@property --tab-tint-2 { syntax: '<color>'; inherits: true; initial-value: #f0f4ff; }
+
+.glowvai-root .shop-home.gvh {
+  --gvh-page: #f6f8fd;
+  --gvh-ink: #0b1b4d;
+  --gvh-text: #1b2540;
+  --gvh-muted: #5b6782;
+  --gvh-line: #e4eaf5;
+  --gvh-blue: #0057fb;
+  --gvh-blue-dark: #0046cc;
+  --gvh-green: #1a7f37;
+  --gvh-font: var(--font-poppins, 'Poppins'), var(--font-body);
+  --gvh-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 24px rgba(11, 27, 77, .06);
+  padding-bottom: 8px;
+  background: var(--gvh-page);
+  color: var(--gvh-text);
+  font-family: var(--gvh-font);
+}
+.glowvai-root .shop-home.gvh :is(h1, h2, h3, b, strong) { font-weight: 600; }
+.glowvai-root .shop-home.gvh :is(button, a):focus-visible { outline: 2px solid var(--gvh-blue); outline-offset: 2px; }
+.glowvai-root .shop-home.gvh .gvh-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* The tablet web header repeats this header, so the home shows only its own (as the desktop home does). */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root .app-viewport:has(.gvh) .web-header { display: none; }
+}
+
+/* ---------- Header: tinted by the chosen tab ---------- */
+.glowvai-root .gvh .gvh-header { padding: 12px var(--gv-gutter) 0; background: linear-gradient(180deg, var(--tab-tint) 0%, var(--tab-tint-2) 62%, var(--gvh-page) 100%); transition: --tab-tint .32s ease, --tab-tint-2 .32s ease; }
+.glowvai-root .gvh .gvh-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc actions' 'search search search'; align-items: center; gap: 10px 12px; }
+.glowvai-root .gvh .gvh-logo { grid-area: logo; color: var(--gvh-blue); font-family: var(--gvh-font); font-size: 27px; font-weight: 700; line-height: 1; letter-spacing: -.045em; }
+.glowvai-root .gvh .gvh-location { grid-area: loc; display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; justify-self: start; gap: 4px; padding: 0 4px; color: var(--gvh-ink); font-size: 13.5px; font-weight: 500; }
+.glowvai-root .gvh .gvh-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gvh .gvh-location svg { flex: 0 0 auto; }
+.glowvai-root .gvh .gvh-location.is-static { cursor: default; }
+.glowvai-root .gvh .gvh-search { grid-area: search; display: flex; min-width: 0; height: 48px; align-items: center; gap: 6px; padding: 0 6px 0 16px; border: 1px solid rgba(11, 27, 77, .06); border-radius: 999px; background: #fff; box-shadow: 0 4px 14px rgba(11, 27, 77, .07); }
+.glowvai-root .gvh .gvh-search-btn { display: flex; flex: 1; min-width: 0; height: 100%; align-items: center; gap: 10px; color: var(--gvh-muted); font-size: 14px; text-align: left; }
+.glowvai-root .gvh .gvh-search-btn > svg { flex: 0 0 auto; color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-search-btn .shop-home-hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gvh .gvh-search .shop-home-voice { width: 38px; height: 38px; min-width: 38px; background: #f1f5ff; }
+.glowvai-root .gvh .gvh-actions { grid-area: actions; display: flex; align-items: center; gap: 4px; }
+.glowvai-root .gvh .gvh-cart-slot { display: none; }
+.glowvai-root .gvh .gvh-cart-slot:empty { display: none !important; }
+.glowvai-root .gvh .gvh-icon { position: relative; display: inline-grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-icon:hover { background: rgba(255, 255, 255, .7); }
+.glowvai-root .gvh .gvh-dot { position: absolute; top: 10px; right: 11px; width: 9px; height: 9px; border: 2px solid #fff; border-radius: 50%; background: #e0245e; }
+.glowvai-root .gvh .gvh-avatar { display: inline-grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--gvh-ink); color: #fff; font-size: 15px; font-weight: 600; box-shadow: 0 0 0 2px #fff; }
+
+/* Tabs */
+.glowvai-root .gvh .gvh-tabs { display: flex; gap: 8px; margin: 14px calc(-1 * var(--gv-gutter)) 0; padding: 0 var(--gv-gutter) 12px; overflow-x: auto; scrollbar-width: none; }
+.glowvai-root .gvh .gvh-tabs::-webkit-scrollbar { display: none; }
+.glowvai-root .gvh .gvh-tab { display: inline-flex; flex: 0 0 auto; min-height: 42px; align-items: center; gap: 7px; padding: 0 16px; border: 1px solid var(--gvh-line); border-radius: 999px; background: #fff; color: var(--gvh-ink); font-size: 13.5px; font-weight: 500; white-space: nowrap; transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.glowvai-root .gvh .gvh-tab svg { color: var(--ac-text); }
+.glowvai-root .gvh .gvh-tab:hover { border-color: var(--ac-ring); }
+.glowvai-root .gvh .gvh-tab.is-on { border-color: transparent; background: linear-gradient(135deg, var(--ac-g1), var(--ac-g2)); color: #fff; font-weight: 600; box-shadow: 0 6px 16px color-mix(in srgb, var(--ac-g1) 30%, transparent); }
+.glowvai-root .gvh .gvh-tab.is-on svg { color: #fff; }
+.glowvai-root .gvh .gvh-tab.is-all svg { color: var(--gvh-ink); }
+
+/* Skin quiz strip under the header */
+.glowvai-root .gvh .shop-quiz-banner { margin: 4px var(--gv-gutter) 0; border: 1px solid #d6e3ff; border-radius: 16px; background: #fff; }
+
+/* ---------- Greeting card ---------- */
+.glowvai-root .gvh .gvh-greet { display: flex; align-items: center; gap: 12px; margin: 8px var(--gv-gutter) 0; padding: 12px 12px 12px 14px; border: 1px solid var(--gvh-line); border-radius: 18px; background: rgba(255, 255, 255, .94); box-shadow: var(--gvh-shadow); }
+.glowvai-root .gvh .gvh-greet-icon { display: inline-grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: linear-gradient(160deg, #e8f0ff, #d6e4ff); color: var(--gvh-blue); }
+.glowvai-root .gvh .gvh-greet-copy { display: grid; flex: 1 1 auto; min-width: 0; gap: 1px; }
+.glowvai-root .gvh .gvh-greet-copy b { overflow: hidden; color: var(--gvh-ink); font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gvh .gvh-greet-copy small { color: var(--gvh-muted); font-size: 11.5px; }
+.glowvai-root .gvh .gvh-greet-eta { display: flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid var(--gvh-line); color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-greet-eta svg { flex: 0 0 auto; }
+.glowvai-root .gvh .gvh-greet-eta span { display: grid; min-width: 0; }
+.glowvai-root .gvh .gvh-greet-eta b { font-size: 12px; font-weight: 500; }
+.glowvai-root .gvh .gvh-greet-eta small { overflow: hidden; color: var(--gvh-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gvh .gvh-track { display: inline-flex; flex: 0 0 auto; min-height: 40px; align-items: center; gap: 4px; padding: 0 14px; border-radius: 999px; background: var(--gvh-blue); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 6px 14px rgba(0, 87, 251, .25); }
+.glowvai-root .gvh .gvh-track:hover { background: var(--gvh-blue-dark); }
+
+/* ---------- Hero carousel ---------- */
+.glowvai-root .shop-home.gvh .gvh-hero { position: relative; min-height: 0; margin: 14px var(--gv-gutter) 0; overflow: hidden; border-radius: 22px; background: linear-gradient(135deg, #e3ecff, #c9dbff); box-shadow: var(--gvh-shadow); }
+/* The older showcase overlay (shop-home.css) is not used here. */
+.glowvai-root .shop-home.gvh .gvh-hero::after { content: none; }
+.glowvai-root .gvh .gvh-preview-note { position: relative; z-index: 2; margin: 0; padding: 8px 12px; background: #fff4d6; color: #6b4a00; font-size: 13px; font-weight: 600; }
+.glowvai-root .gvh .gvh-hero-track { display: flex; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.glowvai-root .gvh .gvh-slide { position: relative; display: flex; flex: 0 0 100%; min-height: 212px; align-items: center; overflow: hidden; color: var(--gvh-ink); text-decoration: none; }
+.glowvai-root .gvh .gvh-slide > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% center; }
+.glowvai-root .gvh .gvh-slide.is-hero .gvh-slide-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(232, 240, 255, .97) 0%, rgba(232, 240, 255, .88) 42%, rgba(232, 240, 255, .2) 72%, rgba(232, 240, 255, 0) 100%); }
+.glowvai-root .gvh .gvh-slide-copy { position: relative; z-index: 1; display: grid; max-width: 64%; justify-items: start; gap: 6px; padding: 20px 18px 34px; }
+.glowvai-root .gvh .gvh-slide-tag { padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, .78); color: #16357c; font-size: 11.5px; font-weight: 600; }
+.glowvai-root .gvh .gvh-slide h1,
+.glowvai-root .gvh .gvh-slide strong { color: inherit; font-size: 27px; font-weight: 700; line-height: 1.08; letter-spacing: -.03em; }
+.glowvai-root .gvh .gvh-slide.is-hero h1 { color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-slide p,
+.glowvai-root .gvh .gvh-slide-sub { color: inherit; font-size: 13.5px; line-height: 1.4; opacity: .85; }
+.glowvai-root .gvh .gvh-slide-btn { display: inline-flex; min-height: 42px; align-items: center; gap: 6px; margin-top: 6px; padding: 0 18px; border-radius: 999px; background: #0b1b4d; color: #fff; font-size: 13.5px; font-weight: 600; }
+.glowvai-root .gvh .gvh-slide.is-banner .gvh-slide-btn { background: #fff; color: #0b0f1a; }
+.glowvai-root .gvh .gvh-dots { position: absolute; bottom: 12px; left: 18px; z-index: 2; display: flex; gap: 6px; }
+.glowvai-root .gvh .gvh-dots button { width: 8px; height: 8px; padding: 0; border-radius: 999px; background: rgba(11, 27, 77, .22); transition: width .3s ease, background .3s ease; }
+.glowvai-root .gvh .gvh-dots button.is-on { width: 22px; background: var(--gvh-blue); }
+.glowvai-root .gvh .gvh-dots button::after { content: ''; position: absolute; inset: -14px -6px; }
+.glowvai-root .gvh .gvh-dots button { position: relative; }
+
+/* ---------- Sections and heads ---------- */
+.glowvai-root .gvh .gvh-section { margin-top: 26px; }
+.glowvai-root .gvh .gvh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 var(--gv-gutter) 12px; }
+.glowvai-root .gvh .gvh-head-titles { display: grid; min-width: 0; gap: 2px; }
+.glowvai-root .gvh .gvh-head h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: #0b0f1a; font-size: 20px; font-weight: 600; letter-spacing: -.015em; }
+.glowvai-root .gvh .gvh-head p { color: var(--gvh-muted); font-size: 12.5px; }
+.glowvai-root .gvh .gvh-see-all { display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; color: var(--gvh-blue); font-size: 14px; font-weight: 600; }
+.glowvai-root .gvh .gvh-zap { color: #f4a261; }
+.glowvai-root .gvh .gvh-star { color: #e0b23e; }
+.glowvai-root .gvh .gvh-ends { display: inline-flex; align-items: center; padding: 4px 11px; border: 1px solid #f7c6d6; border-radius: 999px; background: #fdecf2; color: #b3215a; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.glowvai-root .gvh .gvh-empty { margin: 0 var(--gv-gutter); color: var(--gvh-muted); font-size: 13px; }
+
+/* ---------- Categories ---------- */
+.glowvai-root .gvh .gvh-cats-section { margin-top: 22px; }
+.glowvai-root .gvh .gvh-cats { display: flex; gap: 10px; padding: 2px var(--gv-gutter) 4px; overflow-x: auto; scroll-padding-inline: var(--gv-gutter); scroll-snap-type: x proximity; scrollbar-width: none; }
+.glowvai-root .gvh .gvh-cats::-webkit-scrollbar { display: none; }
+.glowvai-root .gvh .gvh-cat { display: grid; flex: 0 0 82px; justify-items: center; gap: 7px; scroll-snap-align: start; color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-cat-media { display: grid; width: 82px; height: 82px; overflow: hidden; place-items: center; border: 1px solid var(--ac-ring); border-radius: 20px; background: linear-gradient(150deg, var(--ac-tint), var(--ac-ring)); color: var(--ac-text); transition: transform .2s ease, box-shadow .2s ease; }
+.glowvai-root .gvh .gvh-cat-media img { width: 80%; height: 80%; object-fit: contain; mix-blend-mode: multiply; }
+.glowvai-root .gvh .gvh-cat-label { max-width: 90px; color: var(--gvh-ink); font-size: 12px; font-weight: 500; line-height: 1.25; text-align: center; }
+@media (hover: hover) {
+  .glowvai-root .gvh .gvh-cat:hover .gvh-cat-media { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(11, 27, 77, .1); }
+}
+
+/* ---------- Promos: two offer cards ---------- */
+.glowvai-root .gvh .gvh-promos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 18px var(--gv-gutter) 0; }
+.glowvai-root .gvh .gvh-promo { position: relative; display: flex; min-height: 124px; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 3px; overflow: hidden; padding: 14px 44px 14px 14px; border: 1px solid var(--ac-ring); border-radius: 20px; text-align: left; box-shadow: var(--gvh-shadow); }
+.glowvai-root .gvh .gvh-promo.is-dark { border-color: transparent; background: linear-gradient(135deg, var(--ac-g1), var(--ac-g2)); color: #fff; }
+.glowvai-root .gvh .gvh-promo.is-light { background: linear-gradient(135deg, var(--ac-tint), var(--ac-ring)); color: #0b0f1a; }
+.glowvai-root .gvh .gvh-promo-orb { position: absolute; right: -36px; bottom: -48px; width: 130px; height: 130px; border-radius: 50%; background: #fff; opacity: .12; }
+.glowvai-root .gvh .gvh-promo.is-light .gvh-promo-orb { opacity: .45; }
+.glowvai-root .gvh .gvh-promo-icon { position: absolute; top: 14px; right: 14px; opacity: .9; }
+.glowvai-root .gvh .gvh-promo.is-light .gvh-promo-icon { color: var(--ac-text); }
+.glowvai-root .gvh .gvh-promo-img { position: absolute; top: 10px; right: 10px; width: 44%; height: 52%; object-fit: contain; }
+.glowvai-root .gvh .gvh-promo-kicker { margin-bottom: 4px; padding: 3px 10px; border-radius: 999px; background: rgba(255, 255, 255, .18); font-size: 11px; font-weight: 600; }
+.glowvai-root .gvh .gvh-promo.is-light .gvh-promo-kicker { background: #fff; color: var(--ac-text); }
+.glowvai-root .gvh .gvh-promo-title { font-size: 17px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
+.glowvai-root .gvh .gvh-promo-sub { font-size: 12px; line-height: 1.35; opacity: .9; }
+.glowvai-root .gvh .gvh-promo-go { position: absolute; right: 12px; bottom: 12px; display: inline-grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: #fff; color: var(--ac-g1); }
+.glowvai-root .gvh .gvh-promo.is-light .gvh-promo-go { background: var(--ac-g1); color: #fff; }
+.glowvai-root .gvh .gvh-promo.has-bg { border-color: transparent; }
+.glowvai-root .gvh .gvh-promos > .gvh-promo:only-child { grid-column: 1 / -1; }
+
+/* ---------- Product cards ---------- */
+.glowvai-root .gvh .gvh-rail { display: flex; gap: 12px; padding: 2px var(--gv-gutter) 6px; overflow-x: auto; scroll-padding-inline: var(--gv-gutter); scroll-snap-type: x proximity; scrollbar-width: none; }
+.glowvai-root .gvh .gvh-rail::-webkit-scrollbar { display: none; }
+.glowvai-root .gvh .gvh-card { display: flex; flex: 0 0 152px; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--gvh-line); border-radius: 18px; background: #fff; scroll-snap-align: start; box-shadow: var(--gvh-shadow); transition: transform .2s ease, box-shadow .2s ease; }
+.glowvai-root .gvh .gvh-card-media { position: relative; display: block; aspect-ratio: 1 / 1; margin: 6px 6px 0; overflow: hidden; border-radius: 14px; background: linear-gradient(160deg, #f6f7fb, var(--ac-tint, #eef2fb)); }
+.glowvai-root .gvh .gvh-card-open { display: grid; width: 100%; height: 100%; place-items: center; }
+.glowvai-root .gvh .gvh-card-open img { width: 84%; height: 84%; object-fit: contain; mix-blend-mode: multiply; }
+.glowvai-root .gvh .gvh-card-fallback { padding: 8px; color: var(--gvh-muted); font-size: 12px; font-weight: 600; text-align: center; }
+.glowvai-root .gvh .gvh-heart { position: absolute; top: 6px; right: 6px; display: inline-grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .95); color: var(--gvh-ink); box-shadow: 0 1px 4px rgba(11, 27, 77, .12); }
+.glowvai-root .gvh .gvh-heart.is-on { color: #e0245e; }
+.glowvai-root .gvh .gvh-off { position: absolute; bottom: 6px; left: 6px; padding: 3px 8px; border-radius: 999px; background: #d9f6dc; color: #136c2a; font-size: 10.5px; font-weight: 700; }
+.glowvai-root .gvh .gvh-card-body { display: flex; flex: 1; flex-direction: column; gap: 3px; padding: 8px 10px 10px; }
+.glowvai-root .gvh .gvh-card-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.glowvai-root .gvh .gvh-card-price b { color: #0b0f1a; font-size: 16.5px; font-weight: 700; }
+.glowvai-root .gvh .gvh-card-price s { color: #8a94a8; font-size: 12px; }
+.glowvai-root .gvh .gvh-card-name { display: -webkit-box; min-height: 34px; overflow: hidden; color: var(--gvh-text); font-size: 12.5px; line-height: 1.35; text-align: left; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.glowvai-root .gvh .gvh-card-foot { display: flex; justify-content: flex-end; margin-top: auto; padding-top: 6px; }
+.glowvai-root .gvh .gvh-add { display: inline-flex; min-height: 36px; align-items: center; gap: 4px; padding: 0 14px; border-radius: 999px; background: var(--gvh-blue); color: #fff; font-size: 13px; font-weight: 600; transition: background .15s ease; }
+.glowvai-root .gvh .gvh-add:hover { background: var(--gvh-blue-dark); }
+.glowvai-root .gvh .gvh-stepper { display: inline-flex; height: 36px; align-items: center; border-radius: 999px; background: var(--gvh-blue); color: #fff; }
+.glowvai-root .gvh .gvh-stepper button { display: inline-grid; width: 34px; height: 36px; place-items: center; color: #fff; }
+.glowvai-root .gvh .gvh-stepper b { min-width: 16px; font-size: 13px; text-align: center; }
+.glowvai-root .gvh .gvh-card.is-skel { height: 270px; box-shadow: none; animation: gvh-pulse 1.4s ease-in-out infinite; }
+.glowvai-root .gvh .gvh-card.is-skel .gvh-card-media { background: #eef2fb; }
+.glowvai-root .gvh .gvh-skel-line { display: block; height: 12px; margin: 10px 10px 0; border-radius: 6px; background: #eef2fb; }
+.glowvai-root .gvh .gvh-skel-line.is-short { width: 50%; }
+@keyframes gvh-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@media (hover: hover) {
+  .glowvai-root .gvh .gvh-card:not(.is-skel):hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(11, 27, 77, .1); }
+}
+
+/* ---------- Trending tiles, offers, brands, trust ---------- */
+.glowvai-root .gvh .gvh-trend-row,
+.glowvai-root .gvh .gvh-offer-row { display: flex; gap: 10px; padding: 2px var(--gv-gutter) 6px; overflow-x: auto; scrollbar-width: none; }
+.glowvai-root .gvh .gvh-trend-row::-webkit-scrollbar,
+.glowvai-root .gvh .gvh-offer-row::-webkit-scrollbar { display: none; }
+.glowvai-root .gvh .gvh-trend { display: grid; flex: 0 0 96px; justify-items: center; gap: 6px; padding: 6px 6px 9px; border: 1px solid var(--ac-ring); border-radius: 18px; background: var(--ac-tint); color: #0b0f1a; }
+.glowvai-root .gvh .gvh-trend-media { display: grid; width: 100%; aspect-ratio: 1 / .85; overflow: hidden; place-items: center; border-radius: 13px; color: var(--ac-text); }
+.glowvai-root .gvh .gvh-trend-media img { width: 100%; height: 100%; object-fit: cover; }
+.glowvai-root .gvh .gvh-trend-label { font-size: 11.5px; font-weight: 500; line-height: 1.25; text-align: center; }
+.glowvai-root .gvh .gvh-offer { display: flex; flex: 0 0 240px; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--ac-ring); border-radius: 16px; background: var(--ac-tint); color: #0b0f1a; text-align: left; }
+.glowvai-root .gvh .gvh-offer-icon { display: inline-grid; flex: 0 0 auto; width: 40px; height: 40px; overflow: hidden; place-items: center; border-radius: 12px; background: linear-gradient(135deg, var(--ac-g1), var(--ac-g2)); color: #fff; }
+.glowvai-root .gvh .gvh-offer-icon img { width: 100%; height: 100%; object-fit: cover; }
+.glowvai-root .gvh .gvh-offer-copy { display: grid; min-width: 0; gap: 1px; }
+.glowvai-root .gvh .gvh-offer-copy b { font-size: 13.5px; }
+.glowvai-root .gvh .gvh-offer-copy small { font-size: 11.5px; line-height: 1.35; opacity: .85; }
+.glowvai-root .gvh .gvh-brands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 0 var(--gv-gutter); }
+.glowvai-root .gvh .gvh-brand { display: grid; aspect-ratio: 1 / 1; overflow: hidden; place-items: center; padding: 8px; border: 1px solid var(--ac-ring); border-radius: 16px; background: #fff; color: var(--ac-text); font-size: 12px; font-weight: 600; text-align: center; }
+.glowvai-root .gvh .gvh-brand img { width: 100%; height: 100%; object-fit: contain; }
+.glowvai-root .gvh .gvh-trust { margin-right: var(--gv-gutter); margin-left: var(--gv-gutter); padding: 18px 0; border: 1px solid var(--gvh-line); border-radius: 20px; background: #fff; }
+.glowvai-root .gvh .gvh-trust .gvh-head { margin-left: 16px; margin-right: 16px; }
+.glowvai-root .gvh .gvh-trust-row { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 8px; padding: 0 12px; }
+.glowvai-root .gvh .gvh-trust-item { display: grid; justify-items: center; align-content: start; gap: 6px; color: inherit; text-align: center; }
+.glowvai-root .gvh .gvh-trust-icon { display: inline-grid; width: 48px; height: 48px; overflow: hidden; place-items: center; border: 1px solid var(--ac-ring); border-radius: 50%; background: var(--ac-tint); color: var(--ac-text); }
+.glowvai-root .gvh .gvh-trust-icon img { width: 30px; height: 30px; object-fit: contain; }
+.glowvai-root .gvh .gvh-trust-item b { font-size: 12.5px; line-height: 1.3; }
+.glowvai-root .gvh .gvh-trust-item small { color: var(--gvh-muted); font-size: 11px; line-height: 1.35; }
+
+/* ---------- Membership, help and gift banners ---------- */
+.glowvai-root .gvh .gvh-plus-list { display: grid; gap: 10px; padding: 0 var(--gv-gutter); }
+.glowvai-root .gvh .gvh-plus { position: relative; display: flex; align-items: center; gap: 12px; overflow: hidden; padding: 16px 14px; border-radius: 20px; background: linear-gradient(135deg, #16234a, #0b1530); color: #fff; text-align: left; box-shadow: var(--gvh-shadow); }
+.glowvai-root .gvh .gvh-plus-orb { position: absolute; top: -70px; right: 50px; width: 150px; height: 150px; border-radius: 50%; background: var(--ac); opacity: .24; }
+.glowvai-root .gvh .gvh-plus-icon { position: relative; display: inline-grid; flex: 0 0 auto; width: 44px; height: 44px; overflow: hidden; place-items: center; border: 1px solid rgba(243, 213, 142, .6); border-radius: 50%; background: rgba(255, 255, 255, .08); color: #f3d58e; }
+.glowvai-root .gvh .gvh-plus-icon img { width: 100%; height: 100%; object-fit: cover; }
+.glowvai-root .gvh .gvh-plus-copy { position: relative; display: grid; flex: 1; min-width: 0; gap: 2px; }
+.glowvai-root .gvh .gvh-plus-copy b { color: #f3d58e; font-size: 16.5px; font-weight: 700; }
+.glowvai-root .gvh .gvh-plus.has-bg .gvh-plus-copy b { color: inherit; }
+.glowvai-root .gvh .gvh-plus-copy small { font-size: 12px; line-height: 1.4; opacity: .9; }
+.glowvai-root .gvh .gvh-plus-cta { position: relative; display: inline-flex; flex: 0 0 auto; min-height: 40px; align-items: center; gap: 4px; padding: 0 16px; border-radius: 999px; background: #fff; color: #0b0f1a; font-size: 13px; font-weight: 600; }
+
+/* ---------- Concern picks, notices, tail ---------- */
+.glowvai-root .gvh .gvh-concern { animation: gvh-rise .35s cubic-bezier(.2, .7, .2, 1) both; }
+.glowvai-root .gvh .gvh-concern > .gvh-empty { margin-top: 16px; }
+@keyframes gvh-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.glowvai-root .gvh .gvh-notice { border-radius: 20px; }
+.glowvai-root .gvh .gvh-retry { background: var(--gvh-blue); }
+.glowvai-root .gvh .gvh-scan { border-radius: 22px; background: radial-gradient(120% 90% at 100% 0%, rgba(157, 196, 255, .35) 0%, rgba(157, 196, 255, 0) 55%), linear-gradient(135deg, var(--gvh-blue) 0%, #0039b3 55%, #0b1b4d 100%); }
+.glowvai-root .gvh .gvh-scan h2 { font-weight: 700; }
+.glowvai-root .gvh .gvh-end h2 { font-weight: 700; }
+.glowvai-root .gvh .gvh-end .shop-home-end-btn { background: var(--gvh-blue); }
+.glowvai-root .gvh .shop-home-footer { font-family: var(--gvh-font); }
+
+/* ---------- Wider phones and tablets ---------- */
+@media (min-width: 560px) {
+  .glowvai-root .gvh .gvh-top { grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc search actions'; }
+  .glowvai-root .gvh .gvh-location { max-width: 170px; }
+}
+@media (min-width: 720px) {
+  .glowvai-root .gvh .gvh-header { padding-top: 18px; }
+  .glowvai-root .gvh .gvh-cart-slot { display: inline-flex; }
+  .glowvai-root .gvh .gvh-slide { min-height: 300px; }
+  .glowvai-root .gvh .gvh-slide-copy { max-width: 56%; padding: 28px 30px 40px; }
+  .glowvai-root .gvh .gvh-slide h1,
+  .glowvai-root .gvh .gvh-slide strong { font-size: 40px; }
+  .glowvai-root .gvh .gvh-slide p,
+  .glowvai-root .gvh .gvh-slide-sub { font-size: 16px; }
+  .glowvai-root .gvh .gvh-cats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); overflow: visible; }
+  .glowvai-root .gvh .gvh-cat-media { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+  .glowvai-root .gvh .gvh-promo { min-height: 150px; padding: 20px 56px 20px 20px; }
+  .glowvai-root .gvh .gvh-promo-title { font-size: 22px; }
+  .glowvai-root .gvh .gvh-promo-sub { font-size: 13.5px; }
+  .glowvai-root .gvh .gvh-card { flex-basis: 168px; }
+  .glowvai-root .gvh .gvh-brands { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .glowvai-root .gvh .gvh-trend { flex-basis: 112px; }
+  .glowvai-root .gvh .gvh-plus { padding: 20px; }
+}
+
+@media (max-width: 360px) {
+  .glowvai-root .gvh .gvh-greet-eta { display: none; }
+  .glowvai-root .gvh .gvh-slide-copy { max-width: 74%; }
+  .glowvai-root .gvh .gvh-slide h1,
+  .glowvai-root .gvh .gvh-slide strong { font-size: 23px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root .gvh *, .glowvai-root .gvh *::before, .glowvai-root .gvh *::after { animation: none !important; transition: none !important; }
+  .glowvai-root .gvh .gvh-header { transition: none; }
+}
