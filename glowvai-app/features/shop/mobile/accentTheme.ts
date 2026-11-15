@@ -7,7 +7,7 @@
 import { ACCENT, accentFor, readAccent } from '../../../../lib/shop/accents';
 import type { HomeBlockId } from '../lib/useHomeLayout';
 
-export const ACCENT_INK = '#1F2A44';
+export const ACCENT_INK = '#1E293B';
 export const WHITE = '#FFFFFF';
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -75,6 +75,8 @@ export interface AccentTheme {
   ring: string;
   /** Accent-coloured text that reads on the tint and on white. */
   text: string;
+  /** White or deep ink, whichever reads on the solid accent (hover, press, selected). */
+  on: string;
   /** Rich gradient for offer cards; white reads at 4.5:1 on both stops. */
   gradient: [string, string];
 }
@@ -83,28 +85,28 @@ export function accentTheme(accent: string): AccentTheme {
   const a = readAccent(accent) || ACCENT_INK;
   const tint = tintOf(a, 0.12);
   const start = accentTextOn(a, WHITE, 4.5);
-  return { accent: a, tint, ring: tintOf(a, 0.28), text: accentTextOn(a, tint), gradient: [start, shade(start, 0.22)] };
+  return { accent: a, tint, ring: tintOf(a, 0.28), text: accentTextOn(a, tint), on: readableTextOn(a), gradient: [start, shade(start, 0.22)] };
 }
 
 /** CSS custom properties for an element drawn in one accent (--ac, --ac-tint, --ac-ring, --ac-text, --ac-g1, --ac-g2). */
 export function accentVars(accent: string): Record<string, string> {
   const t = accentTheme(accent);
-  return { '--ac': t.accent, '--ac-tint': t.tint, '--ac-ring': t.ring, '--ac-text': t.text, '--ac-g1': t.gradient[0], '--ac-g2': t.gradient[1] };
+  return { '--ac': t.accent, '--ac-tint': t.tint, '--ac-ring': t.ring, '--ac-text': t.text, '--ac-on': t.on, '--ac-g1': t.gradient[0], '--ac-g2': t.gradient[1] };
 }
 
 // Each section's colour when the admin set none: one per block, stable when blocks are reordered.
 const SECTION_DEFAULT: Record<HomeBlockId, string> = {
   hero: ACCENT.amethyst,
   'mini-banners': ACCENT.sky,
-  offers: ACCENT.coral,
+  offers: ACCENT.berry,
   categories: ACCENT.amethyst,
-  promos: ACCENT.peach,
+  promos: ACCENT.teal,
   deals: ACCENT.rose,
-  reorder: ACCENT.sage,
+  reorder: ACCENT.lime,
   'product-rails': ACCENT.sky,
-  brands: ACCENT.champagne,
-  trust: ACCENT.champagne,
-  'help-gift': ACCENT.sage,
+  brands: ACCENT.indigo,
+  trust: ACCENT.indigo,
+  'help-gift': ACCENT.lime,
   footer: ACCENT.ink,
 };
 

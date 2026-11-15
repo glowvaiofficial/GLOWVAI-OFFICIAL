@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Poppins, Syne } from 'next/font/google';
 import { GlowVaiShop } from '@/glowvai-app/GlowVaiShop';
 import { siteConfig } from '@/config/site';
 import { AffiliateClickCapture } from '@/components/affiliate/AffiliateClickCapture';
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Poppins for the premium shop screens (mobile home, cart, checkout, payment, confirming, tracking). Self-hosted by
+// Poppins (body and UI) and Syne (display: headings, hero, prices) for the shop, per the design spec. Poppins for the premium shop screens (mobile home, cart, checkout, payment, confirming, tracking). Self-hosted by
 // next/font, so the browser loads it from this site (font-src 'self'). Exposed as --font-poppins; the rest of the shop keeps
 // its own fonts.
 const poppins = Poppins({
@@ -23,13 +23,21 @@ const poppins = Poppins({
   preload: false,
 });
 
+const syne = Syne({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-syne',
+  display: 'swap',
+  preload: false,
+});
+
 export function generateStaticParams() {
   return [{ slug: [] }];
 }
 
 export default function ShopPage() {
   return (
-    <div className={poppins.variable} style={{ display: 'contents' }}>
+    <div className={`${poppins.variable} ${syne.variable}`} style={{ display: 'contents' }}>
       <AffiliateClickCapture />
       <GlowVaiShop />
     </div>

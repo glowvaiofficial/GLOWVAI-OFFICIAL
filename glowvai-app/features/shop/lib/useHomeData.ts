@@ -5,8 +5,7 @@ import { useProductFeedStatus } from '../../../core/services/productFeed';
 import { parsePriceBand, pickDeals } from '../../../../lib/shop/homeLayout';
 import { browserStore, firstVisitState, skinMatchedPicks } from './firstVisit';
 import { readRecentlyViewed } from './recentlyViewed';
-import { categoryTiles, dedupeRails } from './homeModel';
-import type { RailCandidate } from './homeModel';
+import { bestsellerList, categoryTiles, newLaunchList, pricePointTiles } from './homeModel';
 import type { HomeLayoutView } from './useHomeLayout';
 import { getDiscountPercent, isTrialProduct } from '../shared/shopUtils';
 
@@ -21,7 +20,7 @@ export function buildCatalogLists(catalog: SkincareProduct[]) {
   // Deals are real catalogue products with a discount from their own MRP.
   const DEAL_PRODUCTS = FULL_SIZE_PRODUCTS.filter((p) => getDiscountPercent(p) > 0)
     .sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a))
-    .slice(0, 4);
+    .slice(0, 12);
   return { FULL_SIZE_PRODUCTS, TOP_RATED, UNDER_500, DEAL_PRODUCTS };
 }
 
@@ -57,16 +56,11 @@ export function useHomeData(layout: Pick<HomeLayoutView, 'settings' | 'rows'>) {
     [skinState, lists.FULL_SIZE_PRODUCTS]
   );
 
-  // Each product appears in one rail only, in this order.
-  const rails = useMemo(() => {
-    const candidates: RailCandidate[] = [
-      { id: 'picks', title: 'Picked for your skin', products: picksCandidates, limit: 6 },
-      { id: 'continue', title: 'Continue browsing', products: continueCandidates, limit: 10 },
-      { id: 'top', title: 'Top Rated', products: lists.TOP_RATED, limit: 6 },
-      { id: 'under500', title: 'Under ₹500', products: lists.UNDER_500, limit: 6 },
-    ];
-    return dedupeRails(candidates);
-  }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
+  // Each rail has its own order, so a product can sit in more than one (as on any store home). Recently viewed is the customer's own history.
+  const bestsellers = useMemo(() => bestsellerList(catalog).slice(0, 12), [catalog]);
+  const newLaunches = useMemo(() => newLaunchList(catalog).slice(0, 12), [catalog]);
+  const picks = useMemo(() => picksCandidates.slice(0, 10), [picksCandidates]);
+  const pricePoints = useMemo(() => pricePointTiles(catalog), [catalog]);
 
   const layoutRows = layout.rows;
   // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
@@ -90,5 +84,5 @@ export function useHomeData(layout: Pick<HomeLayoutView, 'settings' | 'rows'>) {
   const adminDealProducts = useMemo(() => pickDeals(adminDeals, catalog), [adminDeals, catalog]);
   const dealProducts = adminDeals.length > 0 ? adminDealProducts : lists.DEAL_PRODUCTS;
 
-  return { catalog, feed, loading, failed, noProducts, lists, tiles, recentIds, skinState, rails, configuredRows, adminDeals, dealProducts };
+  return { catalog, feed, loading, failed, noProducts, lists, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts: continueCandidates, configuredRows, adminDeals, dealProducts };
 }

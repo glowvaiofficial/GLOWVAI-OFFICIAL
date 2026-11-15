@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { BrandLogo } from '../shared/BrandLogo';
 import '../responsive/entry-scan.css';
 
 export const WelcomeScreen: React.FC = () => {
@@ -27,8 +28,8 @@ export const WelcomeScreen: React.FC = () => {
         color: '#fff',
       }}
     >
-      <span className="brand-wordmark" style={{ transform: 'translateY(-54px)', fontSize: 'clamp(46px, 14vw, 64px)', fontWeight: 500, letterSpacing: '-.065em' }}>
-        glowvai
+      <span style={{ transform: 'translateY(-54px)' }}>
+        <BrandLogo height={56} white />
       </span>
       <strong style={{ position: 'absolute', bottom: '11%', color: 'var(--ds-ink)', fontSize: 18, fontWeight: 800, letterSpacing: '-.02em' }}>
         always for you!!

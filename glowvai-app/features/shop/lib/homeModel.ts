@@ -3,6 +3,7 @@
 
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ScreenName } from '../../../context/contextDefinition';
+import type { HomeBlockId } from './useHomeLayout';
 import { isTrialProduct } from '../shared/shopUtils';
 
 export type HomeCategoryId = SkincareProduct['category'];
@@ -119,3 +120,74 @@ export const HOME_FOOTER_GROUPS: FooterGroup[] = [
     ],
   },
 ];
+
+// ---- Price-point tiles, bestsellers and new launches: all from the live catalogue (full-size products only).
+
+export const PRICE_POINTS = [299, 499, 999] as const;
+
+export interface PricePointTile {
+  max: number;
+  label: string;
+  count: number;
+  // A product under the limit whose photo the tile shows (the best rated one).
+  sample: SkincareProduct | null;
+}
+
+const fullSize = (catalog: SkincareProduct[]) => catalog.filter((p) => !isTrialProduct(p));
+
+// One tile per price point that has at least one product under it. A price point with none is left out (nothing empty).
+export function pricePointTiles(catalog: SkincareProduct[]): PricePointTile[] {
+  const products = fullSize(catalog);
+  return PRICE_POINTS.flatMap((max) => {
+    const under = products.filter((p) => p.price > 0 && p.price < max);
+    if (under.length === 0) return [];
+    const best = [...under].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))[0];
+    return [{ max, label: `Under ₹${max}`, count: under.length, sample: best ?? null }];
+  });
+}
+
+// Best rated first (then most reviewed). Trial samples are left out.
+export function bestsellerList(catalog: SkincareProduct[]): SkincareProduct[] {
+  return fullSize(catalog).sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
+}
+
+// The newest listings first (the catalogue lists new products last).
+export function newLaunchList(catalog: SkincareProduct[]): SkincareProduct[] {
+  return fullSize(catalog).reverse();
+}
+
+// ---- Home order: one structure for the phone and the PC home (design spec section 5).
+
+export type HomeModuleId = HomeBlockId | 'price-points' | 'bestsellers' | 'new-launches' | 'concerns' | 'recent' | 'scan';
+
+// The admin designer controls the order and on/off of the blocks (layout `blocks`). Each block draws one or more modules;
+// modules the designer has no block for stay anchored right after their related block, so they move with it. To draw a new
+// designer block, add one entry here (and its case in the homes). Unknown block ids draw nothing.
+export const BLOCK_MODULES: Readonly<Record<string, readonly HomeModuleId[]>> = {
+  hero: ['hero'],
+  categories: ['categories'],
+  offers: ['offers'],
+  promos: ['promos'],
+  deals: ['deals', 'price-points'],
+  'product-rails': ['bestsellers', 'new-launches', 'product-rails', 'concerns'],
+  brands: ['brands'],
+  'mini-banners': ['mini-banners'],
+  reorder: ['reorder', 'recent'],
+  'help-gift': ['help-gift'],
+  trust: ['trust'],
+  footer: ['scan', 'footer'],
+};
+
+
+// The modules to draw, in the designer's block order. Blocks the layout leaves out stay hidden. The scan card always
+// shows, before the footer (or last when the footer block is off).
+export function homeSequence(layoutOrder: readonly string[]): HomeModuleId[] {
+  const out: HomeModuleId[] = [];
+  for (const id of layoutOrder) for (const m of BLOCK_MODULES[id] ?? []) if (!out.includes(m)) out.push(m);
+  if (!out.includes('scan')) {
+    const f = out.indexOf('footer');
+    if (f >= 0) out.splice(f, 0, 'scan');
+    else out.push('scan');
+  }
+  return out;
+}
