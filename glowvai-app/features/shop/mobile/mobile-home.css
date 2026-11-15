@@ -15,7 +15,7 @@
   --gvh-blue: #0057fb;
   --gvh-blue-dark: #0046cc;
   --gvh-green: #1a7f37;
-  --gvh-font: var(--font-poppins, 'Poppins'), var(--font-body);
+  --gvh-font: var(--gv-font);
   --gvh-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 24px rgba(11, 27, 77, .06);
   padding-bottom: 8px;
   background: var(--gvh-page);

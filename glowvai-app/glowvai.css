@@ -1,20 +1,4 @@
 /* Scoped copy of the NOV FINAL stylesheet. Every rule is limited to .glowvai-root so the landing site is unaffected. */
-@font-face {
-  font-family: 'Manrope';
-  src: url('/glowvai/assets/fonts/manrope-latin.woff2') format('woff2');
-  font-weight: 400 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Syne';
-  src: url('/glowvai/assets/fonts/syne-latin.woff2') format('woff2');
-  font-weight: 500 800;
-  font-style: normal;
-  font-display: swap;
-}
-
 .glowvai-root{
   --commerce-blue: #075cff;
   --primary: #0057fb;
@@ -45,9 +29,11 @@
   --insurance: #2854c5;
   --insurance-bg: #edf2ff;
   --insurance-border: #cdd9fb;
-  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-brand: 'Syne', 'Manrope', sans-serif;
+  /* ONE system UI font (design spec section 9). Everything else aliases this token; no web fonts are loaded. */
+  --gv-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-body: var(--gv-font);
+  --font-heading: var(--gv-font);
+  --font-brand: var(--gv-font);
   --shadow-float: 0 10px 30px rgba(31, 45, 78, .12);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }

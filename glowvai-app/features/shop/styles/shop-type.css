@@ -1,10 +1,9 @@
-/* Typography tokens for the shop homes (design spec section 9). Display and prices: Syne 600/700/800. Body and UI: Poppins
-   400/500/600. Both are loaded with next/font on /shop (app/shop/[[...slug]]/page.tsx) as --font-syne and --font-poppins.
+/* Typography tokens for the shop homes (design spec section 9). One system font (--gv-font); 500 and 700 weights, 400 for body copy.
    Sizes live here only; the phone and PC homes read them. */
 .glowvai-root .shop-home.gvh,
 .glowvai-root .shop-screen.shop-desk{
-  --gv-font-display: var(--font-syne, 'Syne'), var(--font-poppins, 'Poppins'), sans-serif;
-  --gv-font-ui: var(--font-poppins, 'Poppins'), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --gv-font-display: var(--gv-font);
+  --gv-font-ui: var(--gv-font);
   --t-display: 28px;      --t-display-lh: 32px;
   --t-h1: 22px;           --t-h1-lh: 28px;
   --t-h2: 18px;           --t-h2-lh: 24px;

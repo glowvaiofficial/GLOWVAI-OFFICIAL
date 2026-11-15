@@ -119,3 +119,21 @@ export const cartLineFor = (product: SkincareProduct) => {
 
 // Products with sizes, shades or packs are chosen on the product page, not added from a card or a rail.
 export const hasVariantOptions = (product: SkincareProduct): boolean => (product.variants?.length ?? 0) > 0;
+
+export type SearchSort = 'relevance' | 'price-asc' | 'price-desc' | 'rating';
+
+export const SEARCH_SORT_LABELS: Record<SearchSort, string> = {
+  relevance: 'Relevance',
+  'price-asc': 'Price: low to high',
+  'price-desc': 'Price: high to low',
+  rating: 'Top rated',
+};
+
+// Returns a new list; "relevance" keeps the catalogue order. Products without a rating sort last for "Top rated".
+export const sortProducts = <T extends { price: number; rating?: number | null }>(products: readonly T[], sort: SearchSort): T[] => {
+  const list = [...products];
+  if (sort === 'price-asc') return list.sort((a, b) => a.price - b.price);
+  if (sort === 'price-desc') return list.sort((a, b) => b.price - a.price);
+  if (sort === 'rating') return list.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+  return list;
+};
