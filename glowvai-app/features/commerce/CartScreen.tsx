@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Minus, Plus, ShieldCheck, ShoppingBag, Tag, Trash2, Truck, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronRight, Heart, Minus, Plus, ShoppingBag, Tag, Trash2, X } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useCartStore } from '../../core/state/cartStore';
 import { lineKeyOf } from '../../../lib/shop/variants';
@@ -7,7 +7,8 @@ import { safeHapticImpact, safeHapticSelection } from '../../core/utils/haptics'
 import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { quoteBag } from './lib/bagQuote';
-import { BillRows, CheckoutSteps, DeliveryPill, FlowHeader, useDeliveryAddress } from './components/shared';
+import { useDeliveryAddress } from './components/shared';
+import { AddressBlock, EmptyState, FreeDeliveryCard, HelpRow, PremiumHeader, PriceSummary, Thumb, rupee } from './components/premium';
 
 type SkippedItem = { name: string; reason: string };
 
@@ -22,20 +23,22 @@ const readSkipped = (params: unknown): SkippedItem[] => {
 // Lists the items a "buy it again" could not add, and why. Shown whether or not the bag has other items.
 const ReorderNotice: React.FC<{ items: SkippedItem[] }> = ({ items }) =>
   items.length === 0 ? null : (
-    <section className="commerce-card commerce-reorder-notice" role="status" aria-label="Items not added">
+    <section className="gvp-card gvp-notice" role="status" aria-label="Items not added">
       <h2>Not added from your last order</h2>
       <ul>
         {items.map((item, i) => (
           <li key={`${item.name}-${i}`}>
-            <b>{item.name}</b> <span className="commerce-muted">{item.reason}</span>
+            <b>{item.name}</b> <span className="gvp-muted">{item.reason}</span>
           </li>
         ))}
       </ul>
     </section>
   );
 
+// The cart (step 1 of checkout). Phones: one column with the button pinned at the bottom. 1024px and wider: items on the
+// left, the order summary and the button in a sticky column on the right.
 export const CartScreen: React.FC = () => {
-  const { goBack, navigate, showToast, activeParams } = useApp();
+  const { goBack, navigate, showToast, activeParams, wishlist, toggleWishlist } = useApp();
   // Items from a "buy it again" that could not be added, with the reason (see useBuyAgain).
   const skipped = readSkipped(activeParams);
   const items = useCartStore((s) => s.items);
@@ -50,7 +53,7 @@ export const CartScreen: React.FC = () => {
   const address = useDeliveryAddress();
   const [codeInput, setCodeInput] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
-  const [confirmClear, setConfirmClear] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const cartItems = Object.values(items);
 
@@ -93,200 +96,205 @@ export const CartScreen: React.FC = () => {
 
   if (cartItems.length === 0) {
     return (
-      <main className="commerce-screen commerce-cart is-empty">
-        <FlowHeader title="Your cart" onBack={goBack} />
-        <div className="commerce-body">
+      <main className="commerce-screen gvp gvp-cart is-empty">
+        <PremiumHeader brand title="Your cart" onBack={goBack} />
+        <div className="commerce-body gvp-body">
           <ReorderNotice items={skipped} />
-          <div className="commerce-empty-state is-card">
-            <span className="commerce-empty-icon">
-              <ShoppingBag size={34} />
-            </span>
-            <h2>Your cart is empty</h2>
-            <p>Add skincare and beauty essentials from the shop and they will show up here.</p>
-            <button className="commerce-primary" onClick={goBack}>
-              Start shopping
-            </button>
-          </div>
+          <EmptyState Icon={ShoppingBag} title="Your cart is empty" body="Add skincare and beauty essentials from the shop and they will show up here." action="Start shopping" onAction={goBack} />
         </div>
       </main>
     );
   }
 
-  const showProgress = totals.deliveryFee > 0 || totals.isFreeDelivery;
+  const couponBlock = (
+    <section className="gvp-coupon" aria-label="Coupon">
+      {totals.flashSavings > 0 && (
+        <p className="gvp-offer-note" role="status">
+          <Tag size={14} aria-hidden="true" /> Flash sale: you save {rupee(totals.flashSavings)}
+        </p>
+      )}
+      {totals.offerLabel && totals.couponDiscount > 0 && (
+        <p className="gvp-offer-note" role="status">
+          <Tag size={14} aria-hidden="true" /> Offer applied: {totals.offerLabel} You save {rupee(totals.couponDiscount)}
+        </p>
+      )}
+      {totals.couponCode ? (
+        <div className="gvp-save is-coupon">
+          <span className="gvp-save-icon" aria-hidden="true">
+            <Tag size={18} />
+          </span>
+          <span className="gvp-save-copy">
+            <b>
+              {totals.couponCode} <Check size={15} aria-label="applied" />
+            </b>
+            <small>{totals.couponDiscount > 0 ? `You saved ${rupee(totals.couponDiscount)} on this order` : 'Applied. The saving shows once the server confirms it.'}</small>
+          </span>
+          <button
+            type="button"
+            className="gvp-icon-btn"
+            onClick={() => {
+              setCouponCode(null);
+              showToast('Coupon removed');
+            }}
+            aria-label={`Remove coupon ${totals.couponCode}`}
+          >
+            <X size={16} aria-hidden="true" />
+          </button>
+        </div>
+      ) : (
+        <form className="gvp-coupon-form" onSubmit={applyCoupon} noValidate>
+          <label className="gvp-input">
+            <Tag size={18} aria-hidden="true" />
+            <input
+              value={codeInput}
+              onChange={(e) => {
+                setCodeInput(e.target.value.toUpperCase());
+                setCodeError(null);
+              }}
+              placeholder="Enter coupon code"
+              aria-label="Coupon code"
+              aria-invalid={codeError ? true : undefined}
+              aria-describedby={codeError ? 'cart-coupon-error' : undefined}
+              autoCapitalize="characters"
+            />
+          </label>
+          <button className="gvp-btn is-soft" type="submit">
+            Apply
+          </button>
+          {codeError && (
+            <em className="gvp-error" id="cart-coupon-error">
+              {codeError}
+            </em>
+          )}
+        </form>
+      )}
+    </section>
+  );
 
   return (
-    <main className="commerce-screen commerce-cart has-aside">
-      <FlowHeader
+    <main className="commerce-screen gvp gvp-cart has-aside">
+      <PremiumHeader
+        brand
         title="Your cart"
-        subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}${address ? ` · ${address.city}` : ''}`}
+        subtitle={`${totals.itemCount} ${totals.itemCount === 1 ? 'item' : 'items'}${address?.etaMinutes ? ` · Delivery in about ${address.etaMinutes} mins` : ''}`}
         onBack={goBack}
-        right={<DeliveryPill minutes={address?.etaMinutes} />}
+        right={
+          <button type="button" className="gvp-link" aria-pressed={editing} onClick={() => setEditing((v) => !v)}>
+            {editing ? 'Done' : 'Edit Cart'}
+          </button>
+        }
       />
-      <CheckoutSteps step={1} />
 
-      <div className="commerce-body commerce-split">
+      <div className="commerce-body commerce-split gvp-body">
         <div className="commerce-main">
+          <AddressBlock
+            address={address}
+            heading="Deliver to"
+            onChange={() => navigate('address-saved', { returnTo: 'cart-tab' })}
+            onAdd={() => navigate('location-setup', { returnTo: 'cart-tab' })}
+          />
           <ReorderNotice items={skipped} />
-          {showProgress && (
-            <section className="commerce-card commerce-progress">
-              <div className="commerce-progress-top">
-                <Truck size={17} />
-                <p>
-                  {totals.isFreeDelivery
-                    ? 'You get free delivery on this order'
-                    : `Add ₹${totals.amountNeededForFreeDelivery} more for free delivery`}
-                </p>
-                <b>Free above ₹{FREE_DELIVERY_ABOVE}</b>
-              </div>
-              <div className="commerce-bar" aria-hidden="true">
-                <span style={{ width: `${totals.freeDeliveryProgress * 100}%` }} />
-              </div>
-            </section>
-          )}
 
-          <section className="commerce-card" aria-label="Items in cart">
-            <div className="commerce-card-head">
-              <h2>Items in your cart ({cartItems.length})</h2>
-              {confirmClear ? (
-                <span className="commerce-inline-confirm">
-                  Remove all items?
-                  <button className="commerce-link" onClick={() => setConfirmClear(false)}>
-                    Keep
-                  </button>
-                  <button
-                    className="commerce-link is-danger"
-                    onClick={() => {
-                      clearCart();
-                      setConfirmClear(false);
-                    }}
-                  >
-                    Clear
-                  </button>
-                </span>
-              ) : (
-                <button className="commerce-link" onClick={() => setConfirmClear(true)}>
-                  Clear cart
+          <section aria-labelledby="cart-items-title">
+            <div className="gvp-section-head">
+              <h2 id="cart-items-title">Items in your cart ({totals.itemCount})</h2>
+              {editing && (
+                <button
+                  type="button"
+                  className="gvp-link is-danger"
+                  onClick={() => {
+                    clearCart();
+                    setEditing(false);
+                    showToast('Cart cleared');
+                  }}
+                >
+                  Remove all
                 </button>
               )}
             </div>
-            {cartItems.map((item) => (
-              <article className="commerce-line" key={lineKeyOf(item.productId, item.variantId)}>
-                <div className="commerce-thumb">
-                  {item.image ? <img src={item.image} alt="" onError={(e) => (e.currentTarget.style.display = 'none')} /> : <ShoppingBag size={22} />}
-                </div>
-                <div className="commerce-line-copy">
-                  <small>{item.brand}</small>
-                  <h3>{item.name}</h3>
-                  {item.variantLabel && <small className="commerce-variant">{item.variantLabel}</small>}
-                  <p>
-                    <b>₹{item.price * item.quantity}</b>
-                    {item.mrp && item.mrp > item.price && <s>₹{item.mrp * item.quantity}</s>}
-                    {item.quantity > 1 && <span className="commerce-each">₹{item.price} each</span>}
-                  </p>
-                </div>
-                <div className="commerce-line-foot">
-                  <div className="commerce-stepper">
-                    <button
-                      onClick={() => {
-                        safeHapticSelection();
-                        decrementItem(lineKeyOf(item.productId, item.variantId));
-                      }}
-                      aria-label={item.quantity === 1 ? `Remove ${item.name}` : `Remove one ${item.name}`}
-                    >
-                      <Minus size={14} />
-                    </button>
-                    <b aria-live="polite">{item.quantity}</b>
-                    <button
-                      onClick={() => {
-                        safeHapticSelection();
-                        incrementItem(lineKeyOf(item.productId, item.variantId));
-                      }}
-                      aria-label={`Add one ${item.name}`}
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                  <button className="commerce-remove" onClick={() => removeItem(lineKeyOf(item.productId, item.variantId))} aria-label={`Remove ${item.name} from cart`}>
-                    <Trash2 size={14} /> Remove
-                  </button>
-                </div>
-              </article>
-            ))}
+            <div className="gvp-card gvp-lines">
+              {cartItems.map((item) => {
+                const key = lineKeyOf(item.productId, item.variantId);
+                const saved = wishlist.includes(item.productId);
+                return (
+                  <article className="gvp-line" key={key}>
+                    <Thumb src={item.image}>
+                      <button
+                        type="button"
+                        className={`gvp-heart${saved ? ' is-on' : ''}`}
+                        onClick={() => toggleWishlist(item.productId)}
+                        aria-pressed={saved}
+                        aria-label={saved ? `Remove ${item.name} from wishlist` : `Save ${item.name} to wishlist`}
+                      >
+                        <Heart size={14} aria-hidden="true" fill={saved ? 'currentColor' : 'none'} />
+                      </button>
+                    </Thumb>
+                    <div className="gvp-line-copy">
+                      {item.brand && <b className="gvp-line-brand">{item.brand}</b>}
+                      <h3>{item.name}</h3>
+                      {item.variantLabel && <small>{item.variantLabel}</small>}
+                      <p className="gvp-line-price">
+                        <b>{rupee(item.price * item.quantity)}</b>
+                        {item.mrp && item.mrp > item.price && <s>{rupee(item.mrp * item.quantity)}</s>}
+                        {item.quantity > 1 && <span>{rupee(item.price)} each</span>}
+                      </p>
+                    </div>
+                    <div className="gvp-line-actions">
+                      <div className="gvp-stepper">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            safeHapticSelection();
+                            decrementItem(key);
+                          }}
+                          aria-label={item.quantity === 1 ? `Remove ${item.name}` : `Remove one ${item.name}`}
+                        >
+                          <Minus size={15} aria-hidden="true" />
+                        </button>
+                        <b aria-live="polite">{item.quantity}</b>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            safeHapticSelection();
+                            incrementItem(key);
+                          }}
+                          aria-label={`Add one ${item.name}`}
+                        >
+                          <Plus size={15} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <button type="button" className="gvp-icon-btn" onClick={() => removeItem(key)} aria-label={`Remove ${item.name} from cart`}>
+                        <Trash2 size={17} aria-hidden="true" />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </section>
+
+          <FreeDeliveryCard totals={totals} threshold={FREE_DELIVERY_ABOVE} />
         </div>
 
         <aside className="commerce-aside">
-          <section className="commerce-card commerce-coupon" aria-label="Coupon">
-            {totals.flashSavings > 0 && (
-              <p className="commerce-offer-note" role="status"><Tag size={14} /> Flash sale: you save ₹{totals.flashSavings}</p>
-            )}
-            {totals.offerLabel && totals.couponDiscount > 0 && (
-              <p className="commerce-offer-note" role="status"><Tag size={14} /> Offer applied: {totals.offerLabel} You save ₹{totals.couponDiscount}</p>
-            )}
-            {totals.couponCode ? (
-              <div className="commerce-coupon-applied">
-                <Tag size={18} />
-                <div>
-                  <b>{totals.couponCode} applied</b>
-                  <p>You save ₹{totals.couponDiscount}</p>
-                </div>
-                <button
-                  className="commerce-link is-danger"
-                  onClick={() => {
-                    setCouponCode(null);
-                    showToast('Coupon removed');
-                  }}
-                >
-                  <X size={14} /> Remove
-                </button>
-              </div>
-            ) : (
-              <form className="commerce-coupon-form" onSubmit={applyCoupon} noValidate>
-                <label className="commerce-search">
-                  <Tag size={18} />
-                  <input
-                    value={codeInput}
-                    onChange={(e) => {
-                      setCodeInput(e.target.value.toUpperCase());
-                      setCodeError(null);
-                    }}
-                    placeholder="Enter coupon code"
-                    aria-label="Coupon code"
-                    aria-invalid={codeError ? true : undefined}
-                    autoCapitalize="characters"
-                  />
-                </label>
-                <button className="commerce-chip" type="submit">
-                  Apply
-                </button>
-                {codeError && <em className="commerce-error">{codeError}</em>}
-              </form>
-            )}
-          </section>
-
-          <section className="commerce-card commerce-bill" aria-labelledby="cart-bill-title">
-            <h2 id="cart-bill-title">Bill details</h2>
-            <BillRows totals={totals} />
-            {!address && <p className="commerce-bill-note">Delivery charge is confirmed once you add your address.</p>}
-            {totals.totalSavings > 0 && (
-              <p className="commerce-assure">
-                <ShieldCheck size={14} /> You save ₹{totals.totalSavings} on this order
-              </p>
-            )}
-            <button className="commerce-primary is-wide commerce-aside-cta" onClick={checkout}>
-              Proceed to checkout <ArrowRight size={18} />
+          <section className="gvp-card gvp-summary" aria-labelledby="cart-summary-title">
+            <h2 id="cart-summary-title" className="gvp-sr">
+              Price details
+            </h2>
+            <PriceSummary totals={totals} note={!address ? 'Delivery charge is confirmed once you add your address.' : undefined}>
+              {couponBlock}
+              <HelpRow onClick={() => navigate('profile-support')} />
+            </PriceSummary>
+            <button type="button" className="gvp-btn is-block commerce-aside-cta" onClick={checkout}>
+              Proceed to Checkout <ArrowRight size={18} aria-hidden="true" />
             </button>
           </section>
         </aside>
       </div>
 
-      <footer className="commerce-sticky-bar">
-        <div>
-          <small>Total payable</small>
-          <b>₹{totals.grandTotal}</b>
-        </div>
-        <button className="commerce-primary" onClick={checkout}>
-          Checkout <ArrowRight size={18} />
+      <footer className="commerce-sticky-bar gvp-bar">
+        <button type="button" className="gvp-btn is-block" onClick={checkout}>
+          Proceed to Checkout · {rupee(totals.grandTotal)} <ChevronRight size={18} aria-hidden="true" />
         </button>
       </footer>
     </main>
