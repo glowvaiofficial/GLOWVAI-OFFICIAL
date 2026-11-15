@@ -236,7 +236,7 @@ export const PaymentProcessingScreen: React.FC = () => {
   }, []);
 
   return (
-    <main className="commerce-screen commerce-processing" aria-busy="true">
+    <main className="commerce-screen commerce-processing gvp gvp-processing" aria-busy="true">
       <header className="commerce-processing-head">
         <span className="commerce-brand">
           <Shield size={17} />
