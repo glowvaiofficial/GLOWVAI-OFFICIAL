@@ -940,12 +940,13 @@ export const ShopDesktopHome: React.FC = () => {
               </div>
             ))}
           </DeskRail>
-        ) : (
+        ) : previewing ? (
+          // Staff preview only: say why the section is empty. Customers never see an empty deals section.
           <section className="shop-desk-section" aria-labelledby="shop-desk-deals-title" style={accentStyle(accent)}>
             <SectionHead id="shop-desk-deals-title" icon={Zap} title={dealsTitle} />
-            <p className="shop-desk-empty">No discounted products right now.</p>
+            <p className="shop-desk-empty">No discounted products right now. This section is hidden for customers until there are deals.</p>
           </section>
-        );
+        ) : null;
       }
       case 'reorder':
         return <DeskReorderRail catalog={catalog} accent={secAccent('reorder')} />;
