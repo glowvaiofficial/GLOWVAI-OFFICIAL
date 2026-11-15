@@ -7,6 +7,9 @@ import type { DocumentData, Firestore, Transaction } from "firebase-admin/firest
 import { firestoreRepo, wrapTx } from "./growth/firestoreRepo";
 import { releaseStockTx, retakeStockTx } from "./platformStockTx";
 import { razorpayKeyId } from "./razorpay";
+import { createRazorpayRefund, findRazorpayRefund } from "./refunds";
+import type { RefundProvider, RefundStore } from "./refundFlow";
+import { refundLatePayment, type LateRefundResult } from "./latePayment";
 import {
   IDEMPOTENCY_COLLECTION,
   IDEMPOTENCY_WINDOW_MS,
@@ -36,7 +39,7 @@ const CLOSE_TEXT: Record<CloseMode, { reason: string; event: string; coins: stri
 
 // Closes one unpaid online order: platform stock and coins go back (each once) and the order is CANCELLED. EXPIRED
 // only closes an order whose payment window has passed. A paid, cancelled or COD order is never touched. A payment that
-// Razorpay confirms later still places the order (verify and the webhook take the stock and coins again).
+// Razorpay captures later does not place it again: it is refunded automatically (lib/shop/latePayment.ts).
 export async function closeUnpaidOrder(store: Firestore, orderId: string, mode: CloseMode, now = Date.now()): Promise<boolean> {
   const repo = firestoreRepo(store);
   const ref = store.collection("orders").doc(orderId);
@@ -102,7 +105,7 @@ export async function expireIfStale(store: Firestore, orderId: string, order: Do
 
 // Daily backstop (run by the existing cleanup cron): closes expired unpaid orders and deletes Idempotency-Key records
 // older than their window. Bounded per run; the next run continues. Returns counts only.
-export async function sweepUnpaidOrders(store: Firestore, now = Date.now(), max = 300): Promise<{ expired: number; keysDeleted: number }> {
+export async function sweepUnpaidOrders(store: Firestore, now = Date.now(), max = 300): Promise<{ expired: number; keysDeleted: number; lateRefundsRetried: number }> {
   let expired = 0;
   const pending = await store.collection("orders").where("status", "==", "PAYMENT_PENDING").limit(max).get();
   for (const d of pending.docs) {
@@ -115,7 +118,17 @@ export async function sweepUnpaidOrders(store: Firestore, now = Date.now(), max 
     keys.docs.forEach((d) => batch.delete(d.ref));
     await batch.commit();
   }
-  return { expired, keysDeleted: keys.size };
+  // Late payments on closed orders whose refund was started but never recorded (for example the function stopped
+  // mid-way): the refund is tried again (idempotent; it looks up an earlier attempt before sending).
+  let lateRefundsRetried = 0;
+  const stuck = await store.collection("orders").where("latePayment.status", "==", "REFUNDING").limit(50).get();
+  for (const d of stuck.docs) {
+    const late = d.data().latePayment as { paymentId?: unknown; at?: unknown } | undefined;
+    if (typeof late?.paymentId !== "string" || now - Number(late.at ?? 0) < 10 * 60_000) continue;
+    await refundLatePaymentLive(store, d.id, late.paymentId);
+    lateRefundsRetried++;
+  }
+  return { expired, keysDeleted: keys.size, lateRefundsRetried };
 }
 
 // The reply for an order that already exists (an Idempotency-Key replay or a reused unpaid order). An unpaid online
@@ -249,10 +262,10 @@ export async function settlePendingBeforeOrder(
   return result;
 }
 
-// A payment confirmed by Razorpay (verify or the webhook) for an order whose stock or coins were given back (a failed
-// attempt, or the order was closed as unpaid before the money arrived): the stock and coins are taken again, never
-// below zero, and a closed order is placed again. Call right after the transaction reads the order and before any
-// write; then call commit() and add `patch` and `notes` to the order update.
+// A payment confirmed by Razorpay (verify or the webhook) for a PAYMENT_PENDING order whose stock or coins were given
+// back by a failed attempt: the stock and coins are taken again, never below zero. Not for an order already closed as
+// unpaid (see latePayment.ts: that payment is refunded instead). Call right after the transaction reads the order and
+// before any write; then call commit() and add `patch` and `notes` to the order update.
 export async function paymentArrivalTx(
   tx: Transaction,
   store: Firestore,
@@ -265,8 +278,6 @@ export async function paymentArrivalTx(
   const stock = await retakeStockTx(tx, store, o.stockReservation, now);
   const coinsDone = coins.ok ? coins : { commit: () => undefined, patch: {}, short: 0 };
   const notes: { at: number; actor: string; event: string }[] = [];
-  const reopened = String(o.status ?? "") === "CANCELLED";
-  if (reopened) notes.push({ at: now, actor: "Payment provider", event: "The payment arrived after the order was closed as unpaid, so the order was placed again." });
   if (stock.shortNote) notes.push({ at: now, actor: "Stock", event: stock.shortNote });
   const coinsNote = coinsShortNote(coinsDone.short);
   if (coinsNote) notes.push({ at: now, actor: "Coins", event: coinsNote });
@@ -275,7 +286,6 @@ export async function paymentArrivalTx(
     patch: {
       ...stock.patch,
       ...coinsDone.patch,
-      ...(reopened ? { cancellationReason: null, cancelledBy: null, closedUnpaid: null, reopenedAfterPaymentAt: now } : {}),
     },
     notes,
   };
@@ -300,4 +310,30 @@ export async function paymentFailedTx(
   });
   const stock = await releaseStockTx(tx, store, o.stockReservation, now);
   return { commit: coins.commit, patch: { ...stock.patch, ...coins.patch } };
+}
+
+// Refunds a payment that arrived for an order already closed as unpaid (steps 2 and 3 in latePayment.ts), through the
+// shared refund flow. Safe to call from both the webhook and verify; never throws. Without Razorpay keys the order is
+// flagged for the team (needsReview) instead.
+export async function refundLatePaymentLive(store: Firestore, orderId: string, paymentId: string): Promise<LateRefundResult> {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const secret = process.env.RAZORPAY_KEY_SECRET;
+  const orders: RefundStore = {
+    update: (id, fn) =>
+      store.runTransaction(async (tx) => {
+        const ref = store.collection("orders").doc(id);
+        const snap = await tx.get(ref);
+        const { result, patch } = fn(snap.exists ? (snap.data() as Record<string, unknown>) : null);
+        if (patch && snap.exists) tx.update(ref, patch);
+        return result;
+      }),
+  };
+  const creds = keyId && secret ? { keyId, secret } : null;
+  const provider: RefundProvider | null = creds
+    ? {
+        create: (pid, input) => createRazorpayRefund(creds, pid, input),
+        find: (pid, requestId) => findRazorpayRefund(creds, pid, requestId),
+      }
+    : null;
+  return refundLatePayment(orderId, paymentId, { store: orders, provider });
 }

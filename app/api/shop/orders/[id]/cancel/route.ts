@@ -87,6 +87,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         status: "CANCELLED",
         cancellationReason: reason,
         cancelledBy: "customer",
+        ...(String(o.status) === "PAYMENT_PENDING" ? { closedUnpaid: "CUSTOMER" } : {}),
         updatedAt: now,
         ...(reservation ? { "stockReservation.releasedAt": now } : {}),
         ...coins.patch,

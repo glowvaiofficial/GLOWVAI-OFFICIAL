@@ -28,7 +28,7 @@ export function outcomeFromOrderStatus(orderId: string, answer: OrderStatusAnswe
   if (!answer.ok) return { kind: 'unconfirmed', message: UNCONFIRMED_MESSAGE };
   const status = String(answer.orderStatus ?? '').toUpperCase();
   if (!NOT_PLACED.has(status)) return { kind: 'placed', orderId };
-  if (status === 'CANCELLED') return { kind: 'failed', message: 'This order was closed before the payment was confirmed. If money was taken, the order will be confirmed automatically or the money refunded.' };
+  if (status === 'CANCELLED') return { kind: 'failed', message: 'This order was closed before the payment was confirmed. If money was taken, it will be refunded to you automatically.' };
   return { kind: 'unconfirmed', message: UNCONFIRMED_MESSAGE };
 }
 

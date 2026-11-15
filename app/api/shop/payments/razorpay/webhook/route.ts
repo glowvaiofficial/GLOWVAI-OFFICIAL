@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
-import { paymentArrivalTx, paymentFailedTx } from "@/lib/shop/pendingOrders";
+import { paymentArrivalTx, paymentFailedTx, refundLatePaymentLive } from "@/lib/shop/pendingOrders";
+import { isClosedUnpaid, lateRefundDue, latePaymentPatch } from "@/lib/shop/latePayment";
 import { notifyCustomer } from "@/lib/shop/notify";
 import { notifyOfferPool } from "@/lib/vendor/notify";
 import { topupWebhookLive } from "@/lib/shop/wallet/live";
@@ -61,15 +62,27 @@ export async function POST(req: NextRequest) {
   // Set inside the transaction when this event changed the order; the customer is told after it commits.
   let notice = null as { uid: string; type: "order_placed" | "payment_failed" } | null;
   let offerPool: { orderId: string; pincode: string } | null = null;
+  // Set when this capture is for an order already closed as unpaid: refunded after the transaction, never placed.
+  let lateRefund = false;
   // The order, its platform stock and its coins change together: a failed payment gives the stock and the coins back
-  // (once each), and a payment confirmed after that (or after the order was closed as unpaid) takes them again. The
-  // order is read inside the transaction before anything is written.
+  // (once each), and a payment confirmed after that takes them again. A payment for an order already closed as unpaid
+  // is not placed: it is refunded (lib/shop/latePayment.ts). The order is read inside the transaction before anything
+  // is written.
   await store.runTransaction(async (tx) => {
+    lateRefund = false;
     const snap = await tx.get(doc.ref);
     const o = snap.data();
     if (!snap.exists || !o) return;
     const history = Array.isArray(o.events) ? o.events : [];
-    if (event.event === "payment.captured" && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
+    if (event.event === "payment.captured" && entity.id && isClosedUnpaid(o)) {
+      // The order was closed (expired, replaced or cancelled) before the money arrived: it stays cancelled, its stock
+      // and coins are not taken again, and the payment is refunded below.
+      tx.update(doc.ref, latePaymentPatch(o, { paymentId: entity.id, now, via: "webhook" }));
+      lateRefund = true;
+    } else if (event.event === "payment.captured" && lateRefundDue(o, String(entity.id ?? ""))) {
+      // A repeat of a late capture whose refund is not done yet (or verify recorded it first): try the refund again.
+      lateRefund = true;
+    } else if (event.event === "payment.captured" && !isClosedUnpaid(o) && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
       const arrival = await paymentArrivalTx(tx, store, doc.id, o, now);
       arrival.commit();
       tx.update(doc.ref, {
@@ -96,6 +109,8 @@ export async function POST(req: NextRequest) {
       if (String(o.status ?? "") !== "CANCELLED") notice = { uid: String(o.userId ?? ""), type: "payment_failed" };
     }
   });
+  // Refund of a late payment on a closed order. Never throws: a failure flags the order for the team (needsReview).
+  if (lateRefund && entity.id) await refundLatePaymentLive(store, doc.id, entity.id);
   // Customer notification after the transaction. notifyCustomer never throws, so the webhook still answers Razorpay.
   if (notice?.uid) await notifyCustomer(notice.uid, { type: notice.type, relatedId: doc.id });
   const pool = offerPool as { orderId: string; pincode: string } | null;

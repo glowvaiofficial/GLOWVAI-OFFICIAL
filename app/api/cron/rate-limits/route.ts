@@ -14,7 +14,8 @@ export const dynamic = "force-dynamic";
 // The response carries counts only: no keys, IPs or uids.
 // The same daily run is the backstop for unpaid online orders: PAYMENT_PENDING orders past their payment window are
 // closed (stock and coins back) and expired Idempotency-Key records are deleted. Orders are also expired lazily when
-// the customer reads them or places a new order, so this run only catches the ones nobody looked at.
+// the customer reads them or places a new order, so this run only catches the ones nobody looked at. It also retries
+// automatic refunds of late payments on closed orders that were started but never recorded.
 const PAGE = 300;
 const ROUNDS = 10;
 
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
     if (round === ROUNDS - 1) truncated = true;
   }
 
-  let unpaid: { expired: number; keysDeleted: number } | { error: true } = { error: true };
+  let unpaid: { expired: number; keysDeleted: number; lateRefundsRetried: number } | { error: true } = { error: true };
   try {
     unpaid = await sweepUnpaidOrders(store, now);
   } catch (err) {
