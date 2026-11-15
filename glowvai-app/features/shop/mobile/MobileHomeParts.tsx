@@ -64,10 +64,10 @@ export function MobileHomeHeader({
 }) {
   const navigate = useHomeNavigate();
   return (
-    <header className="gvh-header" style={{ '--tab-tint': tintOf(tab.accent, 0.2, '#F6F8FD'), '--tab-tint-2': tintOf(tab.accent, 0.08, '#F6F8FD') } as React.CSSProperties}>
+    <header className="gvh-header" style={{ '--wash': tab.accent, '--wash-on': readableTextOn(tab.accent) } as React.CSSProperties}>
       <div className="gvh-top">
         <span className="gvh-logo">
-          <BrandLogo height={26} />
+          <BrandLogo height={26} white={readableTextOn(tab.accent) === '#FFFFFF'} />
         </span>
         {embedded ? (
           <span className="gvh-location is-static">

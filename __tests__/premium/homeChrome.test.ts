@@ -148,10 +148,10 @@ describe("accent colours stay readable", () => {
 
   test("section and item accents: the admin's, else the defaults", () => {
     assert.equal(sectionAccent("deals", "#abcdef"), "#ABCDEF");
-    assert.equal(sectionAccent("deals", ""), "#F43F5E");
-    assert.equal(sectionAccent("offers", "nope"), "#C026D3");
+    assert.equal(sectionAccent("deals", ""), "#0057FB");
+    assert.equal(sectionAccent("offers", "nope"), "#0057FB");
     assert.equal(itemAccent({ accent: "#112233", label: "Serums" }, 3), "#112233");
-    assert.equal(itemAccent({ label: "Serums" }, 3), "#7C3AED");
-    assert.equal(itemAccent({ label: "Something" }, 9), GLOWVAI_ACCENTS[1]);
+    assert.equal(itemAccent({ label: "Serums" }, 3), "#0057FB");
+    assert.equal(itemAccent({ label: "Something" }, 9), "#0057FB");
   });
 });

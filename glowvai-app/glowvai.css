@@ -29,7 +29,6 @@
   --insurance: #2854c5;
   --insurance-bg: #edf2ff;
   --insurance-border: #cdd9fb;
-  /* ONE system UI font (design spec section 9). Everything else aliases this token; no web fonts are loaded. */
   --gv-font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-body: var(--gv-font);
   --font-heading: var(--gv-font);
@@ -821,7 +820,7 @@
   --ds-shadow: 0 6px 24px rgba(26, 54, 120, .05); --ds-shadow-hover: 0 14px 32px rgba(26, 54, 120, .1);
   --ds-gutter: var(--gv-gutter); --ds-gap: 12px; --ds-section: 28px;
   --ds-h1: 24px; --ds-h2: 19px; --ds-body: 14px; --ds-small: 12px;
-  --ds-control: 48px; --ds-aside: 360px; --ds-sticky-top: 16px; --ds-star: #f59e0b;
+  --ds-control: 48px; --ds-aside: 360px; --ds-sticky-top: 16px; --ds-star: #0057fb;
 }
 @media (min-width: 720px){
   .glowvai-root{ --ds-gap: 16px; --ds-section: 36px; --ds-h1: 28px; --ds-h2: 22px; --ds-sticky-top: 88px; }

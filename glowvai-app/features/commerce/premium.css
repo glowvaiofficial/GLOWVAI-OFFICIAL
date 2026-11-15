@@ -1,6 +1,6 @@
 /* Premium cart, checkout (delivery details), payment, processing and confirming screens. Everything sits under .gvp, so
    other screens are unchanged. Soft page, white cards with hairline borders, 16-20px corners, brand blue #0057FB for the
-   primary action, green for savings, the system font token --gv-font.
+   primary action, green for savings, the system UI font stack (--gv-font).
    Phones follow the reference screens one to one; from 1024px the shared .commerce-split puts the content on the left
    and the sticky summary with the primary button on the right (responsive/commerce-ported.css). */
 

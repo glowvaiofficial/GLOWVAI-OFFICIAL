@@ -1,4 +1,5 @@
-/* Typography tokens for the shop homes (design spec section 9). One system font (--gv-font); 500 and 700 weights, 400 for body copy.
+/* Typography tokens for the shop homes (design spec section 9). One system UI font stack (--gv-font, defined in glowvai.css),
+   medium and bold weights, tabular numerals for prices, MRP and phone numbers.
    Sizes live here only; the phone and PC homes read them. */
 .glowvai-root .shop-home.gvh,
 .glowvai-root .shop-screen.shop-desk{
@@ -27,7 +28,7 @@
 .glowvai-root .shop-desk .shop-desk-head h2{ font-family: var(--gv-font-display); font-size: var(--t-section); line-height: var(--t-section-lh); font-weight: 700; letter-spacing: 0; }
 .glowvai-root .gvh .gvh-slide h1,
 .glowvai-root .gvh .gvh-slide strong,
-.glowvai-root .shop-desk .shop-desk-slide :is(h1, h2){ font-family: var(--gv-font-display); font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .shop-desk .shop-desk-slide :is(h1, h2){ font-family: var(--gv-font-display); font-weight: 700; letter-spacing: -.01em; }
 .glowvai-root .shop-desk .shop-desk-slide :is(h1, h2){ font-size: clamp(30px, 2.6vw, var(--t-display)); line-height: 1.1; }
 .glowvai-root .gvh .gvh-slide h1,
 .glowvai-root .gvh .gvh-slide strong{ font-size: var(--t-display); line-height: var(--t-display-lh); }
@@ -53,3 +54,9 @@
 .glowvai-root .shop-desk .shop-desk-cat strong{ font-size: var(--t-caption); line-height: var(--t-caption-lh); font-weight: 500; }
 .glowvai-root .gvh .gvh-card-badge,
 .glowvai-root .shop-desk .shop-desk-card-badge{ font-size: var(--t-micro); line-height: var(--t-micro-lh); font-weight: 600; letter-spacing: .02em; }
+
+/* Numerals line up: prices, MRP, discounts, phone numbers, counts. */
+.glowvai-root .gvh :is(.gvh-price, .gvh-card-price, .gvh-off, .gvh-ends, .gvh-cat-sub),
+.glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-card-price, .shop-desk-card-badge),
+.glowvai-root :is(.shop-home-footer, .shop-desk-footer) :is(a[href^="tel:"], .gv-tabular),
+.glowvai-root :is(.gvh, .shop-desk) :is(s, del, a[href^="tel:"]){ font-variant-numeric: tabular-nums; }

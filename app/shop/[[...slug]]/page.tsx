@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   },
 };
 
+// Fonts: the shop uses the system UI font stack (one token, --gv-font in glowvai-app/glowvai.css); nothing is loaded from a font host.
+
 export function generateStaticParams() {
   return [{ slug: [] }];
 }

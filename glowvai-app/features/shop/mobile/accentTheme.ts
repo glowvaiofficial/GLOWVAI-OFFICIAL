@@ -4,7 +4,7 @@
 // The admin can pick any colour, so this file works out what reads well on it: text on an accent is white or deep ink,
 // whichever has more contrast, and accent-coloured text is darkened step by step until it reaches 4.5:1.
 
-import { ACCENT, accentFor, readAccent } from '../../../../lib/shop/accents';
+import { readAccent } from '../../../../lib/shop/accents';
 import type { HomeBlockId } from '../lib/useHomeLayout';
 
 export const ACCENT_INK = '#1E293B';
@@ -94,32 +94,12 @@ export function accentVars(accent: string): Record<string, string> {
   return { '--ac': t.accent, '--ac-tint': t.tint, '--ac-ring': t.ring, '--ac-text': t.text, '--ac-on': t.on, '--ac-g1': t.gradient[0], '--ac-g2': t.gradient[1] };
 }
 
-// Each section's colour when the admin set none: one per block, stable when blocks are reordered.
-const SECTION_DEFAULT: Record<HomeBlockId, string> = {
-  hero: ACCENT.amethyst,
-  'mini-banners': ACCENT.sky,
-  offers: ACCENT.berry,
-  categories: ACCENT.amethyst,
-  promos: ACCENT.teal,
-  deals: ACCENT.rose,
-  reorder: ACCENT.lime,
-  'product-rails': ACCENT.sky,
-  brands: ACCENT.indigo,
-  trust: ACCENT.indigo,
-  'help-gift': ACCENT.lime,
-  footer: ACCENT.ink,
-  'festival-strip': ACCENT.indigo,
-  'bank-offers': ACCENT.indigo,
-  cashback: ACCENT.indigo,
-  partners: ACCENT.indigo,
-  stories: ACCENT.indigo,
-  sponsored: ACCENT.indigo,
-  'recently-viewed': ACCENT.indigo,
-  recommended: ACCENT.indigo,
-};
+// ONE colour at rest (design spec 2b): sections and items are brand blue unless the admin sets an accent on them. The bright
+// per-concern colours show only in the selected header tab's wash (homeChrome.ts).
+export const BRAND = '#0057FB';
 
-/** The admin's section accent, else the block's own default. */
-export const sectionAccent = (blockId: HomeBlockId, accent?: unknown): string => readAccent(accent) || SECTION_DEFAULT[blockId] || ACCENT.ink;
+/** The admin's section accent, else brand blue. */
+export const sectionAccent = (_blockId: HomeBlockId, accent?: unknown): string => readAccent(accent) || BRAND;
 
-/** An item's accent: its own, else its label's category colour, else the palette by its place. */
-export const itemAccent = (item: { accent?: unknown; label?: string } | null | undefined, index: number): string => accentFor(item, index, item?.label);
+/** An item's accent: the admin's own, else brand blue. */
+export const itemAccent = (item: { accent?: unknown; label?: string } | null | undefined, _index?: number): string => readAccent(item?.accent) || BRAND;
