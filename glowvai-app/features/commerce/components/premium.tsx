@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, BadgePercent, ChevronRight, Headset, MapPin, 
 import type { LucideIcon } from 'lucide-react';
 import type { CartTotals } from '../lib/pricing';
 import type { DeliveryAddress } from '../lib/addressStore';
+import { BrandLogo } from '../../../shared/BrandLogo';
 import { formatAddressForDisplay } from '../lib/displayText';
 
 // Building blocks of the premium cart, checkout and payment screens (styles in ../premium.css, all under .gvp). They show

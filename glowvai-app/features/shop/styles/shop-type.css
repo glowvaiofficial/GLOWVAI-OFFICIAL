@@ -1,0 +1,56 @@
+/* Typography tokens for the shop homes (design spec section 9). Display and prices: Syne 600/700/800. Body and UI: Poppins
+   400/500/600. Both are loaded with next/font on /shop (app/shop/[[...slug]]/page.tsx) as --font-syne and --font-poppins.
+   Sizes live here only; the phone and PC homes read them. */
+.glowvai-root .shop-home.gvh,
+.glowvai-root .shop-screen.shop-desk{
+  --gv-font-display: var(--font-syne, 'Syne'), var(--font-poppins, 'Poppins'), sans-serif;
+  --gv-font-ui: var(--font-poppins, 'Poppins'), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --t-display: 28px;      --t-display-lh: 32px;
+  --t-h1: 22px;           --t-h1-lh: 28px;
+  --t-h2: 18px;           --t-h2-lh: 24px;
+  --t-section: 16px;      --t-section-lh: 22px;
+  --t-body: 14px;         --t-body-lh: 20px;
+  --t-caption: 12px;      --t-caption-lh: 16px;
+  --t-micro: 10px;        --t-micro-lh: 14px;
+  --t-price: 16px;        --t-price-lh: 20px;
+  --t-mrp: 12px;          --t-mrp-lh: 16px;
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-screen.shop-desk{ --t-section: 18px; --t-section-lh: 24px; --t-display: 40px; --t-display-lh: 44px; }
+}
+
+.glowvai-root .shop-home.gvh,
+.glowvai-root .shop-screen.shop-desk{ font-family: var(--gv-font-ui); font-size: var(--t-body); line-height: var(--t-body-lh); }
+.glowvai-root .shop-screen.shop-desk :is(button, input){ font-family: inherit; }
+
+/* Display: section titles, hero headlines, offer titles, price-point tiles, prices. */
+.glowvai-root .gvh .gvh-head h2,
+.glowvai-root .shop-desk .shop-desk-head h2{ font-family: var(--gv-font-display); font-size: var(--t-section); line-height: var(--t-section-lh); font-weight: 700; letter-spacing: 0; }
+.glowvai-root .gvh .gvh-slide h1,
+.glowvai-root .gvh .gvh-slide strong,
+.glowvai-root .shop-desk .shop-desk-slide :is(h1, h2){ font-family: var(--gv-font-display); font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .shop-desk .shop-desk-slide :is(h1, h2){ font-size: clamp(30px, 2.6vw, var(--t-display)); line-height: 1.1; }
+.glowvai-root .gvh .gvh-slide h1,
+.glowvai-root .gvh .gvh-slide strong{ font-size: var(--t-display); line-height: var(--t-display-lh); }
+.glowvai-root .gvh .gvh-promo-title,
+.glowvai-root .shop-desk .shop-desk-promo-title,
+.glowvai-root .gvh .gvh-scan h2,
+.glowvai-root .shop-desk .shop-desk-scan h2,
+.glowvai-root .gvh .gvh-end h2,
+.glowvai-root .shop-desk .shop-desk-end h2,
+.glowvai-root .shop-desk .shop-desk-greet-copy strong,
+.glowvai-root .gvh .gvh-greet-copy b{ font-family: var(--gv-font-display); font-weight: 700; letter-spacing: 0; }
+.glowvai-root .gvh .gvh-price b,
+.glowvai-root .shop-desk .shop-desk-price b,
+.glowvai-root .gvh .gvh-card-price b,
+.glowvai-root .shop-desk .shop-desk-card-price b{ font-family: var(--gv-font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.glowvai-root .gvh .gvh-card-price b,
+.glowvai-root .shop-desk .shop-desk-card-price b{ font-size: var(--t-price); line-height: var(--t-price-lh); }
+.glowvai-root .gvh .gvh-card-price s,
+.glowvai-root .shop-desk .shop-desk-card-price s{ font-family: var(--gv-font-ui); font-weight: 400; font-size: var(--t-mrp); line-height: var(--t-mrp-lh); }
+.glowvai-root .gvh .gvh-card-name,
+.glowvai-root .shop-desk .shop-desk-card-name{ font-size: var(--t-body); line-height: var(--t-body-lh); }
+.glowvai-root .gvh .gvh-cat-label,
+.glowvai-root .shop-desk .shop-desk-cat strong{ font-size: var(--t-caption); line-height: var(--t-caption-lh); font-weight: 500; }
+.glowvai-root .gvh .gvh-card-badge,
+.glowvai-root .shop-desk .shop-desk-card-badge{ font-size: var(--t-micro); line-height: var(--t-micro-lh); font-weight: 600; letter-spacing: .02em; }

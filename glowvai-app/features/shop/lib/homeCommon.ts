@@ -21,15 +21,6 @@ export const CONCERNS: { id: string; label: string; Icon: LucideIcon }[] = [
   { id: 'barrier', label: 'Barrier Repair', Icon: Wind },
 ];
 
-// Accent colour for a category tile when it has no product photo to show.
-export const CATEGORY_ACCENT: Record<string, string> = {
-  Serums: '#3b6cf5',
-  Moisturizers: '#2a9d8f',
-  Suncare: '#e9a23b',
-  Cleansers: '#5b8def',
-  Treatments: '#8e5bd6',
-};
-
 // The scan card says only what the scan does in this build: on-device when that switch is on, otherwise sent to the analysis service.
 export const SCAN_PRIVACY = ON_DEVICE_INFERENCE_ENABLED
   ? 'Your photo is analysed on this device.'

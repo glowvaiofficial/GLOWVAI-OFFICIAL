@@ -15,19 +15,7 @@ import { useCartStore } from "@/lib/store/cart";
 function GlowVaiLogo() {
   return (
     <div className="flex items-center gap-2.5 select-none group">
-      <div className="relative w-8 h-8 rounded-[8px] overflow-hidden shrink-0">
-        <Image
-          src={getAssetPath("/logo/glowvai-logo.svg")}
-          alt="GLOW VAI Logo"
-          fill
-          sizes="32px"
-          priority
-          className="object-contain"
-        />
-      </div>
-      <span className="font-display font-bold text-[26px] leading-none tracking-[-0.02em] text-brand group-hover:text-brand-dark transition-colors">
-        GLOW VAI
-      </span>
+      <Image src={getAssetPath("/brand/glowvai-wordmark.png")} alt="GLOW VAI" width={132} height={35} priority className="h-8 w-auto" />
       <span className="hidden min-[480px]:inline text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
         Quick commerce
       </span>

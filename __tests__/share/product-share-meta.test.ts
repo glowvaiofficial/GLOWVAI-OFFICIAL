@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { buildProductShareMetadata, cleanText, productImageUrl } from "../../lib/shop/productShareMeta";
 
 const SITE = "https://glowvai.in";
-const OPTS = { siteUrl: SITE, brandName: "GLOW VAI", logoPath: "/logo/glowvai-logo-512.png" };
+const OPTS = { siteUrl: SITE, brandName: "GLOW VAI", logoPath: "/brand/icon-512.png" };
 const PIC = "https://firebasestorage.googleapis.com/v0/b/x/o/spf.webp?alt=media";
 
 describe("product share metadata", () => {
@@ -20,8 +20,8 @@ describe("product share metadata", () => {
     for (const picture of [null, undefined, "", "   "]) {
       const meta = buildProductShareMetadata({ id: "p1", name: "Serum", price: 300, picture }, OPTS);
       assert.equal(meta.imageIsProductPicture, false);
-      assert.equal(meta.openGraph.images[0].url, `${SITE}/logo/glowvai-logo-512.png`);
-      assert.equal(meta.twitter.images[0], `${SITE}/logo/glowvai-logo-512.png`);
+      assert.equal(meta.openGraph.images[0].url, `${SITE}/brand/icon-512.png`);
+      assert.equal(meta.twitter.images[0], `${SITE}/brand/icon-512.png`);
     }
   });
 

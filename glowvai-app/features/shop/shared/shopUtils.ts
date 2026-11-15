@@ -13,7 +13,7 @@ const PRODUCT_PHOTOS: Record<string, string> = {
 const TILE_COLOURS: Record<SkincareProduct['category'], { bg: string; ink: string; accent: string }> = {
   Serums: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
   Moisturizers: { bg: '#f2ecfa', ink: '#4a2475', accent: '#5c2a91' },
-  Suncare: { bg: '#fff3e2', ink: '#7a4300', accent: '#d9822b' },
+  Suncare: { bg: '#e2f7f4', ink: '#0b5c53', accent: '#14B8A6' },
   Cleansers: { bg: '#e8f6f0', ink: '#14573d', accent: '#19734f' },
   Treatments: { bg: '#fdecea', ink: '#7a2630', accent: '#c13f4b' },
 };

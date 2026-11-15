@@ -144,16 +144,7 @@ export function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-10 pb-12 items-start">
           <div className="col-span-2 lg:col-span-4 space-y-5">
             <Link href="/" className={`inline-flex min-h-11 items-center gap-2.5 rounded ${focusRing}`} aria-label={`${BRAND_NAME} home`}>
-              <div className="relative w-8 h-8 rounded-[8px] overflow-hidden shrink-0">
-                <Image
-                  src={getAssetPath("/logo/glowvai-logo.svg")}
-                  alt="GLOW VAI Logo"
-                  fill
-                  sizes="32px"
-                  className="object-contain"
-                />
-              </div>
-              <span className="font-display font-bold text-[26px] tracking-[-0.02em] text-brand">GLOW VAI</span>
+              <Image src={getAssetPath("/brand/glowvai-wordmark.png")} alt="GLOW VAI" width={132} height={35} className="h-9 w-auto" />
             </Link>
             <p className="text-[15px] text-ink-muted max-w-xs">
               Skincare that starts with a selfie. Free skin scan and 15-minute delivery in Vijayawada.

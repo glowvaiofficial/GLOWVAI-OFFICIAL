@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   // WhatsApp, iMessage and social previews read when the product is shared.
   const shared = await loadSharedProduct(slug);
   if (shared) {
-    const meta = buildProductShareMetadata(shared, { siteUrl: SITE_URL, brandName: BRAND_NAME, logoPath: "/logo/glowvai-logo-512.png" });
+    const meta = buildProductShareMetadata(shared, { siteUrl: SITE_URL, brandName: BRAND_NAME, logoPath: "/brand/icon-512.png" });
     return {
       title: meta.title,
       description: meta.description,

@@ -1,5 +1,5 @@
 export const assetConfig = {
-  logo: "/images/logo/glowvai-logo.png",
+  logo: "/brand/glowvai-wordmark.png",
   hero: {
     product: "/images/hero/product.webp",
     swatch: "/images/hero/swatch.webp",

@@ -48,6 +48,9 @@ export const ShopBrowseScreen: React.FC = () => {
     params.concern && VALID_CONCERN_IDS.has(params.concern) ? params.concern : 'all'
   );
   const [selectedBrand, setSelectedBrand] = useState<string | null>(params.brand ?? null);
+  // A price point from the home ("Under ₹499") narrows the list to products priced below it.
+  const readMaxPrice = (v: string | undefined) => (v && /^d{2,5}$/.test(v) ? Number(v) : null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(readMaxPrice(params.maxPrice));
 
   // A `cat` param opens the dedicated category page instead of filtering here.
   useEffect(() => {
@@ -59,7 +62,8 @@ export const ShopBrowseScreen: React.FC = () => {
   useEffect(() => {
     if (params.concern && VALID_CONCERN_IDS.has(params.concern)) setSelectedConcern(params.concern);
     if (params.brand) setSelectedBrand(params.brand);
-  }, [params.concern, params.brand]);
+    if (params.maxPrice) setMaxPrice(readMaxPrice(params.maxPrice));
+  }, [params.concern, params.brand, params.maxPrice]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -84,18 +88,21 @@ export const ShopBrowseScreen: React.FC = () => {
       !selectedBrand ||
       product.brand.toLowerCase().replace(/[^a-z0-9]/g, '').includes(selectedBrand.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
-    return matchesSearch && matchesConcern && matchesBrand;
+    const matchesPrice = maxPrice === null || product.price < maxPrice;
+
+    return matchesSearch && matchesConcern && matchesBrand && matchesPrice;
   });
 
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedConcern('all');
     setSelectedBrand(null);
+    setMaxPrice(null);
   };
 
-  const hasActiveFilters = Boolean(selectedBrand) || selectedConcern !== 'all';
+  const hasActiveFilters = Boolean(selectedBrand) || selectedConcern !== 'all' || maxPrice !== null;
   const concernLabel = SKIN_CONCERNS.find((c) => c.id === selectedConcern)?.label ?? '';
-  const emptyHint = searchQuery || selectedBrand || (selectedConcern !== 'all' ? concernLabel : '');
+  const emptyHint = searchQuery || selectedBrand || (maxPrice !== null ? `under ₹${maxPrice}` : '') || (selectedConcern !== 'all' ? concernLabel : '');
   const itemsLabel = (n: number) => `${n} ${n === 1 ? 'item' : 'items'}`;
 
   return (
@@ -187,6 +194,17 @@ export const ShopBrowseScreen: React.FC = () => {
                 Showing: {selectedBrand} ({itemsLabel(filteredProducts.length)})
               </span>
               <button type="button" onClick={() => setSelectedBrand(null)}>
+                Show All
+              </button>
+            </div>
+          )}
+
+          {maxPrice !== null && (
+            <div className="shop-browse-banner">
+              <span>
+                Showing: Under ₹{maxPrice} ({itemsLabel(filteredProducts.length)})
+              </span>
+              <button type="button" onClick={() => setMaxPrice(null)}>
                 Show All
               </button>
             </div>

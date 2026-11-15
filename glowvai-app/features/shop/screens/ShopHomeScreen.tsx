@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Boxes, ChevronRight, ScanFace, ShieldCheck, ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, Boxes, ChevronRight, ScanFace, ShieldCheck, ShoppingBag, PackagePlus, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { useCustomerStore } from '../../../core/state/customerStore';
 import { useInbox } from '../../../core/notifications/inboxStore';
 import { siteConfig } from '../../../../config/site';
+import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId } from '../lib/useHomeLayout';
 import { useHomeData } from '../lib/useHomeData';
-import { SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
+import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, mergeFooterSocials } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, homeSequence, mergeFooterSocials, type HomeModuleId } from '../lib/homeModel';
 import { getProductThumbUrl } from '../shared/shopUtils';
 import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
@@ -21,6 +22,7 @@ import {
   BrandsBlock,
   CardRail,
   CategoryTile,
+  ConcernGrid,
   ConcernPicks,
   EndsInPill,
   FlashSaleRows,
@@ -29,6 +31,7 @@ import {
   HeroCarousel,
   MobileHomeHeader,
   OffersBlock,
+  PricePoints,
   ProductRow,
   PromosBlock,
   SectionHead,
@@ -41,6 +44,7 @@ import {
 } from '../mobile/MobileHomeParts';
 import '../styles/shop-home.css';
 import '../mobile/mobile-home.css';
+import '../styles/shop-type.css';
 
 // Admin settings and items may carry an accent ("#RRGGBB", lib/shop/accents.ts); the layout types do not list it.
 type Accented = { accent?: string };
@@ -71,7 +75,7 @@ type ShopHomeScreenProps = { embedded?: boolean };
 // a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
   const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout('mobile');
-  const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, rails, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
+  const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
 
@@ -115,7 +119,20 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   ].filter((s) => s.url !== '');
 
   // Each homepage block. The order comes from the admin layout (useHomeLayout).
-  const renderBlock = (id: HomeBlockId): React.ReactNode => {
+  // Scrolls to a rail of this page (the Best sellers and New launches category tiles).
+  const jumpTo = (elementId: string) => {
+    const el = document.getElementById(elementId);
+    if (!el) return navigate('shop-browse');
+    let reduce = false;
+    try {
+      reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch {
+      // Smooth scrolling stays on.
+    }
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  };
+
+  const renderBlock = (id: HomeModuleId): React.ReactNode => {
     switch (id) {
       case 'hero':
         return <HeroCarousel hero={heroOverride as (HeroOverride & Accented) | null} deliveryEta={deliveryEta} accent={(heroOverride as (HeroOverride & Accented) | null)?.accent || accentOf('hero')} />;
@@ -149,6 +166,8 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
                         />
                       );
                     })}
+                    {bestsellers.length > 0 && <CategoryTile label="Best sellers" Icon={Star} accent={itemAccent({ label: 'Best sellers' }, 5)} onOpen={() => jumpTo('gvh-bestsellers-title')} />}
+                    {newLaunches.length > 0 && <CategoryTile label="New launches" Icon={PackagePlus} accent={itemAccent({ label: 'New launches' }, 6)} onOpen={() => jumpTo('gvh-new-title')} />}
                     <CategoryTile label="Shop all" Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
                   </>
                 )}
@@ -212,14 +231,24 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
         ) : (
           <>
             {loading && skinState.recommendationsOn && <SkeletonRow title="Picked for your skin" />}
-            {loading && recentIds.length > 0 && <SkeletonRow title="Continue browsing" />}
-            {(configuredRows.length > 0 ? configuredRows : rails).map((rail, i) => (
+            {configuredRows.map((rail, i) => (
               <ProductRow key={rail.id} title={rail.title} products={rail.products} accent={i === 0 ? accentOf('product-rails') : itemAccent(null, i + 1)} onSeeAll={() => navigate('shop-browse')} />
             ))}
-            {loading && <SkeletonRow title="Top Rated" />}
-            {loading && <SkeletonRow title="Under ₹500" />}
+            <ProductRow title="Picked for your skin" products={picks} accent={itemAccent(null, 4)} onSeeAll={() => navigate('shop-browse')} />
           </>
         );
+      case 'price-points':
+        return <PricePoints tiles={pricePoints} onOpen={(max) => navigate('shop-browse', { maxPrice: String(max) })} />;
+      case 'bestsellers':
+        return loading ? <SkeletonRow title="Bestsellers" /> : <ProductRow id="gvh-bestsellers-title" title="Bestsellers" sub="Best rated by customers" products={bestsellers} accent={itemAccent(null, 1)} onSeeAll={() => navigate('shop-browse')} />;
+      case 'new-launches':
+        return loading ? null : <ProductRow id="gvh-new-title" title="New launches" products={newLaunches} accent={itemAccent(null, 2)} onSeeAll={() => navigate('shop-browse')} />;
+      case 'concerns':
+        return <ConcernGrid concerns={CONCERNS} onOpen={(concern) => navigate('shop-browse', { concern })} onAll={() => navigate('shop-browse')} />;
+      case 'recent':
+        return loading && recentIds.length > 0 ? <SkeletonRow title="Recently viewed" /> : <ProductRow title="Recently viewed" products={recentProducts} accent={itemAccent(null, 3)} />;
+      case 'scan':
+        return scanCard;
       case 'brands':
         return hasItems('brands') ? <BrandsBlock settings={settingsOf('brands')!} accent={accentOf('brands')} onOpenLink={openLink} /> : <BrandStripPlaceholder settings={blockSettings['brands']} />;
       case 'trust':
@@ -233,8 +262,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
               <div className="shop-home-footer-inner">
                 <div className="shop-home-footer-brand">
                   <span className="shop-home-footer-logo">
-                    <Sparkles size={16} aria-hidden="true" />
-                    <strong>GlowVai</strong>
+                    <BrandLogo height={28} white />
                   </span>
                   <p>Skincare, delivered.</p>
                   {storeLinks.length > 0 && (
@@ -303,30 +331,32 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
     }
   };
 
+  const scanCard = (
+  <section className="shop-home-scan gvh-scan" aria-labelledby="shop-home-scan-title">
+    <span className="shop-home-scan-tag">
+      <ScanFace size={12} />
+      FACE SCAN
+    </span>
+    <h2 id="shop-home-scan-title">
+      Find the routine that
+      <br />
+      <span>fits your skin</span>
+    </h2>
+    <p className="shop-home-scan-body">Take or upload one clear photo in even light. The check suggests a skin type and up to five visible concerns, then matches products to them.</p>
+    <p className="shop-home-scan-privacy">
+      <ShieldCheck size={15} aria-hidden="true" />
+      <span>{SCAN_PRIVACY}</span>
+    </p>
+    <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
+    <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
+      Start skin check
+      <ArrowRight size={16} />
+    </button>
+  </section>
+  );
+
   const pinnedTail = (
     <>
-      <section className="shop-home-scan gvh-scan" aria-labelledby="shop-home-scan-title">
-        <span className="shop-home-scan-tag">
-          <ScanFace size={12} />
-          FACE SCAN
-        </span>
-        <h2 id="shop-home-scan-title">
-          Find the routine that
-          <br />
-          <span>fits your skin</span>
-        </h2>
-        <p className="shop-home-scan-body">Take or upload one clear photo in even light. The check suggests a skin type and up to five visible concerns, then matches products to them.</p>
-        <p className="shop-home-scan-privacy">
-          <ShieldCheck size={15} aria-hidden="true" />
-          <span>{SCAN_PRIVACY}</span>
-        </p>
-        <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
-        <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
-          Start skin check
-          <ArrowRight size={16} />
-        </button>
-      </section>
-
       <section className="shop-home-end gvh-end">
         <Boxes size={28} aria-hidden="true" />
         <h2>You've seen it all!</h2>
@@ -353,7 +383,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
 
       <ConcernPicks tab={tab} products={concernProducts} onSeeAll={() => navigate('shop-browse', tab.concern ? { concern: tab.concern } : undefined)} />
 
-      {layoutOrder.filter((id) => id !== 'footer').map((id) => (
+      {homeSequence(layoutOrder).filter((id) => id !== 'footer').map((id) => (
         <React.Fragment key={id}>{renderBlock(id)}</React.Fragment>
       ))}
       {pinnedTail}

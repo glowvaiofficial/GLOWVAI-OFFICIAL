@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { browserStore, dismissQuiz } from '../features/shop/lib/firstVisit';
+import { BrandLogo } from '../shared/BrandLogo';
 import '../responsive/entry-scan.css';
 const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.png';
 const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.png';
@@ -66,8 +67,8 @@ export const OnboardingScreen: React.FC = () => {
           decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: step === 2 ? 'center 46%' : 'center 52%' }}
         />
-        <span className="brand-wordmark" style={{ position: 'absolute', top: 25, left: 29, color: '#fff', fontSize: 26, fontWeight: 500, letterSpacing: '-.055em', textShadow: '0 2px 12px rgba(0,53,170,.18)' }}>
-          glowvai
+        <span style={{ position: 'absolute', top: 25, left: 29 }}>
+          <BrandLogo height={30} white />
         </span>
       </div>
 
