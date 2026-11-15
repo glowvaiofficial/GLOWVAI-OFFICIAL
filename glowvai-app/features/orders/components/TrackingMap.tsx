@@ -34,9 +34,14 @@ function loadGoogleMaps(key: string): Promise<void> {
 
 interface Props {
   map: LiveTracking['map'];
+  // 'hero': the large map while the order is out for delivery. 'strip': a short band above the status card.
+  variant?: 'card' | 'hero' | 'strip';
 }
 
-export const TrackingMap: React.FC<Props> = ({ map }) => {
+// True when this build can load Google Maps (a key was set at build time).
+export const TRACKING_MAP_SUPPORTED = mapsKeyFrom(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) !== null;
+
+export const TrackingMap: React.FC<Props> = ({ map, variant = 'card' }) => {
   const key = mapsKeyFrom(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<GoogleMaps>(null);
@@ -120,7 +125,7 @@ export const TrackingMap: React.FC<Props> = ({ map }) => {
 
   const hasPoints = map.available;
   return (
-    <section className="trk-card trk-map-card" aria-label="Live map">
+    <section className={`trk-card trk-map-card is-${variant}`} aria-label="Live map">
       <div className="trk-map" ref={hostRef} role="img" aria-label="Map showing your delivery partner, your location and the store" hidden={state === 'error'} />
       {state === 'loading' && <p className="trk-note">Loading the map...</p>}
       {state === 'error' && <p className="trk-note is-error">The map could not load. Your delivery details are still below.</p>}
