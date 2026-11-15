@@ -33,12 +33,16 @@
 
 /* ---------- Header: the whole top backdrop takes the chosen tab's bright accent (250 ms) and fades out behind the hero ---------- */
 .glowvai-root .gvh .gvh-header { position: relative; z-index: 0; margin-bottom: -22px; padding: 12px var(--gv-gutter) 22px; background: linear-gradient(180deg, var(--wash) 0%, var(--wash) 62%, transparent 100%); color: var(--wash-on); transition: --wash .25s ease, --wash-on .25s ease; }
-.glowvai-root .gvh .gvh-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc actions' 'search search search'; align-items: center; gap: 10px 12px; }
+.glowvai-root .gvh .gvh-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'logo actions' 'loc loc' 'search search'; align-items: center; gap: 10px 12px; }
 .glowvai-root .gvh .gvh-logo { grid-area: logo; display: inline-flex; align-items: center; }
 .glowvai-root .gvh .gvh-location { grid-area: loc; display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; justify-self: start; gap: 4px; padding: 0 4px; color: var(--wash-on); font-size: 13.5px; font-weight: 500; }
 .glowvai-root .gvh .gvh-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .gvh .gvh-location svg { flex: 0 0 auto; }
 .glowvai-root .gvh .gvh-location.is-static { cursor: default; }
+/* Phones: the location has its own row, so the label ("Deliver to" and the area, or "Set location") is never clipped by the Skin scan button. */
+.glowvai-root .gvh .gvh-location { min-height: 40px; margin-top: -6px; }
+.glowvai-root .gvh .gvh-loc-label { flex: 0 0 auto; opacity: .8; font-size: 12.5px; }
+.glowvai-root .gvh .gvh-loc-name { min-width: 0; font-weight: 700; }
 .glowvai-root .gvh .gvh-search { grid-area: search; display: flex; min-width: 0; height: 48px; align-items: center; gap: 6px; padding: 0 6px 0 16px; border: 1px solid rgba(11, 27, 77, .06); border-radius: 999px; background: #fff; box-shadow: 0 4px 14px rgba(11, 27, 77, .07); }
 .glowvai-root .gvh .gvh-search-btn { display: flex; flex: 1; min-width: 0; height: 100%; align-items: center; gap: 10px; color: var(--gvh-muted); font-size: 14px; text-align: left; }
 .glowvai-root .gvh .gvh-search-btn > svg { flex: 0 0 auto; color: var(--gvh-ink); }
@@ -245,7 +249,8 @@
 /* ---------- Wider phones and tablets ---------- */
 @media (min-width: 560px) {
   .glowvai-root .gvh .gvh-top { grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc search actions'; }
-  .glowvai-root .gvh .gvh-location { max-width: 170px; }
+  .glowvai-root .gvh .gvh-location { max-width: 170px; min-height: 44px; margin-top: 0; }
+  .glowvai-root .gvh .gvh-loc-label { display: none; }
 }
 @media (min-width: 720px) {
   .glowvai-root .gvh .gvh-header { padding-top: 18px; }

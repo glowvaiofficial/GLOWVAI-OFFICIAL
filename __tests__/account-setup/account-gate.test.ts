@@ -7,9 +7,11 @@ import {
   afterSignIn,
   gateNavigation,
   screenOpensWithoutAccount,
+  requiresSignIn,
   startScreenFor,
   type AccountState,
 } from "../../glowvai-app/features/auth/accountGate";
+import { guestAreaAddress, isServiceableAreaPincode, parseGuestArea, readGuestArea, saveGuestArea } from "../../glowvai-app/features/commerce/lib/guestArea";
 import { holdAction, takeHeldAction } from "../../glowvai-app/features/auth/resumeAction";
 
 const root = join(import.meta.dirname, "..", "..");
@@ -63,7 +65,7 @@ describe("the decision table: which screens open without an account", () => {
   });
 
   test("the bag, checkout, orders, profile, wishlist and scan need an account", () => {
-    for (const screen of ["cart-tab", "checkout", "checkout-payment-method", "customer-details", "orders-list", "order-history", "profile-tab", "shop-wishlist", "face-prep", "scan-tab", "wallet-home", "support", "notifications-list"]) {
+    for (const screen of ["checkout", "checkout-payment-method", "customer-details", "orders-list", "order-history", "profile-tab", "shop-wishlist", "face-prep", "scan-camera", "scan-gallery", "wallet-home", "support", "notifications-list"]) {
       assert.equal(screenOpensWithoutAccount(screen), false, screen);
     }
   });
@@ -75,8 +77,8 @@ describe("the decision table: which screens open without an account", () => {
 
 describe("gating a navigation", () => {
   test("no account, a screen that needs one: the sign-in screen, remembering where to return", () => {
-    const decision = gateNavigation(NONE, { screen: "cart-tab", params: null });
-    assert.deepEqual(decision, { screen: "auth-login", params: { returnTo: "cart-tab", returnParams: null } });
+    const decision = gateNavigation(NONE, { screen: "checkout-review", params: null });
+    assert.deepEqual(decision, { screen: "auth-login", params: { returnTo: "checkout-review", returnParams: null } });
   });
 
   test("the return keeps the screen's params", () => {
@@ -129,11 +131,11 @@ describe("the whole journey", () => {
     // 2. The intro leads to sign-in (an allowed screen).
     assert.equal(gateNavigation(NONE, { screen: "auth-login", params: null }).screen, "auth-login");
     // 3. From a product preview, the bag asks for sign-in and remembers the product page.
-    const ask = gateNavigation(NONE, { screen: "cart-tab", params: null });
+    const ask = gateNavigation(NONE, { screen: "checkout-review", params: null });
     assert.equal(ask.screen, "auth-login");
     // 4. The code is checked: the account is the phone account, and the bag opens.
     assert.equal(accountStateOf(phoneUser), PHONE);
-    assert.deepEqual(gateNavigation(PHONE, { screen: "auth-login", params: { returnTo: "cart-tab" } }), { screen: "cart-tab", params: null });
+    assert.deepEqual(gateNavigation(PHONE, { screen: "auth-login", params: { returnTo: "checkout-review" } }), { screen: "checkout-review", params: null });
   });
 
   test("a returning signed-in account goes straight to the shop", () => {
@@ -193,8 +195,6 @@ describe("wiring in the app", () => {
     assert.match(ctx, /gateNavigation\(accountNow\(\), \{ screen: requested/);
     assert.match(ctx, /gateNavigation\(accountNow\(\), \{ screen: first\.screen/);
     assert.match(ctx, /gateNavigation\(accountNow\(\), \{ screen: restored\.screen/);
-    assert.match(ctx, /requireSignIn\(\(\) => addToCartNow\(/);
-    assert.match(ctx, /requireSignIn\(\(\) => toggleWishlistNow\(/);
     assert.match(ctx, /const first: NavEntry = saved/);
   });
 
@@ -235,5 +235,46 @@ describe("wiring in the app", () => {
     ]) {
       assert.doesNotMatch(read(file), /navigate\('login'|leave\('login'|'login' :/, file);
     }
+  });
+});
+
+describe("what a guest may do (requiresSignIn)", () => {
+  test("browsing, the cart, the delivery area, the scan intro and the wishlist heart need no account", () => {
+    for (const action of ["browse", "open-cart", "add-to-cart", "apply-coupon-preview", "set-delivery-area", "check-pincode", "open-scan-intro", "wishlist-toggle"]) {
+      assert.equal(requiresSignIn(action), false, action);
+    }
+  });
+  test("checkout, payment, a named address, the scan itself, orders and the account need sign-in", () => {
+    for (const action of ["checkout", "place-order", "payment", "save-named-address", "start-scan", "upload-scan-photo", "open-orders", "open-account"]) {
+      assert.equal(requiresSignIn(action), true, action);
+    }
+  });
+  test("an unknown action asks for sign-in", () => {
+    assert.equal(requiresSignIn("something-new"), true);
+    assert.equal(requiresSignIn("toString"), true);
+  });
+  test("the guest screens open, and starting the scan or checkout goes to sign-in", () => {
+    for (const screen of ["cart-tab", "cart", "location-setup", "location-map-picker", "location-serviceability", "scan-tab", "scan-intro"]) {
+      assert.equal(gateNavigation(NONE, { screen, params: null }).screen, screen, screen);
+    }
+    assert.equal(gateNavigation(NONE, { screen: "scan-camera", params: null }).screen, "auth-login");
+    assert.equal(gateNavigation(NONE, { screen: "checkout-review", params: null }).screen, "auth-login");
+    assert.equal(gateNavigation(NONE, { screen: "profile-tab", params: null }).screen, "auth-login");
+  });
+});
+
+describe("the delivery area kept for a guest", () => {
+  test("keeps the area name and pincode, rejects bad data", () => {
+    const store = new Map<string, string>();
+    const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
+    saveGuestArea({ area: "Benz Circle, Vijayawada", pincode: "520010" }, storage);
+    assert.deepEqual(readGuestArea(storage), { area: "Benz Circle", pincode: "520010" });
+    assert.equal(parseGuestArea("{bad"), null);
+    assert.equal(parseGuestArea(JSON.stringify({ area: "X", pincode: "12" })), null);
+  });
+  test("serviceability is 520xxx and the header address has no street", () => {
+    assert.equal(isServiceableAreaPincode("520010"), true);
+    assert.equal(isServiceableAreaPincode("560001"), false);
+    assert.equal(guestAreaAddress({ area: "Benz Circle", pincode: "520010" }).street, "");
   });
 });
