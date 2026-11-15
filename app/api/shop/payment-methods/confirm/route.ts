@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 // and keeps the token id only when the payment belongs to this customer and to the setup order created for them.
 export async function POST(req: NextRequest) {
   if (!paymentMethodsEnabled(env())) return gateOff();
-  const g = await gate(req, "payment-methods-confirm", 20);
+  const g = await gate(req, "payment-methods-confirm", 20, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const body = (await req.json().catch(() => null)) as { paymentId?: unknown } | null;

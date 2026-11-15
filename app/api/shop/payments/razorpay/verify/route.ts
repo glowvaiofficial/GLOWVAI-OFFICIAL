@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
 import { paymentArrivalTx, refundLatePaymentLive } from "@/lib/shop/pendingOrders";
@@ -13,8 +14,9 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "razorpay-verify-post", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "razorpay-verify", 60);
   if (userLimited) return userLimited;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

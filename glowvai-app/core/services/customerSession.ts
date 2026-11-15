@@ -13,7 +13,12 @@ export interface ApiResult<T> {
   status: number;
   data: T | null;
   error: string | null;
+  // The server's error code when it sent one (for example PHONE_REQUIRED).
+  code?: string | null;
 }
+
+// Fired when the server refuses a call because the session has no verified phone. AppContext opens the phone sign-in.
+export const PHONE_REQUIRED_EVENT = 'glowvai:phone-required';
 
 let pending: Promise<User> | null = null;
 
@@ -70,6 +75,14 @@ const withTimeout = <T,>(work: Promise<T>, ms: number): Promise<T> =>
     );
   });
 
+async function isPhoneRequired(res: Response): Promise<boolean> {
+  try {
+    return ((await res.clone().json()) as { code?: unknown } | null)?.code === 'PHONE_REQUIRED';
+  } catch {
+    return false;
+  }
+}
+
 // Calls a shop server route with the customer's ID token. Never throws: the result carries the server's message.
 export async function apiFetch<T = Record<string, unknown>>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   let token: string;
@@ -98,8 +111,8 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
   let response: Response;
   try {
     response = await send(token);
-    // An expired token is refreshed once.
-    if (response.status === 401) response = await send(await withTimeout(getIdToken(true), TOKEN_TIMEOUT_MS));
+    // An expired token is refreshed once. A PHONE_REQUIRED answer is final: a fresh anonymous token would not change it.
+    if (response.status === 401 && !(await isPhoneRequired(response))) response = await send(await withTimeout(getIdToken(true), TOKEN_TIMEOUT_MS));
   } catch {
     return { ok: false, status: 0, data: null, error: NETWORK_ERROR };
   }
@@ -110,9 +123,11 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
   } catch {
     body = null;
   }
+  const code = typeof body?.code === 'string' ? body.code : null;
+  if (response.status === 401 && code === 'PHONE_REQUIRED' && typeof window !== 'undefined') window.dispatchEvent(new Event(PHONE_REQUIRED_EVENT));
   const ok = response.ok && body?.ok !== false;
   const error = ok
     ? null
     : (typeof body?.error === 'string' && body.error) || (response.status >= 500 ? 'Something went wrong on our side. Try again in a moment.' : NETWORK_ERROR);
-  return { ok, status: response.status, data: (body as T | null) ?? null, error };
+  return { ok, status: response.status, data: (body as T | null) ?? null, error, code };
 }

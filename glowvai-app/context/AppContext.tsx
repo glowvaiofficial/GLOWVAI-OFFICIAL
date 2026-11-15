@@ -14,7 +14,7 @@ import { NO_ADDRESS } from '../data/serviceability';
 import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
 import { auth } from '../core/config/firebase';
-import { ensureCustomerSession } from '../core/services/customerSession';
+import { ensureCustomerSession, PHONE_REQUIRED_EVENT } from '../core/services/customerSession';
 import { refreshSavedAddresses } from '../features/commerce/lib/savedAddresses';
 import { pushWishlistAdd, pushWishlistRemove, syncWishlistWithAccount, WISHLIST_KEY } from '../features/shop/lib/wishlistSync';
 import type { ShopProfileAddress } from '../core/services/shopApi';
@@ -338,6 +338,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (resume) holdAction(resume);
     navigate(SIGN_IN_SCREEN as ScreenName, { returnTo: cur.screen, returnParams: cur.params });
   };
+
+  // The server refuses a call from a session with no verified phone (401 PHONE_REQUIRED): open the phone sign-in, not an error.
+  useEffect(() => {
+    const onPhoneRequired = () => { if (accountNow() !== 'phone') requireSignIn(); };
+    window.addEventListener(PHONE_REQUIRED_EVENT, onPhoneRequired);
+    return () => window.removeEventListener(PHONE_REQUIRED_EVENT, onPhoneRequired);
+  });
 
   // Adding to the bag needs a phone account. Signed out, the add waits for sign-in.
   const addToCart = (product: Product, variantId?: string, withInsurance = false) => {

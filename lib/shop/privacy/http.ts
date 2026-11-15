@@ -2,14 +2,22 @@
 import "server-only";
 import type { NextRequest } from "next/server";
 import { customerFrom, json, limitByIp, limitByUser } from "../server";
+import { requirePhoneUser } from "../../auth/requirePhoneUser";
 import { deviceHash, isDeviceId } from "./rules";
 
 export const DEVICE_HEADER = "x-glowvai-device";
 
 // The signed-in customer, or the response to send back (rate limit or sign-in). Checked before any work.
-export async function gate(req: NextRequest, route: string, perMinute: number) {
+// With phoneOnly, an anonymous session is refused with 401 PHONE_REQUIRED (money and saved-payment routes).
+export async function gate(req: NextRequest, route: string, perMinute: number, phoneOnly = false) {
   const ipLimited = limitByIp(req, route, perMinute);
   if (ipLimited) return { response: ipLimited, uid: null, anonymous: false };
+  if (phoneOnly) {
+    const phone = await requirePhoneUser(req);
+    if (!phone.ok) return { response: phone.response, uid: null, anonymous: false };
+    const limited = limitByUser(phone.user.uid, route, perMinute);
+    return limited ? { response: limited, uid: null, anonymous: false } : { response: null, uid: phone.user.uid, anonymous: false };
+  }
   const customer = await customerFrom(req);
   if (!customer) return { response: json({ ok: false, error: "Sign in again to continue." }, 401), uid: null, anonymous: false };
   const userLimited = limitByUser(customer.uid, route, perMinute);

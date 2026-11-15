@@ -24,7 +24,10 @@ export async function POST(req: NextRequest) {
   const ids = [...new Set(parsed.lines.map((l) => l.productId))];
   const snaps = ids.length ? await store.getAll(...ids.map((id) => store.collection("products").doc(id))) : [];
   const now = Date.now();
-  const customer = await customerFrom(req).catch(() => null);
+  // An anonymous session is a guest here: per-customer offer and flash-sale limits belong to real phone accounts, so a
+  // fresh anonymous id can never reset them. Guests still get the public quote.
+  const signedIn = await customerFrom(req).catch(() => null);
+  const customer = signedIn && !signedIn.anonymous ? signedIn : null;
   const priced: { productId: string; category: string; quantity: number; unitPrice: number; totalPrice: number }[] = [];
   for (const line of parsed.lines) {
     const snap = snaps.find((s) => s.id === line.productId);

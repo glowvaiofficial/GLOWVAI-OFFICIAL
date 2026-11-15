@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { createRazorpayOrder, razorpayConfigured } from "@/lib/shop/razorpay";
 import { placeOrderCore } from "@/lib/shop/orderCore";
@@ -161,8 +162,9 @@ async function withReviewState<T extends { items: { productId: unknown }[]; orde
 export async function POST(req: NextRequest) {
   const ipLimited = await limitByIpShared(req, "orders-post", 60, 60 * 60 * 1000, "Too many orders in a short time. Try again later.");
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   // Idempotency-Key (sent by the native app): the same key from the same customer within 24 hours returns the order it
   // first created, before the per-customer limits, so a retried request is never counted as a new order. A missing or
   // malformed key is ignored. Replays still count against the per-IP limit above and a short per-customer limit.
