@@ -323,3 +323,48 @@ export function readFooterDetails(raw: unknown): FooterDetails {
     companyLine: companyLineOf(f.companyLine),
   };
 }
+
+// ---- Device layouts. siteContent/homeLayout keeps draft and published as the MOBILE layout (also the default). An
+// optional desktop: { draft?, published? } field holds the layout for wide screens, each with the same shape as published.
+// The footer details always come from the mobile layout, so both devices share one footer.
+export const LAYOUT_DEVICES = ["desktop", "mobile"] as const;
+export type LayoutDevice = (typeof LAYOUT_DEVICES)[number];
+
+// The device a request asks for. No device parameter means mobile (today's behaviour, and what the native app sends).
+// Anything other than exactly one "desktop" or "mobile" is null (the route refuses it).
+export function readLayoutDevice(values: readonly string[]): LayoutDevice | null {
+  if (values.length === 0) return "mobile";
+  if (values.length > 1) return null;
+  const v = values[0];
+  return v === "desktop" || v === "mobile" ? v : null;
+}
+
+// A saved layout can drive the page only when it is an object whose blocks list names at least one known block.
+export function hasLayoutBlocks(raw: unknown): boolean {
+  if (!raw || typeof raw !== "object") return false;
+  const blocks = (raw as { blocks?: unknown }).blocks;
+  if (!Array.isArray(blocks)) return false;
+  return blocks.slice(0, 40).some((b) => b !== null && typeof b === "object" && isBlockId((b as { id?: unknown }).id));
+}
+
+export interface LayoutSourceChoice {
+  // The layout whose blocks, settings, rows and hero are served.
+  source: unknown;
+  // The layout the footer details are read from (always the mobile one).
+  footerSource: unknown;
+  // True when a desktop request is served the mobile layout because no usable desktop layout is saved.
+  fallback: boolean;
+}
+
+// Which saved layout a request is served. doc is the whole siteContent/homeLayout data (undefined when missing).
+// Mobile: published, or draft for a staff preview. Desktop: desktop.published (preview: desktop.draft, then
+// desktop.published), else the mobile layout of the same kind.
+export function chooseLayoutSource(doc: unknown, device: LayoutDevice, isPreview: boolean): LayoutSourceChoice {
+  const d = doc && typeof doc === "object" ? (doc as Record<string, unknown>) : {};
+  const mobile = isPreview ? d.draft : d.published;
+  if (device === "mobile") return { source: mobile, footerSource: mobile, fallback: false };
+  const desk = d.desktop && typeof d.desktop === "object" ? (d.desktop as Record<string, unknown>) : {};
+  const candidates = isPreview ? [desk.draft, desk.published] : [desk.published];
+  const found = candidates.find(hasLayoutBlocks);
+  return found !== undefined ? { source: found, footerSource: mobile, fallback: false } : { source: mobile, footerSource: mobile, fallback: true };
+}
