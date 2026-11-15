@@ -43,6 +43,19 @@ export async function getIdToken(forceRefresh = false): Promise<string> {
   return user.getIdToken(forceRefresh);
 }
 
+// The signed-in customer's ID token when there is a session already, or null for a guest. Unlike getIdToken, this never
+// starts an anonymous session: it is for public calls (the bag quote) that only add per-customer rules when signed in.
+export async function optionalIdToken(timeoutMs = 5_000): Promise<string | null> {
+  try {
+    if (!auth) return null;
+    if (!auth.currentUser && typeof auth.authStateReady === 'function') await withTimeout(auth.authStateReady(), timeoutMs);
+    const user = auth.currentUser;
+    return user ? await withTimeout(user.getIdToken(), timeoutMs) : null;
+  } catch {
+    return null;
+  }
+}
+
 const NETWORK_ERROR = 'We could not reach GlowVai. Check your connection and try again.';
 
 // A call that never answers must end, so a settings or account screen cannot stay on its loading state forever.
