@@ -4,7 +4,7 @@ import { sendEmail } from "@/lib/email/send";
 import { storage } from "@/lib/storage";
 import crypto from "node:crypto";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 /**
  * GLOW VAI Weekly Performance Digest Cron Route.

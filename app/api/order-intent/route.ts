@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 import { z } from "zod";
 import { getProduct } from "@/lib/catalog";
@@ -29,6 +30,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const limited = rateLimit(`order-intent:${clientIp(req)}`, 10, 60_000);
   if (!limited.ok) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limited.retryAfter) } });

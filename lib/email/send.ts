@@ -45,9 +45,13 @@ export async function sendEmail<T extends Record<string, unknown>>(
     const defaultReplyTo = replyTo || env.EMAIL_REPLY_TO;
 
     const headers: Record<string, string> = {};
+    let unsubPage: string | undefined;
     if (stream === "marketing") {
       const unsubToken = createUnsubscribeToken(cleanTo);
-      const unsubHttps = `${SITE_URL}/unsubscribe?token=${unsubToken}`;
+      // The footer link opens the unsubscribe page. The header link is the API route, because mail apps send the
+      // RFC 8058 one-click POST to it; opening it in a browser redirects to the page. Both carry the signed token.
+      unsubPage = `${SITE_URL}/unsubscribe?token=${unsubToken}`;
+      const unsubHttps = `${SITE_URL}/api/unsubscribe?token=${unsubToken}`;
       const unsubMailto = `mailto:unsubscribe@glowvai.in?subject=unsubscribe`;
 
       headers["List-Unsubscribe"] = `<${unsubHttps}>, <${unsubMailto}>`;
@@ -55,7 +59,7 @@ export async function sendEmail<T extends Record<string, unknown>>(
     }
 
     // 5. Render HTML and Plain Text versions
-    const rendered = renderEmail(template, data, stream);
+    const rendered = renderEmail(template, data, stream, unsubPage);
 
     // 6. Idempotency Key
     const idempotencyKey = `${template}:${relatedId}`;

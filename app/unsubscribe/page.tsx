@@ -10,27 +10,27 @@ const input =
 
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
+  // The signed token from the link in a GLOW VAI email. Without it nothing can be unsubscribed, so the form is not shown.
   const token = searchParams.get("token") || "";
-  const emailParam = searchParams.get("email") || "";
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (token) {
-      fetch(`/api/unsubscribe?token=${encodeURIComponent(token)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.ok && data.email) {
-            setEmail(data.email);
-          }
-        })
-        .catch(() => {});
-    } else if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [token, emailParam]);
+    if (!token) return;
+    fetch(`/api/unsubscribe?token=${encodeURIComponent(token)}`, { headers: { Accept: "application/json" } })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok && data.email) {
+          setEmail(data.email);
+        } else {
+          setStatus("error");
+          setErrorMessage("This unsubscribe link is not valid. Use the unsubscribe link at the bottom of any GLOW VAI email.");
+        }
+      })
+      .catch(() => {});
+  }, [token]);
 
   const handleUnsubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ function UnsubscribeContent() {
       const res = await fetch("/api/unsubscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, email: email || emailParam }),
+        body: JSON.stringify({ token }),
       });
 
       const data = await res.json();
@@ -73,6 +73,14 @@ function UnsubscribeContent() {
                 Your email has been removed from GLOW VAI marketing emails. Order updates about any orders you place will still be sent.
               </p>
             </div>
+          ) : !token ? (
+            <div role="status" className="mt-10 border border-ink/20 bg-white rounded-[24px] p-6 sm:p-8 space-y-3">
+              <p className="font-display font-semibold text-2xl">Use the link in your email.</p>
+              <p className="text-[17px] text-ink-muted">
+                To stop GLOW VAI marketing emails, open the &ldquo;Unsubscribe&rdquo; link at the bottom of any email we sent you. That link
+                proves the address is yours, so nobody else can unsubscribe you.
+              </p>
+            </div>
           ) : (
             <form onSubmit={handleUnsubscribe} noValidate className="mt-10 space-y-5 border border-ink/15 bg-white rounded-[24px] p-6 sm:p-8">
               <div>
@@ -80,11 +88,9 @@ function UnsubscribeContent() {
                 <input
                   id="unsub-email"
                   type="email"
-                  required
-                  autoComplete="email"
+                  readOnly
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
+                  placeholder="Checking your link…"
                   aria-invalid={status === "error"}
                   aria-describedby={status === "error" ? "unsub-error" : undefined}
                   className={`${input} mt-2`}

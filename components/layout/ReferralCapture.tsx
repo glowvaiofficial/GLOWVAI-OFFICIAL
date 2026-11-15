@@ -1,23 +1,40 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import { referralCodeFromLink, savePendingReferral } from "@/lib/shop/growth/pendingReferral";
 
 /**
- * ReferralCapture: intercepts ?ref= query param on ANY page load
- * and stores it in localStorage so the referral portal can credit it
- * even if the user lands on the homepage (not /referral directly).
+ * ReferralCapture: reads the ref (or partnerId, driverId, studentId) query value on any page load.
+ *
+ * - A customer's referral code (the share link glowvai.in/shop?ref=CODE) is kept on this device until the visitor signs
+ *   in with a phone account; the shop then applies it once through /api/shop/referral/apply (see
+ *   glowvai-app/features/profile/pendingReferral.ts). Affiliate links use the same ?ref= value: the shop page still sends
+ *   it as an affiliate click (AffiliateClickCapture), and the server decides which kind of code it is.
+ * - An old partner id (GLV-AUTO-..., GLV-STUDENT-...) is stored for the referral portal as before.
  */
 export function ReferralCapture() {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
+    let params: URLSearchParams;
+    try {
+      params = new URLSearchParams(window.location.search);
+    } catch {
+      return;
+    }
     const ref =
       params.get("ref") ||
       params.get("partnerId") ||
       params.get("driverId") ||
       params.get("studentId");
+    if (!ref || !ref.trim()) return;
 
-    if (ref && ref.trim()) {
+    try {
+      const code = params.get("ref") ? referralCodeFromLink(params.get("ref")) : "";
+      if (code) {
+        savePendingReferral(window.localStorage, code, Date.now());
+        return;
+      }
+
       // Only store if not already set (don't overwrite an existing session partner)
       const existing = localStorage.getItem("v_partner_id");
       if (!existing) {
@@ -34,6 +51,8 @@ export function ReferralCapture() {
           localStorage.setItem("v_partner_meta", "Auto Partner");
         }
       }
+    } catch {
+      // Storage blocked: the link is not remembered.
     }
   }, []);
 

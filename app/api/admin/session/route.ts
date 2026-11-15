@@ -11,8 +11,17 @@ function secureCookie() {
   return process.env.NODE_ENV === "production";
 }
 
+function tooMany(retryAfter: number) {
+  return NextResponse.json(
+    { ok: false, error: "Too many requests. Try again later." },
+    { status: 429, headers: { "Retry-After": String(retryAfter), "Cache-Control": "no-store" } }
+  );
+}
+
 /** Is the current request carrying a valid admin session? */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const limit = rateLimit(`admin-session:${clientIp(req)}`, 60, 60_000);
+  if (!limit.ok) return tooMany(limit.retryAfter);
   const secret = process.env.SESSION_SECRET;
   const jar = await cookies();
   const authed = Boolean(secret) && verifySession(jar.get(ADMIN_COOKIE)?.value, secret as string);
@@ -65,7 +74,9 @@ export async function POST(req: NextRequest) {
 }
 
 /** Log out. */
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+  const limit = rateLimit(`admin-logout:${clientIp(req)}`, 20, 60_000);
+  if (!limit.ok) return tooMany(limit.retryAfter);
   const res = NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
   res.cookies.set(ADMIN_COOKIE, "", { httpOnly: true, secure: secureCookie(), sameSite: "strict", path: "/", maxAge: 0 });
   return res;

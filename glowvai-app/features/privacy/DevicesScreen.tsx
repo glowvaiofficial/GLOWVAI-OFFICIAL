@@ -3,6 +3,10 @@ import { LogOut, Smartphone } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { useApp } from '../../context/useApp';
 import { auth } from '../../core/config/firebase';
+import { forgetDeviceToken } from '../../core/notifications/push';
+import { useCustomerStore } from '../../core/state/customerStore';
+import { clearAccountLocalData, signOutThisDevice as signOutThisDeviceSteps } from '../auth/signOutCleanup';
+import { stopWishlistSync } from '../shop/lib/wishlistSync';
 import { ProfileHeader } from '../profile/ProfileShared';
 import '../profile/profile.css';
 import './privacy.css';
@@ -10,6 +14,14 @@ import { fetchDevices, removeDevice, signOutOtherDevices, type DeviceView } from
 
 const when = (ms: number) =>
   new Date(ms).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+
+function deviceStorage(): Storage | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
 
 // Security and devices: the devices signed in to this account, the "This device" marker, a last sign-in line, and the two
 // sign-out actions. Signing out ends the browser's session; for a guest account the next session is a new guest account.
@@ -40,11 +52,22 @@ export const DevicesScreen = () => {
     void load();
   }, [load]);
 
+  // Ends the session in this browser the same way as Settings > Sign out: this device's push token is removed while still
+  // signed in, then the account's data kept on this device is cleared (see features/auth/signOutCleanup.ts).
   const endLocalSession = async () => {
     try {
-      await signOut(auth);
+      await signOutThisDeviceSteps({
+        forgetPushToken: forgetDeviceToken,
+        signOut: () => signOut(auth),
+        stopSync: stopWishlistSync,
+        resetCustomer: () => useCustomerStore.getState().reset(),
+        store: deviceStorage(),
+      });
     } catch {
-      // The session may already be gone. Either way this browser starts fresh on the next request.
+      // The session may already be gone. Either way this browser starts fresh on the next request, without the old
+      // account's data.
+      stopWishlistSync();
+      clearAccountLocalData(deviceStorage());
     }
   };
 

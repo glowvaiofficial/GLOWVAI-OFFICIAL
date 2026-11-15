@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 import { randomUUID } from "crypto";
 import { leadFormSchema, leadPatchSchema } from "@/lib/schemas";
 import { setSessionCookie, verifySessionToken } from "@/lib/session";
@@ -61,6 +62,7 @@ function parseUA(ua: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
   if (limited(ip)) {
     return NextResponse.json(
@@ -201,6 +203,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
+  if (limited(`patch:${ip}`)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   const sessionCookie = req.cookies.get("gv_session")?.value;
   let verification: { valid: boolean; sessionId?: string };
   try {
