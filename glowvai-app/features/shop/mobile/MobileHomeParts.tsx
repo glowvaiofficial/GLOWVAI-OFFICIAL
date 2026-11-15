@@ -63,6 +63,7 @@ export function MobileHomeHeader({
   initial: string;
 }) {
   const navigate = useHomeNavigate();
+  const { accountSignedIn } = useApp();
   return (
     <header className="gvh-header" style={{ '--wash': tab.accent, '--wash-on': readableTextOn(tab.accent) } as React.CSSProperties}>
       <div className="gvh-top">
@@ -72,12 +73,14 @@ export function MobileHomeHeader({
         {embedded ? (
           <span className="gvh-location is-static">
             <MapPin size={15} aria-hidden="true" />
-            <span>{location}</span>
+            <span className="gvh-loc-label">Deliver to</span>
+            <span className="gvh-loc-name">{location}</span>
           </span>
         ) : (
           <button type="button" className="gvh-location" onClick={() => navigate('location-setup')} aria-label={`Deliver to ${location}. Change location`}>
             <MapPin size={15} aria-hidden="true" />
-            <span>{location}</span>
+            <span className="gvh-loc-label">Deliver to</span>
+            <span className="gvh-loc-name">{location}</span>
             <ChevronDown size={14} aria-hidden="true" />
           </button>
         )}
@@ -93,7 +96,7 @@ export function MobileHomeHeader({
           <span className="gvh-cart-slot">
             <HeaderCartButton onOpen={() => navigate('cart-tab')} />
           </span>
-          <button type="button" className="gvh-scan-pill" onClick={() => navigate('scan-camera')}>
+          <button type="button" className="gvh-scan-pill" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
             <ScanFace size={16} aria-hidden="true" />
             Skin scan
           </button>

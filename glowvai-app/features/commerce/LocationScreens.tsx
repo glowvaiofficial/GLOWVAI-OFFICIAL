@@ -6,6 +6,7 @@ import { locateDevice, searchPlaces, type PlaceResult } from './lib/geocode';
 import { isServiceablePincode, useAddressStore } from './lib/addressStore';
 import { FlowHeader, useDeliveryAddress } from './components/shared';
 import { readReturnTo } from './AddressScreens';
+import { areaNameOf, guestAreaAddress, isServiceableAreaPincode, saveGuestArea } from './lib/guestArea';
 
 // Areas we deliver to (data/serviceability.ts). Coordinates are not stored for them, so picking one fills the area and pincode.
 const SERVICE_AREAS = VIJAYAWADA_AREAS.filter((area) => area.quickCommerceAvailable);
@@ -171,7 +172,7 @@ export const LocationSetupScreen: React.FC = () => {
 
 // Step 2: confirm the area and pincode. Web has no map view, so the pin comes from search or the device location.
 export const LocationMapPickerScreen: React.FC = () => {
-  const { activeParams, goBack, navigate, showToast } = useApp();
+  const { activeParams, goBack, navigate, showToast, accountSignedIn, selectAddress } = useApp();
   const returnTo = readReturnTo(activeParams);
   const params = (activeParams || {}) as { address?: string; latitude?: number; longitude?: number; pincode?: string };
   const initialPin =
@@ -228,6 +229,18 @@ export const LocationMapPickerScreen: React.FC = () => {
   const confirm = () => {
     if (!address.trim()) {
       setAddressError('Add the area or street to continue');
+      return;
+    }
+    // A visitor without an account picks an area only: the pincode is checked, the area is kept on the device, and a named address stays behind sign-in.
+    if (!accountSignedIn) {
+      if (!isServiceableAreaPincode(pincode)) {
+        setAddressError('Add a Vijayawada pincode (520xxx) to check delivery');
+        return;
+      }
+      const area = { area: areaNameOf(address), pincode };
+      saveGuestArea(area);
+      selectAddress(guestAreaAddress(area));
+      navigate((returnTo ?? 'shop-home') as Parameters<typeof navigate>[0]);
       return;
     }
     navigate('address-add', { ...(returnTo ? { returnTo } : {}), address: address.trim(), latitude: pin?.latitude, longitude: pin?.longitude, pincode });
@@ -298,9 +311,10 @@ export const LocationMapPickerScreen: React.FC = () => {
               <span>Pincode</span>
               <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} autoComplete="postal-code" />
             </label>
+            {!accountSignedIn && <p className="commerce-warn">Browsing as a guest: we keep this area on your device. Sign in to save a named address.</p>}
             {pincode.length === 6 && !isServiceablePincode(pincode) && <p className="commerce-warn">We deliver to Vijayawada pincodes (520xxx) right now.</p>}
             <button className="commerce-primary is-wide commerce-aside-cta" onClick={confirm}>
-              Confirm and add details
+              {accountSignedIn ? 'Confirm and add details' : 'Use this area'}
             </button>
           </section>
         </div>
@@ -308,7 +322,7 @@ export const LocationMapPickerScreen: React.FC = () => {
 
       <footer className="commerce-sticky-bar">
         <button className="commerce-primary is-wide" onClick={confirm}>
-          Confirm and add details
+          {accountSignedIn ? 'Confirm and add details' : 'Use this area'}
         </button>
       </footer>
     </main>
