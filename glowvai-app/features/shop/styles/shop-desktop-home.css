@@ -1,27 +1,65 @@
 /* Desktop shop home (ShopDesktopHome: screens 1024px wide and more, or ?device=desktop). Its own look, separate from the
-   mobile home in shop-home.css: a white page, one wide sticky header with a category tab row, a wide hero, a wide category
-   grid, and rails that show many cards at once. Content sits in one centred column up to 1440px. Colours and fonts come
-   from the theme variables (--ds-brand, --font-body, --font-brand), so the admin theme applies here too. */
+   mobile home in shop-home.css. A beauty brand's page: warm porcelain surfaces, deep ink text, an editorial serif for
+   headings with small spaced eyebrows above them, products on soft tinted squares with no hard borders, brand blue only
+   for the main actions, one soft rose accent used sparingly. One centred column (1280px of content, wide gutters), an
+   8px spacing scale and the same space between every section. Motion is short and eased out, and the moving parts are
+   switched off for people who ask for less motion. The body font comes from the theme (--font-body), so the admin theme
+   still applies; the display serif is set by the component (--desk-font-display). */
 
 .glowvai-root .shop-screen.shop-desk{
-  --desk-max: 1440px;
-  --desk-pad: clamp(16px, 3vw, 40px);
+  /* Layout */
+  --desk-max: 1280px;
+  --desk-pad: 40px;
+  --desk-section: 72px;
+  --desk-gap: 24px;
+  /* Colour */
+  --desk-bg: #fbf8f5;
+  --desk-surface: #ffffff;
+  --desk-sand: #f4ede7;
+  --desk-blush: #f7e9e4;
+  --desk-ink: #141b34;
+  --desk-muted: #5c6074;
+  --desk-faint: #767887;
+  --desk-line: #ebe4dd;
+  --desk-line-strong: #d9d0c7;
+  --desk-rose: #9a5448;
+  --desk-rose-soft: #f6e4de;
   --desk-brand: var(--ds-brand, #0057fb);
   --desk-brand-dark: var(--ds-brand-dark, #0046cc);
-  --desk-ink: var(--ds-ink, #071b4d);
-  --desk-muted: var(--ds-muted, #53617d);
-  --desk-line: #e6ebf3;
-  --desk-sky: #eef3ff;
+  --desk-ring: 0 0 0 4px rgba(0, 87, 251, .14);
+  /* Shape and depth */
+  --desk-r-sm: 10px;
+  --desk-r: 16px;
+  --desk-r-lg: 20px;
+  --desk-shadow-hover: 0 24px 40px -22px rgba(20, 27, 52, .28);
+  --desk-shadow-soft: 0 12px 32px -20px rgba(20, 27, 52, .22);
+  /* Motion */
+  --desk-ease: cubic-bezier(.22, .61, .36, 1);
+  --desk-fast: 200ms;
+  --desk-mid: 300ms;
+  --desk-slow: 400ms;
+  /* Type */
+  --desk-display: var(--desk-font-display, 'Instrument Serif'), 'Iowan Old Style', Georgia, 'Times New Roman', serif;
   --mode-accent: #ef2f72; --mode-deep: #aa0c43; --mode-soft: #fff1f5;
+  position: relative;
   min-height: 100%;
   padding-bottom: 0;
-  background: #fff;
+  background: var(--desk-bg);
   color: var(--desk-ink);
   font-family: var(--font-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
 }
 .glowvai-root .shop-screen.shop-desk.zq-mode-men{ --mode-accent: #075df7; --mode-deep: #073784; --mode-soft: #edf5ff; }
 .glowvai-root .shop-desk img{ display: block; }
+.glowvai-root .shop-desk button{ font-family: inherit; cursor: pointer; }
+.glowvai-root .shop-desk button:disabled{ cursor: default; }
 .glowvai-root .shop-desk .shop-desk-sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-top{ position: absolute; top: 0; left: 0; width: 1px; height: 16px; pointer-events: none; }
+.glowvai-root .shop-desk .shop-desk-display{ font-family: var(--desk-display); font-weight: 400; }
+
+/* Focus: one clear ring for every control on the page (the footer has its own, on the dark band). */
+.glowvai-root .shop-desk :where(button, a):focus-visible{ outline: 2px solid var(--desk-brand); outline-offset: 3px; }
 
 /* The desktop home brings its own header, so the shell's header and the phone tab bar are not shown with it. The page uses
    the full window width; the column inside is centred. */
@@ -29,249 +67,418 @@
 .glowvai-root .app-viewport:has(.shop-desk) .bottom-commerce-shell{ display: none; }
 .glowvai-root .screen-content > .shop-desk{ width: 100%; max-width: none; margin-inline: 0; }
 
-/* Header: logo, delivery time and place, a wide search, then the account links and the cart. */
-.glowvai-root .shop-desk .shop-desk-header{ position: sticky; top: 0; z-index: 120; border-bottom: 1px solid var(--desk-line); background: #fff; box-shadow: 0 2px 12px rgba(7, 27, 77, .04); }
-.glowvai-root .shop-desk .shop-desk-header-inner{ display: flex; height: 76px; align-items: center; gap: 20px; max-width: var(--desk-max); margin: 0 auto; padding: 0 var(--desk-pad); box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-logo{ display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--desk-ink); font-family: var(--font-brand); font-size: 28px; font-weight: 600; letter-spacing: -.055em; line-height: 1; }
-.glowvai-root .shop-desk .shop-desk-logo img{ width: 36px; height: 36px; border-radius: 10px; }
-.glowvai-root .shop-desk .shop-desk-delivery{ display: grid; flex: 0 1 230px; min-width: 0; gap: 3px; padding: 4px 0 4px 20px; border: 0; border-left: 1px solid var(--desk-line); background: none; text-align: left; }
-.glowvai-root .shop-desk .shop-desk-delivery strong{ color: var(--desk-ink); font-size: 16px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-delivery > span{ display: flex; min-width: 0; align-items: center; gap: 4px; color: var(--desk-muted); font-size: 13px; font-weight: 600; }
+/* ---------------------------------------------------------------- Header */
+/* Sticky, frosted porcelain. Once the page scrolls, a soft shadow appears and the top row gets 12px shorter; the header
+   gains the same 12px as a bottom margin at the same time, so the page below does not move. */
+.glowvai-root .shop-desk .shop-desk-header{ position: sticky; top: 0; z-index: 120; margin-bottom: 0; border-bottom: 1px solid var(--desk-line); background: rgba(251, 248, 245, .9); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); transition: box-shadow var(--desk-mid) var(--desk-ease), margin-bottom var(--desk-mid) var(--desk-ease), border-color var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled{ margin-bottom: 12px; border-bottom-color: transparent; box-shadow: 0 10px 30px -18px rgba(20, 27, 52, .3); }
+.glowvai-root .shop-desk .shop-desk-header-inner{ display: flex; height: 76px; align-items: center; gap: 24px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 0 var(--desk-pad); box-sizing: border-box; transition: height var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled .shop-desk-header-inner{ height: 64px; }
+
+.glowvai-root .shop-desk .shop-desk-logo{ display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--desk-ink); font-family: var(--font-brand); font-size: 26px; font-weight: 600; letter-spacing: -.05em; line-height: 1; }
+.glowvai-root .shop-desk .shop-desk-logo img{ width: 32px; height: 32px; border-radius: 9px; }
+
+.glowvai-root .shop-desk .shop-desk-delivery{ display: grid; flex: 0 1 216px; min-width: 0; gap: 2px; padding: 6px 0 6px 24px; border: 0; border-left: 1px solid var(--desk-line); background: none; color: var(--desk-ink); text-align: left; }
+.glowvai-root .shop-desk .shop-desk-delivery strong{ font-size: 15px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-delivery > span{ display: flex; min-width: 0; align-items: center; gap: 4px; color: var(--desk-muted); font-size: 13px; font-weight: 400; }
 .glowvai-root .shop-desk .shop-desk-delivery svg{ flex: 0 0 auto; }
 .glowvai-root .shop-desk .shop-desk-delivery-place{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-delivery:hover .shop-desk-delivery-place{ color: var(--desk-ink); text-decoration: underline; }
+.glowvai-root .shop-desk .shop-desk-delivery:hover .shop-desk-delivery-place{ color: var(--desk-ink); text-decoration: underline; text-underline-offset: 3px; }
 
-.glowvai-root .shop-desk .shop-desk-search{ display: flex; flex: 1 1 auto; min-width: 0; height: 50px; align-items: center; gap: 8px; padding: 0 6px 0 18px; border: 1px solid #e1e6ef; border-radius: 14px; background: #f6f8fc; }
-.glowvai-root .shop-desk .shop-desk-search:hover, .glowvai-root .shop-desk .shop-desk-search:focus-within{ border-color: #c9d3e6; background: #fff; }
-.glowvai-root .shop-desk .shop-desk-search-input{ display: flex; flex: 1; min-width: 0; height: 100%; align-items: center; gap: 10px; padding: 0; border: 0; background: none; color: var(--desk-muted); font-size: 15px; text-align: left; cursor: text; }
+/* The search is the centre of the header: the widest element, a white pill with a clear focus ring. */
+.glowvai-root .shop-desk .shop-desk-search{ display: flex; flex: 1 1 auto; min-width: 0; max-width: 680px; height: 46px; align-items: center; gap: 8px; margin-inline: auto; padding: 0 6px 0 20px; border: 1px solid var(--desk-line-strong); border-radius: 999px; background: var(--desk-surface); transition: border-color var(--desk-fast) var(--desk-ease), box-shadow var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-search:hover{ border-color: #c4b9ae; }
+.glowvai-root .shop-desk .shop-desk-search:focus-within{ border-color: var(--desk-brand); box-shadow: var(--desk-ring); }
+.glowvai-root .shop-desk .shop-desk-search-input{ display: flex; flex: 1; min-width: 0; height: 100%; align-items: center; gap: 12px; padding: 0; border: 0; background: none; color: var(--desk-muted); font-size: 14px; text-align: left; cursor: text; }
+.glowvai-root .shop-desk .shop-desk-search-input:focus-visible{ outline: none; }
 .glowvai-root .shop-desk .shop-desk-search-input svg{ flex-shrink: 0; color: var(--desk-ink); }
 .glowvai-root .shop-desk .shop-desk-search-input > span{ min-width: 0; }
 /* The rotating hint and the voice button are shared with the mobile home (SearchHint, VoiceSearchButton). */
 .glowvai-root .shop-desk .shop-home-hint{ display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: opacity 400ms ease; }
 .glowvai-root .shop-desk .shop-home-hint:not(.is-visible){ opacity: 0; }
 .glowvai-root .shop-desk .shop-home-voice-wrap{ position: relative; display: inline-flex; flex-shrink: 0; }
-.glowvai-root .shop-desk .shop-home-voice{ display: inline-flex; min-width: 38px; height: 38px; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; padding: 0; border: 0; border-radius: 10px; background: #fff; color: var(--desk-brand); font-size: 13px; font-weight: 800; }
-.glowvai-root .shop-desk .shop-home-voice:hover{ background: var(--desk-sky); }
+.glowvai-root .shop-desk .shop-home-voice{ display: inline-flex; min-width: 36px; height: 36px; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--desk-ink); font-size: 13px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-home-voice:hover{ background: var(--desk-sand); }
 .glowvai-root .shop-desk .shop-home-voice.is-listening{ justify-content: flex-start; padding: 0 12px; background: var(--desk-brand); color: #fff; }
-.glowvai-root .shop-desk .shop-home-voice-msg{ position: absolute; top: calc(100% + 6px); right: 0; z-index: 2; width: max-content; max-width: 280px; margin: 0; padding: 6px 10px; border-radius: 10px; background: #fff; color: var(--desk-ink); font-size: 12px; box-shadow: 0 2px 10px rgba(7, 27, 77, .12); }
-@media (prefers-reduced-motion: reduce){
-  .glowvai-root .shop-desk .shop-home-hint{ transition: none; }
-}
+.glowvai-root .shop-desk .shop-home-voice-msg{ position: absolute; top: calc(100% + 8px); right: 0; z-index: 2; width: max-content; max-width: 280px; margin: 0; padding: 8px 12px; border-radius: var(--desk-r-sm); background: var(--desk-surface); color: var(--desk-ink); font-size: 12px; box-shadow: var(--desk-shadow-soft); }
 
-.glowvai-root .shop-desk .shop-desk-actions{ display: flex; flex: 0 0 auto; align-items: center; gap: 2px; }
-.glowvai-root .shop-desk .shop-desk-action{ position: relative; display: inline-flex; min-width: 60px; min-height: 52px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0 10px; border: 0; border-radius: 12px; background: none; color: var(--desk-ink); font-size: 12px; font-weight: 600; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-action:hover{ background: #f4f6fa; color: var(--desk-brand); }
-.glowvai-root .shop-desk .shop-desk-action.is-icon{ min-width: 48px; }
-.glowvai-root .shop-desk .shop-desk-badge{ position: absolute; top: 6px; right: 8px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #e5484d; color: #fff; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-cart{ display: inline-flex; min-width: 124px; min-height: 50px; align-items: center; justify-content: center; gap: 10px; margin-left: 8px; padding: 0 18px; border: 0; border-radius: 12px; background: var(--desk-brand); color: #fff; font-size: 15px; font-weight: 700; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-cart:hover{ background: var(--desk-brand-dark); }
-.glowvai-root .shop-desk .shop-desk-cart-copy{ display: grid; gap: 3px; text-align: left; }
-.glowvai-root .shop-desk .shop-desk-cart-copy b{ font-size: 13px; font-weight: 800; line-height: 1; }
-.glowvai-root .shop-desk .shop-desk-cart-copy small{ font-size: 12px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.glowvai-root .shop-desk .shop-desk-actions{ display: flex; flex: 0 0 auto; align-items: center; gap: 4px; }
+.glowvai-root .shop-desk .shop-desk-action{ position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--desk-ink); font-size: 14px; font-weight: 500; white-space: nowrap; transition: background-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-action:hover{ background: var(--desk-sand); }
+.glowvai-root .shop-desk .shop-desk-action.is-icon{ width: 44px; justify-content: center; padding: 0; }
+.glowvai-root .shop-desk .shop-desk-badge{ position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border: 2px solid var(--desk-bg); border-radius: 999px; background: var(--desk-rose); color: #fff; font-size: 10px; font-weight: 700; line-height: 14px; text-align: center; box-sizing: border-box; }
+.glowvai-root .shop-desk .shop-desk-cart{ display: inline-flex; min-width: 120px; min-height: 44px; align-items: center; justify-content: center; gap: 8px; margin-left: 8px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 14px; font-weight: 600; white-space: nowrap; transition: background-color var(--desk-fast) var(--desk-ease), transform var(--desk-fast) var(--desk-ease), box-shadow var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-cart:hover{ background: var(--desk-brand-dark); box-shadow: 0 10px 24px -12px rgba(0, 87, 251, .6); }
+.glowvai-root .shop-desk .shop-desk-cart-copy{ display: grid; gap: 2px; text-align: left; }
+.glowvai-root .shop-desk .shop-desk-cart-copy b{ font-size: 13px; font-weight: 600; line-height: 1; }
+.glowvai-root .shop-desk .shop-desk-cart-copy small{ font-size: 12px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; opacity: .9; }
 
-/* Category tabs: an icon over each name, the current one underlined in the brand colour; the For Her / For Him switch on the right. */
-.glowvai-root .shop-desk .shop-desk-tabs-row{ display: flex; align-items: center; gap: 20px; max-width: var(--desk-max); margin: 0 auto; padding: 0 var(--desk-pad); box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-tabs{ display: flex; flex: 1 1 auto; min-width: 0; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+/* Category tabs: icon and name side by side, one underline that glides to the tab under the pointer; the For Her / For
+   Him switch on the right, in quiet neutrals. */
+.glowvai-root .shop-desk .shop-desk-tabs-row{ display: flex; align-items: center; gap: 24px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 0 var(--desk-pad); box-sizing: border-box; }
+.glowvai-root .shop-desk .shop-desk-tabs{ position: relative; display: flex; flex: 1 1 auto; min-width: 0; gap: 8px; overflow-x: auto; scrollbar-width: none; }
 .glowvai-root .shop-desk .shop-desk-tabs::-webkit-scrollbar{ display: none; }
-.glowvai-root .shop-desk .shop-desk-tab{ display: inline-flex; flex: 0 0 auto; min-width: 84px; flex-direction: column; align-items: center; gap: 4px; padding: 8px 14px 9px; border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: var(--desk-muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-tab{ display: inline-flex; flex: 0 0 auto; height: 48px; align-items: center; gap: 8px; padding: 0 12px; border: 0; border-radius: 0; background: none; color: var(--desk-muted); font-size: 14px; font-weight: 500; white-space: nowrap; transition: color var(--desk-fast) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-tab:hover{ color: var(--desk-ink); }
-.glowvai-root .shop-desk .shop-desk-tab[aria-current="page"]{ border-bottom-color: var(--desk-brand); color: var(--desk-brand); font-weight: 800; }
-.glowvai-root .shop-desk .shop-desk-mode{ flex: 0 0 240px; height: 42px; }
-.glowvai-root .shop-desk .shop-desk-mode button{ min-height: 0; font-size: 13px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-tab:focus-visible{ outline-offset: -4px; border-radius: 8px; }
+.glowvai-root .shop-desk .shop-desk-tab[aria-current="page"]{ color: var(--desk-ink); font-weight: 600; }
+.glowvai-root .shop-desk .shop-desk-tab-ink{ position: absolute; bottom: 0; left: 0; height: 2px; border-radius: 2px; background: var(--desk-brand); pointer-events: none; transition: transform var(--desk-mid) var(--desk-ease), width var(--desk-mid) var(--desk-ease), opacity var(--desk-fast) ease; }
+.glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode{ flex: 0 0 208px; height: 36px; border: 0; border-radius: 999px; background: var(--desk-sand); box-shadow: none; }
+.glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode .zq-mode-thumb{ border-radius: 999px; background: var(--desk-surface); box-shadow: 0 2px 8px -2px rgba(20, 27, 52, .18); }
+.glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode button{ min-height: 0; color: var(--desk-muted); font-size: 13px; font-weight: 500; }
+.glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode button[aria-pressed="true"]{ color: var(--desk-ink); font-weight: 600; }
+.glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode button:focus-visible{ outline-offset: -2px; border-radius: 999px; }
 
-.glowvai-root .shop-desk .shop-desk-header button:focus-visible{ outline: 3px solid var(--desk-brand); outline-offset: 2px; }
+/* ---------------------------------------------------------------- Page column */
+.glowvai-root .shop-desk .shop-desk-main{ max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 0 var(--desk-pad) 16px; box-sizing: border-box; }
+.glowvai-root .shop-desk .shop-desk-preview{ margin: 24px 0 0; padding: 12px 16px; border-radius: var(--desk-r-sm); background: #fff4d6; color: #6b4a00; font-size: 14px; font-weight: 600; }
 
-/* The page column */
-.glowvai-root .shop-desk .shop-desk-main{ max-width: var(--desk-max); margin: 0 auto; padding: 0 var(--desk-pad) 8px; box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-preview{ margin: 16px 0 0; padding: 10px 14px; border-radius: 12px; background: #fff4d6; color: #6b4a00; font-size: 14px; font-weight: 700; }
-
-/* Skin quiz strip (shared component) */
-.glowvai-root .shop-desk .shop-quiz-banner{ display: flex; align-items: center; gap: 14px; margin: 20px 0 0; padding: 14px 18px; border-radius: 16px; background: #eaf1ff; color: var(--desk-ink); }
-.glowvai-root .shop-desk .shop-quiz-banner-icon{ display: grid; flex: 0 0 auto; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: #fff; color: var(--desk-brand); }
+/* Skin quiz strip (shared component): a quiet white card. */
+.glowvai-root .shop-desk .shop-quiz-banner{ display: flex; align-items: center; gap: 16px; margin: 24px 0 0; padding: 12px 16px 12px 12px; border: 1px solid var(--desk-line); border-radius: var(--desk-r); background: var(--desk-surface); color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-quiz-banner-icon{ display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--desk-rose-soft); color: var(--desk-rose); }
 .glowvai-root .shop-desk .shop-quiz-banner-copy{ display: flex; flex: 1 1 auto; min-width: 0; align-items: center; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; }
-.glowvai-root .shop-desk .shop-quiz-banner-copy strong{ font-size: 15px; }
+.glowvai-root .shop-desk .shop-quiz-banner-copy strong{ font-size: 15px; font-weight: 600; }
 .glowvai-root .shop-desk .shop-quiz-banner-copy > span{ color: var(--desk-muted); }
-.glowvai-root .shop-desk .shop-quiz-banner-cta{ padding: 8px 16px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 13px; font-weight: 700; }
-.glowvai-root .shop-desk .shop-quiz-banner-skip{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; padding: 0 6px; border: 0; background: none; color: var(--desk-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-desk .shop-quiz-banner-cta{ padding: 8px 18px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-desk .shop-quiz-banner-skip{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; padding: 0 8px; border: 0; background: none; color: var(--desk-muted); font-size: 13px; font-weight: 500; }
 
-/* Hero: one wide rounded banner in the brand colour, the picture on the right fading into it. */
-.glowvai-root .shop-desk .shop-desk-hero{ position: relative; min-height: 340px; margin-top: 24px; overflow: hidden; border-radius: 24px; background: var(--desk-brand); color: #fff; }
-.glowvai-root .shop-desk .shop-desk-hero > img{ position: absolute; top: 0; right: 0; width: 64%; height: 100%; object-fit: cover; object-position: 67% center; }
-.glowvai-root .shop-desk .shop-desk-hero::after{ content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--desk-brand) 0%, var(--desk-brand) 36%, rgba(0, 87, 251, .5) 56%, rgba(0, 87, 251, 0) 80%); background: linear-gradient(90deg, var(--desk-brand) 0%, var(--desk-brand) 36%, color-mix(in srgb, var(--desk-brand) 50%, transparent) 56%, transparent 80%); }
-.glowvai-root .shop-desk .shop-desk-hero-copy{ position: relative; z-index: 1; display: flex; min-height: 340px; max-width: 600px; flex-direction: column; justify-content: center; padding: 44px 56px; box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-hero-tag{ align-self: flex-start; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .18); font-size: 13px; font-weight: 700; }
-.glowvai-root .shop-desk .shop-desk-hero h1{ margin: 0; font-size: 56px; font-weight: 800; line-height: 1; letter-spacing: -.04em; }
-.glowvai-root .shop-desk .shop-desk-hero-sub{ margin: 12px 0 0; font-size: 18px; font-weight: 600; line-height: 1.4; opacity: .95; }
-.glowvai-root .shop-desk .shop-desk-hero-actions{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+/* ---------------------------------------------------------------- Hero */
+/* Editorial: a soft blush backdrop with two blurred light shapes, the headline in the display serif on the left (about
+   45% of the width), the campaign picture on the right fading into the backdrop. About 360px tall on a 1440px screen. */
+.glowvai-root .shop-desk .shop-desk-hero{ position: relative; display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); height: clamp(320px, 25vw, 380px); margin-top: 24px; overflow: hidden; border-radius: var(--desk-r-lg); background: linear-gradient(115deg, #fbf3ef 0%, #f6e6df 55%, #f1ddd5 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-hero-shapes{ position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.glowvai-root .shop-desk .shop-desk-hero-shapes::before,
+.glowvai-root .shop-desk .shop-desk-hero-shapes::after{ content: ''; position: absolute; border-radius: 50%; filter: blur(8px); }
+.glowvai-root .shop-desk .shop-desk-hero-shapes::before{ top: -120px; left: -80px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, 0) 70%); }
+.glowvai-root .shop-desk .shop-desk-hero-shapes::after{ right: 34%; bottom: -160px; width: 420px; height: 420px; background: radial-gradient(circle, rgba(232, 196, 182, .55) 0%, rgba(232, 196, 182, 0) 70%); }
+.glowvai-root .shop-desk .shop-desk-hero-copy{ position: relative; z-index: 1; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 40px 0 40px 56px; }
+.glowvai-root .shop-desk .shop-desk-hero-tag{ margin: 0 0 16px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-hero h1{ margin: 0; font-family: var(--desk-display); font-size: clamp(48px, 4.6vw, 68px); font-weight: 400; line-height: 1; letter-spacing: -.015em; }
+.glowvai-root .shop-desk .shop-desk-hero h1 em{ color: var(--desk-rose); font-style: italic; }
+.glowvai-root .shop-desk .shop-desk-hero-sub{ max-width: 380px; margin: 16px 0 0; color: var(--desk-muted); font-size: 17px; font-weight: 400; line-height: 1.5; }
+.glowvai-root .shop-desk .shop-desk-hero-actions{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
+.glowvai-root .shop-desk .shop-desk-hero-media{ position: relative; min-width: 0; }
+.glowvai-root .shop-desk .shop-desk-hero-media img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 67% center; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 28%); mask-image: linear-gradient(90deg, transparent 0%, #000 28%); }
+
+/* Buttons: one primary (brand pill), one quiet secondary (thin outline), and an outline pill that fills on hover. */
 .glowvai-root .shop-desk .shop-desk-btn-light,
-.glowvai-root .shop-desk .shop-desk-btn-ghost{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 22px; border-radius: 999px; font-size: 15px; font-weight: 700; }
-.glowvai-root .shop-desk .shop-desk-btn-light{ border: 0; background: #fff; color: var(--desk-brand); }
-.glowvai-root .shop-desk .shop-desk-btn-ghost{ border: 1.5px solid rgba(255, 255, 255, .7); background: transparent; color: #fff; }
-.glowvai-root .shop-desk .shop-desk-btn-ghost:hover{ background: rgba(255, 255, 255, .12); }
-/* The admin's banner slide show (shared HomeBanners, which sets its own spacing inline). */
-.glowvai-root .shop-desk .shop-desk-banners > .shop-home-banners{ padding: 16px 0 0 !important; }
+.glowvai-root .shop-desk .shop-desk-btn-ghost,
+.glowvai-root .shop-desk .shop-desk-btn-outline{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 24px; border-radius: 999px; font-size: 15px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease), box-shadow var(--desk-mid) var(--desk-ease), transform var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-btn-light{ border: 0; background: var(--desk-brand); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-btn-light:hover{ background: var(--desk-brand-dark); box-shadow: 0 14px 28px -14px rgba(0, 87, 251, .7); }
+.glowvai-root .shop-desk .shop-desk-btn-ghost{ border: 1px solid rgba(20, 27, 52, .28); background: transparent; color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-btn-ghost:hover{ border-color: var(--desk-ink); background: rgba(255, 255, 255, .5); }
+.glowvai-root .shop-desk .shop-desk-btn-outline{ min-height: 44px; padding: 0 20px; border: 1px solid var(--desk-ink); background: transparent; color: var(--desk-ink); font-size: 14px; }
+.glowvai-root .shop-desk .shop-desk-btn-outline:hover{ background: var(--desk-ink); color: #fff; }
+.glowvai-root .shop-desk :is(.shop-desk-btn-light, .shop-desk-btn-ghost, .shop-desk-btn-outline, .shop-desk-cart, .shop-desk-add, .shop-desk-scan-btn, .shop-desk-end-btn, .shop-desk-retry, .shop-quiz-banner-cta) svg{ transition: transform var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk :is(.shop-desk-btn-light, .shop-desk-btn-outline, .shop-desk-scan-btn, .shop-desk-end-btn):hover svg:last-child{ transform: translateX(3px); }
 
-/* Section heads */
-.glowvai-root .shop-desk .shop-desk-section{ margin-top: 40px; }
-.glowvai-root .shop-desk .shop-desk-head{ display: flex; min-height: 40px; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.glowvai-root .shop-desk .shop-desk-head-titles{ display: grid; gap: 2px; }
-.glowvai-root .shop-desk .shop-desk-head h2{ margin: 0; color: var(--desk-ink); font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+/* The admin's banners (shared HomeBanners, which sets its own look inline): on the desktop the slides lie on top of each
+   other and change with a slow crossfade instead of sliding. */
+.glowvai-root .shop-desk .shop-desk-banners > .shop-home-banners{ gap: 16px !important; padding: 24px 0 0 !important; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners > div:not([role]){ border-radius: var(--desk-r-lg) !important; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners > div:not([role]) > div{ display: grid !important; transform: none !important; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners a[data-kind]{ grid-area: 1 / 1; min-height: 168px !important; padding: 32px 48px !important; border-radius: var(--desk-r-lg) !important; opacity: 1; visibility: visible; transition: opacity 900ms var(--desk-ease), visibility 0s linear 0s; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners a[data-kind][aria-hidden="true"]{ opacity: 0; visibility: hidden; transition: opacity 900ms var(--desk-ease), visibility 0s linear 900ms; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners a[data-kind] strong{ font-family: var(--desk-display); font-size: 30px !important; font-weight: 400; }
+.glowvai-root .shop-desk .shop-desk-banners .shop-home-banners [role="tablist"] button{ cursor: pointer; }
+
+/* ---------------------------------------------------------------- Section heads */
+/* Every section: a spaced eyebrow, the title in the display serif on the left, "See all" (and rail arrows) on the right. */
+.glowvai-root .shop-desk .shop-desk-section{ margin-top: var(--desk-section); }
+.glowvai-root .shop-desk .shop-desk-head{ display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.glowvai-root .shop-desk .shop-desk-head-titles{ display: grid; min-width: 0; gap: 8px; }
+.glowvai-root .shop-desk .shop-desk-eyebrow{ color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-head h2{ margin: 0; color: var(--desk-ink); font-family: var(--desk-display); font-size: 36px; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; }
 .glowvai-root .shop-desk .shop-desk-head-titles p{ margin: 0; color: var(--desk-muted); font-size: 14px; }
-.glowvai-root .shop-desk .shop-desk-head-actions{ display: flex; align-items: center; gap: 8px; }
-.glowvai-root .shop-desk .shop-desk-arrow{ display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--desk-line); border-radius: 50%; background: #fff; color: var(--desk-ink); }
-.glowvai-root .shop-desk .shop-desk-arrow:hover{ border-color: var(--desk-brand); color: var(--desk-brand); }
-.glowvai-root .shop-desk .shop-desk-see-all{ display: inline-flex; min-height: 40px; align-items: center; gap: 2px; margin-left: 4px; padding: 0 4px; border: 0; background: none; color: var(--desk-brand); font-size: 15px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-head-actions{ display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding-bottom: 2px; }
+.glowvai-root .shop-desk .shop-desk-arrow{ display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--desk-line-strong); border-radius: 50%; background: transparent; color: var(--desk-ink); transition: background-color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), opacity var(--desk-fast) ease; }
+.glowvai-root .shop-desk .shop-desk-arrow:hover:not(:disabled){ border-color: var(--desk-ink); background: var(--desk-ink); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-arrow:disabled{ opacity: .35; }
+.glowvai-root .shop-desk .shop-desk-see-all{ display: inline-flex; min-height: 40px; align-items: center; gap: 4px; margin-left: 8px; padding: 0 4px; border: 0; background: none; color: var(--desk-ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--desk-line-strong); text-decoration-thickness: 1px; text-underline-offset: 6px; transition: text-decoration-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-see-all:hover{ text-decoration-color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-see-all svg{ transition: transform var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-see-all:hover svg{ transform: translateX(3px); }
 .glowvai-root .shop-desk .shop-desk-empty{ margin: 0; color: var(--desk-muted); font-size: 14px; }
 
-/* Shop by Category: a wide grid, about eight to ten tiles a row. */
-.glowvai-root .shop-desk .shop-desk-cats{ display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 22px 16px; }
-.glowvai-root .shop-desk .shop-desk-cat{ display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 8px; padding: 0; border: 0; background: none; color: var(--desk-ink); text-align: center; }
-.glowvai-root .shop-desk .shop-desk-cat-media{ display: grid; width: 100%; aspect-ratio: 1 / 1; place-items: center; overflow: hidden; border-radius: 20px; transition: transform .2s ease, box-shadow .2s ease; }
-.glowvai-root .shop-desk .shop-desk-cat-media img{ width: 100%; height: 100%; object-fit: cover; }
-.glowvai-root .shop-desk .shop-desk-cat strong{ font-size: 14px; font-weight: 700; line-height: 1.25; }
-.glowvai-root .shop-desk .shop-desk-cat-count{ margin-top: -4px; color: var(--desk-muted); font-size: 12px; font-weight: 600; }
-.glowvai-root .shop-desk .shop-desk-cat-count.is-placeholder{ width: 60px; height: 12px; border-radius: 6px; background: var(--desk-sky); }
+/* Soft tinted squares for product and category photos: a gentle light in the upper middle, no border. */
+.glowvai-root .shop-desk :is(.shop-desk-card-media, .shop-desk-cat-media){ position: relative; display: grid; aspect-ratio: 1 / 1; place-items: center; overflow: hidden; border-radius: var(--desk-r-lg); background: radial-gradient(90% 75% at 50% 32%, #fffdfb 0%, var(--desk-sand) 72%); transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
+.glowvai-root .shop-desk :is(.shop-desk-card-media, .shop-desk-cat-media) img{ width: 100%; height: 100%; box-sizing: border-box; padding: 12%; object-fit: contain; mix-blend-mode: multiply; transition: transform var(--desk-slow) var(--desk-ease); }
 
-/* Offer cards: side by side across the width. */
-.glowvai-root .shop-desk .shop-desk-promos{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 32px; }
-.glowvai-root .shop-desk .shop-desk-promo{ position: relative; display: flex; min-height: 150px; flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; overflow: hidden; padding: 24px 76px 24px 28px; border: 0; border-radius: 22px; text-align: left; }
-.glowvai-root .shop-desk .shop-desk-promo.is-dark{ background: #081f68; color: #fff; }
-.glowvai-root .shop-desk .shop-desk-promo.is-light{ background: #e8eaff; color: var(--desk-ink); }
-.glowvai-root .shop-desk .shop-desk-promo-kicker{ font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
-.glowvai-root .shop-desk .shop-desk-promo-title{ font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
-.glowvai-root .shop-desk .shop-desk-promo-sub{ font-size: 14px; line-height: 1.4; opacity: .85; }
-.glowvai-root .shop-desk .shop-desk-promo-icon{ position: absolute; right: 24px; bottom: 24px; display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: #fff; color: var(--desk-brand); }
-.glowvai-root .shop-desk .shop-desk-promo-image{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.glowvai-root .shop-desk .shop-desk-promo-shade{ position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 27, 77, .86) 0%, rgba(7, 27, 77, .2) 100%); }
-.glowvai-root .shop-desk .shop-desk-promo.has-picture .shop-desk-promo-title, .glowvai-root .shop-desk .shop-desk-promo.has-picture .shop-desk-promo-sub{ position: relative; }
+/* ---------------------------------------------------------------- Shop by Category */
+/* One even row (six tiles across, more rows spread evenly when the admin sets more), so the row always fills the width. */
+.glowvai-root .shop-desk .shop-desk-cats{ display: grid; grid-template-columns: repeat(var(--cat-cols, 6), minmax(0, 1fr)); gap: 32px var(--desk-gap); }
+.glowvai-root .shop-desk .shop-desk-cat{ display: flex; min-width: 0; flex-direction: column; gap: 16px; padding: 0; border: 0; border-radius: var(--desk-r-lg); background: none; color: var(--desk-ink); text-align: center; }
+.glowvai-root .shop-desk .shop-desk-cat-media > svg{ opacity: .9; }
+.glowvai-root .shop-desk .shop-desk-cat-copy{ display: grid; justify-items: center; gap: 4px; }
+.glowvai-root .shop-desk .shop-desk-cat strong{ font-size: 15px; font-weight: 500; line-height: 1.3; }
+.glowvai-root .shop-desk .shop-desk-cat-count{ color: var(--desk-muted); font-size: 13px; font-weight: 400; }
+.glowvai-root .shop-desk .shop-desk-cat-count.is-placeholder{ display: block; width: 72px; height: 12px; margin-top: 2px; border-radius: 6px; }
 
-/* Deals: a grid of cards with an ADD button beside the price. */
-.glowvai-root .shop-desk .shop-desk-deals{ display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
-.glowvai-root .shop-desk .shop-desk-deal{ position: relative; display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid var(--desk-line); border-radius: 18px; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
-.glowvai-root .shop-desk .shop-desk-deal-badge{ position: absolute; top: 10px; left: 10px; z-index: 1; padding: 4px 9px; border-radius: 8px; background: var(--desk-brand); color: #fff; font-size: 11px; font-weight: 800; }
-.glowvai-root .shop-desk .shop-desk-deal-open{ display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; padding: 0; border: 0; background: none; text-align: left; }
-.glowvai-root .shop-desk .shop-desk-deal-media{ display: grid; aspect-ratio: 1 / 1; place-items: center; overflow: hidden; background: var(--desk-sky); }
-.glowvai-root .shop-desk .shop-desk-deal-media img{ width: 100%; height: 100%; object-fit: cover; }
-.glowvai-root .shop-desk .shop-desk-deal-brand{ padding: 12px 14px 0; color: var(--desk-muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.glowvai-root .shop-desk .shop-desk-deal-name{ display: -webkit-box; min-height: 40px; padding: 0 14px; overflow: hidden; color: var(--desk-ink); font-size: 15px; font-weight: 700; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.glowvai-root .shop-desk .shop-desk-deal-foot{ display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px 14px; }
-.glowvai-root .shop-desk .shop-desk-deal-price{ display: grid; gap: 1px; }
-.glowvai-root .shop-desk .shop-desk-deal-price b{ color: var(--desk-ink); font-size: 17px; font-weight: 800; }
-.glowvai-root .shop-desk .shop-desk-deal-price s{ color: #8d95a7; font-size: 12px; }
-.glowvai-root .shop-desk .shop-desk-deal-add{ min-width: 76px; height: 38px; padding: 0 12px; border: 1.5px solid var(--desk-brand); border-radius: 10px; background: #fff; color: var(--desk-brand); font-size: 13px; font-weight: 800; letter-spacing: .02em; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-deal-add:hover, .glowvai-root .shop-desk .shop-desk-deal-add.is-in-cart{ background: var(--desk-brand); color: #fff; }
+/* ---------------------------------------------------------------- Offer cards */
+/* Side by side in one even row (up to three across). Warm sand and blush, the title in the serif. */
+.glowvai-root .shop-desk .shop-desk-promos{ display: grid; grid-template-columns: repeat(var(--promo-cols, 2), minmax(0, 1fr)); gap: var(--desk-gap); margin-top: var(--desk-section); }
+.glowvai-root .shop-desk .shop-desk-promo{ position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; min-height: 152px; align-items: center; gap: 24px; overflow: hidden; padding: 32px; border: 0; border-radius: var(--desk-r-lg); color: var(--desk-ink); text-align: left; isolation: isolate; transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-promo::after{ content: ''; position: absolute; top: -60px; right: -40px; z-index: -1; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, 0) 70%); pointer-events: none; }
+.glowvai-root .shop-desk .shop-desk-promo.is-sand{ background: var(--desk-sand); }
+.glowvai-root .shop-desk .shop-desk-promo.is-blush{ background: var(--desk-blush); }
+.glowvai-root .shop-desk .shop-desk-promo-icon{ display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; background: var(--desk-surface); color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-promo-copy{ display: grid; min-width: 0; gap: 8px; }
+.glowvai-root .shop-desk .shop-desk-promo-kicker{ color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-promo-title{ font-family: var(--desk-display); font-size: 30px; font-weight: 400; letter-spacing: -.01em; line-height: 1.1; }
+.glowvai-root .shop-desk .shop-desk-promo-sub{ color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
+.glowvai-root .shop-desk .shop-desk-code{ padding: 2px 8px; border: 1px dashed var(--desk-line-strong); border-radius: 6px; background: rgba(255, 255, 255, .6); color: var(--desk-ink); font-weight: 600; letter-spacing: .06em; }
+.glowvai-root .shop-desk .shop-desk-promo-go{ display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: var(--desk-surface); color: var(--desk-ink); transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease); }
+/* An admin card with a picture: the picture fills the card, a shade keeps the words readable. */
+.glowvai-root .shop-desk .shop-desk-promo.has-picture{ grid-template-columns: minmax(0, 1fr) auto; background: #2a2730; color: #fff; }
+.glowvai-root .shop-desk .shop-desk-promo-image{ position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; transition: transform var(--desk-slow) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-promo-shade{ position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(20, 27, 52, .78) 0%, rgba(20, 27, 52, .12) 100%); }
+.glowvai-root .shop-desk .shop-desk-promo.has-picture .shop-desk-promo-sub{ color: rgba(255, 255, 255, .88); }
+.glowvai-root .shop-desk .shop-desk-promo.has-picture::after{ display: none; }
 
-/* Product rails: one row that scrolls sideways inside itself; about six or seven cards show at once. */
-.glowvai-root .shop-desk .shop-desk-rail{ display: flex; gap: 16px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x proximity; scrollbar-width: none; }
+/* ---------------------------------------------------------------- Product cards */
+/* The photo on a soft square, then brand, a name of at most two lines, size, the price row (price, struck MRP, discount
+   as a soft pill) and an "Add to bag" pill on the bottom line. Cards in a row share one height. */
+.glowvai-root .shop-desk .shop-desk-card{ position: relative; display: flex; min-width: 0; height: 100%; flex-direction: column; border-radius: var(--desk-r-lg); }
+.glowvai-root .shop-desk .shop-desk-card-fallback{ padding: 16px; color: var(--desk-muted); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-align: center; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-card-body{ display: flex; flex: 1 1 auto; min-width: 0; flex-direction: column; gap: 4px; padding: 16px 4px 0; }
+.glowvai-root .shop-desk .shop-desk-card-brand{ overflow: hidden; color: var(--desk-muted); font-size: 11px; font-weight: 600; letter-spacing: .14em; line-height: 16px; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-card-name{ display: -webkit-box; min-height: 42px; overflow: hidden; padding: 0; border: 0; background: none; color: var(--desk-ink); font-size: 15px; font-weight: 500; line-height: 21px; text-align: left; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+/* The name is the card's link: its hit area covers the whole card. */
+.glowvai-root .shop-desk .shop-desk-card-name::after{ content: ''; position: absolute; inset: 0; z-index: 1; border-radius: var(--desk-r-lg); }
+.glowvai-root .shop-desk .shop-desk-card:has(.shop-desk-card-name:focus-visible){ outline: 2px solid var(--desk-brand); outline-offset: 6px; }
+@supports selector(:has(a)){
+  .glowvai-root .shop-desk .shop-desk-card-name:focus-visible{ outline: none; }
+}
+.glowvai-root .shop-desk .shop-desk-card-size{ display: flex; min-height: 18px; align-items: center; justify-content: space-between; gap: 8px; color: var(--desk-muted); font-size: 13px; line-height: 18px; }
+.glowvai-root .shop-desk .shop-desk-card-size > span:first-child{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-card-eta{ display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; color: var(--desk-muted); font-size: 12px; }
+.glowvai-root .shop-desk .shop-desk-card-price{ display: flex; min-height: 26px; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin-top: 4px; }
+.glowvai-root .shop-desk .shop-desk-card-price b{ color: var(--desk-ink); font-size: 17px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.glowvai-root .shop-desk .shop-desk-card-price s{ color: var(--desk-faint); font-size: 13px; font-weight: 400; text-decoration-thickness: 1px; }
+.glowvai-root .shop-desk .shop-desk-card-price small{ color: var(--desk-muted); font-size: 12px; }
+.glowvai-root .shop-desk .shop-desk-card-off{ align-self: center; padding: 2px 8px; border-radius: 999px; background: var(--desk-rose-soft); color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+.glowvai-root .shop-desk .shop-desk-card-foot{ margin-top: auto; padding-top: 12px; }
+.glowvai-root .shop-desk .shop-desk-add{ position: relative; z-index: 2; display: flex; width: 100%; height: 40px; align-items: center; justify-content: center; padding: 0 16px; border: 1px solid var(--desk-brand); border-radius: 999px; background: transparent; color: var(--desk-brand); font-size: 14px; font-weight: 600; white-space: nowrap; transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), transform var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-add:hover{ background: var(--desk-brand); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-stepper{ position: relative; z-index: 2; display: flex; height: 40px; align-items: center; justify-content: space-between; overflow: hidden; border-radius: 999px; background: var(--desk-brand); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-stepper button{ display: grid; width: 44px; height: 40px; place-items: center; border: 0; background: none; color: inherit; transition: background-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-stepper button:hover{ background: rgba(255, 255, 255, .14); }
+.glowvai-root .shop-desk .shop-desk-stepper button:focus-visible{ outline: 2px solid #fff; outline-offset: -4px; border-radius: 999px; }
+.glowvai-root .shop-desk .shop-desk-stepper b{ font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- Rails */
+/* One row of equal cards that scrolls sideways inside itself: five across on a wide screen, four on a smaller one, so no
+   card is cut at the edge. The row reaches into the gutters so hover shadows are not clipped. */
+.glowvai-root .shop-desk .shop-desk-rail{ display: flex; gap: var(--desk-gap); margin: -8px -24px -40px; padding: 8px 24px 40px; overflow-x: auto; scroll-padding-inline: 24px; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .glowvai-root .shop-desk .shop-desk-rail::-webkit-scrollbar{ display: none; }
-.glowvai-root .shop-desk .shop-desk-rail-item{ display: flex; flex: 0 0 200px; scroll-snap-align: start; }
-.glowvai-root .shop-desk .shop-desk-rail-item > .shop-product-card{ width: 100%; }
+.glowvai-root .shop-desk .shop-desk-rail > *{ flex: 0 0 calc((100% - var(--desk-gap) * 4) / 5); min-width: 0; scroll-snap-align: start; }
+.glowvai-root .shop-desk .shop-desk-rail-item{ display: flex; }
 
-/* Loading placeholders, the size of the real cards, so nothing moves when the products arrive. */
-.glowvai-root .shop-desk .shop-desk-skel-card{ display: flex; flex: 0 0 200px; flex-direction: column; gap: 8px; height: 340px; box-sizing: border-box; padding: 10px; border: 1px solid var(--desk-line); border-radius: 16px; background: #fff; animation: shop-desk-pulse 1.4s ease-in-out infinite; }
-.glowvai-root .shop-desk .shop-desk-deals .shop-desk-skel-card{ height: 380px; }
-.glowvai-root .shop-desk .shop-desk-skel-media{ display: block; flex: 1 1 auto; min-height: 0; border-radius: 12px; background: var(--desk-sky); }
-.glowvai-root .shop-desk .shop-desk-skel-line{ display: block; height: 12px; flex-shrink: 0; border-radius: 6px; background: var(--desk-sky); }
-.glowvai-root .shop-desk .shop-desk-skel-line.is-short{ width: 60%; }
-@keyframes shop-desk-pulse{ 0%, 100%{ opacity: 1; } 50%{ opacity: .55; } }
+/* Deals: the deals card beside up to four cards, one row of five. */
+.glowvai-root .shop-desk .shop-desk-deals{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; gap: var(--desk-gap); }
+.glowvai-root .shop-desk .shop-desk-deals-panel{ position: relative; display: flex; grid-column: span var(--deal-span-5, 1); min-height: 280px; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 12px; overflow: hidden; padding: 28px; border-radius: var(--desk-r-lg); background: radial-gradient(120% 80% at 100% 0%, #fff7f3 0%, rgba(255, 247, 243, 0) 60%), linear-gradient(160deg, var(--desk-blush) 0%, #f2ddd5 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-deals-panel::before{ content: ''; position: absolute; top: 24px; right: 24px; z-index: -1; width: 96px; height: 96px; border: 1px solid rgba(154, 84, 72, .25); border-radius: 50%; }
+.glowvai-root .shop-desk .shop-desk-deals-panel.is-skeleton{ background: none; }
+.glowvai-root .shop-desk .shop-desk-deals-panel.is-skeleton::before{ display: none; }
+.glowvai-root .shop-desk .shop-desk-deals-kicker{ display: inline-flex; align-items: center; gap: 8px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-deals-panel strong{ font-size: 40px; line-height: 1.02; letter-spacing: -.015em; }
+.glowvai-root .shop-desk .shop-desk-deals-panel p{ margin: 0 0 8px; color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
+
+/* Loading placeholders with the real card's boxes, under a slow shimmer. */
+.glowvai-root .shop-desk .shop-desk-shimmer{ background: linear-gradient(100deg, #f1ebe5 30%, #faf6f2 50%, #f1ebe5 70%); background-size: 300% 100%; animation: shop-desk-shimmer 1.6s ease-in-out infinite; }
+.glowvai-root .shop-desk .shop-desk-skel-card{ display: flex; min-width: 0; flex-direction: column; }
+.glowvai-root .shop-desk .shop-desk-skel-media{ display: block; aspect-ratio: 1 / 1; border-radius: var(--desk-r-lg); }
+.glowvai-root .shop-desk .shop-desk-skel-body{ display: flex; flex-direction: column; gap: 10px; padding: 18px 4px 0; }
+.glowvai-root .shop-desk .shop-desk-skel-line{ display: block; height: 12px; border-radius: 6px; }
+.glowvai-root .shop-desk .shop-desk-skel-line.is-tiny{ width: 40%; height: 10px; }
+.glowvai-root .shop-desk .shop-desk-skel-line.is-short{ width: 65%; }
+.glowvai-root .shop-desk .shop-desk-skel-line.is-price{ width: 45%; height: 16px; margin-top: 6px; }
+.glowvai-root .shop-desk .shop-desk-skel-foot{ display: grid; gap: 16px; }
+.glowvai-root .shop-desk .shop-desk-skel-btn{ display: block; height: 40px; border-radius: 999px; }
+@keyframes shop-desk-shimmer{ 0%{ background-position: 100% 0; } 100%{ background-position: 0 0; } }
 
 /* Notices that take the place of the rails: a failed load (with retry) and an empty catalogue. */
-.glowvai-root .shop-desk .shop-desk-notice{ display: grid; justify-items: start; gap: 6px; margin-top: 40px; padding: 24px; border: 1px solid var(--desk-line); border-radius: 18px; background: #fff; }
-.glowvai-root .shop-desk .shop-desk-notice strong{ font-size: 16px; }
+.glowvai-root .shop-desk .shop-desk-notice{ display: grid; justify-items: start; gap: 8px; margin-top: var(--desk-section); padding: 32px; border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); }
+.glowvai-root .shop-desk .shop-desk-notice strong{ font-family: var(--desk-display); font-size: 26px; font-weight: 400; }
 .glowvai-root .shop-desk .shop-desk-notice p{ margin: 0; color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
-.glowvai-root .shop-desk .shop-desk-retry{ min-height: 44px; margin-top: 6px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 14px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-retry{ min-height: 44px; margin-top: 8px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 14px; font-weight: 600; }
 
-/* Shop by Concern: five cards in one row. */
+/* ---------------------------------------------------------------- Shop by Concern */
+/* Five pill chips in one even row. */
 .glowvai-root .shop-desk .shop-desk-concerns{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
-.glowvai-root .shop-desk .shop-desk-concern{ display: flex; min-width: 0; min-height: 72px; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--desk-line); border-radius: 16px; background: #fff; color: var(--desk-muted); text-align: left; transition: border-color .15s ease, transform .2s ease, box-shadow .2s ease; }
-.glowvai-root .shop-desk .shop-desk-concern strong{ flex: 1; min-width: 0; color: var(--desk-ink); font-size: 14px; font-weight: 700; line-height: 1.3; }
-.glowvai-root .shop-desk .shop-desk-concern-icon{ display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--desk-sky); color: var(--desk-brand); }
+.glowvai-root .shop-desk .shop-desk-concern{ display: flex; min-width: 0; min-height: 56px; align-items: center; gap: 12px; padding: 0 20px 0 8px; border: 1px solid var(--desk-line); border-radius: 999px; background: var(--desk-surface); color: var(--desk-ink); font-size: 14px; font-weight: 500; text-align: left; transition: border-color var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-concern > span:not(.shop-desk-concern-icon){ flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-concern-icon{ display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--desk-rose-soft); color: var(--desk-rose); }
+.glowvai-root .shop-desk .shop-desk-concern-go{ flex: 0 0 auto; color: var(--desk-ink); opacity: 0; transform: translateX(-4px); transition: opacity var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-concern:focus-visible .shop-desk-concern-go{ opacity: 1; transform: none; }
 
-/* Admin placeholder sections (shared HomePlaceholders, .hp-*): full column width, more cards a row than on a phone. */
-.glowvai-root .shop-desk .hp-section{ max-width: none; margin: 40px 0 0; padding: 0; }
-.glowvai-root .shop-desk .hp-head{ margin: 0 0 16px; }
-.glowvai-root .shop-desk .hp-title{ font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
-.glowvai-root .shop-desk .hp-sub{ font-size: 14px; }
+/* ---------------------------------------------------------------- Admin sections (shared HomePlaceholders, .hp-*) */
+/* Full column width, the same heads, cards and spacing as the rest of the page. */
+.glowvai-root .shop-desk .hp-section{ max-width: none; margin: var(--desk-section) 0 0; padding: 0; animation: none; }
+.glowvai-root .shop-desk .hp-head{ align-items: flex-end; margin: 0 0 24px; }
+.glowvai-root .shop-desk .hp-title{ font-family: var(--desk-display); font-size: 36px; font-weight: 400; letter-spacing: -.01em; line-height: 1.08; color: var(--desk-ink); }
+.glowvai-root .shop-desk .hp-sub{ color: var(--desk-muted); font-size: 14px; }
+.glowvai-root .shop-desk .hp-timer{ padding: 6px 12px; border-radius: 999px; background: var(--desk-rose-soft); color: var(--desk-rose); font-size: 13px; font-weight: 600; }
 .glowvai-root .shop-desk .hp-grid,
-.glowvai-root .shop-desk .hp-chips{ gap: 16px; padding: 0 0 6px; grid-auto-columns: calc((100% - 48px) / 4); }
+.glowvai-root .shop-desk .hp-chips{ gap: var(--desk-gap); padding: 0 0 8px; grid-auto-columns: calc((100% - var(--desk-gap) * 3) / 4); }
 .glowvai-root .shop-desk .hp-grid.is-three,
-.glowvai-root .shop-desk .hp-chips{ grid-auto-columns: calc((100% - 32px) / 3); }
-.glowvai-root .shop-desk .hp-brands{ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; padding: 0; }
-.glowvai-root .shop-desk .hp-card{ min-height: 180px; border-radius: 18px; padding: 18px; }
+.glowvai-root .shop-desk .hp-chips{ grid-auto-columns: calc((100% - var(--desk-gap) * 2) / 3); }
+.glowvai-root .shop-desk .hp-brands{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--desk-gap); padding: 0; }
+.glowvai-root .shop-desk .hp-brand{ border: 0; border-radius: var(--desk-r-lg); background: var(--desk-surface); }
+.glowvai-root .shop-desk .hp-card{ min-height: 184px; padding: 24px; border: 0; border-radius: var(--desk-r-lg); background: var(--desk-sand); }
+.glowvai-root .shop-desk .hp-card strong{ font-size: 17px; font-weight: 600; }
+.glowvai-root .shop-desk .hp-card-promise{ border: 1px solid var(--desk-line); background: var(--desk-surface); }
+.glowvai-root .shop-desk .hp-chip{ padding: 16px 20px; border-color: var(--desk-line); border-radius: var(--desk-r); }
+.glowvai-root .shop-desk .hp-skel{ border-radius: var(--desk-r-lg); background: linear-gradient(100deg, #f1ebe5 30%, #faf6f2 50%, #f1ebe5 70%); background-size: 300% 100%; animation: shop-desk-shimmer 1.6s ease-in-out infinite; }
 
-/* Face scan: one wide card, the words on the left and the action on the right. */
-.glowvai-root .shop-desk .shop-desk-scan{ display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: 40px; margin-top: 48px; padding: 40px 48px; border-radius: 28px; background: radial-gradient(120% 90% at 100% 0%, rgba(157, 196, 255, .35) 0%, rgba(157, 196, 255, 0) 55%), linear-gradient(135deg, var(--desk-brand) 0%, var(--desk-brand-dark) 50%, #071b4d 100%); color: #fff; }
-.glowvai-root .shop-desk .shop-desk-scan-tag{ display: inline-flex; align-items: center; gap: 6px; color: #b9ccff; font-size: 12px; font-weight: 800; letter-spacing: .08em; }
-.glowvai-root .shop-desk .shop-desk-scan h2{ margin: 10px 0 10px; font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
-.glowvai-root .shop-desk .shop-desk-scan h2 span{ color: #9dc4ff; }
-.glowvai-root .shop-desk .shop-desk-scan-body{ margin: 0; font-size: 16px; line-height: 1.55; opacity: .92; }
-.glowvai-root .shop-desk .shop-desk-scan-note{ margin: 12px 0 0; font-size: 13px; opacity: .75; }
-.glowvai-root .shop-desk .shop-desk-scan-side{ display: grid; justify-items: start; gap: 18px; }
-.glowvai-root .shop-desk .shop-desk-scan-privacy{ display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, .12); font-size: 14px; line-height: 1.45; }
-.glowvai-root .shop-desk .shop-desk-scan-privacy svg{ flex-shrink: 0; margin-top: 2px; color: #9dc4ff; }
-.glowvai-root .shop-desk .shop-desk-scan-btn{ display: inline-flex; min-height: 50px; align-items: center; gap: 8px; padding: 0 26px; border: 0; border-radius: 999px; background: #fff; color: var(--desk-brand); font-size: 15px; font-weight: 700; }
+/* ---------------------------------------------------------------- Face scan */
+/* A wide, calm card: the words on the left, the privacy note and the action on the right. */
+.glowvai-root .shop-desk .shop-desk-scan{ position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 48px; margin-top: var(--desk-section); overflow: hidden; padding: 56px 64px; border-radius: var(--desk-r-lg); background: linear-gradient(120deg, #f6efe9 0%, #f3e9e3 50%, #eef0f8 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-scan-shapes{ position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.glowvai-root .shop-desk .shop-desk-scan-shapes::before{ content: ''; position: absolute; top: -140px; right: -100px; width: 420px; height: 420px; border: 1px solid rgba(20, 27, 52, .08); border-radius: 50%; box-shadow: 0 0 0 48px rgba(255, 255, 255, .25), 0 0 0 96px rgba(255, 255, 255, .15); }
+.glowvai-root .shop-desk .shop-desk-scan-tag{ display: inline-flex; align-items: center; gap: 8px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; }
+.glowvai-root .shop-desk .shop-desk-scan h2{ margin: 16px 0; font-family: var(--desk-display); font-size: 44px; font-weight: 400; line-height: 1.05; letter-spacing: -.015em; }
+.glowvai-root .shop-desk .shop-desk-scan h2 span{ color: var(--desk-rose); font-style: italic; }
+.glowvai-root .shop-desk .shop-desk-scan-body{ max-width: 560px; margin: 0; color: var(--desk-muted); font-size: 16px; line-height: 1.6; }
+.glowvai-root .shop-desk .shop-desk-scan-note{ margin: 16px 0 0; color: var(--desk-muted); font-size: 13px; }
+.glowvai-root .shop-desk .shop-desk-scan-side{ display: grid; justify-items: start; gap: 24px; }
+.glowvai-root .shop-desk .shop-desk-scan-privacy{ display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 16px; border-radius: var(--desk-r); background: rgba(255, 255, 255, .7); color: var(--desk-ink); font-size: 14px; line-height: 1.5; }
+.glowvai-root .shop-desk .shop-desk-scan-privacy svg{ flex-shrink: 0; margin-top: 2px; color: var(--desk-rose); }
+.glowvai-root .shop-desk .shop-desk-scan-btn{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 28px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 15px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), box-shadow var(--desk-mid) var(--desk-ease), transform var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-scan-btn:hover{ background: var(--desk-brand-dark); box-shadow: 0 14px 28px -14px rgba(0, 87, 251, .7); }
 
-.glowvai-root .shop-desk .shop-desk-end{ display: grid; justify-items: center; gap: 4px; margin-top: 32px; padding: 28px 20px 16px; color: var(--desk-brand); text-align: center; }
-.glowvai-root .shop-desk .shop-desk-end h2{ margin: 8px 0 0; color: var(--desk-ink); font-size: 20px; font-weight: 800; }
-.glowvai-root .shop-desk .shop-desk-end > p{ margin: 0; color: var(--desk-muted); font-size: 14px; }
-.glowvai-root .shop-desk .shop-desk-end-btn{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; margin-top: 16px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 15px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-end{ display: grid; justify-items: center; gap: 8px; margin-top: var(--desk-section); padding: 48px 24px 24px; border-top: 1px solid var(--desk-line); text-align: center; }
+.glowvai-root .shop-desk .shop-desk-end-icon{ display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: var(--desk-rose-soft); color: var(--desk-rose); }
+.glowvai-root .shop-desk .shop-desk-end h2{ margin: 8px 0 0; color: var(--desk-ink); font-family: var(--desk-display); font-size: 32px; font-weight: 400; }
+.glowvai-root .shop-desk .shop-desk-end > p{ margin: 0; color: var(--desk-muted); font-size: 15px; }
+.glowvai-root .shop-desk .shop-desk-end-btn{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; margin-top: 16px; padding: 0 28px; border: 1px solid var(--desk-ink); border-radius: 999px; background: transparent; color: var(--desk-ink); font-size: 15px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), transform var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-end-btn:hover{ background: var(--desk-ink); color: #fff; }
 
-/* Footer: a deep navy band across the window, the brand on the left and four link columns. */
-.glowvai-root .shop-desk .shop-desk-footer{ margin-top: 48px; background: #071b4d; color: #dce8ff; }
-.glowvai-root .shop-desk .shop-desk-footer-inner{ display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 3fr); gap: 48px; max-width: var(--desk-max); margin: 0 auto; padding: 48px var(--desk-pad) 32px; box-sizing: border-box; }
-.glowvai-root .shop-desk .shop-desk-footer-brand{ display: grid; align-content: start; gap: 12px; }
-.glowvai-root .shop-desk .shop-desk-footer-logo{ display: inline-flex; align-items: center; gap: 10px; color: #fff; }
+/* ---------------------------------------------------------------- Footer */
+/* A deep ink band across the window: the brand on the left and four link columns, thin dividers. */
+.glowvai-root .shop-desk .shop-desk-footer{ margin-top: var(--desk-section); background: var(--desk-ink); color: #d9dce6; }
+.glowvai-root .shop-desk .shop-desk-footer-inner{ display: grid; grid-template-columns: minmax(240px, 1fr) minmax(0, 3fr); gap: 64px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 64px var(--desk-pad) 48px; box-sizing: border-box; }
+.glowvai-root .shop-desk .shop-desk-footer-brand{ display: grid; align-content: start; gap: 16px; }
+.glowvai-root .shop-desk .shop-desk-footer-logo{ display: inline-flex; align-items: center; gap: 12px; color: #fff; }
 .glowvai-root .shop-desk .shop-desk-footer-logo img{ border-radius: 9px; }
-.glowvai-root .shop-desk .shop-desk-footer-logo strong{ font-family: var(--font-heading); font-size: 20px; font-weight: 800; }
-.glowvai-root .shop-desk .shop-desk-footer-brand > p{ margin: 0; font-size: 14px; }
-.glowvai-root .shop-desk .shop-desk-footer-pills{ display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; }
-.glowvai-root .shop-desk .shop-desk-footer-pills a{ display: inline-flex; min-height: 38px; align-items: center; padding: 0 14px; border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
-.glowvai-root .shop-desk .shop-desk-footer-pills.is-store a{ border-radius: 8px; background: #000; }
-.glowvai-root .shop-desk .shop-desk-footer-pills a:hover{ background: rgba(255, 255, 255, .14); text-decoration: underline; }
+.glowvai-root .shop-desk .shop-desk-footer-logo strong{ font-family: var(--desk-display); font-size: 28px; font-weight: 400; letter-spacing: -.01em; }
+.glowvai-root .shop-desk .shop-desk-footer-brand > p{ margin: 0; color: #b8bdcc; font-size: 14px; }
+.glowvai-root .shop-desk .shop-desk-footer-pills{ display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.glowvai-root .shop-desk .shop-desk-footer-pills a{ display: inline-flex; min-height: 36px; align-items: center; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .24); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 500; text-decoration: none; transition: background-color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-footer-pills.is-store a{ border-radius: var(--desk-r-sm); background: #000; }
+.glowvai-root .shop-desk .shop-desk-footer-pills a:hover{ border-color: rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .08); }
 .glowvai-root .shop-desk .shop-desk-footer-cols{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
-.glowvai-root .shop-desk .shop-desk-footer-col h3{ margin: 0 0 10px; color: #fff; font-family: var(--font-heading); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.glowvai-root .shop-desk .shop-desk-footer-col ul{ display: grid; margin: 0; padding: 0; list-style: none; }
+.glowvai-root .shop-desk .shop-desk-footer-col h3{ margin: 0 0 16px; color: #fff; font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-footer-col ul{ display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
 .glowvai-root .shop-desk .shop-desk-footer-col a,
-.glowvai-root .shop-desk .shop-desk-footer-col button{ display: flex; width: 100%; min-height: 34px; align-items: center; padding: 0; border: 0; background: none; color: #c7d6f5; font-family: var(--font-body); font-size: 14px; font-weight: 500; text-align: left; text-decoration: none; }
+.glowvai-root .shop-desk .shop-desk-footer-col button{ display: flex; width: 100%; min-height: 32px; align-items: center; padding: 0; border: 0; background: none; color: #b8bdcc; font-family: var(--font-body); font-size: 14px; font-weight: 400; text-align: left; text-decoration: none; transition: color var(--desk-fast) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-footer-col a:hover,
-.glowvai-root .shop-desk .shop-desk-footer-col button:hover{ color: #fff; text-decoration: underline; }
+.glowvai-root .shop-desk .shop-desk-footer-col button:hover{ color: #fff; }
 .glowvai-root .shop-desk .shop-desk-footer a:focus-visible,
 .glowvai-root .shop-desk .shop-desk-footer button:focus-visible{ outline: 2px solid #fff; outline-offset: 2px; }
-.glowvai-root .shop-desk .shop-desk-footer-bottom{ display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; max-width: var(--desk-max); margin: 0 auto; padding: 18px var(--desk-pad) 24px; border-top: 1px solid rgba(255, 255, 255, .14); box-sizing: border-box; color: #a9bbe0; font-size: 13px; }
+.glowvai-root .shop-desk .shop-desk-footer-bottom{ display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 24px var(--desk-pad) 32px; border-top: 1px solid rgba(255, 255, 255, .1); box-sizing: border-box; color: #9aa0b4; font-size: 13px; }
 .glowvai-root .shop-desk .shop-desk-footer-bottom p{ margin: 0; }
 
+/* ---------------------------------------------------------------- Motion */
+/* Sections below the fold rise in once as they reach the screen (ShopDesktopHome marks them); their cards follow one
+   after another. The cards' entrance only fills backwards, so it never holds a transform that would fight the hover. */
+.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="wait"]{ opacity: 0; transform: translateY(24px); }
+.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"]{ opacity: 1; transform: none; transition: opacity 500ms var(--desk-ease), transform 600ms var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"] :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .hp-grid, .hp-brands) > *,
+.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"]:is(.shop-desk-promos) > *{ animation: shop-desk-fade-up 520ms var(--desk-ease) backwards; animation-delay: calc(var(--i, 0) * 70ms + 120ms); }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(2){ --i: 1; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(3){ --i: 2; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(4){ --i: 3; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(5){ --i: 4; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(6){ --i: 5; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(n + 7){ --i: 6; }
+@keyframes shop-desk-fade-up{ from{ opacity: 0; transform: translateY(16px); } to{ opacity: 1; transform: none; } }
+
+/* Hover: a small lift, a very soft long shadow and a slight zoom of the photo. Press: a short squeeze. */
 @media (hover: hover){
-  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(7, 27, 77, .1); }
-  .glowvai-root .shop-desk .shop-desk-deal:hover,
-  .glowvai-root .shop-desk .shop-desk-concern:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(26, 54, 120, .1); }
-  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--desk-brand); }
+  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media,
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ transform: translateY(-4px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media img,
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media img{ transform: scale(1.03); }
+  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-name{ text-decoration: underline; text-decoration-color: var(--desk-line-strong); text-underline-offset: 4px; }
+  .glowvai-root .shop-desk .shop-desk-promo:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go{ background: var(--desk-ink); color: #fff; transform: translateX(3px); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-image{ transform: scale(1.03); }
+  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--desk-ink); transform: translateY(-2px); box-shadow: var(--desk-shadow-soft); }
+  .glowvai-root .shop-desk .shop-desk-concern:hover .shop-desk-concern-go{ opacity: 1; transform: none; }
 }
+.glowvai-root .shop-desk :is(.shop-desk-btn-light, .shop-desk-btn-ghost, .shop-desk-btn-outline, .shop-desk-cart, .shop-desk-add, .shop-desk-scan-btn, .shop-desk-end-btn, .shop-desk-retry, .shop-desk-arrow, .shop-desk-promo, .shop-desk-concern, .shop-desk-cat, .shop-desk-action):active:not(:disabled){ transform: scale(.97); transition-duration: 100ms; }
+
+/* Less motion: nothing moves, slides or zooms; colours still change. */
 @media (prefers-reduced-motion: reduce){
-  .glowvai-root .shop-desk .shop-desk-skel-card{ animation: none; }
-  .glowvai-root .shop-desk .shop-desk-cat-media,
-  .glowvai-root .shop-desk .shop-desk-deal,
-  .glowvai-root .shop-desk .shop-desk-concern{ transition: none; }
+  .glowvai-root .shop-desk .shop-home-hint{ transition: none; }
+  .glowvai-root .shop-desk *,
+  .glowvai-root .shop-desk *::before,
+  .glowvai-root .shop-desk *::after{ animation: none !important; scroll-behavior: auto !important; }
+  .glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal]{ opacity: 1; transform: none; transition: none; }
+  .glowvai-root .shop-desk .shop-desk-header,
+  .glowvai-root .shop-desk .shop-desk-header-inner,
+  .glowvai-root .shop-desk .shop-desk-tab-ink,
+  .glowvai-root .shop-desk .shop-desk-banners .shop-home-banners a[data-kind]{ transition: none !important; }
+  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media,
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media,
+  .glowvai-root .shop-desk .shop-desk-promo:hover,
+  .glowvai-root .shop-desk .shop-desk-concern:hover,
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go,
+  .glowvai-root .shop-desk .shop-desk-concern-go,
+  .glowvai-root .shop-desk :active,
+  .glowvai-root .shop-desk :hover > svg,
+  .glowvai-root .shop-desk :hover svg:last-child{ transform: none !important; }
+  .glowvai-root .shop-desk :is(.shop-desk-card-media, .shop-desk-cat-media, .shop-desk-promo) img{ transform: none !important; }
 }
 
-/* Smaller desktops: Skin scan and Orders leave the header (both are on the page and in Account) so the search keeps its room. */
+/* ---------------------------------------------------------------- Smaller desktops */
+/* Skin scan and Orders leave the header (both are on the page and in Account) so the search keeps its room; rails show
+   four cards, the deals grid is four wide, and the concern chips wrap to their own widths. */
 @media (max-width: 1279px){
+  .glowvai-root .shop-screen.shop-desk{ --desk-pad: 32px; --desk-section: 64px; --desk-gap: 20px; }
   .glowvai-root .shop-desk .shop-desk-action.is-optional{ display: none; }
-  .glowvai-root .shop-desk .shop-desk-delivery{ flex-basis: 190px; }
-  .glowvai-root .shop-desk .shop-desk-hero h1{ font-size: 48px; }
-  .glowvai-root .shop-desk .shop-desk-concerns{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-delivery{ flex-basis: 184px; }
+  .glowvai-root .shop-desk .shop-desk-header-inner{ gap: 16px; }
+  .glowvai-root .shop-desk .shop-desk-rail > *{ flex-basis: calc((100% - var(--desk-gap) * 3) / 4); }
+  .glowvai-root .shop-desk .shop-desk-deals{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-deals-panel{ grid-column: span var(--deal-span-4, 1); }
+  .glowvai-root .shop-desk .shop-desk-concerns{ display: flex; flex-wrap: wrap; }
+  .glowvai-root .shop-desk .shop-desk-concern{ flex: 1 1 auto; }
+  .glowvai-root .shop-desk .shop-desk-promo{ padding: 28px; gap: 20px; }
+  .glowvai-root .shop-desk .shop-desk-promo-title{ font-size: 26px; }
+  .glowvai-root .shop-desk .shop-desk-hero-copy{ padding-left: 40px; }
+  .glowvai-root .shop-desk .shop-desk-scan{ padding: 48px; }
+}
+/* Four deals on a smaller desktop fill the row, so the deals card takes a row of its own above them and lies flat. */
+@media (max-width: 1279px){
+  .glowvai-root .shop-desk .shop-desk-deals.is-fills-4 .shop-desk-deals-panel{ min-height: 96px; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px 24px; }
+  .glowvai-root .shop-desk .shop-desk-deals.is-fills-4 .shop-desk-deals-panel strong{ font-size: 32px; }
+  .glowvai-root .shop-desk .shop-desk-deals.is-fills-4 .shop-desk-deals-panel p{ margin: 0; }
+  .glowvai-root .shop-desk .shop-desk-deals.is-fills-4 .shop-desk-btn-outline{ margin-left: auto; }
 }
 
 /* The desktop home forced onto a narrow frame (?device=desktop): the header wraps, the search takes its own row. */
 @media (max-width: 899px){
+  .glowvai-root .shop-screen.shop-desk{ --desk-pad: 20px; --desk-section: 48px; }
   .glowvai-root .shop-desk .shop-desk-header{ position: relative; }
-  .glowvai-root .shop-desk .shop-desk-header-inner{ height: auto; flex-wrap: wrap; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
-  .glowvai-root .shop-desk .shop-desk-search{ order: 10; flex-basis: 100%; }
+  .glowvai-root .shop-desk .shop-desk-header-inner,
+  .glowvai-root .shop-desk .shop-desk-header.is-scrolled .shop-desk-header-inner{ height: auto; flex-wrap: wrap; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
+  .glowvai-root .shop-desk .shop-desk-header.is-scrolled{ margin-bottom: 0; }
+  .glowvai-root .shop-desk .shop-desk-search{ order: 10; flex-basis: 100%; max-width: none; }
   .glowvai-root .shop-desk .shop-desk-actions{ margin-left: auto; }
-  .glowvai-root .shop-desk .shop-desk-mode{ display: none; }
+  .glowvai-root .shop-desk .shop-desk-tabs-row .shop-desk-mode{ display: none; }
+  .glowvai-root .shop-desk .shop-desk-hero{ grid-template-columns: 1fr; height: auto; }
   .glowvai-root .shop-desk .shop-desk-hero-copy{ padding: 32px; }
-  .glowvai-root .shop-desk .shop-desk-hero > img{ width: 100%; opacity: .35; }
-  .glowvai-root .shop-desk .shop-desk-scan{ grid-template-columns: 1fr; gap: 20px; padding: 28px; }
-  .glowvai-root .shop-desk .shop-desk-concerns{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .glowvai-root .shop-desk .shop-desk-footer-inner{ grid-template-columns: 1fr; gap: 28px; }
+  .glowvai-root .shop-desk .shop-desk-hero-media{ position: absolute; inset: 0; z-index: -1; opacity: .3; }
+  .glowvai-root .shop-desk .shop-desk-cats{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-promos{ grid-template-columns: 1fr; }
+  .glowvai-root .shop-desk .shop-desk-rail{ margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+  .glowvai-root .shop-desk .shop-desk-rail > *{ flex-basis: calc((100% - var(--desk-gap)) / 2); }
+  .glowvai-root .shop-desk .shop-desk-deals{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-deals-panel{ grid-column: 1 / -1; min-height: 0; }
+  .glowvai-root .shop-desk .shop-desk-scan{ grid-template-columns: 1fr; gap: 24px; padding: 32px; }
+  .glowvai-root .shop-desk .shop-desk-footer-inner{ grid-template-columns: 1fr; gap: 32px; }
   .glowvai-root .shop-desk .shop-desk-footer-cols{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
