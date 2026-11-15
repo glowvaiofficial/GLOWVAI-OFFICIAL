@@ -1,11 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Droplets, Flower2, Leaf, Mars, RotateCcw, ScanFace, Search, ShieldCheck, ShoppingBag, Sparkles, Sun, Ticket, Truck, User, Venus, Wind, Zap } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { ArrowRight, Boxes, ChevronLeft, ChevronRight, Mars, RotateCcw, ScanFace, Search, ShieldCheck, ShoppingBag, Sparkles, Ticket, Truck, User, Venus, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
-import { useCatalogReady, useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
-import { useProductFeedStatus } from '../../../core/services/productFeed';
-import { ON_DEVICE_INFERENCE_ENABLED } from '../../../core/services/skinModelService';
 import { useCartStore } from '../../../core/state/cartStore';
 import { siteConfig } from '../../../../config/site';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
@@ -15,32 +12,16 @@ import { HomeBanners } from '../shared/HomeBanners';
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { HeaderCartButton } from '../shared/HeaderCartButton';
-import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
+import { useHomeDevice, useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
+import { useHomeData } from '../lib/useHomeData';
+import { CATEGORY_ACCENT, CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
+import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
-import { fetchReorderItems } from '../../../core/services/shopApi';
-import { parsePriceBand, pickDeals } from '../../../../lib/shop/homeLayout';
-import { browserStore, firstVisitState, skinMatchedPicks } from '../lib/firstVisit';
-import { readRecentlyViewed } from '../lib/recentlyViewed';
-import { rememberScroll } from '../../../context/scrollMemory';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, categoryTiles, configuredSocials, dedupeRails, mergeFooterSocials } from '../lib/homeModel';
-import type { HomeCategoryTile, RailCandidate } from '../lib/homeModel';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
+import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, mergeFooterSocials } from '../lib/homeModel';
+import type { HomeCategoryTile } from '../lib/homeModel';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
 import type { ScreenName } from '../../../context/contextDefinition';
 import '../styles/shop-home.css';
-
-// Sorted and filtered lists from the live catalogue. Trial samples are left out so they don't top the rankings.
-function buildCatalogLists(catalog: SkincareProduct[]) {
-  const FULL_SIZE_PRODUCTS = catalog.filter((p) => !isTrialProduct(p));
-  const TOP_RATED = [...FULL_SIZE_PRODUCTS].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
-  const UNDER_500 = FULL_SIZE_PRODUCTS.filter((p) => p.price < 500);
-  // Deals are real catalogue products with a discount from their own MRP.
-  const DEAL_PRODUCTS = FULL_SIZE_PRODUCTS.filter((p) => getDiscountPercent(p) > 0)
-    .sort((a, b) => getDiscountPercent(b) - getDiscountPercent(a))
-    .slice(0, 4);
-  return { FULL_SIZE_PRODUCTS, TOP_RATED, UNDER_500, DEAL_PRODUCTS };
-}
-
-const HERO_IMAGE = '/glowvai/assets/home/glowvai-shopping-hero.png';
 
 const QUICK_LINKS: { label: string; Icon: LucideIcon; screen: ScreenName; params?: Record<string, string> }[] = [
   { label: 'All Categories', Icon: Boxes, screen: 'shop-browse' },
@@ -48,24 +29,6 @@ const QUICK_LINKS: { label: string; Icon: LucideIcon; screen: ScreenName; params
   { label: 'Orders', Icon: RotateCcw, screen: 'orders-list' },
   { label: 'Account', Icon: User, screen: 'profile-tab' },
 ];
-
-// Concern ids match the filter ids on the browse screen.
-const CONCERNS: { id: string; label: string; Icon: LucideIcon }[] = [
-  { id: 'acne', label: 'Acne & Blemishes', Icon: Leaf },
-  { id: 'hydration', label: 'Hydration & Dryness', Icon: Droplets },
-  { id: 'brightening', label: 'Glow & Dark Spots', Icon: Sun },
-  { id: 'antiaging', label: 'Firming & Lines', Icon: Flower2 },
-  { id: 'barrier', label: 'Barrier Repair', Icon: Wind },
-];
-
-// Accent colour for a category tile when it has no product photo to show.
-const CATEGORY_ACCENT: Record<string, string> = {
-  Serums: '#3b6cf5',
-  Moisturizers: '#2a9d8f',
-  Suncare: '#e9a23b',
-  Cleansers: '#5b8def',
-  Treatments: '#8e5bd6',
-};
 
 // Quiet placeholder cards with the same size as the real cards (see the skel rules in shop-home.css), so the page does not
 // move when the products arrive.
@@ -78,23 +41,6 @@ function skeletonCards(count: number, deal = false) {
       <span className="shop-home-skel-line is-short" />
     </span>
   ));
-}
-
-// How far the home is scrolled. On a phone the screen scrolls inside .screen-content; on a desktop the window does.
-function homeScrollY(): number {
-  const screen = document.querySelector<HTMLElement>('.glowvai-root .screen-content');
-  return Math.max(screen ? screen.scrollTop : 0, window.scrollY);
-}
-
-// Opens a screen from the home and records where the home was left, so Back returns to the same place. The app's own
-// save reads only the inner screen scroller, which is still at the top on a desktop, so the home saves its real position.
-function useHomeNavigate() {
-  const { navigate, currentScreen, activeParams } = useApp();
-  return (screen: ScreenName, params?: Record<string, string>) => {
-    const y = homeScrollY();
-    navigate(screen, params);
-    rememberScroll(currentScreen, activeParams, y);
-  };
 }
 
 function Notice({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
@@ -166,24 +112,7 @@ function ProductRail({ title, products }: { title: string; products: SkincarePro
 // "Buy it again": the customer's recent products, from the live catalogue. Shows nothing when the customer is not signed in,
 // has no orders, or the request fails.
 function ReorderRail({ catalog }: { catalog: SkincareProduct[] }) {
-  const [ids, setIds] = useState<string[]>([]);
-  useEffect(() => {
-    let alive = true;
-    fetchReorderItems()
-      .then((res) => {
-        if (alive && res.ok && res.data) setIds(res.data.items.map((i) => i.productId));
-      })
-      .catch(() => {
-        // Nothing is shown.
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  const products = useMemo(() => {
-    const byId = new Map(catalog.map((p) => [p.id, p] as const));
-    return ids.map((id) => byId.get(id)).filter((p): p is SkincareProduct => p !== undefined);
-  }, [ids, catalog]);
+  const products = useReorderProducts(catalog);
   if (products.length === 0) return null;
   return <ProductRail title="Buy it again" products={products} />;
 }
@@ -249,13 +178,6 @@ function DealCard({ product }: { product: SkincareProduct }) {
 
 // A category tile: the category's own product photo under a colour fade, with its real product count. Before the catalogue
 // loads the count line is a placeholder of the same height; if the catalogue fails, the tile still opens the category.
-// null: a placeholder while the catalogue loads. '': no count when the catalogue failed. Otherwise the real count.
-function countLabel(loading: boolean, failed: boolean, n: number): string | null {
-  if (loading) return null;
-  if (failed) return '';
-  return `${n} ${n === 1 ? 'product' : 'products'}`;
-}
-
 function CategoryCard({ tile, onOpen, count, isAll = false }: { tile: HomeCategoryTile | null; onOpen: () => void; count: string | null; isAll?: boolean }) {
   const label = isAll ? 'All Products' : tile?.label ?? '';
   const accent = (tile && CATEGORY_ACCENT[tile.id]) || '#1447e6';
@@ -340,79 +262,13 @@ const FESTIVAL: Record<Mode, FestivalContent> = {
   },
 };
 
-// The scan card says only what the scan does in this build: on-device when that switch is on, otherwise sent to the analysis service.
-const SCAN_PRIVACY = ON_DEVICE_INFERENCE_ENABLED
-  ? 'Your photo is analysed on this device.'
-  : 'Your photo is sent to GlowVai’s analysis service only to run this check.';
-
-let sessionRecent: string[] | null = null;
-function readSessionRecent(): string[] {
-  if (sessionRecent === null) sessionRecent = readRecentlyViewed();
-  return sessionRecent;
-}
-
-export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
-  const catalog = useLiveCatalog();
-  const ready = useCatalogReady();
-  const feed = useProductFeedStatus();
-  const loading = !ready && !feed.error;
-  const failed = !ready && feed.error;
-  const noProducts = ready && catalog.length === 0;
-
-  const lists = useMemo(() => buildCatalogLists(catalog), [catalog]);
-  const tiles = useMemo(() => categoryTiles(catalog), [catalog]);
-
-  // The customer's history and quiz answers are read once per app session, not on every visit to the home. A product
-  // opened from here would otherwise add a "Continue browsing" rail on Back and move the page under the customer.
-  const [recentIds] = useState(() => readSessionRecent());
-  const [skinState] = useState(() => firstVisitState(browserStore()));
-
-  const continueCandidates = useMemo(() => {
-    const byId = new Map(lists.FULL_SIZE_PRODUCTS.map((p) => [p.id, p] as const));
-    return recentIds.map((id) => byId.get(id)).filter((p): p is SkincareProduct => Boolean(p)).slice(0, 10);
-  }, [recentIds, lists.FULL_SIZE_PRODUCTS]);
-
-  const picksCandidates = useMemo(
-    () => (skinState.recommendationsOn ? skinMatchedPicks(lists.FULL_SIZE_PRODUCTS, skinState.concerns) : []),
-    [skinState, lists.FULL_SIZE_PRODUCTS]
-  );
-
-  // Each product appears in one rail only, in this order.
-  const rails = useMemo(() => {
-    const candidates: RailCandidate[] = [
-      { id: 'picks', title: 'Picked for your skin', products: picksCandidates, limit: 6 },
-      { id: 'continue', title: 'Continue browsing', products: continueCandidates, limit: 10 },
-      { id: 'top', title: 'Top Rated', products: lists.TOP_RATED, limit: 6 },
-      { id: 'under500', title: 'Under ₹500', products: lists.UNDER_500, limit: 6 },
-    ];
-    return dedupeRails(candidates);
-  }, [picksCandidates, continueCandidates, lists.TOP_RATED, lists.UNDER_500]);
-
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout();
+export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout('mobile');
+  const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, rails, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
   // The promo cards the admin published. None published means the built-in promo cards.
   const adminPromos = blockSettings['promos']?.items ?? [];
-  // Rows the admin set on the product block. A row shows only with at least four products; none set means the default rows.
-  const configuredRows = useMemo(() => {
-    const out: { id: string; title: string; products: SkincareProduct[] }[] = [];
-    layoutRows.forEach((r, i) => {
-      const band = r.source === 'price-band' ? parsePriceBand(r.value) : null;
-      const pool = r.source === 'category' ? catalog.filter((p) => p.category === r.value)
-        : r.source === 'brand' ? catalog.filter((p) => p.brand === r.value)
-        : r.source === 'bestsellers' ? lists.TOP_RATED
-        : r.source === 'price-band' ? (band ? catalog.filter((p) => p.price >= band.min && p.price <= band.max) : [])
-        : r.source === 'price-drop' ? catalog.filter((p) => p.originalPrice > p.price)
-        : [...catalog].reverse();
-      if (pool.length >= 4) out.push({ id: 'row-' + i, title: r.title, products: pool.slice(0, r.limit) });
-    });
-    return out;
-  }, [layoutRows, catalog, lists]);
-
-  // The deals the admin chose, in the admin's order (published products only). None chosen: the built-in deals.
-  const adminDeals = blockSettings['deals']?.items ?? [];
-  const adminDealProducts = useMemo(() => pickDeals(adminDeals, catalog), [adminDeals, catalog]);
-  const dealProducts = adminDeals.length > 0 ? adminDealProducts : lists.DEAL_PRODUCTS;
 
   const navigate = useHomeNavigate();
   const { setShoppingPreference, shoppingPreference, currentAddress } = useApp();
@@ -860,4 +716,13 @@ export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false
       {renderBlock('footer')}
     </div>
   );
+};
+
+// The shop home. Screens 1024px wide and more get the desktop home with its own admin layout; narrower screens, and the home
+// shown inside the skin report, get the mobile home. ?device=desktop|mobile forces one (the admin preview frames use it).
+// Resizing across 1024px switches between them without a reload.
+export const ShopHomeScreen: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
+  const device = useHomeDevice();
+  if (device === 'desktop' && !embedded) return <ShopDesktopHome />;
+  return <ShopMobileHome embedded={embedded} />;
 };
