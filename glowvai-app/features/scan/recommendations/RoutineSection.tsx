@@ -58,7 +58,7 @@ interface RoutineSectionProps {
 export const RoutineSection: React.FC<RoutineSectionProps> = ({ result }) => {
   const { navigate } = useApp();
   const catalog = useLiveCatalog();
-  const present = result?.concerns.filter((concern) => concern.present).map((concern) => concern.key) ?? [];
+  const present = result?.concerns.filter((concern) => concern.present && !(result.hiddenConcerns ?? []).includes(concern.key)).map((concern) => concern.key) ?? [];
 
   const steps = useMemo(() => {
     const keywords = Array.from(new Set(present.flatMap((key) => CONCERN_ACTIVES[key] ?? [])));

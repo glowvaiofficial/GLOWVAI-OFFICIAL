@@ -20,6 +20,7 @@
  */
 
 import type { InferenceSession, Tensor } from 'onnxruntime-web';
+import type { DisplayMetric, SkinScoreView } from '../../features/scan/services/scanDisplay';
 
 // ─── Inference switch (off by default) ───────────────────────────────────────
 export const ON_DEVICE_INFERENCE_ENABLED =
@@ -80,6 +81,12 @@ export interface SkinAnalysisResult {
   disclaimer: string;
   inferenceMethod: 'backend_cnn' | 'onnx_on_device';
   inferenceLatencyMs: number;
+  /** New scan API only: the metrics the model really measured (placeholders already removed). */
+  metrics?: DisplayMetric[];
+  /** New scan API only: overall score with its metric count; absent or null score means hide it. */
+  skinScore?: SkinScoreView | null;
+  /** Concern keys that must not be drawn (their source metric is a placeholder or was not measured). */
+  hiddenConcerns?: string[];
 }
 
 export const DISCLAIMER =
