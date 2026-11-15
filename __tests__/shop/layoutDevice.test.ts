@@ -68,25 +68,26 @@ describe("which layout is served", () => {
 
   test("desktop never serves the desktop draft without a preview", () => {
     const got = chooseLayoutSource({ ...doc, desktop: { draft: DESKTOP_DRAFT } }, "desktop", false);
-    assert.equal(got.source, MOBILE_PUBLISHED);
+    assert.equal(got.source, undefined);
     assert.equal(got.fallback, true);
   });
 
-  test("desktop falls back to the mobile published layout when no desktop layout is saved", () => {
+  test("desktop with no saved desktop layout gets NO source (built-in PC default), never the mobile layout", () => {
     for (const desktop of [undefined, null, "x", {}, { published: null }, { published: { blocks: [] } }, { published: { blocks: [{ id: "nope" }] } }]) {
       const got = chooseLayoutSource({ ...doc, desktop }, "desktop", false);
-      assert.equal(got.source, MOBILE_PUBLISHED, JSON.stringify(desktop));
+      assert.equal(got.source, undefined, JSON.stringify(desktop));
+      assert.equal(got.footerSource, MOBILE_PUBLISHED);
       assert.equal(got.fallback, true);
     }
   });
 
-  test("desktop preview: desktop.draft, else desktop.published, else the mobile draft", () => {
+  test("desktop preview: desktop.draft, else desktop.published, else the built-in PC default", () => {
     assert.deepEqual(chooseLayoutSource(doc, "desktop", true), { source: DESKTOP_DRAFT, footerSource: MOBILE_DRAFT, fallback: false });
     const noDraft = chooseLayoutSource({ ...doc, desktop: { published: DESKTOP_PUBLISHED } }, "desktop", true);
     assert.equal(noDraft.source, DESKTOP_PUBLISHED);
     assert.equal(noDraft.fallback, false);
     const none = chooseLayoutSource({ draft: MOBILE_DRAFT, published: MOBILE_PUBLISHED }, "desktop", true);
-    assert.equal(none.source, MOBILE_DRAFT);
+    assert.equal(none.source, undefined);
     assert.equal(none.fallback, true);
   });
 

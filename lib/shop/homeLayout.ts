@@ -483,13 +483,14 @@ export interface LayoutSourceChoice {
   source: unknown;
   // The layout the footer details are read from (always the mobile one).
   footerSource: unknown;
-  // True when a desktop request is served the mobile layout because no usable desktop layout is saved.
+  // True when a desktop request has no saved desktop layout: the PC home then uses its own built-in default design.
+  // The mobile design is never copied to PC (the two are designed separately).
   fallback: boolean;
 }
 
 // Which saved layout a request is served. doc is the whole siteContent/homeLayout data (undefined when missing).
 // Mobile: published, or draft for a staff preview. Desktop: desktop.published (preview: desktop.draft, then
-// desktop.published), else the mobile layout of the same kind.
+// desktop.published), else NOTHING (built-in PC default). Never the mobile layout: mobile and PC are separate designs.
 export function chooseLayoutSource(doc: unknown, device: LayoutDevice, isPreview: boolean): LayoutSourceChoice {
   const d = doc && typeof doc === "object" ? (doc as Record<string, unknown>) : {};
   const mobile = isPreview ? d.draft : d.published;
@@ -497,5 +498,5 @@ export function chooseLayoutSource(doc: unknown, device: LayoutDevice, isPreview
   const desk = d.desktop && typeof d.desktop === "object" ? (d.desktop as Record<string, unknown>) : {};
   const candidates = isPreview ? [desk.draft, desk.published] : [desk.published];
   const found = candidates.find(hasLayoutBlocks);
-  return found !== undefined ? { source: found, footerSource: mobile, fallback: false } : { source: mobile, footerSource: mobile, fallback: true };
+  return found !== undefined ? { source: found, footerSource: mobile, fallback: false } : { source: undefined, footerSource: mobile, fallback: true };
 }
