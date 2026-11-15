@@ -3,6 +3,7 @@ import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/serve
 import { ORDER_ID_PATTERN, type Doc } from "@/lib/shop/orderState";
 import { trackingView } from "@/lib/shop/tracking";
 import { customerReturnView, RETURN_COLLECTION } from "@/lib/shop/returns";
+import { expireIfStale } from "@/lib/shop/pendingOrders";
 
 export const dynamic = "force-dynamic";
 
@@ -20,9 +21,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   if (!ORDER_ID_PATTERN.test(id)) return json({ ok: false, error: "Order not found." }, 404);
   const store = db();
-  const [orderSnap, overlaySnap] = await store.getAll(store.collection("orders").doc(id), store.collection("admin_orders").doc(id));
-  const order = orderSnap.data() as Doc | undefined;
+  const [firstSnap, overlaySnap] = await store.getAll(store.collection("orders").doc(id), store.collection("admin_orders").doc(id));
+  let orderSnap = firstSnap;
+  let order = orderSnap.data() as Doc | undefined;
   if (!orderSnap.exists || !order || order.userId !== customer.uid) return json({ ok: false, error: "Order not found." }, 404);
+  // An unpaid online order past its payment window is closed now (stock and coins back) and read again.
+  if (await expireIfStale(store, id, order)) {
+    orderSnap = await store.collection("orders").doc(id).get();
+    order = orderSnap.data() as Doc | undefined;
+    if (!order) return json({ ok: false, error: "Order not found." }, 404);
+  }
   const overlay = overlaySnap.exists ? (overlaySnap.data() as Doc) : null;
 
   const returnsSnap = await store.collection(RETURN_COLLECTION).where("uid", "==", customer.uid).where("orderId", "==", id).limit(20).get();

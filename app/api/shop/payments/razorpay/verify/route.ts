@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
-import { retakeStockTx } from "@/lib/shop/platformStockTx";
+import { paymentArrivalTx } from "@/lib/shop/pendingOrders";
 import { notifyCustomer } from "@/lib/shop/notify";
 import { notifyOfferPool } from "@/lib/vendor/notify";
 
@@ -39,17 +39,18 @@ export async function POST(req: NextRequest) {
     const settled = ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"].includes(String(cur.payment?.status ?? ""));
     if (settled) return;
     confirmed = true;
-    const retake = await retakeStockTx(tx, store, cur.stockReservation, now);
-    const notes = retake.shortNote ? [{ at: now, actor: "Stock", event: retake.shortNote }] : [];
+    // Stock and coins given back by a failed attempt or by closing the order as unpaid are taken again.
+    const arrival = await paymentArrivalTx(tx, store, doc.id, cur, now);
+    arrival.commit();
     tx.update(doc.ref, {
       status: "PLACED",
       "payment.status": "PAID",
       "payment.paymentId": paymentId,
       transactionId: paymentId,
       "payment.transactionId": paymentId,
-      ...retake.patch,
+      ...arrival.patch,
       updatedAt: now,
-      events: [...(Array.isArray(cur.events) ? cur.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
+      events: [...(Array.isArray(cur.events) ? cur.events : []), { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...arrival.notes],
     });
   });
   // Customer notification, only when this call confirmed the payment (a repeat call sends nothing).

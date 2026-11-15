@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { verifyWebhookSignature } from "@/lib/shop/razorpay";
 import { applyRefundEvent, refundNotes, type RazorpayRefundEntity } from "@/lib/shop/refunds";
-import { releaseStockTx, retakeStockTx } from "@/lib/shop/platformStockTx";
+import { paymentArrivalTx, paymentFailedTx } from "@/lib/shop/pendingOrders";
 import { notifyCustomer } from "@/lib/shop/notify";
 import { notifyOfferPool } from "@/lib/vendor/notify";
 import { topupWebhookLive } from "@/lib/shop/wallet/live";
@@ -61,36 +61,39 @@ export async function POST(req: NextRequest) {
   // Set inside the transaction when this event changed the order; the customer is told after it commits.
   let notice = null as { uid: string; type: "order_placed" | "payment_failed" } | null;
   let offerPool: { orderId: string; pincode: string } | null = null;
-  // The order and its platform stock change together: a failed payment gives the stock back (once), and a payment
-  // confirmed after that takes it again. The order is read inside the transaction before anything is written.
+  // The order, its platform stock and its coins change together: a failed payment gives the stock and the coins back
+  // (once each), and a payment confirmed after that (or after the order was closed as unpaid) takes them again. The
+  // order is read inside the transaction before anything is written.
   await store.runTransaction(async (tx) => {
     const snap = await tx.get(doc.ref);
     const o = snap.data();
     if (!snap.exists || !o) return;
     const history = Array.isArray(o.events) ? o.events : [];
     if (event.event === "payment.captured" && UNSETTLED.has(String(o.payment?.status ?? "PENDING"))) {
-      const retake = await retakeStockTx(tx, store, o.stockReservation, now);
-      const notes = retake.shortNote ? [{ at: now, actor: "Stock", event: retake.shortNote }] : [];
+      const arrival = await paymentArrivalTx(tx, store, doc.id, o, now);
+      arrival.commit();
       tx.update(doc.ref, {
         status: "PLACED",
         "payment.status": "PAID",
         "payment.paymentId": entity.id ?? null,
         transactionId: entity.id ?? null,
-        ...retake.patch,
+        ...arrival.patch,
         updatedAt: now,
-        events: [...history, { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...notes],
+        events: [...history, { at: now, actor: "Payment provider", event: "Payment confirmed" }, ...arrival.notes],
       });
       notice = { uid: String(o.userId ?? ""), type: "order_placed" };
       offerPool = { orderId: String(o.orderId ?? ""), pincode: String((o.shippingAddress as { pincode?: unknown } | undefined)?.pincode ?? "") };
     } else if (event.event === "payment.failed" && o.payment?.status === "PENDING") {
-      const release = await releaseStockTx(tx, store, o.stockReservation, now);
+      const release = await paymentFailedTx(tx, store, doc.id, o, now);
+      release.commit();
       tx.update(doc.ref, {
         "payment.status": "FAILED",
         ...release.patch,
         updatedAt: now,
         events: [...history, { at: now, actor: "Payment provider", event: "Payment failed" }],
       });
-      notice = { uid: String(o.userId ?? ""), type: "payment_failed" };
+      // An order already closed as unpaid needs no "payment failed" message on top.
+      if (String(o.status ?? "") !== "CANCELLED") notice = { uid: String(o.userId ?? ""), type: "payment_failed" };
     }
   });
   // Customer notification after the transaction. notifyCustomer never throws, so the webhook still answers Razorpay.

@@ -13,6 +13,8 @@ import { deliveredAtOf, toMillis, type Doc } from "@/lib/shop/orderState";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { AFFILIATE_CONFIG } from "@/lib/shop/affiliate/config";
 import { affiliateCodeForOrder } from "@/lib/shop/affiliate/store";
+import { idempotencyDocId, parseIdempotencyKey } from "@/lib/shop/pendingPayment";
+import { expirePendingForCustomer, idempotentReplay } from "@/lib/shop/pendingOrders";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,10 @@ export async function GET(req: NextRequest) {
   const limit = parsePageLimit(params.get("limit"));
   const cursor = decodeOrderCursor(params.get("cursor"));
   if (cursor === "invalid") return json({ ok: false, error: "Those orders could not be opened. Start again from the first page." }, 400);
+
+  // Unpaid online orders past their payment window are closed first (stock and coins back), so the list shows them
+  // as cancelled. Never throws.
+  await expirePendingForCustomer(db(), customer.uid);
 
   const returnsSnap = await db().collection(RETURN_COLLECTION).where("uid", "==", customer.uid).limit(100).get();
   const returnedOrderIds = new Set(returnsSnap.docs.map((d) => String((d.data() as Doc).orderId ?? "")));
@@ -157,6 +163,17 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to place your order." }, 401);
+  // Idempotency-Key (sent by the native app): the same key from the same customer within 24 hours returns the order it
+  // first created, before the per-customer limits, so a retried request is never counted as a new order. A missing or
+  // malformed key is ignored. Replays still count against the per-IP limit above and a short per-customer limit.
+  const idemKey = parseIdempotencyKey(req.headers.get("idempotency-key"));
+  const idemDocId = idemKey ? idempotencyDocId(customer.uid, idemKey) : null;
+  if (idemDocId) {
+    const replayLimited = limitByUser(customer.uid, "orders-post-replay", 30);
+    if (replayLimited) return replayLimited;
+    const replay = await idempotentReplay(db(), customer.uid, idemDocId);
+    if (replay) return json(replay);
+  }
   // Customer limits: at most 10 order attempts a day, and at most 3 in any 10 minutes (a burst guard).
   const userBurst = await limitByUserShared(customer.uid, "orders-post-burst", 3, 10 * 60 * 1000, "You are placing orders too quickly. Wait a few minutes and try again.");
   if (userBurst) return userBurst;
@@ -164,9 +181,9 @@ export async function POST(req: NextRequest) {
   if (userDaily) return userDaily;
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
-  if (!body) return json({ ok: false, error: "Invalid request." }, 400);
+  if (!body) return json({ ok: false, code: "VALIDATION", error: "Invalid request." }, 400);
   const parsed = parseOrderRequest(body, { onlineAvailable: razorpayConfigured() });
-  if (!parsed.ok) return json({ ok: false, error: parsed.error }, parsed.status);
+  if (!parsed.ok) return json({ ok: false, code: "VALIDATION", error: parsed.error }, parsed.status);
 
   const online = parsed.value.paymentMethod === "ONLINE";
   // Affiliate attribution from the signed cookie set on the affiliate link visit. A failure here never blocks the order.
@@ -175,8 +192,10 @@ export async function POST(req: NextRequest) {
     uid: customer.uid,
     ...parsed.value,
     affiliateCode,
+    idempotencyDocId: idemDocId,
     startPayment: online ? (amount, orderId) => createRazorpayOrder(amount, orderId) : undefined,
   });
-  if (!result.ok) return json({ ok: false, error: result.error }, result.status);
+  // The app reads `code` (orderCore's OrderFailure) to decide what to show; `error` is the customer message.
+  if (!result.ok) return json({ ok: false, code: result.code, error: result.error }, result.status);
   return json(result.body);
 }
