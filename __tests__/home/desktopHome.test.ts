@@ -81,7 +81,8 @@ describe("the desktop home", () => {
     assert.match(desktopSource, /No products are listed yet/);
     assert.match(desktopSource, /Products could not be loaded/);
     assert.match(desktopSource, /Loading products/);
-    assert.match(desktopSource, /<HomeBanners \/>/);
+    // The admin banners join the hero carousel (the same /api/shop/home list the phone home shows).
+    assert.match(desktopSource, /\/api\/shop\/home/);
     assert.match(desktopSource, /layout\.preview &&/);
     assert.match(desktopSource, /<SkinQuizBanner \/>/);
   });
@@ -95,5 +96,96 @@ describe("the desktop home", () => {
   test("hides the shell header and the phone tab bar only while the desktop home is shown", () => {
     assert.match(desktopCss, /\.app-viewport:has\(\.shop-desk\) \.web-header/);
     assert.match(desktopCss, /\.app-viewport:has\(\.shop-desk\) \.bottom-commerce-shell/);
+  });
+});
+
+describe("desktop rows fill evenly", () => {
+  test("balancedColumns spreads tiles over even rows", async () => {
+    const { balancedColumns } = await import("../../glowvai-app/features/shop/lib/homeDevice");
+    assert.equal(balancedColumns(6, 6), 6);
+    assert.equal(balancedColumns(6, 8), 6);
+    assert.equal(balancedColumns(10, 8), 5);
+    assert.equal(balancedColumns(9, 8), 5);
+    assert.equal(balancedColumns(12, 6), 6);
+    assert.equal(balancedColumns(2, 3), 2);
+    assert.equal(balancedColumns(4, 3), 2);
+    assert.equal(balancedColumns(0, 6), 1);
+  });
+});
+
+describe("desktop accents", () => {
+  test("an item's own valid accent wins, otherwise the palette in order", async () => {
+    const { ACCENT_PALETTE, effectiveAccent, isAccent } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
+    assert.deepEqual(ACCENT_PALETTE.map((a) => a.hex), ["#8B5CF6", "#4F8EF7", "#F4A261", "#6BAF92", "#E85D8F", "#F26B5B", "#C8A96A", "#1F2A44"]);
+    assert.equal(effectiveAccent("#12ab34", 0), "#12AB34");
+    for (const bad of ["", "red", "#123", "#12345g", "123456", null, undefined, 5]) assert.equal(isAccent(bad), false, String(bad));
+    assert.equal(effectiveAccent("", 0), "#8B5CF6");
+    assert.equal(effectiveAccent("nope", 9), "#4F8EF7");
+  });
+
+  test("categories map by name first, then the palette", async () => {
+    const { categoryAccent } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
+    assert.equal(categoryAccent("Serums", null, 5), "#8B5CF6");
+    assert.equal(categoryAccent("moisturizers", null, 0), "#4F8EF7");
+    assert.equal(categoryAccent("Sunscreen", null, 0), "#F4A261");
+    assert.equal(categoryAccent("Cleansers", null, 0), "#6BAF92");
+    assert.equal(categoryAccent("Treatments", null, 0), "#E85D8F");
+    assert.equal(categoryAccent("Coupons", null, 0), "#F26B5B");
+    assert.equal(categoryAccent("Brands", null, 0), "#C8A96A");
+    assert.equal(categoryAccent("Shop all", null, 0), "#1F2A44");
+    assert.equal(categoryAccent("All", null, 0), "#1F2A44");
+    assert.equal(categoryAccent("Serums", "#000000", 0), "#000000");
+    assert.equal(categoryAccent("Lip care", null, 2), "#F4A261");
+  });
+
+  test("a section's accent falls back to its default; text on tints stays readable", async () => {
+    const { sectionAccent, accentInk, contrast, textOn, mix, ACCENT_PALETTE } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
+    assert.equal(sectionAccent({ accent: "#abcdef" }, "#000000"), "#ABCDEF");
+    assert.equal(sectionAccent({ accent: "pink" }, "#000000"), "#000000");
+    assert.equal(sectionAccent(undefined, "#000000"), "#000000");
+    for (const { hex } of ACCENT_PALETTE) {
+      const ink = accentInk(hex);
+      assert.ok(contrast(ink, "#F5F7FD") >= 4.5, hex);
+      assert.ok(contrast(ink, "#FFFFFF") >= 4.5, hex);
+      assert.ok(contrast(ink, mix("#F5F7FD", hex, 0.16)) >= 4.5, hex);
+      assert.ok(contrast(textOn(hex), hex) >= 3, hex);
+    }
+  });
+
+  test("the desktop home uses the accents and keeps brand blue for the main buttons", () => {
+    assert.match(desktopSource, /from '\.\.\/lib\/desktopAccents'/);
+    assert.match(desktopCss, /var\(--acc-ink/);
+    assert.match(desktopCss, /\.shop-desk-add\{[^}]*var\(--desk-brand\)/);
+  });
+});
+
+describe("desktop motion respects reduced motion", () => {
+  test("movement is switched off under prefers-reduced-motion", () => {
+    assert.match(desktopCss, /@media \(prefers-reduced-motion: reduce\)\{[\s\S]*animation: none !important/);
+    assert.match(desktopSource, /prefers-reduced-motion: reduce/);
+  });
+});
+
+describe("desktop layout follows the home design", () => {
+  test("header tabs, greeting, chips, flash deals and the help banner are there", () => {
+    for (const marker of ['className="shop-desk-greet"', "Track Order", 'className="shop-desk-chips"', "For You", "All Categories", "/api/shop/flash-sales", "Ends in", 'className="shop-desk-plus"', "aria-roledescription=\"carousel\""]) {
+      assert.ok(desktopSource.includes(marker), marker);
+    }
+  });
+
+  test("the layout reply's section accents are read, keeping only #RRGGBB", () => {
+    const got = readLayoutResponse({ sectionAccents: { deals: "#112233", hero: "red", brands: "#abc", promos: "#A1b2C3" } });
+    assert.deepEqual(got.sectionAccents, { deals: "#112233", promos: "#A1b2C3" });
+    assert.deepEqual(readLayoutResponse({ sectionAccents: ["#112233"] }).sectionAccents, {});
+    assert.deepEqual(readLayoutResponse(null).sectionAccents, {});
+  });
+
+  test("a block's accent: its settings, then sectionAccents, then the default; deep shades carry white text", async () => {
+    const { blockAccent, accentDeep, contrast, ACCENT_PALETTE } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
+    assert.equal(blockAccent({ accent: "#010203" }, { deals: "#0A0B0C" }, "deals", "#FFFFFF"), "#010203");
+    assert.equal(blockAccent({ items: [] }, { deals: "#0a0b0c" }, "deals", "#FFFFFF"), "#0A0B0C");
+    assert.equal(blockAccent(undefined, { deals: "nope" }, "deals", "#FFFFFF"), "#FFFFFF");
+    assert.equal(blockAccent(undefined, undefined, "deals", "#FFFFFF"), "#FFFFFF");
+    for (const { hex } of ACCENT_PALETTE) assert.ok(contrast("#FFFFFF", accentDeep(hex)) >= 4.5, hex);
   });
 });
