@@ -77,6 +77,7 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
   const router = useRouter();
   const session = useVendorSession();
   const [signingOut, setSigningOut] = useState(false);
+  const [confirmingSignOut, setConfirmingSignOut] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   // Pages pass a short name ("orders"); the nav matches on the full path, so map it to "/vendor/<name>".
   const current = active ? `/vendor/${active}` : pathname;
@@ -91,6 +92,7 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
 
   async function signOut() {
     if (signingOut) return;
+    setConfirmingSignOut(false);
     setSigningOut(true);
     setSignOutError(null);
     try {
@@ -114,7 +116,8 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
           {session.authPhase === "signed-in" ? (
             <button
               type="button"
-              onClick={signOut}
+              onClick={() => setConfirmingSignOut(true)}
+              aria-haspopup="dialog"
               disabled={signingOut}
               className="min-h-[44px] rounded-xl px-3 text-[14px] font-semibold text-[#0057FB] hover:bg-[#EAF2FF] disabled:opacity-60"
             >
@@ -122,6 +125,21 @@ export function VendorShell({ children, active }: { children: ReactNode; active?
             </button>
           ) : null}
         </div>
+        {confirmingSignOut ? (
+          <div className="mx-auto max-w-6xl px-4 pb-3">
+            <div role="alertdialog" aria-labelledby="signout-title" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#BFD4FF] bg-[#EAF2FF] p-4">
+              <p id="signout-title" className="text-[15px] font-semibold text-ink">Sign out of your store?</p>
+              <div className="flex gap-2">
+                <button type="button" autoFocus onClick={() => setConfirmingSignOut(false)} aria-label="Stay signed in" className="min-h-[44px] rounded-xl border border-[#0057FB]/30 bg-white px-4 text-[14px] font-semibold text-[#0057FB]">
+                  Stay signed in
+                </button>
+                <button type="button" onClick={signOut} aria-label="Confirm sign out" className="min-h-[44px] rounded-xl bg-[#0057FB] px-4 text-[14px] font-semibold text-white">
+                  Sign out
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
         {signOutError ? (
           <div className="mx-auto max-w-6xl px-4 pb-3">
             <Notice>{signOutError}</Notice>

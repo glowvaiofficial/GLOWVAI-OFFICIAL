@@ -9,8 +9,8 @@ import { Notice } from "@/components/vendor-web/ui/Notice";
 import { Skeleton } from "@/components/vendor-web/ui/Skeleton";
 import { StatusChip } from "@/components/vendor-web/ui/StatusChip";
 import { isVendorApiError } from "@/lib/vendor-web/errors";
-import { markPacked } from "@/lib/vendor-web/ops/api";
-import { PACKED_SUCCESS, SUBSTITUTION_COPY, TIMELINE_LABELS, messageFor } from "@/lib/vendor-web/ops/copy";
+import { markPacked, markReady } from "@/lib/vendor-web/ops/api";
+import { PACKED_SUCCESS, READY_NOTE, READY_SUCCESS, SUBSTITUTION_COPY, messageFor } from "@/lib/vendor-web/ops/copy";
 import { allTicked, checkedProductIds, packLines } from "@/lib/vendor-web/ops/pack";
 import { formatRupees } from "@/lib/vendor-web/ops/time";
 import { useOrders } from "./OrdersProvider";
@@ -48,7 +48,8 @@ export function PackScreen({ orderId }: { orderId: string }) {
     );
   }
 
-  const packed = order.status === "PACKED" || order.packedAt !== undefined;
+  const isReady = order.status === "READY_FOR_PICKUP";
+  const packed = order.status === "PACKED" || isReady || order.packedAt !== undefined;
   const waiting = order.status === "VENDOR_ACCEPTED";
   const ready = waiting && allTicked(lines, ticked);
   const substitution = order.substitutionPreference ? SUBSTITUTION_COPY[order.substitutionPreference] : null;
@@ -78,12 +79,27 @@ export function PackScreen({ orderId }: { orderId: string }) {
     }
   }
 
+  async function submitReady() {
+    setBusy(true);
+    setActionError(null);
+    try {
+      const res = await markReady(orderId);
+      putOrder(res.order);
+      setSuccess(READY_SUCCESS);
+    } catch (err) {
+      setActionError(messageFor(err));
+      if (isVendorApiError(err) && (err.code === "ORDER_CANCELLED" || err.code === "NOT_FOUND" || err.code === "INVALID_STATE")) refresh();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <BackLink orderId={orderId} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-[24px] font-semibold text-ink">Pack order {order.reference}</h1>
-        {packed ? <StatusChip tone="ok">Packed</StatusChip> : order.cancelled ? <StatusChip tone="bad">Cancelled</StatusChip> : <StatusChip tone="warn">To pack</StatusChip>}
+        {isReady ? <StatusChip tone="ok">Ready for pickup</StatusChip> : packed ? <StatusChip tone="ok">Packed</StatusChip> : order.cancelled ? <StatusChip tone="bad">Cancelled</StatusChip> : <StatusChip tone="warn">To pack</StatusChip>}
       </div>
 
       {order.customerFirstName ? <p className="text-[15px] text-ink">For {order.customerFirstName}</p> : null}
@@ -135,6 +151,18 @@ export function PackScreen({ orderId }: { orderId: string }) {
         ) : null}
       </Card>
 
+      {packed && !order.cancelled ? (
+        <Card title="Pickup" description={READY_NOTE}>
+          {isReady ? (
+            <p className="text-[15px] font-semibold text-ink">Ready for pickup</p>
+          ) : (
+            <Button fullWidth disabled={busy} loading={busy} aria-label="Mark this order ready for pickup" onClick={() => void submitReady()}>
+              Mark ready for pickup
+            </Button>
+          )}
+        </Card>
+      ) : null}
+
       <Card title="Substitution preference" description="Set by the customer. You cannot change it.">
         {substitution ? (
           <>
@@ -152,8 +180,8 @@ export function PackScreen({ orderId }: { orderId: string }) {
         ) : (
           <ol className="flex flex-col gap-2">
             {order.timeline.map((step) => (
-              <li key={step.stage} className="flex items-center justify-between gap-3 text-[15px] text-ink">
-                <span>{TIMELINE_LABELS[step.stage]}</span>
+              <li key={step.label} className="flex items-center justify-between gap-3 text-[15px] text-ink">
+                <span>{step.label}</span>
                 <span className="text-[13px] text-ink-muted">{step.at ? new Date(step.at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : ""}</span>
               </li>
             ))}

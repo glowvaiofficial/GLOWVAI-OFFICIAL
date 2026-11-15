@@ -47,7 +47,7 @@ export function tabOf(order: OpsOrder): OrderTab {
   if (order.cancelled || order.status === "CANCELLED") return "cancelled";
   if (order.isOffer) return "offers";
   if (order.status === "VENDOR_ACCEPTED") return "preparing";
-  if (order.status === "PACKED") return "packed";
+  if (order.status === "PACKED" || order.status === "READY_FOR_PICKUP") return "packed";
   return "completed";
 }
 

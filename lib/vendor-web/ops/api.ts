@@ -3,7 +3,7 @@
 import { vendorFetch } from "../api";
 import type { DeclineReason } from "./decline";
 import type { ProductRequestPayload } from "./productRequest";
-import type { AnalyticsResult, InventoryLine, OpsOrder, OrdersPage, ProductRequestView, VariantView } from "./types";
+import type { AnalyticsResult, InventoryLine, OpsOrder, OpsReturn, OrdersPage, ProductRequestView, VariantView } from "./types";
 import type { SaveItem } from "./inventory";
 
 export interface StatusResponse {
@@ -34,6 +34,14 @@ export function markPacked(orderId: string, checkedProductIds: string[]): Promis
     method: "POST",
     body: { checkedProductIds },
   });
+}
+
+export function markReady(orderId: string): Promise<{ order: OpsOrder }> {
+  return vendorFetch<{ order: OpsOrder }>(`/orders/${encodeURIComponent(orderId)}/ready`, { method: "POST" });
+}
+
+export function fetchReturns(): Promise<{ returns: OpsReturn[] }> {
+  return vendorFetch<{ returns: OpsReturn[] }>("/returns");
 }
 
 export interface InventoryResponse {

@@ -38,6 +38,7 @@ export interface VendorOrder {
   updatedAt: number;
   acceptedAt?: number;
   packedAt?: number;
+  readyAt?: number;
   customerFirstName?: string;
   cancelled: boolean;
   cancellationReason?: string;
@@ -191,6 +192,7 @@ export function toVendorOrder(order: Doc, opts: { uid: string; isOffer: boolean;
   if (mine) {
     if (num(order.vendorAcceptedAt)) out.acceptedAt = num(order.vendorAcceptedAt);
     if (num(order.vendorPackedAt)) out.packedAt = num(order.vendorPackedAt);
+    if (num(order.vendorReadyAt)) out.readyAt = num(order.vendorReadyAt);
     if (out.acceptedAt) {
       const first = firstName(order);
       if (first) out.customerFirstName = first;

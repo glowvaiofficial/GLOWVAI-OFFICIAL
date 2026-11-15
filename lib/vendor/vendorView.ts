@@ -53,6 +53,7 @@ const ms = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) 
 const MILESTONES: readonly { field: string; label: string }[] = [
   { field: "vendorAcceptedAt", label: "Accepted" },
   { field: "vendorPackedAt", label: "Packed" },
+  { field: "vendorReadyAt", label: "Ready for pickup" },
   { field: "outForDeliveryAt", label: "Handed to delivery partner" },
 ];
 
