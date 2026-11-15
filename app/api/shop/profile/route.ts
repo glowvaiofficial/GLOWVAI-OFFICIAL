@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { FieldValue } from "firebase-admin/firestore";
 import { customerFrom, db, indianMobile, json, limitByIp, limitByUser, text, tooMany } from "@/lib/shop/server";
 import { recordActivity } from "@/lib/shop/activity";
@@ -43,8 +44,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "profile-post", 20);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   if (tooMany(`profile:${customer.uid}`, 20, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

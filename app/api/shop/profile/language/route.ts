@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
 import { recordActivity } from "@/lib/shop/activity";
 import { isLanguageCode } from "@/lib/shop/settings/rules";
@@ -9,8 +10,9 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "language-post", 20);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "language-post", 30);
   if (userLimited) return userLimited;
   if (tooMany(`language:${customer.uid}`, 30, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);

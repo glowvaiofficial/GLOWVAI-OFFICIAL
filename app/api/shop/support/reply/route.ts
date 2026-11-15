@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop/server";
 import { createWindowLimiter, decideCustomerReply, validateCustomerReply } from "@/lib/shop/support";
 
@@ -12,8 +13,9 @@ const TICKET_ID = /^TKT-[A-Za-z0-9-]{1,60}$/;
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "support-reply", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "support", 60);
   if (userLimited) return userLimited;
   if (!replyLimit.allow(customer.uid, Date.now())) {

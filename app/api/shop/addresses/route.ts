@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, json, limitByIp, limitByUser, tooMany } from "@/lib/shop/server";
 import { ADDRESS_ID, MAX_ADDRESSES, sortAddresses, type StoredAddress } from "@/lib/shop/addressRules";
 import { listAddresses, runAddressOp } from "@/lib/shop/addressService";
@@ -46,8 +47,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "addresses-post", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "addresses-write", 60);
   if (userLimited) return userLimited;
   if (tooMany(`addresses-write:${customer.uid}`, 60, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);
@@ -64,8 +66,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const ipLimited = limitByIp(req, "addresses-patch", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "addresses-write", 60);
   if (userLimited) return userLimited;
   if (tooMany(`addresses-write:${customer.uid}`, 60, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);
@@ -92,8 +95,9 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const ipLimited = limitByIp(req, "addresses-delete", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "addresses-write", 60);
   if (userLimited) return userLimited;
   if (tooMany(`addresses-write:${customer.uid}`, 60, 60 * 60 * 1000)) return json({ ok: false, error: "Too many changes. Try again later." }, 429);

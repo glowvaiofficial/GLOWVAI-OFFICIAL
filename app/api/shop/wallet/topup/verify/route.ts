@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { verifyTopupLive } from "@/lib/shop/wallet/live";
 import { TOPUP_LIMITS } from "@/lib/shop/wallet-config";
@@ -13,8 +14,9 @@ const HOUR = 60 * 60 * 1000;
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "wallet-topup-verify", TOPUP_LIMITS.verifyPerIpPerHour, HOUR);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "wallet-topup-verify", TOPUP_LIMITS.verifyPerCustomerPerHour, HOUR);
   if (userLimited) return userLimited;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

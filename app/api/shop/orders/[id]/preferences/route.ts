@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { ORDER_ID_PATTERN, type Doc } from "@/lib/shop/orderState";
 import { parseSubstitutionPreference, preferenceChangeBlock } from "@/lib/shop/preferences";
@@ -11,8 +12,9 @@ export const dynamic = "force-dynamic";
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const ipLimited = limitByIp(req, "order-preferences", 60);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   // Thirty changes an hour per customer.
   const userLimited = limitByUser(customer.uid, "order-preferences", 30, 60 * 60 * 1000);
   if (userLimited) return userLimited;

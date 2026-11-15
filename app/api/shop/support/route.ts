@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { randomBytes } from "node:crypto";
 import { customerFrom, db, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared, text } from "@/lib/shop/server";
 import { customerTicket } from "@/lib/shop/support";
@@ -46,8 +47,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const ipLimited = await limitByIpShared(req, "support-post", 30, 60_000);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = await limitByUserShared(customer.uid, "support-ticket", 5, 60 * 60 * 1000, "Too many requests. Try again later.");
   if (userLimited) return userLimited;
 

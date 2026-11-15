@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 // refused. Removing the preferred method clears the preference.
 export async function DELETE(req: NextRequest, ctx: { params: Promise<{ tokenId: string }> }) {
   if (!paymentMethodsEnabled(env())) return gateOff();
-  const g = await gate(req, "payment-methods-delete", 20);
+  const g = await gate(req, "payment-methods-delete", 20, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const { tokenId } = await ctx.params;

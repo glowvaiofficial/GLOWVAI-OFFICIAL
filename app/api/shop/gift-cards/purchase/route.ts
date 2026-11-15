@@ -13,7 +13,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // Starts a gift card purchase: validates the amount and the recipient, then creates a Razorpay order for the amount.
 // The card is issued only after the payment is verified on the server (see purchase/verify). Ten purchases a day per account.
 export async function POST(req: NextRequest) {
-  const g = await gate(req, "gift-card-purchase", 10);
+  const g = await gate(req, "gift-card-purchase", 10, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop/server";
 import { planRelease } from "@/lib/shop/platformStock";
@@ -20,8 +21,9 @@ const SETTLED_PAYMENT = new Set(["PAID", "PARTIALLY_REFUNDED", "REFUNDED"]);
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const ipLimited = limitByIp(req, "cancel-post", 30);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   const userLimited = limitByUser(customer.uid, "cancel", 60);
   if (userLimited) return userLimited;
   const { id } = await params;

@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { requirePhoneUser } from "@/lib/auth/requirePhoneUser";
 import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
 import { DAY_MS, ORDER_ID_PATTERN, type Doc } from "@/lib/shop/orderState";
 import { recordActivity } from "@/lib/shop/activity";
@@ -20,8 +21,10 @@ export const dynamic = "force-dynamic";
 // can be requested once (a lock document per item, written in the same transaction), and the order is read in that
 // transaction so a late cancellation cannot slip through. Staff decide and move the state (lib/shop/returns.ts).
 class RequestBlocked extends Error {
-  constructor(readonly status: number, message: string) {
+  readonly status: number;
+  constructor(status: number, message: string) {
     super(message);
+    this.status = status;
   }
 }
 
@@ -47,8 +50,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const ipLimited = limitByIp(req, "returns-post", 20);
   if (ipLimited) return ipLimited;
-  const customer = await customerFrom(req);
-  if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
+  const phone = await requirePhoneUser(req);
+  if (!phone.ok) return phone.response;
+  const customer = phone.user;
   // Five requests a day per customer, counted per attempt.
   const dailyLimited = limitByUser(customer.uid, "returns-post", 5, DAY_MS);
   if (dailyLimited) return dailyLimited;

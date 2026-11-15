@@ -22,12 +22,12 @@ const ORDER_ID_PATTERN = /^GV-[A-Za-z0-9-]{3,40}$/;
 const CLOSED_STATUSES = ["DELIVERED", "VENDOR_REJECTED", "CANCELLED"];
 
 export class DelayError extends Error {
-  constructor(
-    readonly code: string,
-    readonly status: number,
-    message: string,
-  ) {
+  readonly code: string;
+  readonly status: number;
+  constructor(code: string, status: number, message: string) {
     super(message);
+    this.code = code;
+    this.status = status;
     this.name = "DelayError";
   }
 }

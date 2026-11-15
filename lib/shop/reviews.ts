@@ -47,12 +47,12 @@ const REJECTION_REASON_MAX = 300;
 
 // A refusal with an HTTP status and a short code. Routes turn it into a JSON response.
 export class ReviewError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-    readonly code: string,
-  ) {
+  readonly status: number;
+  readonly code: string;
+  constructor(status: number, message: string, code: string) {
     super(message);
+    this.status = status;
+    this.code = code;
   }
 }
 

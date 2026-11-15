@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 // payments use). The card is created once per purchase. The full code is returned in this response only: GlowVai keeps
 // a salted hash, so a repeat call for an issued purchase returns the card id and no code.
 export async function POST(req: NextRequest) {
-  const g = await gate(req, "gift-card-verify", 30);
+  const g = await gate(req, "gift-card-verify", 30, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 // Sets the preferred saved method (a token id from the list), or clears it with tokenId: null.
 export async function POST(req: NextRequest) {
   if (!paymentMethodsEnabled(env())) return gateOff();
-  const g = await gate(req, "payment-methods-preferred", 20);
+  const g = await gate(req, "payment-methods-preferred", 20, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const body = (await req.json().catch(() => null)) as { tokenId?: unknown } | null;

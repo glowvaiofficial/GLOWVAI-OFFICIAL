@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 // Razorpay Checkout with the customer id and save: 1. Card entry happens on Razorpay's page; GlowVai never sees it.
 export async function POST(req: NextRequest) {
   if (!paymentMethodsEnabled(env())) return gateOff();
-  const g = await gate(req, "payment-methods-post", 10);
+  const g = await gate(req, "payment-methods-post", 10, true);
   if (g.response) return g.response;
   const uid = g.uid as string;
   const now = Date.now();
