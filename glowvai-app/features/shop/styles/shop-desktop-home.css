@@ -514,6 +514,7 @@
   .glowvai-root .shop-desk .shop-desk-header-inner{ gap: 12px; }
   .glowvai-root .shop-desk .shop-desk-delivery{ max-width: 150px; }
   .glowvai-root .shop-desk .shop-desk-action > span:not(.shop-desk-avatar){ display: none; }
+  .glowvai-root .shop-desk .shop-desk-action:not(.is-account):not(.is-icon){ padding: 0 10px; }
   .glowvai-root .shop-desk .shop-desk-action.is-account{ padding-right: 4px; }
   .glowvai-root .shop-desk .shop-desk-concerns{ display: flex; flex-wrap: wrap; }
   .glowvai-root .shop-desk .shop-desk-concern{ flex: 1 1 auto; }

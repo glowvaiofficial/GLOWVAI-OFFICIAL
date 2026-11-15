@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
+import { ArrowRight, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
@@ -787,7 +787,8 @@ export const ShopDesktopHome: React.FC = () => {
   const adminPromos = blockSettings['promos']?.items ?? [];
 
   const navigate = useHomeNavigate();
-  const { currentAddress, accountSignedIn, requireSignIn } = useApp();
+  const { currentAddress, accountSignedIn, requireSignIn, wishlist: wishlistIds } = useApp();
+  const wishlistCount = wishlistIds.length;
   const cart = useShellCart();
   const unread = useInbox((s) => s.unreadCount);
   const { banners, previewing } = useHomeBanners();
@@ -1190,16 +1191,22 @@ export const ShopDesktopHome: React.FC = () => {
                 <ScanFace size={18} aria-hidden="true" />
                 Skin scan
               </button>
-              <button type="button" className="shop-desk-action" onClick={() => (accountSignedIn ? navigate('orders-list') : requireSignIn())}>
+              <button type="button" className="shop-desk-action" aria-label="Orders" onClick={() => (accountSignedIn ? navigate('orders-list') : requireSignIn())}>
                 <Package size={20} aria-hidden="true" />
                 <span>Orders</span>
               </button>
-              <button type="button" className="shop-desk-action is-account" onClick={() => (accountSignedIn ? navigate('profile-tab') : requireSignIn())}>
+              <button type="button" className="shop-desk-action is-icon" aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} saved` : 'Wishlist'} onClick={() => (accountSignedIn ? navigate('shop-wishlist') : requireSignIn())}>
+                <Heart size={20} aria-hidden="true" />
+              </button>
+              <button type="button" className="shop-desk-action is-icon" aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} onClick={() => (accountSignedIn ? navigate('notifications-list') : requireSignIn())}>
+                <Bell size={20} aria-hidden="true" />
+                {unread > 0 && <b className="shop-desk-badge" aria-hidden="true">{unread > 99 ? '99+' : unread}</b>}
+              </button>
+              <button type="button" className="shop-desk-action is-account" aria-label={accountSignedIn ? 'Account' : 'Log in'} onClick={() => (accountSignedIn ? navigate('profile-tab') : requireSignIn())}>
                 <span className="shop-desk-avatar" aria-hidden="true">
                   {accountSignedIn && firstName ? firstName.charAt(0).toUpperCase() : <User size={18} />}
                 </span>
                 <span>{accountSignedIn ? 'Account' : 'Login'}</span>
-                {unread > 0 && <b className="shop-desk-badge" aria-label={`${unread} unread notifications`}>{unread > 99 ? '99+' : unread}</b>}
               </button>
               <button
                 type="button"

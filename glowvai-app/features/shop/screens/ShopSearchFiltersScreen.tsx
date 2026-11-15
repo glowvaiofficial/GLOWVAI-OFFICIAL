@@ -4,6 +4,7 @@ import { useApp } from '../../../context/useApp';
 import { useLiveCatalog, type SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { rankSuggestions } from '../../../../lib/shop/suggest';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { SEARCH_SORT_LABELS, sortProducts, type SearchSort } from '../shared/shopUtils';
 import '../styles/shop-search-filters.css';
 
 const SUGGEST_LIST_ID = 'shop-search-suggestions';
@@ -40,6 +41,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(EMPTY_FILTERS);
+  const [sort, setSort] = useState<SearchSort>('relevance');
   const [voiceSupported, setVoiceSupported] = useState(false);
   const resultsRef = useRef<HTMLElement>(null);
 
@@ -85,7 +87,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return catalog.filter((p) => {
+    const filtered = catalog.filter((p) => {
       const matchesQuery =
         !q ||
         p.name.toLowerCase().includes(q) ||
@@ -96,7 +98,9 @@ export const ShopSearchFiltersScreen: React.FC = () => {
       const matchesPrice = activeFilters.price === 'All' || PRICE_BUCKETS[activeFilters.price]?.(p.price);
       return matchesQuery && matchesCategory && matchesBrand && matchesPrice;
     });
-  }, [query, activeFilters]);
+    return sortProducts(filtered, sort);
+    // The live catalogue arrives after the screen opens, so it is a dependency.
+  }, [catalog, query, activeFilters, sort]);
 
   const activeChips = (Object.keys(activeFilters) as FilterKey[])
     .filter((key) => activeFilters[key] !== 'All')
@@ -255,6 +259,16 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                 </h2>
                 <p>{query.trim() ? `Results for "${query.trim()}"` : 'Showing all products'}</p>
               </div>
+              <label className="shop-search-sort">
+                <span>Sort by</span>
+                <select value={sort} onChange={(e) => setSort(e.target.value as SearchSort)}>
+                  {(Object.keys(SEARCH_SORT_LABELS) as SearchSort[]).map((key) => (
+                    <option key={key} value={key}>
+                      {SEARCH_SORT_LABELS[key]}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {activeChips.length > 0 && (
                 <div className="shop-search-applied">
                   {activeChips.map((chip) => (
@@ -284,10 +298,17 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                 <span className="shop-empty-icon">
                   <Search size={24} />
                 </span>
-                <h3>No products match these filters</h3>
-                <p>Try another ingredient, brand or price range.</p>
-                <button type="button" className="shop-btn-primary" onClick={clearAll}>
-                  Clear all filters
+                <h3>{query.trim() ? `No products found for "${query.trim()}"` : 'No products match these filters'}</h3>
+                <p>Check the spelling, or try another ingredient, brand or price range.</p>
+                <button
+                  type="button"
+                  className="shop-btn-primary"
+                  onClick={() => {
+                    clearAll();
+                    setQuery('');
+                  }}
+                >
+                  Clear search and filters
                 </button>
               </div>
             )}
