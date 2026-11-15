@@ -2,7 +2,7 @@ import type { ChipTone } from "@/lib/vendor-web/copy";
 
 const TONE: Record<ChipTone, string> = {
   ok: "bg-[#E7F7EE] text-[#136C3A]",
-  warn: "bg-[#FFF4D6] text-[#7A5600]",
+  warn: "bg-[#E8EEFB] text-[#1E3A8A] ring-1 ring-inset ring-[#0057FB]/20",
   bad: "bg-[#FDE8E6] text-[#9B2418]",
   info: "bg-[#EAF2FF] text-[#0B3B8F]",
   neutral: "bg-[#F1F2F4] text-ink-muted",

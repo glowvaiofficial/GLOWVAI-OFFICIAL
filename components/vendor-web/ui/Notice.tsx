@@ -5,7 +5,7 @@ export type NoticeTone = "error" | "warning" | "info" | "success";
 
 const TONE: Record<NoticeTone, string> = {
   error: "border-[#F3C4C0] bg-[#FDF1F0] text-[#7A1F17]",
-  warning: "border-[#F3DEA8] bg-[#FFF8E6] text-[#5C4400]",
+  warning: "border-[#CBD5E1] bg-[#F1F5F9] text-[#1E293B]",
   info: "border-[#BFD4FF] bg-[#EAF2FF] text-[#0B3B8F]",
   success: "border-[#B7E4C7] bg-[#EDF9F1] text-[#14532D]",
 };
