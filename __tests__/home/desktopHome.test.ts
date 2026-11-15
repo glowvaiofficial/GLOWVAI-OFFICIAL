@@ -81,7 +81,8 @@ describe("the desktop home", () => {
     assert.match(desktopSource, /No products are listed yet/);
     assert.match(desktopSource, /Products could not be loaded/);
     assert.match(desktopSource, /Loading products/);
-    assert.match(desktopSource, /<HomeBanners \/>/);
+    // The admin banners join the hero carousel (the same /api/shop/home list the phone home shows).
+    assert.match(desktopSource, /\/api\/shop\/home/);
     assert.match(desktopSource, /layout\.preview &&/);
     assert.match(desktopSource, /<SkinQuizBanner \/>/);
   });
@@ -161,5 +162,29 @@ describe("desktop motion respects reduced motion", () => {
   test("movement is switched off under prefers-reduced-motion", () => {
     assert.match(desktopCss, /@media \(prefers-reduced-motion: reduce\)\{[\s\S]*animation: none !important/);
     assert.match(desktopSource, /prefers-reduced-motion: reduce/);
+  });
+});
+
+describe("desktop layout follows the home design", () => {
+  test("header tabs, greeting, chips, flash deals and the help banner are there", () => {
+    for (const marker of ['className="shop-desk-greet"', "Track Order", 'className="shop-desk-chips"', "For You", "All Categories", "/api/shop/flash-sales", "Ends in", 'className="shop-desk-plus"', "aria-roledescription=\"carousel\""]) {
+      assert.ok(desktopSource.includes(marker), marker);
+    }
+  });
+
+  test("the layout reply's section accents are read, keeping only #RRGGBB", () => {
+    const got = readLayoutResponse({ sectionAccents: { deals: "#112233", hero: "red", brands: "#abc", promos: "#A1b2C3" } });
+    assert.deepEqual(got.sectionAccents, { deals: "#112233", promos: "#A1b2C3" });
+    assert.deepEqual(readLayoutResponse({ sectionAccents: ["#112233"] }).sectionAccents, {});
+    assert.deepEqual(readLayoutResponse(null).sectionAccents, {});
+  });
+
+  test("a block's accent: its settings, then sectionAccents, then the default; deep shades carry white text", async () => {
+    const { blockAccent, accentDeep, contrast, ACCENT_PALETTE } = await import("../../glowvai-app/features/shop/lib/desktopAccents");
+    assert.equal(blockAccent({ accent: "#010203" }, { deals: "#0A0B0C" }, "deals", "#FFFFFF"), "#010203");
+    assert.equal(blockAccent({ items: [] }, { deals: "#0a0b0c" }, "deals", "#FFFFFF"), "#0A0B0C");
+    assert.equal(blockAccent(undefined, { deals: "nope" }, "deals", "#FFFFFF"), "#FFFFFF");
+    assert.equal(blockAccent(undefined, undefined, "deals", "#FFFFFF"), "#FFFFFF");
+    for (const { hex } of ACCENT_PALETTE) assert.ok(contrast("#FFFFFF", accentDeep(hex)) >= 4.5, hex);
   });
 });

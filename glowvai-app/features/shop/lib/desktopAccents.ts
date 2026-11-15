@@ -63,6 +63,12 @@ export function sectionAccent(settings: unknown, fallback: string): string {
   return isAccent(accent) ? accent.toUpperCase() : fallback;
 }
 
+// A block's section accent from a layout reply: the accent in the block's settings, then the reply's sectionAccents
+// entry (sent also for blocks with no items), then the section's default.
+export function blockAccent(settings: unknown, sectionAccents: Partial<Record<string, string>> | undefined, id: string, fallback: string): string {
+  return sectionAccent(settings, sectionAccent({ accent: sectionAccents?.[id] }, fallback));
+}
+
 // The accent field of an item that may or may not carry one (the layout types gain it with the admin change).
 export const itemAccent = (item: unknown): unknown => (item && typeof item === 'object' ? (item as { accent?: unknown }).accent : undefined);
 
@@ -112,6 +118,15 @@ export function accentInk(accent: string): string {
 // The text colour for words set on the solid accent: white or deep ink, whichever reads better.
 export const textOn = (accent: string): string => (contrast('#FFFFFF', accent) >= contrast(INK, accent) ? '#FFFFFF' : INK);
 
+// The accent mixed toward deep navy until white text reads on it (4.5:1).
+export function accentDeep(accent: string): string {
+  for (let t = 0.35; t <= 1.0001; t += 0.05) {
+    const c = mix(accent, '#0B1240', t);
+    if (contrast('#FFFFFF', c) >= 4.5) return c;
+  }
+  return '#0B1240';
+}
+
 // The CSS custom properties a section, tile or card sets so its stylesheet can use the accent.
 export function accentVars(accent: string): Record<string, string> {
   return {
@@ -121,5 +136,8 @@ export function accentVars(accent: string): Record<string, string> {
     '--acc-soft': mix(PAGE, accent, 0.16),
     '--acc-softer': mix(PAGE, accent, 0.07),
     '--acc-line': mix(PAGE, accent, 0.4),
+    // A deep shade for dark gradients (white text reads on it) and a light one for accent text on dark navy.
+    '--acc-deep': accentDeep(accent),
+    '--acc-light': mix(accent, '#FFFFFF', 0.35),
   };
 }

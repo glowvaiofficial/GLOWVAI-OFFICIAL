@@ -31,9 +31,21 @@ export interface HomeLayoutView {
   preview: boolean;
   // True when the desktop home was given the mobile layout because no desktop layout is saved.
   fallback: boolean;
+  // Each block's section accent ("#RRGGBB") the admin set, also for blocks with no items. Only the desktop home uses it.
+  sectionAccents: Partial<Record<HomeBlockId, string>>;
 }
 
-export const DEFAULT_LAYOUT_VIEW: HomeLayoutView = { order: DEFAULT_BLOCK_ORDER, settings: {}, rows: [], hero: null, footer: EMPTY_FOOTER_DETAILS, preview: false, fallback: false };
+// The valid section accents of a layout reply (anything that is not "#RRGGBB" is left out).
+function readSectionAccents(value: unknown): Partial<Record<HomeBlockId, string>> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const out: Partial<Record<HomeBlockId, string>> = {};
+  for (const [id, accent] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof accent === 'string' && /^#[0-9a-fA-F]{6}$/.test(accent)) out[id as HomeBlockId] = accent;
+  }
+  return out;
+}
+
+export const DEFAULT_LAYOUT_VIEW: HomeLayoutView = { order: DEFAULT_BLOCK_ORDER, settings: {}, rows: [], hero: null, footer: EMPTY_FOOTER_DETAILS, preview: false, fallback: false, sectionAccents: {} };
 
 // The page's view of a layout reply. Each field the reply gets wrong keeps its built-in value.
 export function readLayoutResponse(data: unknown): HomeLayoutView {
@@ -46,6 +58,7 @@ export function readLayoutResponse(data: unknown): HomeLayoutView {
     footer: d.footer && typeof d.footer === 'object' ? { ...EMPTY_FOOTER_DETAILS, ...(d.footer as Partial<FooterDetails>) } : EMPTY_FOOTER_DETAILS,
     preview: d.preview === true,
     fallback: d.fallback === true,
+    sectionAccents: readSectionAccents(d.sectionAccents),
   };
 }
 
