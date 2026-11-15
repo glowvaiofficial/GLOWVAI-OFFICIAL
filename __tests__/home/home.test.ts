@@ -8,6 +8,7 @@ import {
   HOME_FOOTER_GROUPS,
   categoryTiles,
   configuredSocials,
+  BLOCK_MODULES,
   PRICE_POINTS,
   bestsellerList,
   dedupeRails,
@@ -16,6 +17,7 @@ import {
   pricePointTiles,
   type FooterLink,
 } from "../../glowvai-app/features/shop/lib/homeModel";
+import { DEFAULT_BLOCK_ORDER, readLayoutResponse } from "../../glowvai-app/features/shop/lib/useHomeLayout";
 import type { SkincareProduct } from "../../glowvai-app/core/data/indianSkincareCatalog";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -227,26 +229,41 @@ describe("social links", () => {
   });
 });
 
-describe("home order (phone and PC share it)", () => {
-  const ALL = ["hero", "mini-banners", "offers", "categories", "promos", "deals", "reorder", "product-rails", "brands", "trust", "help-gift", "footer"] as const;
+describe("home order (the designer's blocks set it)", () => {
+  const SPEC = ["hero", "categories", "offers", "promos", "deals", "product-rails", "brands", "mini-banners", "reorder", "help-gift", "trust", "footer"];
 
-  test("modules follow the spec order whatever order the admin layout lists", () => {
-    const expected = ["hero", "categories", "offers", "promos", "deals", "price-points", "bestsellers", "new-launches", "product-rails", "concerns", "brands", "mini-banners", "reorder", "recent", "help-gift", "trust", "scan", "footer"];
-    assert.deepEqual(homeSequence(ALL), expected);
-    assert.deepEqual(homeSequence([...ALL].reverse()), expected);
+  test("default order (no saved blocks) is the spec order, with anchored modules after their block", () => {
+    assert.deepEqual(DEFAULT_BLOCK_ORDER, SPEC);
+    assert.deepEqual(readLayoutResponse({}).order, SPEC);
+    assert.deepEqual(homeSequence(DEFAULT_BLOCK_ORDER), ["hero", "categories", "offers", "promos", "deals", "price-points", "bestsellers", "new-launches", "product-rails", "concerns", "brands", "mini-banners", "reorder", "recent", "help-gift", "trust", "scan", "footer"]);
   });
 
-  test("a block the admin leaves out hides its modules; the catalogue modules follow the product block", () => {
-    const seq = homeSequence(ALL.filter((id) => id !== "offers" && id !== "product-rails"));
-    assert.ok(!seq.includes("offers"));
-    for (const id of ["price-points", "bestsellers", "new-launches", "product-rails", "concerns", "recent"]) assert.ok(!seq.includes(id as never), id);
-    assert.ok(seq.includes("scan") && seq.includes("hero"));
+  test("modules follow the order of the blocks the layout returns", () => {
+    const seq = homeSequence(["trust", "hero", "deals", "categories", "footer"]);
+    assert.deepEqual(seq, ["trust", "hero", "deals", "price-points", "categories", "scan", "footer"]);
+    assert.deepEqual(readLayoutResponse({ blocks: ["trust", "hero"] }).order, ["trust", "hero"]);
+  });
+
+  test("a block the layout turns off hides its modules", () => {
+    const seq = homeSequence(["hero", "categories", "footer"]);
+    for (const id of ["offers", "deals", "price-points", "bestsellers", "new-launches", "product-rails", "concerns", "reorder", "recent", "brands"]) assert.ok(!seq.includes(id as never), id);
+  });
+
+  test("anchored modules move with their block", () => {
+    assert.deepEqual(homeSequence(["product-rails", "deals"]).slice(0, 6), ["bestsellers", "new-launches", "product-rails", "concerns", "deals", "price-points"]);
+    assert.deepEqual(homeSequence(["reorder", "brands"]).slice(0, 3), ["reorder", "recent", "brands"]);
+  });
+
+  test("the scan card shows before the footer, or last without a footer block; unknown blocks draw nothing", () => {
+    assert.deepEqual(homeSequence(["footer", "hero"]), ["scan", "footer", "hero"]);
+    assert.deepEqual(homeSequence(["hero", "festival-strip"]), ["hero", "scan"]);
+    assert.ok(Object.keys(BLOCK_MODULES).includes("deals"));
   });
 
   test("the phone and PC homes both render from homeSequence", () => {
     const desktop = readFileSync(join(root, "glowvai-app/features/shop/screens/ShopDesktopHome.tsx"), "utf8");
-    assert.match(desktop, /homeSequence\(layoutOrder\)/);
-    assert.match(homeSource, /homeSequence\(layoutOrder\)/);
+    assert.ok(desktop.includes("homeSequence(layoutOrder)"));
+    assert.ok(homeSource.includes("homeSequence(layoutOrder)"));
   });
 });
 

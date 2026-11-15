@@ -160,29 +160,34 @@ export function newLaunchList(catalog: SkincareProduct[]): SkincareProduct[] {
 
 export type HomeModuleId = HomeBlockId | 'price-points' | 'bestsellers' | 'new-launches' | 'concerns' | 'recent' | 'scan';
 
-// Each module and the admin block that switches it on: a block the admin left out of the layout hides its modules.
-// Catalogue modules follow the product block. The order is fixed by the spec; the content comes from the admin and the catalogue.
-const HOME_SEQUENCE: { id: HomeModuleId; needs?: HomeBlockId }[] = [
-  { id: 'hero', needs: 'hero' },
-  { id: 'categories', needs: 'categories' },
-  { id: 'offers', needs: 'offers' },
-  { id: 'promos', needs: 'promos' },
-  { id: 'deals', needs: 'deals' },
-  { id: 'price-points', needs: 'product-rails' },
-  { id: 'bestsellers', needs: 'product-rails' },
-  { id: 'new-launches', needs: 'product-rails' },
-  { id: 'product-rails', needs: 'product-rails' },
-  { id: 'concerns', needs: 'product-rails' },
-  { id: 'brands', needs: 'brands' },
-  { id: 'mini-banners', needs: 'mini-banners' },
-  { id: 'reorder', needs: 'reorder' },
-  { id: 'recent', needs: 'product-rails' },
-  { id: 'help-gift', needs: 'help-gift' },
-  { id: 'trust', needs: 'trust' },
-  { id: 'scan' },
-  { id: 'footer', needs: 'footer' },
-];
+// The admin designer controls the order and on/off of the blocks (layout `blocks`). Each block draws one or more modules;
+// modules the designer has no block for stay anchored right after their related block, so they move with it. To draw a new
+// designer block, add one entry here (and its case in the homes). Unknown block ids draw nothing.
+export const BLOCK_MODULES: Readonly<Record<string, readonly HomeModuleId[]>> = {
+  hero: ['hero'],
+  categories: ['categories'],
+  offers: ['offers'],
+  promos: ['promos'],
+  deals: ['deals', 'price-points'],
+  'product-rails': ['bestsellers', 'new-launches', 'product-rails', 'concerns'],
+  brands: ['brands'],
+  'mini-banners': ['mini-banners'],
+  reorder: ['reorder', 'recent'],
+  'help-gift': ['help-gift'],
+  trust: ['trust'],
+  footer: ['scan', 'footer'],
+};
 
-export function homeSequence(layoutOrder: readonly HomeBlockId[]): HomeModuleId[] {
-  return HOME_SEQUENCE.filter((m) => !m.needs || layoutOrder.includes(m.needs)).map((m) => m.id);
+
+// The modules to draw, in the designer's block order. Blocks the layout leaves out stay hidden. The scan card always
+// shows, before the footer (or last when the footer block is off).
+export function homeSequence(layoutOrder: readonly string[]): HomeModuleId[] {
+  const out: HomeModuleId[] = [];
+  for (const id of layoutOrder) for (const m of BLOCK_MODULES[id] ?? []) if (!out.includes(m)) out.push(m);
+  if (!out.includes('scan')) {
+    const f = out.indexOf('footer');
+    if (f >= 0) out.splice(f, 0, 'scan');
+    else out.push('scan');
+  }
+  return out;
 }

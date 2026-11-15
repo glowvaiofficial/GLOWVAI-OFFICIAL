@@ -11,7 +11,7 @@ export type HomeBlockId =
   | 'product-rails' | 'brands' | 'trust' | 'help-gift' | 'footer';
 
 export const DEFAULT_BLOCK_ORDER: HomeBlockId[] = [
-  'hero', 'mini-banners', 'offers', 'categories', 'promos', 'deals', 'reorder', 'product-rails', 'brands', 'trust', 'help-gift', 'footer',
+  'hero', 'categories', 'offers', 'promos', 'deals', 'product-rails', 'brands', 'mini-banners', 'reorder', 'help-gift', 'trust', 'footer',
 ];
 
 export interface BlockItem { label: string; sub: string; link: string; image: string }
