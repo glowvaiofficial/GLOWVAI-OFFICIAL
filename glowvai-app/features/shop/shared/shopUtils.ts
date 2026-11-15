@@ -12,10 +12,10 @@ const PRODUCT_PHOTOS: Record<string, string> = {
 
 const TILE_COLOURS: Record<SkincareProduct['category'], { bg: string; ink: string; accent: string }> = {
   Serums: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-  Moisturizers: { bg: '#f2ecfa', ink: '#4a2475', accent: '#5c2a91' },
-  Suncare: { bg: '#e2f7f4', ink: '#0b5c53', accent: '#14B8A6' },
-  Cleansers: { bg: '#e8f6f0', ink: '#14573d', accent: '#19734f' },
-  Treatments: { bg: '#fdecea', ink: '#7a2630', accent: '#c13f4b' },
+  Moisturizers: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
+  Suncare: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
+  Cleansers: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
+  Treatments: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
 };
 
 // A simple pack outline per category: dropper bottle, jar, tube or pump bottle.
@@ -119,3 +119,21 @@ export const cartLineFor = (product: SkincareProduct) => {
 
 // Products with sizes, shades or packs are chosen on the product page, not added from a card or a rail.
 export const hasVariantOptions = (product: SkincareProduct): boolean => (product.variants?.length ?? 0) > 0;
+
+export type SearchSort = 'relevance' | 'price-asc' | 'price-desc' | 'rating';
+
+export const SEARCH_SORT_LABELS: Record<SearchSort, string> = {
+  relevance: 'Relevance',
+  'price-asc': 'Price: low to high',
+  'price-desc': 'Price: high to low',
+  rating: 'Top rated',
+};
+
+// Returns a new list; "relevance" keeps the catalogue order. Products without a rating sort last for "Top rated".
+export const sortProducts = <T extends { price: number; rating?: number | null }>(products: readonly T[], sort: SearchSort): T[] => {
+  const list = [...products];
+  if (sort === 'price-asc') return list.sort((a, b) => a.price - b.price);
+  if (sort === 'price-desc') return list.sort((a, b) => b.price - a.price);
+  if (sort === 'rating') return list.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+  return list;
+};

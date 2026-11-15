@@ -12,7 +12,7 @@
 
 /* Live order tracking: stage hero, progress list, delay banner, OTP card and map card. Blue #0057FB, white cards,
    hairline borders. Targets are at least 44px. Motion is off for people who ask for reduced motion. */
-.glowvai-root .trk-screen{ --trk-blue: #0057fb; --trk-ink: #0b1b3a; --trk-muted: #4b5870; --trk-line: #e3e9f5; font-family: Inter, 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.glowvai-root .trk-screen{ --trk-blue: #0057fb; --trk-ink: #0b1b3a; --trk-muted: #4b5870; --trk-line: #e3e9f5; font-family: var(--gv-font); }
 .glowvai-root .trk-card{ background: #fff; border: 1px solid var(--trk-line); border-radius: 16px; padding: 18px; margin: 0 0 12px; color: var(--trk-ink); }
 .glowvai-root .trk-eyebrow{ display: inline-flex; align-items: center; gap: 6px; margin: 0 0 8px; color: var(--trk-blue); font-size: 13px; font-weight: 600; }
 .glowvai-root .trk-title{ margin: 0; font-size: 28px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }

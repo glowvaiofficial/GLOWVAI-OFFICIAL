@@ -53,6 +53,7 @@ export const CartScreen: React.FC = () => {
   const address = useDeliveryAddress();
   const [codeInput, setCodeInput] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
   const [editing, setEditing] = useState(false);
 
   const cartItems = Object.values(items);
@@ -61,6 +62,7 @@ export const CartScreen: React.FC = () => {
 
   const applyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (applying) return;
     const raw = codeInput.trim();
     if (!raw) {
       setCodeError('Enter a coupon code.');
@@ -77,7 +79,16 @@ export const CartScreen: React.FC = () => {
     }
     // An offer code is checked with the server before it is applied, so a wrong code is refused here, not at payment.
     const code = raw.toUpperCase();
-    const r = await quoteBag(code, cartItems);
+    setApplying(true);
+    let r: Awaited<ReturnType<typeof quoteBag>>;
+    try {
+      r = await quoteBag(code, cartItems);
+    } catch {
+      setApplying(false);
+      setCodeError('Could not check this code. Try again.');
+      return;
+    }
+    setApplying(false);
     if (!r.ok) {
       setCodeError(r.error);
       return;
@@ -158,8 +169,8 @@ export const CartScreen: React.FC = () => {
               autoCapitalize="characters"
             />
           </label>
-          <button className="gvp-btn is-soft" type="submit">
-            Apply
+          <button className="gvp-btn is-soft" type="submit" disabled={applying}>
+            {applying ? 'Checking…' : 'Apply'}
           </button>
           {codeError && (
             <em className="gvp-error" id="cart-coupon-error">
