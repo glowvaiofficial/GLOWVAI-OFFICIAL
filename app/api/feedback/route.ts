@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 import { z } from "zod";
 
 const feedbackSchema = z.object({
@@ -41,6 +42,7 @@ async function callSheet(payload: object) {
 }
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
   if (limited(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

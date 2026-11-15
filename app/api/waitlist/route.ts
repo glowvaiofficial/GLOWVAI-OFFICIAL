@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 import { z } from "zod";
 import { queueEmail } from "@/lib/email/send";
 import { storage } from "@/lib/storage";
@@ -22,6 +23,7 @@ function limited(ip: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
   if (limited(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
