@@ -10,9 +10,9 @@
 
 /* Top bar, search */
 .glowvai-root .shop-home .shop-home-top{ padding: 16px var(--gv-gutter) 0; }
-/* Phones and tablets: the top bar is a clean warm-white band that sits on the pearl page, divided by a hairline. */
+/* Phones and tablets: the top bar is a clean white band that sits on the pearl page, divided by a hairline. */
 @media (max-width: 1023px){
-  .glowvai-root .shop-home .shop-home-top{ padding-bottom: 14px; background: #fffdf9; border-bottom: 1px solid var(--border-light); }
+  .glowvai-root .shop-home .shop-home-top{ padding-bottom: 14px; background: #ffffff; border-bottom: 1px solid var(--border-light); }
 }
 .glowvai-root .shop-home .shop-home-topbar{ display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-bottom: 14px; }
 .glowvai-root .shop-home .shop-home-location{ min-width: 0; flex: 1; }
@@ -162,7 +162,7 @@
 .glowvai-root .shop-home .shop-home-scan-note{ margin-top: 10px; font-size: 12px; line-height: 1.4; opacity: .75; }
 .glowvai-root .shop-home .shop-home-scan-btn{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; margin-top: 16px; padding: 0 22px; border: 0; border-radius: 999px; background: #fff; color: var(--home-brand); font-size: 14px; font-weight: 700; }
 
-/* Footer: a deep brand blue brand band, then a warm off-white area with the link columns (two on phones, four on desktop),
+/* Footer: a deep brand blue brand band, then a cool off-white area with the link columns (two on phones, four on desktop),
    a thin divider and the copyright line. Headings use two sizes only (18px brand name, 12px column titles). */
 .glowvai-root .shop-home .shop-home-footer{ --footer-paper: #f6f8fc; margin-top: 40px; background: var(--footer-paper); color: var(--ds-ink); font-family: var(--font-body); }
 .glowvai-root .shop-home .shop-home-footer-inner{ display: grid; gap: 0; }

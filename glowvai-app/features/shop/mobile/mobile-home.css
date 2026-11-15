@@ -3,8 +3,8 @@
    (--ac, --ac-tint, --ac-ring, --ac-text, --ac-g1, --ac-g2) worked out in accentTheme.ts, so admin colours stay readable.
    16px side gutter on phones, 24px from 720px. Rows scroll sideways inside themselves; the page never does. */
 
-@property --tab-tint { syntax: '<color>'; inherits: true; initial-value: #e6eeff; }
-@property --tab-tint-2 { syntax: '<color>'; inherits: true; initial-value: #f0f4ff; }
+@property --wash { syntax: '<color>'; inherits: true; initial-value: #0057fb; }
+@property --wash-on { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
 
 .glowvai-root .shop-home.gvh {
   --gvh-page: #f6f8fd;
@@ -15,7 +15,7 @@
   --gvh-blue: #0057fb;
   --gvh-blue-dark: #0046cc;
   --gvh-green: #1a7f37;
-  --gvh-font: var(--font-poppins, 'Poppins'), var(--font-body);
+  --gvh-font: var(--gv-font);
   --gvh-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 24px rgba(11, 27, 77, .06);
   padding-bottom: 8px;
   background: var(--gvh-page);
@@ -31,11 +31,11 @@
   .glowvai-root .app-viewport:has(.gvh) .web-header { display: none; }
 }
 
-/* ---------- Header: tinted by the chosen tab ---------- */
-.glowvai-root .gvh .gvh-header { padding: 12px var(--gv-gutter) 0; background: linear-gradient(180deg, var(--tab-tint) 0%, var(--tab-tint-2) 62%, var(--gvh-page) 100%); transition: --tab-tint .32s ease, --tab-tint-2 .32s ease; }
+/* ---------- Header: the whole top backdrop takes the chosen tab's bright accent (250 ms) and fades out behind the hero ---------- */
+.glowvai-root .gvh .gvh-header { position: relative; z-index: 0; margin-bottom: -22px; padding: 12px var(--gv-gutter) 22px; background: linear-gradient(180deg, var(--wash) 0%, var(--wash) 62%, transparent 100%); color: var(--wash-on); transition: --wash .25s ease, --wash-on .25s ease; }
 .glowvai-root .gvh .gvh-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc actions' 'search search search'; align-items: center; gap: 10px 12px; }
 .glowvai-root .gvh .gvh-logo { grid-area: logo; display: inline-flex; align-items: center; }
-.glowvai-root .gvh .gvh-location { grid-area: loc; display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; justify-self: start; gap: 4px; padding: 0 4px; color: var(--gvh-ink); font-size: 13.5px; font-weight: 500; }
+.glowvai-root .gvh .gvh-location { grid-area: loc; display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; justify-self: start; gap: 4px; padding: 0 4px; color: var(--wash-on); font-size: 13.5px; font-weight: 500; }
 .glowvai-root .gvh .gvh-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .gvh .gvh-location svg { flex: 0 0 auto; }
 .glowvai-root .gvh .gvh-location.is-static { cursor: default; }
@@ -47,21 +47,21 @@
 .glowvai-root .gvh .gvh-actions { grid-area: actions; display: flex; align-items: center; gap: 8px; }
 .glowvai-root .gvh .gvh-cart-slot { display: none; }
 .glowvai-root .gvh .gvh-cart-slot:empty { display: none !important; }
-.glowvai-root .gvh .gvh-scan-pill { display: inline-flex; min-height: 40px; align-items: center; gap: 5px; padding: 0 12px; border-radius: 999px; background: var(--gvh-blue); color: #fff; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
-.glowvai-root .gvh .gvh-scan-pill:hover { background: var(--gvh-blue-dark); }
-.glowvai-root .gvh .gvh-icon { position: relative; display: inline-grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-scan-pill { display: inline-flex; min-height: 40px; align-items: center; gap: 5px; padding: 0 12px; border-radius: 999px; background: #fff; color: var(--gvh-blue); font-size: 12.5px; font-weight: 700; white-space: nowrap; box-shadow: 0 1px 3px rgba(11, 27, 77, .18); }
+.glowvai-root .gvh .gvh-scan-pill:hover { background: #f1f5ff; }
+.glowvai-root .gvh .gvh-icon { position: relative; display: inline-grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--wash-on); }
 .glowvai-root .gvh .gvh-icon:hover { background: rgba(255, 255, 255, .7); }
 .glowvai-root .gvh .gvh-dot { position: absolute; top: -1px; right: -1px; width: 9px; height: 9px; border: 2px solid #fff; border-radius: 50%; background: #e0245e; }
 .glowvai-root .gvh .gvh-avatar { position: relative; display: inline-grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--gvh-ink); color: #fff; font-size: 15px; font-weight: 600; box-shadow: 0 0 0 2px #fff; }
 
 /* Tabs */
-.glowvai-root .gvh .gvh-tabs { display: flex; gap: 8px; margin: 14px calc(-1 * var(--gv-gutter)) 0; padding: 0 var(--gv-gutter) 12px; overflow-x: auto; scrollbar-width: none; }
+.glowvai-root .gvh .gvh-tabs { display: flex; gap: 8px; margin: 14px calc(-1 * var(--gv-gutter)) 0; padding: 4px var(--gv-gutter) 12px; overflow-x: auto; scrollbar-width: none; }
 .glowvai-root .gvh .gvh-tabs::-webkit-scrollbar { display: none; }
 .glowvai-root .gvh .gvh-tab { display: inline-flex; flex: 0 0 auto; min-height: 42px; align-items: center; gap: 7px; padding: 0 16px; border: 1px solid var(--gvh-line); border-radius: 999px; background: #fff; color: var(--gvh-ink); font-size: 13.5px; font-weight: 500; white-space: nowrap; transition: background .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease; }
-.glowvai-root .gvh .gvh-tab svg { color: var(--ac-text); }
-.glowvai-root .gvh .gvh-tab:hover { border-color: var(--ac-ring); }
-.glowvai-root .gvh .gvh-tab.is-on { border-color: transparent; background: linear-gradient(135deg, var(--ac-g1), var(--ac-g2)); color: #fff; font-weight: 600; box-shadow: 0 6px 16px color-mix(in srgb, var(--ac-g1) 30%, transparent); }
-.glowvai-root .gvh .gvh-tab.is-on svg { color: #fff; }
+.glowvai-root .gvh .gvh-tab svg { color: var(--gvh-muted); }
+.glowvai-root .gvh .gvh-tab:hover { border-color: var(--gvh-muted); }
+.glowvai-root .gvh .gvh-tab.is-on { border-color: #fff; background: var(--ac); color: var(--ac-on); font-weight: 700; box-shadow: 0 0 0 2px #fff, 0 6px 16px rgba(11, 27, 77, .22); }
+.glowvai-root .gvh .gvh-tab.is-on svg { color: var(--ac-on); }
 .glowvai-root .gvh .gvh-tab.is-all svg { color: var(--gvh-ink); }
 
 /* Skin quiz strip under the header */
@@ -114,7 +114,7 @@
 .glowvai-root .gvh .gvh-see-all { display: inline-flex; flex: 0 0 auto; min-height: 44px; margin: -8px 0; align-items: center; gap: 4px; color: var(--gvh-blue); font-size: 14px; font-weight: 600; }
 .glowvai-root .gvh .gvh-zap { color: #14B8A6; }
 .glowvai-root .gvh .gvh-star { color: #4F46E5; }
-.glowvai-root .gvh .gvh-ends { display: inline-flex; align-items: center; padding: 4px 11px; border: 1px solid #f7c6d6; border-radius: 999px; background: #fdecf2; color: #b3215a; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.glowvai-root .gvh .gvh-ends { display: inline-flex; align-items: center; padding: 4px 11px; border: 1px solid #d6e3ff; border-radius: 999px; background: #e8f0ff; color: #0046cc; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .glowvai-root .gvh .gvh-empty { margin: 0 var(--gv-gutter); color: var(--gvh-muted); font-size: 13px; }
 
 /* ---------- Categories ---------- */
