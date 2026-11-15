@@ -200,3 +200,10 @@ describe("a body phone must match the verified token", () => {
     assert.equal(bodyPhoneMatches({ phone: null }, PHONE), false);
   });
 });
+
+// Phone sign-in stores "+91XXXXXXXXXX"; the profile form sends "XXXXXXXXXX". The same number must still be allowed.
+test("a verified number matches its 10-digit form from the profile form", () => {
+  assert.equal(phoneChangeAllowed(true, "+919876543210", "9876543210"), true);
+  assert.equal(phoneChangeAllowed(true, "+919876543210", "9123456789"), false);
+  assert.equal(phoneChangeAllowed(true, "9876543210", "+919876543210"), true);
+});
