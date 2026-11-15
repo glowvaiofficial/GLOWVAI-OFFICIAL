@@ -133,7 +133,7 @@ describe("desktop accents", () => {
     assert.equal(categoryAccent("Coupons", null, 0), "#F26B5B");
     assert.equal(categoryAccent("Brands", null, 0), "#C8A96A");
     assert.equal(categoryAccent("Shop all", null, 0), "#1F2A44");
-    assert.equal(categoryAccent("All Products", null, 0), "#1F2A44");
+    assert.equal(categoryAccent("All", null, 0), "#1F2A44");
     assert.equal(categoryAccent("Serums", "#000000", 0), "#000000");
     assert.equal(categoryAccent("Lip care", null, 2), "#F4A261");
   });
@@ -145,8 +145,9 @@ describe("desktop accents", () => {
     assert.equal(sectionAccent(undefined, "#000000"), "#000000");
     for (const { hex } of ACCENT_PALETTE) {
       const ink = accentInk(hex);
-      assert.ok(contrast(ink, "#FBF8F5") >= 4.5, hex);
-      assert.ok(contrast(ink, mix("#FBF8F5", hex, 0.16)) >= 4.5, hex);
+      assert.ok(contrast(ink, "#F5F7FD") >= 4.5, hex);
+      assert.ok(contrast(ink, "#FFFFFF") >= 4.5, hex);
+      assert.ok(contrast(ink, mix("#F5F7FD", hex, 0.16)) >= 4.5, hex);
       assert.ok(contrast(textOn(hex), hex) >= 3, hex);
     }
   });

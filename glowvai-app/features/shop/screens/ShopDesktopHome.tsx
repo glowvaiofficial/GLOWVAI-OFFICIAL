@@ -877,7 +877,7 @@ export const ShopDesktopHome: React.FC = () => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
                     return <DeskCategoryTile key={categoryId} label={label} accent={categoryAccent(label, null, i)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  <DeskCategoryTile label="All Products" accent={categoryAccent('All Products', null, 0)} photo={null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+                  <DeskCategoryTile label="All Products" accent={categoryAccent('All', null, 0)} photo={null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
             </div>

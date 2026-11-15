@@ -1,66 +1,38 @@
-// Accent colours on the desktop home: each home section and each cosmetic category has its own accent. The admin may set
-// `accent: "#RRGGBB"` on a block's settings (the section accent) and on each item (hero, mini banners, offers, categories,
-// promos, brands, trust, help and gifts). An empty, missing or invalid accent falls back to the default palette.
-//
-// These are the same rules as lib/shop/accents.ts (being added with the admin side); this local copy keeps the desktop
-// home working until then, and can be swapped for that module without changing the callers. Pure, so the tests call it.
+// Accent colours on the desktop home: each home section and each cosmetic category has its own accent. The rules (the
+// palette, what counts as a valid accent, the category name map) are the shop's shared contract in lib/shop/accents.ts;
+// this file only adds the desktop's helpers around it and the colour maths (tints and readable text). Pure, so the tests
+// call it.
+import { ACCENT, GLOWVAI_ACCENTS, accentForName, isAccent as isSharedAccent, paletteAccent, readAccent } from '../../../../lib/shop/accents';
 
-export const ACCENT_PALETTE = [
-  { name: 'amethyst', hex: '#8B5CF6' },
-  { name: 'sky', hex: '#4F8EF7' },
-  { name: 'peach', hex: '#F4A261' },
-  { name: 'sage', hex: '#6BAF92' },
-  { name: 'rose', hex: '#E85D8F' },
-  { name: 'coral', hex: '#F26B5B' },
-  { name: 'champagne', hex: '#C8A96A' },
-  { name: 'ink', hex: '#1F2A44' },
-] as const;
+export type AccentName = keyof typeof ACCENT;
 
-export type AccentName = (typeof ACCENT_PALETTE)[number]['name'];
+// The palette with its names, in the contract's order.
+export const ACCENT_PALETTE = (Object.keys(ACCENT) as AccentName[]).map((name) => ({ name, hex: ACCENT[name] as string }));
 
-export const accentHex = (name: AccentName): string => ACCENT_PALETTE.find((a) => a.name === name)!.hex;
+export const accentHex = (name: AccentName): string => ACCENT[name];
 
 // A valid accent is exactly "#RRGGBB".
-export function isAccent(value: unknown): value is string {
-  return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
-}
+export const isAccent = (value: unknown): value is string => isSharedAccent(value);
 
 // The accent of the i-th item: its own accent when valid, otherwise the palette in order (wrapping after eight).
 export function effectiveAccent(accent: unknown, index: number): string {
-  if (isAccent(accent)) return accent.toUpperCase();
-  const i = ((Math.floor(index) % ACCENT_PALETTE.length) + ACCENT_PALETTE.length) % ACCENT_PALETTE.length;
-  return ACCENT_PALETTE[i].hex;
+  return readAccent(accent) || paletteAccent(Math.max(0, Math.floor(index)) % GLOWVAI_ACCENTS.length);
 }
 
-// Category (and section) names that map to a fixed accent before the palette order is used.
-const NAME_ACCENTS: [RegExp, AccentName][] = [
-  [/^serums?$/, 'amethyst'],
-  [/^moisturi[sz]ers?$/, 'sky'],
-  [/^(sunscreens?|suncare|sun care|spf)$/, 'peach'],
-  [/^cleansers?$/, 'sage'],
-  [/^treatments?$/, 'rose'],
-  [/^(offers?|coupons?)$/, 'coral'],
-  [/^(brands?|trust)$/, 'champagne'],
-  [/^(all|shop all|all products)$/, 'ink'],
-];
-
-// The accent a name maps to, or null. Case, spaces and a trailing "s" do not matter.
+// The accent a category (or section) name maps to, or null.
 export function namedAccent(name: string): string | null {
-  const key = name.trim().toLowerCase().replace(/\s+/g, ' ');
-  const hit = NAME_ACCENTS.find(([re]) => re.test(key));
-  return hit ? accentHex(hit[1]) : null;
+  return accentForName(name) || null;
 }
 
 // A category tile's or tab's accent: its own accent when valid, then its name, then the palette by position.
 export function categoryAccent(name: string, accent: unknown, index: number): string {
-  if (isAccent(accent)) return accent.toUpperCase();
-  return namedAccent(name) ?? effectiveAccent(null, index);
+  return readAccent(accent) || accentForName(name) || effectiveAccent(null, index);
 }
 
 // A section's accent: the block's own accent when valid, otherwise the section's default.
 export function sectionAccent(settings: unknown, fallback: string): string {
   const accent = settings && typeof settings === 'object' ? (settings as { accent?: unknown }).accent : undefined;
-  return isAccent(accent) ? accent.toUpperCase() : fallback;
+  return readAccent(accent) || fallback;
 }
 
 // A block's section accent from a layout reply: the accent in the block's settings, then the reply's sectionAccents
@@ -69,12 +41,13 @@ export function blockAccent(settings: unknown, sectionAccents: Partial<Record<st
   return sectionAccent(settings, sectionAccent({ accent: sectionAccents?.[id] }, fallback));
 }
 
-// The accent field of an item that may or may not carry one (the layout types gain it with the admin change).
+// The accent field of an item that may or may not carry one.
 export const itemAccent = (item: unknown): unknown => (item && typeof item === 'object' ? (item as { accent?: unknown }).accent : undefined);
 
 // ---- Colour maths: tints and readable text, so any accent the admin picks stays legible.
 
-const PAGE = '#FBF8F5';
+// The desktop page colour (shop-desktop-home.css --desk-bg); white cards are lighter still.
+const PAGE = '#F5F7FD';
 const INK = '#141B34';
 
 function rgb(hex: string): [number, number, number] {
