@@ -5,3 +5,8 @@ export const queued: unknown[] = [];
 export function queueEmail(options: unknown): void {
   queued.push(options);
 }
+
+export async function sendEmail(options: unknown): Promise<{ ok: boolean }> {
+  queued.push(options);
+  return { ok: true };
+}

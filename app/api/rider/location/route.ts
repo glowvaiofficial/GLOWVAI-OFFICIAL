@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 // The partner's position, sent every 30 seconds by the page while a delivery is out. Limited to 4 writes a minute per
 // partner. Only the last point is kept, and it expires after 15 minutes.
-export const POST = riderRoute({ route: "location", write: true, auth: true, partner: { max: 4, windowMs: 60_000 } }, async ({ partner, body }) => {
+export const POST = riderRoute({ route: "location", write: true, auth: true, ip: { max: 60, windowMs: 60_000 }, partner: { max: 4, windowMs: 60_000 } }, async ({ partner, body }) => {
   const { lat, lng } = body;
   if (typeof lat !== "number" || typeof lng !== "number" || !validCoords(lat, lng)) {
     throw new RiderError("INVALID_INPUT", 400, "The location is not valid.");

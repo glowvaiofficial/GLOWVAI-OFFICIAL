@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../core/config/firebase';
+import { forgetDeviceToken } from '../../core/notifications/push';
+import { signOutThisDevice } from '../auth/signOutCleanup';
+import { stopWishlistSync } from '../shop/lib/wishlistSync';
 import { useApp } from '../../context/useApp';
 import { useCustomerStore } from '../../core/state/customerStore';
 import { useT } from '../../core/i18n/store';
@@ -22,6 +25,14 @@ function useWideLayout(): boolean {
     return () => query.removeEventListener('change', onChange);
   }, []);
   return wide;
+}
+
+function localStorageOrNull(): Storage | null {
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
 }
 
 // The Settings hub. Phones: a single list, each row opens its own page. Large screens: the list on the left and the
@@ -54,8 +65,14 @@ export const SettingsHubScreen = () => {
     setSigningOut(true);
     setSignOutError(null);
     try {
-      await signOut(auth);
-      useCustomerStore.getState().reset();
+      // Removes this device's push token while still signed in, signs out, then clears the account's data on this device.
+      await signOutThisDevice({
+        forgetPushToken: forgetDeviceToken,
+        signOut: () => signOut(auth),
+        stopSync: stopWishlistSync,
+        resetCustomer: () => useCustomerStore.getState().reset(),
+        store: localStorageOrNull(),
+      });
       // A fresh page start gives this device a new session and reloads the account from the server.
       window.location.assign('/shop');
     } catch {

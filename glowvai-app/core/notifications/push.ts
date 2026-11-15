@@ -5,9 +5,9 @@
 // The owner sets NEXT_PUBLIC_FIREBASE_VAPID_KEY (Firebase console: Project settings, Cloud Messaging, Web Push
 // certificates) and NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID. Until both are set the feature reports 'not-configured'
 // and does nothing.
-import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { deleteToken, getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 import { app } from '../config/firebase';
-import { registerPushToken } from '../services/shopApi';
+import { registerPushToken, removePushToken } from '../services/shopApi';
 
 export const VAPID_KEY: string = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || '';
 export const SERVICE_WORKER_PATH = '/firebase-messaging-sw.js';
@@ -123,6 +123,56 @@ export async function keepTokenCurrent(): Promise<void> {
   if (!issued.ok || recentlyRegistered(issued.token)) return;
   const saved = await registerPushToken(issued.token);
   if (saved.ok) rememberToken(issued.token);
+}
+
+function forgetStoredToken(): void {
+  try {
+    localStorage.removeItem(STORED_TOKEN_KEY);
+    localStorage.removeItem(STORED_AT_KEY);
+  } catch {
+    // Storage blocked: nothing was stored.
+  }
+}
+
+// Sign-out: stops order updates for the account on this device. Must run while the customer is still signed in, so the
+// shop can remove the token from that account. Then the browser's token itself is deleted, so a later account on this
+// device gets a new one and the old account's messages can no longer reach it. Never prompts and never throws.
+export async function forgetDeviceToken(): Promise<void> {
+  const tokens = new Set<string>();
+  try {
+    const stored = localStorage.getItem(STORED_TOKEN_KEY);
+    if (stored) tokens.add(stored);
+  } catch {
+    // Storage blocked: the current token is read from the browser below.
+  }
+  let messagingReady = false;
+  try {
+    if (pushConfigured() && (await pushSupported()) && Notification.permission === 'granted') {
+      // Reads the current token (and sets up the shop's service worker for deleteToken below).
+      const issued = await issueToken();
+      if (issued.ok) {
+        tokens.add(issued.token);
+        messagingReady = true;
+      }
+    }
+  } catch {
+    // Messaging unavailable: only the stored token is removed.
+  }
+  for (const token of tokens) {
+    try {
+      await removePushToken(token);
+    } catch {
+      // A failed removal is not shown; the token is still deleted in the browser below.
+    }
+  }
+  if (messagingReady) {
+    try {
+      await deleteToken(getMessaging(app));
+    } catch {
+      // Nothing more to do.
+    }
+  }
+  forgetStoredToken();
 }
 
 // Calls onData for each message that arrives while the shop is open. Returns a function that stops listening.

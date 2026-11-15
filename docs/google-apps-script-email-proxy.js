@@ -1,33 +1,32 @@
 /**
  * GLOW VAI: Resend email proxy (separate Apps Script project).
  *
- * Why this exists: the site is a static export (no live Node server), so a
- * Next.js API route never runs in production. This Apps Script plays the
- * same role your leads-sheet script already plays for Google Sheets - a
- * small trusted server the static client can call, so the Resend API key
- * never ships in browser JS again.
+ * Why this exists: the admin's email sender (app/api/admin/email/route.ts)
+ * calls this small trusted script on the server, so the Resend API key lives
+ * only in Apps Script and never in the Next.js app or browser JS.
  *
  * SETUP
  * 1. Go to script.google.com -> New project. Paste this whole file in.
  * 2. Project Settings -> Script Properties -> add:
  *      RESEND_API_KEY = <your ROTATED Resend key>
- *      PROXY_SECRET   = <any random string you make up>
+ *      PROXY_SECRET   = <a long random string you make up>
  *    (Rotate the key in your Resend dashboard first - the old one was
  *    exposed in the public JS bundle and must be treated as compromised.)
  * 3. Deploy -> New deployment -> type "Web app".
  *      Execute as: Me
  *      Who has access: Anyone
  * 4. Copy the resulting /exec URL.
- * 5. In the Next.js project's .env.local (and your host's env settings),
- *    set NEXT_PUBLIC_EMAIL_PROXY_URL to that URL.
- * 6. Also set PROXY_SECRET as NEXT_PUBLIC_EMAIL_PROXY_SECRET in .env.local
- *    if you want the lightweight shared-token check below enabled.
+ * 5. In the Next.js host's server environment (Vercel project settings, and
+ *    .env.local for local work), set:
+ *      EMAIL_PROXY_URL    = that /exec URL
+ *      EMAIL_PROXY_SECRET = the same value as PROXY_SECRET above
+ *    These are server-only variables. Never give them a NEXT_PUBLIC_ prefix:
+ *    NEXT_PUBLIC_ values are built into the browser JS, where anyone can
+ *    read them and use the proxy to send email as GLOW VAI.
  *
- * This is NOT a real secret boundary - anything shipped to the browser is
- * public once deployed. PROXY_SECRET only raises the bar against random
- * scraping of the URL; it does not protect against someone reading your
- * site's JS. Real protection is: rate limiting (below) + only allowing the
- * three known template types + keeping the Resend key itself server-only.
+ * The secret is required: without PROXY_SECRET this script refuses every
+ * request. Only the admin API route (after an admin session check) sends it,
+ * from the server. The rate limit below is a second line of defence.
  */
 
 const MAX_EMAILS_PER_HOUR = 30;
@@ -53,7 +52,9 @@ function doPost(e) {
 
     const body = JSON.parse((e && e.postData && e.postData.contents) || "{}");
 
-    if (expectedSecret && body.secret !== expectedSecret) {
+    // The secret is required, so a missing PROXY_SECRET can never leave the proxy open to anyone with the URL.
+    if (!expectedSecret) return out_({ ok: false, error: "proxy_not_configured" });
+    if (body.secret !== expectedSecret) {
       return out_({ ok: false, error: "unauthorized" });
     }
 

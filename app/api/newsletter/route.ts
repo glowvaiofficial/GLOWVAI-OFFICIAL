@@ -4,8 +4,10 @@ import { createConfirmToken, verifyConfirmToken } from "@/lib/email/tokens";
 import { queueEmail, sendEmail } from "@/lib/email/send";
 import { storage } from "@/lib/storage";
 import { SITE_URL } from "@/lib/site-url";
+import { clientIp, rateLimit } from "@/lib/security/rateLimit";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 const newsletterSchema = z.object({
   email: z.string().trim().email("Valid email address required"),
@@ -25,7 +27,12 @@ function limited(ip: string) {
   return h.n > 10;
 }
 
+// The confirm link from the double opt-in email. Still live: links in emails already sent point here.
 export async function GET(req: NextRequest) {
+  const limit = rateLimit(`newsletter-confirm:${clientIp(req)}`, 20, 60_000);
+  if (!limit.ok) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
+  }
   const token = req.nextUrl.searchParams.get("token");
   if (!token) {
     return NextResponse.redirect(`${SITE_URL}/?newsletter=invalid`);
@@ -62,6 +69,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "127.0.0.1";
   if (limited(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
