@@ -4,7 +4,12 @@
    for the main actions, one soft rose accent used sparingly. One centred column (1280px of content, wide gutters), an
    8px spacing scale and the same space between every section. Motion is short and eased out, and the moving parts are
    switched off for people who ask for less motion. The body font comes from the theme (--font-body), so the admin theme
-   still applies; the display serif is set by the component (--desk-font-display). */
+   still applies; the display serif is set by the component (--desk-font-display).
+
+   Accents: every section, category, offer card and chip sets its own accent as CSS variables (from desktopAccents.ts):
+   --acc (the colour), --acc-ink (the colour darkened to read as text, 4.5:1), --acc-on (text on the solid colour),
+   --acc-soft and --acc-softer (light tints of the page colour) and --acc-line (a soft line). Without them, the warm
+   defaults below apply. Brand blue stays on the main buttons. */
 
 .glowvai-root .shop-screen.shop-desk{
   /* Layout */
@@ -120,6 +125,7 @@
 .glowvai-root .shop-desk .shop-desk-tabs::-webkit-scrollbar{ display: none; }
 .glowvai-root .shop-desk .shop-desk-tab{ display: inline-flex; flex: 0 0 auto; height: 48px; align-items: center; gap: 8px; padding: 0 12px; border: 0; border-radius: 0; background: none; color: var(--desk-muted); font-size: 14px; font-weight: 500; white-space: nowrap; transition: color var(--desk-fast) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-tab:hover{ color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-tab svg{ color: var(--acc-ink, currentColor); }
 .glowvai-root .shop-desk .shop-desk-tab:focus-visible{ outline-offset: -4px; border-radius: 8px; }
 .glowvai-root .shop-desk .shop-desk-tab[aria-current="page"]{ color: var(--desk-ink); font-weight: 600; }
 .glowvai-root .shop-desk .shop-desk-tab-ink{ position: absolute; bottom: 0; left: 0; height: 2px; border-radius: 2px; background: var(--desk-brand); pointer-events: none; transition: transform var(--desk-mid) var(--desk-ease), width var(--desk-mid) var(--desk-ease), opacity var(--desk-fast) ease; }
@@ -145,16 +151,16 @@
 /* ---------------------------------------------------------------- Hero */
 /* Editorial: a soft blush backdrop with two blurred light shapes, the headline in the display serif on the left (about
    45% of the width), the campaign picture on the right fading into the backdrop. About 360px tall on a 1440px screen. */
-.glowvai-root .shop-desk .shop-desk-hero{ position: relative; display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); height: clamp(320px, 25vw, 380px); margin-top: 24px; overflow: hidden; border-radius: var(--desk-r-lg); background: linear-gradient(115deg, #fbf3ef 0%, #f6e6df 55%, #f1ddd5 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-hero{ position: relative; display: grid; grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); height: clamp(320px, 25vw, 380px); margin-top: 24px; overflow: hidden; border-radius: var(--desk-r-lg); background: linear-gradient(115deg, #fcf8f5 0%, var(--acc-softer, #f6e6df) 45%, var(--acc-soft, #f1ddd5) 100%); color: var(--desk-ink); isolation: isolate; }
 .glowvai-root .shop-desk .shop-desk-hero-shapes{ position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .glowvai-root .shop-desk .shop-desk-hero-shapes::before,
 .glowvai-root .shop-desk .shop-desk-hero-shapes::after{ content: ''; position: absolute; border-radius: 50%; filter: blur(8px); }
 .glowvai-root .shop-desk .shop-desk-hero-shapes::before{ top: -120px; left: -80px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, 0) 70%); }
-.glowvai-root .shop-desk .shop-desk-hero-shapes::after{ right: 34%; bottom: -160px; width: 420px; height: 420px; background: radial-gradient(circle, rgba(232, 196, 182, .55) 0%, rgba(232, 196, 182, 0) 70%); }
+.glowvai-root .shop-desk .shop-desk-hero-shapes::after{ right: 34%; bottom: -160px; width: 420px; height: 420px; background: radial-gradient(circle, var(--acc-line, rgba(232, 196, 182, .55)) 0%, rgba(251, 248, 245, 0) 70%); opacity: .55; }
 .glowvai-root .shop-desk .shop-desk-hero-copy{ position: relative; z-index: 1; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 40px 0 40px 56px; }
-.glowvai-root .shop-desk .shop-desk-hero-tag{ margin: 0 0 16px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-hero-tag{ margin: 0 0 16px; color: var(--acc-ink, var(--desk-rose)); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
 .glowvai-root .shop-desk .shop-desk-hero h1{ margin: 0; font-family: var(--desk-display); font-size: clamp(48px, 4.6vw, 68px); font-weight: 400; line-height: 1; letter-spacing: -.015em; }
-.glowvai-root .shop-desk .shop-desk-hero h1 em{ color: var(--desk-rose); font-style: italic; }
+.glowvai-root .shop-desk .shop-desk-hero h1 em{ color: var(--acc-ink, var(--desk-rose)); font-style: italic; }
 .glowvai-root .shop-desk .shop-desk-hero-sub{ max-width: 380px; margin: 16px 0 0; color: var(--desk-muted); font-size: 17px; font-weight: 400; line-height: 1.5; }
 .glowvai-root .shop-desk .shop-desk-hero-actions{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
 .glowvai-root .shop-desk .shop-desk-hero-media{ position: relative; min-width: 0; }
@@ -188,15 +194,17 @@
 .glowvai-root .shop-desk .shop-desk-section{ margin-top: var(--desk-section); }
 .glowvai-root .shop-desk .shop-desk-head{ display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
 .glowvai-root .shop-desk .shop-desk-head-titles{ display: grid; min-width: 0; gap: 8px; }
-.glowvai-root .shop-desk .shop-desk-eyebrow{ color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-eyebrow{ display: inline-flex; align-items: center; gap: 12px; color: var(--acc-ink, var(--desk-rose)); font-size: 11px; font-weight: 600; letter-spacing: .2em; line-height: 1.2; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-eyebrow::before{ content: ''; width: 24px; height: 2px; border-radius: 2px; background: var(--acc, var(--desk-rose)); }
 .glowvai-root .shop-desk .shop-desk-head h2{ margin: 0; color: var(--desk-ink); font-family: var(--desk-display); font-size: 36px; font-weight: 400; line-height: 1.08; letter-spacing: -.01em; }
 .glowvai-root .shop-desk .shop-desk-head-titles p{ margin: 0; color: var(--desk-muted); font-size: 14px; }
 .glowvai-root .shop-desk .shop-desk-head-actions{ display: flex; flex: 0 0 auto; align-items: center; gap: 8px; padding-bottom: 2px; }
 .glowvai-root .shop-desk .shop-desk-arrow{ display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid var(--desk-line-strong); border-radius: 50%; background: transparent; color: var(--desk-ink); transition: background-color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), opacity var(--desk-fast) ease; }
-.glowvai-root .shop-desk .shop-desk-arrow:hover:not(:disabled){ border-color: var(--desk-ink); background: var(--desk-ink); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-arrow:hover:not(:disabled){ border-color: var(--acc-ink, var(--desk-ink)); background: var(--acc-ink, var(--desk-ink)); color: #fff; }
 .glowvai-root .shop-desk .shop-desk-arrow:disabled{ opacity: .35; }
-.glowvai-root .shop-desk .shop-desk-see-all{ display: inline-flex; min-height: 40px; align-items: center; gap: 4px; margin-left: 8px; padding: 0 4px; border: 0; background: none; color: var(--desk-ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--desk-line-strong); text-decoration-thickness: 1px; text-underline-offset: 6px; transition: text-decoration-color var(--desk-fast) var(--desk-ease); }
-.glowvai-root .shop-desk .shop-desk-see-all:hover{ text-decoration-color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-see-all{ display: inline-flex; min-height: 40px; align-items: center; gap: 4px; margin-left: 8px; padding: 0 4px; border: 0; background: none; color: var(--desk-ink); font-size: 14px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--acc-line, var(--desk-line-strong)); text-decoration-thickness: 2px; text-underline-offset: 6px; transition: text-decoration-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-see-all svg{ color: var(--acc-ink, currentColor); }
+.glowvai-root .shop-desk .shop-desk-see-all:hover{ color: var(--acc-ink, var(--desk-ink)); text-decoration-color: var(--acc, var(--desk-ink)); }
 .glowvai-root .shop-desk .shop-desk-see-all svg{ transition: transform var(--desk-mid) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-see-all:hover svg{ transform: translateX(3px); }
 .glowvai-root .shop-desk .shop-desk-empty{ margin: 0; color: var(--desk-muted); font-size: 14px; }
@@ -209,7 +217,9 @@
 /* One even row (six tiles across, more rows spread evenly when the admin sets more), so the row always fills the width. */
 .glowvai-root .shop-desk .shop-desk-cats{ display: grid; grid-template-columns: repeat(var(--cat-cols, 6), minmax(0, 1fr)); gap: 32px var(--desk-gap); }
 .glowvai-root .shop-desk .shop-desk-cat{ display: flex; min-width: 0; flex-direction: column; gap: 16px; padding: 0; border: 0; border-radius: var(--desk-r-lg); background: none; color: var(--desk-ink); text-align: center; }
-.glowvai-root .shop-desk .shop-desk-cat-media > svg{ opacity: .9; }
+.glowvai-root .shop-desk .shop-desk-cat-media{ background: radial-gradient(90% 75% at 50% 32%, #fffdfb 0%, var(--acc-softer, #fffdfb) 30%, var(--acc-soft, var(--desk-sand)) 80%); box-shadow: inset 0 0 0 1px transparent; }
+.glowvai-root .shop-desk .shop-desk-cat-media > svg{ color: var(--acc-ink, var(--desk-ink)); }
+.glowvai-root .shop-desk .shop-desk-cat:focus-visible .shop-desk-cat-media{ box-shadow: inset 0 0 0 2px var(--acc, var(--desk-line-strong)); }
 .glowvai-root .shop-desk .shop-desk-cat-copy{ display: grid; justify-items: center; gap: 4px; }
 .glowvai-root .shop-desk .shop-desk-cat strong{ font-size: 15px; font-weight: 500; line-height: 1.3; }
 .glowvai-root .shop-desk .shop-desk-cat-count{ color: var(--desk-muted); font-size: 13px; font-weight: 400; }
@@ -218,16 +228,14 @@
 /* ---------------------------------------------------------------- Offer cards */
 /* Side by side in one even row (up to three across). Warm sand and blush, the title in the serif. */
 .glowvai-root .shop-desk .shop-desk-promos{ display: grid; grid-template-columns: repeat(var(--promo-cols, 2), minmax(0, 1fr)); gap: var(--desk-gap); margin-top: var(--desk-section); }
-.glowvai-root .shop-desk .shop-desk-promo{ position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; min-height: 152px; align-items: center; gap: 24px; overflow: hidden; padding: 32px; border: 0; border-radius: var(--desk-r-lg); color: var(--desk-ink); text-align: left; isolation: isolate; transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-promo{ position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; min-height: 152px; align-items: center; gap: 24px; overflow: hidden; padding: 32px; border: 0; border-radius: var(--desk-r-lg); background: linear-gradient(135deg, var(--acc-softer, var(--desk-sand)) 0%, var(--acc-soft, var(--desk-blush)) 100%); color: var(--desk-ink); text-align: left; isolation: isolate; transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-promo::after{ content: ''; position: absolute; top: -60px; right: -40px; z-index: -1; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, .7) 0%, rgba(255, 255, 255, 0) 70%); pointer-events: none; }
-.glowvai-root .shop-desk .shop-desk-promo.is-sand{ background: var(--desk-sand); }
-.glowvai-root .shop-desk .shop-desk-promo.is-blush{ background: var(--desk-blush); }
-.glowvai-root .shop-desk .shop-desk-promo-icon{ display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; background: var(--desk-surface); color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-promo-icon{ display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; background: var(--desk-surface); color: var(--acc-ink, var(--desk-ink)); box-shadow: 0 0 0 6px rgba(255, 255, 255, .35); }
 .glowvai-root .shop-desk .shop-desk-promo-copy{ display: grid; min-width: 0; gap: 8px; }
-.glowvai-root .shop-desk .shop-desk-promo-kicker{ color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-promo-kicker{ color: var(--acc-ink, var(--desk-rose)); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
 .glowvai-root .shop-desk .shop-desk-promo-title{ font-family: var(--desk-display); font-size: 30px; font-weight: 400; letter-spacing: -.01em; line-height: 1.1; }
 .glowvai-root .shop-desk .shop-desk-promo-sub{ color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
-.glowvai-root .shop-desk .shop-desk-code{ padding: 2px 8px; border: 1px dashed var(--desk-line-strong); border-radius: 6px; background: rgba(255, 255, 255, .6); color: var(--desk-ink); font-weight: 600; letter-spacing: .06em; }
+.glowvai-root .shop-desk .shop-desk-code{ padding: 2px 8px; border: 1px dashed var(--acc-line, var(--desk-line-strong)); border-radius: 6px; background: rgba(255, 255, 255, .6); color: var(--desk-ink); font-weight: 600; letter-spacing: .06em; }
 .glowvai-root .shop-desk .shop-desk-promo-go{ display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: var(--desk-surface); color: var(--desk-ink); transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease); }
 /* An admin card with a picture: the picture fills the card, a shade keeps the words readable. */
 .glowvai-root .shop-desk .shop-desk-promo.has-picture{ grid-template-columns: minmax(0, 1fr) auto; background: #2a2730; color: #fff; }
@@ -277,11 +285,10 @@
 
 /* Deals: the deals card beside up to four cards, one row of five. */
 .glowvai-root .shop-desk .shop-desk-deals{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; gap: var(--desk-gap); }
-.glowvai-root .shop-desk .shop-desk-deals-panel{ position: relative; display: flex; grid-column: span var(--deal-span-5, 1); min-height: 280px; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 12px; overflow: hidden; padding: 28px; border-radius: var(--desk-r-lg); background: radial-gradient(120% 80% at 100% 0%, #fff7f3 0%, rgba(255, 247, 243, 0) 60%), linear-gradient(160deg, var(--desk-blush) 0%, #f2ddd5 100%); color: var(--desk-ink); isolation: isolate; }
-.glowvai-root .shop-desk .shop-desk-deals-panel::before{ content: ''; position: absolute; top: 24px; right: 24px; z-index: -1; width: 96px; height: 96px; border: 1px solid rgba(154, 84, 72, .25); border-radius: 50%; }
-.glowvai-root .shop-desk .shop-desk-deals-panel.is-skeleton{ background: none; }
+.glowvai-root .shop-desk .shop-desk-deals-panel{ position: relative; display: flex; grid-column: span var(--deal-span-5, 1); min-height: 280px; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 12px; overflow: hidden; padding: 28px; border-radius: var(--desk-r-lg); background: radial-gradient(120% 80% at 100% 0%, #fffaf7 0%, rgba(255, 250, 247, 0) 60%), linear-gradient(160deg, var(--acc-softer, var(--desk-blush)) 0%, var(--acc-soft, #f2ddd5) 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-deals-panel::before{ content: ''; position: absolute; top: 24px; right: 24px; z-index: -1; width: 96px; height: 96px; border: 1px solid var(--acc-line, rgba(154, 84, 72, .25)); border-radius: 50%; }
 .glowvai-root .shop-desk .shop-desk-deals-panel.is-skeleton::before{ display: none; }
-.glowvai-root .shop-desk .shop-desk-deals-kicker{ display: inline-flex; align-items: center; gap: 8px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-deals-kicker{ display: inline-flex; align-items: center; gap: 8px; color: var(--acc-ink, var(--desk-rose)); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
 .glowvai-root .shop-desk .shop-desk-deals-panel strong{ font-size: 40px; line-height: 1.02; letter-spacing: -.015em; }
 .glowvai-root .shop-desk .shop-desk-deals-panel p{ margin: 0 0 8px; color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
 
@@ -309,8 +316,8 @@
 .glowvai-root .shop-desk .shop-desk-concerns{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
 .glowvai-root .shop-desk .shop-desk-concern{ display: flex; min-width: 0; min-height: 56px; align-items: center; gap: 12px; padding: 0 20px 0 8px; border: 1px solid var(--desk-line); border-radius: 999px; background: var(--desk-surface); color: var(--desk-ink); font-size: 14px; font-weight: 500; text-align: left; transition: border-color var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-concern > span:not(.shop-desk-concern-icon){ flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .shop-desk .shop-desk-concern-icon{ display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--desk-rose-soft); color: var(--desk-rose); }
-.glowvai-root .shop-desk .shop-desk-concern-go{ flex: 0 0 auto; color: var(--desk-ink); opacity: 0; transform: translateX(-4px); transition: opacity var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-concern-icon{ display: grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--acc-soft, var(--desk-rose-soft)); color: var(--acc-ink, var(--desk-rose)); }
+.glowvai-root .shop-desk .shop-desk-concern-go{ flex: 0 0 auto; color: var(--acc-ink, var(--desk-ink)); opacity: 0; transform: translateX(-4px); transition: opacity var(--desk-fast) var(--desk-ease), transform var(--desk-mid) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-concern:focus-visible .shop-desk-concern-go{ opacity: 1; transform: none; }
 
 /* ---------------------------------------------------------------- Admin sections (shared HomePlaceholders, .hp-*) */
@@ -332,19 +339,46 @@
 .glowvai-root .shop-desk .hp-chip{ padding: 16px 20px; border-color: var(--desk-line); border-radius: var(--desk-r); }
 .glowvai-root .shop-desk .hp-skel{ border-radius: var(--desk-r-lg); background: linear-gradient(100deg, #f1ebe5 30%, #faf6f2 50%, #f1ebe5 70%); background-size: 300% 100%; animation: shop-desk-shimmer 1.6s ease-in-out infinite; }
 
+/* Blocks the admin filled (DeskLiveBlock): one even row of cards, chips or tiles, each in its own accent. */
+.glowvai-root .shop-desk .shop-desk-live-grid{ display: grid; grid-template-columns: repeat(var(--live-cols, 3), minmax(0, 1fr)); gap: var(--desk-gap); }
+.glowvai-root .shop-desk .shop-desk-live-item{ display: block; min-width: 0; border-radius: var(--desk-r-lg); color: inherit; text-decoration: none; }
+.glowvai-root .shop-desk .shop-desk-live.is-chips .shop-desk-live-item{ border-radius: 999px; }
+.glowvai-root .shop-desk :is(.shop-desk-live-card, .shop-desk-live-tile, .shop-desk-live-chip){ transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-slow) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-live-card{ position: relative; display: flex; height: 100%; min-height: 184px; box-sizing: border-box; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; padding: 28px; border-radius: var(--desk-r-lg); background: linear-gradient(150deg, var(--acc-softer, var(--desk-sand)) 0%, var(--acc-soft, var(--desk-blush)) 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-live-card::before{ content: ''; position: absolute; top: -40px; right: -40px; z-index: -1; width: 140px; height: 140px; border: 1px solid var(--acc-line, var(--desk-line-strong)); border-radius: 50%; }
+.glowvai-root .shop-desk .shop-desk-live-card strong{ font-family: var(--desk-display); font-size: 26px; font-weight: 400; line-height: 1.1; letter-spacing: -.01em; }
+.glowvai-root .shop-desk .shop-desk-live-card span{ color: var(--desk-muted); font-size: 14px; line-height: 1.5; }
+.glowvai-root .shop-desk .shop-desk-live-card.has-picture{ background-color: #2a2730; background-position: center; background-size: cover; color: #fff; }
+.glowvai-root .shop-desk .shop-desk-live-card.has-picture::before{ display: none; }
+.glowvai-root .shop-desk .shop-desk-live-card.has-picture span{ color: rgba(255, 255, 255, .9); }
+.glowvai-root .shop-desk .shop-desk-live-card.is-promise{ justify-content: flex-start; min-height: 0; border: 1px solid var(--desk-line); background: var(--desk-surface); }
+.glowvai-root .shop-desk .shop-desk-live-card.is-promise::before{ display: none; }
+.glowvai-root .shop-desk .shop-desk-live-card.is-promise strong{ margin-top: 8px; font-family: var(--font-body); font-size: 17px; font-weight: 600; letter-spacing: 0; }
+.glowvai-root .shop-desk .shop-desk-live-icon{ display: block; width: 48px; height: 48px; box-sizing: border-box; padding: 10px; border-radius: 50%; background: var(--acc-soft, var(--desk-sand)); object-fit: contain; }
+.glowvai-root .shop-desk span.shop-desk-live-icon{ box-shadow: inset 0 0 0 14px var(--acc-soft, var(--desk-sand)); background: var(--acc, var(--desk-rose)); }
+.glowvai-root .shop-desk .shop-desk-live-chip{ display: flex; height: 100%; box-sizing: border-box; align-items: center; gap: 12px; padding: 12px 24px 12px 12px; border: 1px solid var(--desk-line); border-radius: 999px; background: var(--desk-surface); color: var(--desk-ink); }
+.glowvai-root .shop-desk .shop-desk-live-chip > span:last-child{ display: grid; min-width: 0; gap: 2px; }
+.glowvai-root .shop-desk .shop-desk-live-chip b{ overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-live-chip small{ overflow: hidden; color: var(--desk-muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-live-dot{ display: block; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; background: var(--acc-soft, var(--desk-sand)); object-fit: cover; }
+.glowvai-root .shop-desk span.shop-desk-live-dot{ box-shadow: inset 0 0 0 12px var(--acc-soft, var(--desk-sand)); background: var(--acc, var(--desk-rose)); }
+.glowvai-root .shop-desk .shop-desk-live-tile{ display: grid; aspect-ratio: 3 / 2; box-sizing: border-box; place-items: center; overflow: hidden; padding: 20px; border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); text-align: center; }
+.glowvai-root .shop-desk .shop-desk-live-tile img{ max-width: 100%; max-height: 100%; object-fit: contain; }
+.glowvai-root .shop-desk .shop-desk-live-tile strong{ color: var(--acc-ink, var(--desk-ink)); font-size: 15px; font-weight: 600; letter-spacing: .04em; overflow-wrap: anywhere; }
+
 /* ---------------------------------------------------------------- Face scan */
 /* A wide, calm card: the words on the left, the privacy note and the action on the right. */
-.glowvai-root .shop-desk .shop-desk-scan{ position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 48px; margin-top: var(--desk-section); overflow: hidden; padding: 56px 64px; border-radius: var(--desk-r-lg); background: linear-gradient(120deg, #f6efe9 0%, #f3e9e3 50%, #eef0f8 100%); color: var(--desk-ink); isolation: isolate; }
+.glowvai-root .shop-desk .shop-desk-scan{ position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: 48px; margin-top: var(--desk-section); overflow: hidden; padding: 56px 64px; border-radius: var(--desk-r-lg); background: linear-gradient(120deg, #f8f2ed 0%, var(--acc-softer, #f3e9e3) 50%, var(--acc-soft, #eef0f8) 100%); color: var(--desk-ink); isolation: isolate; }
 .glowvai-root .shop-desk .shop-desk-scan-shapes{ position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .glowvai-root .shop-desk .shop-desk-scan-shapes::before{ content: ''; position: absolute; top: -140px; right: -100px; width: 420px; height: 420px; border: 1px solid rgba(20, 27, 52, .08); border-radius: 50%; box-shadow: 0 0 0 48px rgba(255, 255, 255, .25), 0 0 0 96px rgba(255, 255, 255, .15); }
-.glowvai-root .shop-desk .shop-desk-scan-tag{ display: inline-flex; align-items: center; gap: 8px; color: var(--desk-rose); font-size: 11px; font-weight: 600; letter-spacing: .2em; }
+.glowvai-root .shop-desk .shop-desk-scan-tag{ display: inline-flex; align-items: center; gap: 8px; color: var(--acc-ink, var(--desk-rose)); font-size: 11px; font-weight: 600; letter-spacing: .2em; }
 .glowvai-root .shop-desk .shop-desk-scan h2{ margin: 16px 0; font-family: var(--desk-display); font-size: 44px; font-weight: 400; line-height: 1.05; letter-spacing: -.015em; }
-.glowvai-root .shop-desk .shop-desk-scan h2 span{ color: var(--desk-rose); font-style: italic; }
+.glowvai-root .shop-desk .shop-desk-scan h2 span{ color: var(--acc-ink, var(--desk-rose)); font-style: italic; }
 .glowvai-root .shop-desk .shop-desk-scan-body{ max-width: 560px; margin: 0; color: var(--desk-muted); font-size: 16px; line-height: 1.6; }
 .glowvai-root .shop-desk .shop-desk-scan-note{ margin: 16px 0 0; color: var(--desk-muted); font-size: 13px; }
 .glowvai-root .shop-desk .shop-desk-scan-side{ display: grid; justify-items: start; gap: 24px; }
 .glowvai-root .shop-desk .shop-desk-scan-privacy{ display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 16px; border-radius: var(--desk-r); background: rgba(255, 255, 255, .7); color: var(--desk-ink); font-size: 14px; line-height: 1.5; }
-.glowvai-root .shop-desk .shop-desk-scan-privacy svg{ flex-shrink: 0; margin-top: 2px; color: var(--desk-rose); }
+.glowvai-root .shop-desk .shop-desk-scan-privacy svg{ flex-shrink: 0; margin-top: 2px; color: var(--acc-ink, var(--desk-rose)); }
 .glowvai-root .shop-desk .shop-desk-scan-btn{ display: inline-flex; min-height: 48px; align-items: center; gap: 8px; padding: 0 28px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 15px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), box-shadow var(--desk-mid) var(--desk-ease), transform var(--desk-fast) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-scan-btn:hover{ background: var(--desk-brand-dark); box-shadow: 0 14px 28px -14px rgba(0, 87, 251, .7); }
 
@@ -385,27 +419,29 @@
    after another. The cards' entrance only fills backwards, so it never holds a transform that would fight the hover. */
 .glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="wait"]{ opacity: 0; transform: translateY(24px); }
 .glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"]{ opacity: 1; transform: none; transition: opacity 500ms var(--desk-ease), transform 600ms var(--desk-ease); }
-.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"] :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .hp-grid, .hp-brands) > *,
+.glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"] :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-live-grid, .hp-grid, .hp-brands) > *,
 .glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal="in"]:is(.shop-desk-promos) > *{ animation: shop-desk-fade-up 520ms var(--desk-ease) backwards; animation-delay: calc(var(--i, 0) * 70ms + 120ms); }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(2){ --i: 1; }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(3){ --i: 2; }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(4){ --i: 3; }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(5){ --i: 4; }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(6){ --i: 5; }
-.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .hp-grid, .hp-brands) > :nth-child(n + 7){ --i: 6; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(2){ --i: 1; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(3){ --i: 2; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(4){ --i: 3; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(5){ --i: 4; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(6){ --i: 5; }
+.glowvai-root .shop-desk :is(.shop-desk-rail, .shop-desk-deals, .shop-desk-cats, .shop-desk-concerns, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(n + 7){ --i: 6; }
 @keyframes shop-desk-fade-up{ from{ opacity: 0; transform: translateY(16px); } to{ opacity: 1; transform: none; } }
 
 /* Hover: a small lift, a very soft long shadow and a slight zoom of the photo. Press: a short squeeze. */
 @media (hover: hover){
-  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media,
-  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ transform: translateY(-4px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media{ transform: translateY(-4px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--acc-line, transparent), var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-live-item:hover :is(.shop-desk-live-card, .shop-desk-live-tile, .shop-desk-live-chip){ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-live-item:hover :is(.shop-desk-live-tile, .shop-desk-live-chip, .is-promise){ border-color: var(--acc-line, var(--desk-line-strong)); }
   .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media img,
   .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media img{ transform: scale(1.03); }
   .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-name{ text-decoration: underline; text-decoration-color: var(--desk-line-strong); text-underline-offset: 4px; }
   .glowvai-root .shop-desk .shop-desk-promo:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
-  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go{ background: var(--desk-ink); color: #fff; transform: translateX(3px); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go{ background: var(--acc, var(--desk-ink)); color: var(--acc-on, #fff); transform: translateX(3px); }
   .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-image{ transform: scale(1.03); }
-  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--desk-ink); transform: translateY(-2px); box-shadow: var(--desk-shadow-soft); }
+  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--acc-line, var(--desk-ink)); background: var(--acc-softer, var(--desk-surface)); transform: translateY(-2px); box-shadow: var(--desk-shadow-soft); }
   .glowvai-root .shop-desk .shop-desk-concern:hover .shop-desk-concern-go{ opacity: 1; transform: none; }
 }
 .glowvai-root .shop-desk :is(.shop-desk-btn-light, .shop-desk-btn-ghost, .shop-desk-btn-outline, .shop-desk-cart, .shop-desk-add, .shop-desk-scan-btn, .shop-desk-end-btn, .shop-desk-retry, .shop-desk-arrow, .shop-desk-promo, .shop-desk-concern, .shop-desk-cat, .shop-desk-action):active:not(:disabled){ transform: scale(.97); transition-duration: 100ms; }
@@ -425,6 +461,7 @@
   .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media,
   .glowvai-root .shop-desk .shop-desk-promo:hover,
   .glowvai-root .shop-desk .shop-desk-concern:hover,
+  .glowvai-root .shop-desk .shop-desk-live-item:hover *,
   .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go,
   .glowvai-root .shop-desk .shop-desk-concern-go,
   .glowvai-root .shop-desk :active,
@@ -474,6 +511,7 @@
   .glowvai-root .shop-desk .shop-desk-hero-media{ position: absolute; inset: 0; z-index: -1; opacity: .3; }
   .glowvai-root .shop-desk .shop-desk-cats{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .glowvai-root .shop-desk .shop-desk-promos{ grid-template-columns: 1fr; }
+  .glowvai-root .shop-desk .shop-desk-live-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .glowvai-root .shop-desk .shop-desk-rail{ margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
   .glowvai-root .shop-desk .shop-desk-rail > *{ flex-basis: calc((100% - var(--desk-gap)) / 2); }
   .glowvai-root .shop-desk .shop-desk-deals{ grid-template-columns: repeat(2, minmax(0, 1fr)); }

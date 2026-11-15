@@ -15,10 +15,11 @@ import { HomeBanners } from '../shared/HomeBanners';
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, FlashSaleStrip, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
-import { useHomeLayout, type BlockItem, type HomeBlockId } from '../lib/useHomeLayout';
+import { useHomeLayout, type BlockItem, type BlockSettings, type HomeBlockId } from '../lib/useHomeLayout';
 import { useHomeData } from '../lib/useHomeData';
 import { balancedColumns } from '../lib/homeDevice';
-import { CATEGORY_ACCENT, CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
+import { accentHex, accentVars, categoryAccent, effectiveAccent, itemAccent, sectionAccent, type AccentName } from '../lib/desktopAccents';
+import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, mergeFooterSocials } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
@@ -51,6 +52,28 @@ const CATEGORY_ROW_MAX = 6;
 const PROMO_ROW_MAX = 3;
 // Up to this many deals sit in a grid beside the deals card; more become a scrolling rail.
 const DEAL_GRID_MAX = 4;
+
+// Each section's accent when the admin sets none (the admin's block accent wins). Fixed per section, so a section keeps
+// its colour wherever the admin moves it.
+const SECTION_ACCENT: Record<HomeBlockId | 'concerns' | 'scan', AccentName> = {
+  hero: 'rose',
+  'mini-banners': 'amethyst',
+  offers: 'coral',
+  categories: 'amethyst',
+  promos: 'coral',
+  deals: 'rose',
+  reorder: 'sage',
+  'product-rails': 'sky',
+  brands: 'champagne',
+  trust: 'champagne',
+  'help-gift': 'sage',
+  footer: 'ink',
+  concerns: 'rose',
+  scan: 'sky',
+};
+
+// The CSS variables (--acc, --acc-ink, --acc-soft, ...) an element sets so its styles follow an accent.
+const accentStyle = (hex: string, extra?: React.CSSProperties) => ({ ...accentVars(hex), ...extra }) as React.CSSProperties;
 
 // The small spaced label above each rail's title.
 const RAIL_EYEBROW: Record<string, string> = {
@@ -245,7 +268,7 @@ function DeskProductCard({ product }: { product: SkincareProduct }) {
 
 // A product rail: one row of equal cards (five across on a wide screen) that scrolls sideways inside itself, with arrows
 // in the head. An arrow is off at its end of the row, and both are hidden when the whole row fits.
-function DeskRail({ eyebrow, title, titleId, onSeeAll, children, busy = false }: { eyebrow?: string; title: string; titleId?: string; onSeeAll?: () => void; children: React.ReactNode; busy?: boolean }) {
+function DeskRail({ eyebrow, title, titleId, accent, onSeeAll, children, busy = false }: { eyebrow?: string; title: string; titleId?: string; accent?: string; onSeeAll?: () => void; children: React.ReactNode; busy?: boolean }) {
   const railRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ prev: false, next: false });
   const childCount = React.Children.count(children);
@@ -272,7 +295,7 @@ function DeskRail({ eyebrow, title, titleId, onSeeAll, children, busy = false }:
   };
   const overflowing = edges.prev || edges.next;
   return (
-    <section className="shop-desk-section" aria-labelledby={titleId} aria-label={titleId ? undefined : title} aria-busy={busy || undefined}>
+    <section className="shop-desk-section" aria-labelledby={titleId} aria-label={titleId ? undefined : title} aria-busy={busy || undefined} style={accent ? accentStyle(accent) : undefined}>
       <SectionHead
         id={titleId}
         eyebrow={eyebrow}
@@ -300,10 +323,10 @@ function DeskRail({ eyebrow, title, titleId, onSeeAll, children, busy = false }:
   );
 }
 
-function DeskProductRail({ eyebrow, title, products }: { eyebrow?: string; title: string; products: SkincareProduct[] }) {
+function DeskProductRail({ eyebrow, title, accent, products }: { eyebrow?: string; title: string; accent?: string; products: SkincareProduct[] }) {
   const navigate = useHomeNavigate();
   return (
-    <DeskRail eyebrow={eyebrow} title={title} onSeeAll={() => navigate('shop-browse')}>
+    <DeskRail eyebrow={eyebrow} title={title} accent={accent} onSeeAll={() => navigate('shop-browse')}>
       {products.map((product) => (
         <div key={product.id} className="shop-desk-rail-item">
           <DeskProductCard product={product} />
@@ -313,9 +336,9 @@ function DeskProductRail({ eyebrow, title, products }: { eyebrow?: string; title
   );
 }
 
-function DeskSkeletonRail({ eyebrow, title }: { eyebrow?: string; title: string }) {
+function DeskSkeletonRail({ eyebrow, title, accent }: { eyebrow?: string; title: string; accent?: string }) {
   return (
-    <section className="shop-desk-section" aria-busy="true" aria-label={title}>
+    <section className="shop-desk-section" aria-busy="true" aria-label={title} style={accent ? accentStyle(accent) : undefined}>
       <SectionHead eyebrow={eyebrow} title={title} />
       <div className="shop-desk-rail" aria-hidden="true">
         {skeletonCards(5)}
@@ -325,10 +348,10 @@ function DeskSkeletonRail({ eyebrow, title }: { eyebrow?: string; title: string 
   );
 }
 
-function DeskReorderRail({ catalog }: { catalog: SkincareProduct[] }) {
+function DeskReorderRail({ catalog, accent }: { catalog: SkincareProduct[]; accent: string }) {
   const products = useReorderProducts(catalog);
   if (products.length === 0) return null;
-  return <DeskProductRail eyebrow="Your favourites" title="Buy it again" products={products} />;
+  return <DeskProductRail eyebrow="Your favourites" title="Buy it again" accent={accent} products={products} />;
 }
 
 // The columns the deals card takes beside n deal cards: the row is five cards wide (four on smaller desktops). When the
@@ -355,14 +378,16 @@ function DealsPanel({ best, picked, onViewAll }: { best: number; picked: boolean
   );
 }
 
-// The category tab row. The brand underline glides to the tab under the pointer (or keyboard focus) and back to the
-// current tab when the pointer leaves the row.
+// The category tab row. Each tab has its category's accent (its icon is drawn in it); the underline glides to the tab
+// under the pointer (or keyboard focus), taking that tab's accent, and returns to the current tab when the pointer leaves.
 function CategoryTabs({ onOpenCategory, onShopAll }: { onOpenCategory: (categoryId: string) => void; onShopAll: () => void }) {
   const navRef = useRef<HTMLElement>(null);
-  const [ink, setInk] = useState<{ x: number; w: number } | null>(null);
+  const [ink, setInk] = useState<{ x: number; w: number; color: string } | null>(null);
   const moveTo = (el: HTMLElement | null) => {
-    if (el) setInk({ x: el.offsetLeft, w: el.offsetWidth });
+    if (el) setInk({ x: el.offsetLeft, w: el.offsetWidth, color: el.dataset.accent || accentHex('ink') });
   };
+  const allAccent = categoryAccent('All', null, 0);
+  const shopAllAccent = categoryAccent('Shop all', null, 0);
   const reset = () => moveTo(navRef.current?.querySelector<HTMLElement>('[aria-current="page"]') ?? null);
   useEffect(() => {
     reset();
@@ -386,38 +411,37 @@ function CategoryTabs({ onOpenCategory, onShopAll }: { onOpenCategory: (category
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) reset();
       }}
     >
-      <button type="button" className="shop-desk-tab" aria-current="page" onMouseEnter={hover} onFocus={hover}>
+      <button type="button" className="shop-desk-tab" aria-current="page" data-accent={allAccent} style={accentStyle(allAccent)} onMouseEnter={hover} onFocus={hover}>
         <Boxes size={18} aria-hidden="true" />
         <span>All</span>
       </button>
-      {HOME_CATEGORY_TILES.map(({ id: categoryId, label }) => {
+      {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
         const Icon = CATEGORY_ICON[categoryId] ?? Sparkles;
+        const accent = categoryAccent(label, null, i);
         return (
-          <button key={categoryId} type="button" className="shop-desk-tab" onClick={() => onOpenCategory(categoryId)} onMouseEnter={hover} onFocus={hover}>
+          <button key={categoryId} type="button" className="shop-desk-tab" data-accent={accent} style={accentStyle(accent)} onClick={() => onOpenCategory(categoryId)} onMouseEnter={hover} onFocus={hover}>
             <Icon size={18} aria-hidden="true" />
             <span>{label}</span>
           </button>
         );
       })}
-      <button type="button" className="shop-desk-tab" onClick={onShopAll} onMouseEnter={hover} onFocus={hover}>
+      <button type="button" className="shop-desk-tab" data-accent={shopAllAccent} style={accentStyle(shopAllAccent)} onClick={onShopAll} onMouseEnter={hover} onFocus={hover}>
         <Sparkles size={18} aria-hidden="true" />
         <span>Shop all</span>
       </button>
-      <span className="shop-desk-tab-ink" aria-hidden="true" style={ink ? { width: ink.w, transform: `translateX(${ink.x}px)` } : { opacity: 0 }} />
+      <span className="shop-desk-tab-ink" aria-hidden="true" style={ink ? { width: ink.w, transform: `translateX(${ink.x}px)`, background: ink.color } : { opacity: 0 }} />
     </nav>
   );
 }
 
-// A category tile: the category's product photo on a soft warm square, the name and the real product count below. A
-// category without a photo shows its icon in the category's colour.
-function DeskCategoryTile({ tile, onOpen, count, isAll = false }: { tile: HomeCategoryTile | null; onOpen: () => void; count: string | null; isAll?: boolean }) {
-  const label = isAll ? 'All Products' : tile?.label ?? '';
-  const accent = (tile && CATEGORY_ACCENT[tile.id]) || '#0057fb';
+// A category tile: the category's product photo on a soft tint of the category's accent, with an accent ring on hover,
+// the name and the real product count below. A category without a photo shows its icon in the accent.
+function DeskCategoryTile({ tile, label, accent, onOpen, count, isAll = false }: { tile: HomeCategoryTile | null; label: string; accent: string; onOpen: () => void; count: string | null; isAll?: boolean }) {
   const photo = tile?.sample ? getProductThumbUrl(tile.sample, 400) : null;
   const Icon = isAll ? Boxes : (tile && CATEGORY_ICON[tile.id]) || Sparkles;
   return (
-    <button type="button" className="shop-desk-cat" onClick={onOpen} aria-label={count ? `${label}, ${count}` : label}>
-      <span className="shop-desk-cat-media" style={{ color: accent }}>
+    <button type="button" className="shop-desk-cat" onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
+      <span className="shop-desk-cat-media">
         {photo ? <img src={photo} alt="" width={400} height={300} loading="lazy" decoding="async" /> : <Icon size={32} aria-hidden="true" />}
       </span>
       <span className="shop-desk-cat-copy">
@@ -428,9 +452,9 @@ function DeskCategoryTile({ tile, onOpen, count, isAll = false }: { tile: HomeCa
   );
 }
 
-function DeskAdminCategoryTile({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
+function DeskAdminCategoryTile({ item, accent, onOpen }: { item: BlockItem; accent: string; onOpen: () => void }) {
   return (
-    <button type="button" className="shop-desk-cat" onClick={onOpen} aria-label={item.sub ? `${item.label}, ${item.sub}` : item.label}>
+    <button type="button" className="shop-desk-cat" onClick={onOpen} aria-label={item.sub ? `${item.label}, ${item.sub}` : item.label} style={accentStyle(accent)}>
       <span className="shop-desk-cat-media">
         {item.image ? <img src={item.image} alt="" width={400} height={300} loading="lazy" decoding="async" /> : <Sparkles size={32} aria-hidden="true" />}
       </span>
@@ -442,9 +466,9 @@ function DeskAdminCategoryTile({ item, onOpen }: { item: BlockItem; onOpen: () =
   );
 }
 
-function DeskAdminPromo({ item, onOpen }: { item: BlockItem; onOpen: () => void }) {
+function DeskAdminPromo({ item, accent, onOpen }: { item: BlockItem; accent: string; onOpen: () => void }) {
   return (
-    <button type="button" className={`shop-desk-promo${item.image ? ' has-picture' : ' is-sand'}`} onClick={onOpen}>
+    <button type="button" className={`shop-desk-promo${item.image ? ' has-picture' : ''}`} onClick={onOpen} style={accentStyle(accent)}>
       {item.image && <img className="shop-desk-promo-image" src={item.image} alt="" width={600} height={300} loading="lazy" decoding="async" />}
       {item.image && <span className="shop-desk-promo-shade" aria-hidden="true" />}
       {!item.image && (
@@ -460,6 +484,69 @@ function DeskAdminPromo({ item, onOpen }: { item: BlockItem; onOpen: () => void 
         <ArrowRight size={18} />
       </span>
     </button>
+  );
+}
+
+// A block the admin filled (mini banners, offers strip, brands, trust, help and gifts), drawn in the desktop's style: an
+// even row of cards, chips or tiles, each item in its own accent (the admin's, or the palette in order). The admin's
+// background and text colours, when set, still win. Empty blocks keep the shared placeholders (staff preview only).
+type LiveKind = 'cards' | 'chips' | 'tiles' | 'promises';
+const LIVE_ROW_MAX: Record<LiveKind, number> = { cards: 3, chips: 4, tiles: 6, promises: 3 };
+
+function DeskLiveBlock({ kind, settings, eyebrow, fallbackTitle, aria, accent }: { kind: LiveKind; settings: BlockSettings; eyebrow?: string; fallbackTitle: string; aria: string; accent: string }) {
+  const custom: React.CSSProperties = {};
+  if (settings.background) custom.background = settings.background;
+  if (settings.textColor) custom.color = settings.textColor;
+  const title = settings.title || fallbackTitle;
+  return (
+    <section className={`shop-desk-section shop-desk-live is-${kind}`} aria-label={title || aria} style={accentStyle(accent)}>
+      {title && <SectionHead eyebrow={eyebrow} title={title} />}
+      <div className="shop-desk-live-grid" style={{ '--live-cols': balancedColumns(settings.items.length, LIVE_ROW_MAX[kind]) } as React.CSSProperties}>
+        {settings.items.map((item, i) => {
+          const pic = item.image || '';
+          const itemStyle = accentStyle(effectiveAccent(itemAccent(item), i), custom);
+          const inner =
+            kind === 'tiles' ? (
+              <span className="shop-desk-live-tile" style={itemStyle}>
+                {pic ? <img src={pic} alt={item.label} loading="lazy" decoding="async" /> : <strong>{item.label}</strong>}
+              </span>
+            ) : kind === 'chips' ? (
+              <span className="shop-desk-live-chip" style={itemStyle}>
+                {pic ? <img className="shop-desk-live-dot" src={pic} alt="" width={40} height={40} loading="lazy" decoding="async" /> : <span className="shop-desk-live-dot" aria-hidden="true" />}
+                <span>
+                  <b>{item.label}</b>
+                  {item.sub && <small>{item.sub}</small>}
+                </span>
+              </span>
+            ) : kind === 'promises' ? (
+              <span className="shop-desk-live-card is-promise" style={itemStyle}>
+                {pic ? <img className="shop-desk-live-icon" src={pic} alt="" width={40} height={40} loading="lazy" decoding="async" /> : <span className="shop-desk-live-icon" aria-hidden="true" />}
+                <strong>{item.label}</strong>
+                {item.sub && <span>{item.sub}</span>}
+              </span>
+            ) : pic ? (
+              <span className="shop-desk-live-card has-picture" style={{ ...itemStyle, backgroundImage: `linear-gradient(to top, rgba(20, 27, 52, .78), rgba(20, 27, 52, .05) 65%), url("${pic}")` }}>
+                <strong>{item.label}</strong>
+                {item.sub && <span>{item.sub}</span>}
+              </span>
+            ) : (
+              <span className="shop-desk-live-card" style={itemStyle}>
+                <strong>{item.label}</strong>
+                {item.sub && <span>{item.sub}</span>}
+              </span>
+            );
+          return item.link ? (
+            <a key={i} className="shop-desk-live-item" href={item.link}>
+              {inner}
+            </a>
+          ) : (
+            <div key={i} className="shop-desk-live-item">
+              {inner}
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -506,13 +593,24 @@ export const ShopDesktopHome: React.FC = () => {
   const categoryCount = adminCategories.length > 0 ? adminCategories.length : HOME_CATEGORY_TILES.length + 1;
   const promoCount = adminPromos.length > 0 ? adminPromos.length : 2;
   const bestDeal = dealProducts.reduce((best, p) => Math.max(best, getDiscountPercent(p)), 0);
+  // A section's accent: the admin's block accent, otherwise the section's own default.
+  const secAccent = (id: keyof typeof SECTION_ACCENT) => sectionAccent(blockSettings[id as HomeBlockId], accentHex(SECTION_ACCENT[id]));
+  // Each product rail has its own accent (the palette in order) unless the admin set one for the whole block.
+  const railsAccentSet = sectionAccent(blockSettings['product-rails'], '') !== '';
+  const railAccent = (i: number) => (railsAccentSet ? secAccent('product-rails') : effectiveAccent(null, i + 1));
+  // The hero's accent: the hero's own (from the admin), otherwise the hero block's.
+  const heroAccent = sectionAccent({ accent: itemAccent(heroOverride) }, secAccent('hero'));
+  const liveBlock = (id: 'mini-banners' | 'offers' | 'brands' | 'trust' | 'help-gift', kind: LiveKind, fallbackTitle: string, aria: string, eyebrow?: string) => {
+    const settings = blockSettings[id];
+    return settings && settings.items.length > 0 ? <DeskLiveBlock kind={kind} settings={settings} eyebrow={eyebrow} fallbackTitle={fallbackTitle} aria={aria} accent={secAccent(id)} /> : null;
+  };
 
   const renderBlock = (id: HomeBlockId): React.ReactNode => {
     switch (id) {
       case 'hero':
         return (
           <>
-            <section className="shop-desk-hero" aria-labelledby="shop-desk-hero-title">
+            <section className="shop-desk-hero" aria-labelledby="shop-desk-hero-title" style={accentStyle(heroAccent)}>
               <span className="shop-desk-hero-shapes" aria-hidden="true" />
               <div className="shop-desk-hero-copy">
                 <p className="shop-desk-hero-tag">Discover. Shop. Glow.</p>
@@ -545,23 +643,23 @@ export const ShopDesktopHome: React.FC = () => {
           </>
         );
       case 'mini-banners':
-        return <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />;
+        return liveBlock('mini-banners', 'cards', '', 'Featured promotions') ?? <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />;
       case 'offers':
-        return <OffersStripPlaceholder settings={blockSettings['offers']} />;
+        return liveBlock('offers', 'chips', '', 'Offers', 'Offers') ?? <OffersStripPlaceholder settings={blockSettings['offers']} />;
       case 'categories':
         return (
-          <section className="shop-desk-section" aria-labelledby="shop-desk-categories-title">
+          <section className="shop-desk-section" aria-labelledby="shop-desk-categories-title" style={accentStyle(secAccent('categories'))}>
             <SectionHead id="shop-desk-categories-title" eyebrow="Shop by category" title="Everything for your routine" action={<SeeAll onClick={() => navigate('shop-browse')} name="categories" />} />
             <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(categoryCount, CATEGORY_ROW_MAX) } as React.CSSProperties}>
               {adminCategories.length > 0 ? (
-                adminCategories.map((item, i) => <DeskAdminCategoryTile key={`${i}-${item.label}`} item={item} onOpen={() => openLink(item.link)} />)
+                adminCategories.map((item, i) => <DeskAdminCategoryTile key={`${i}-${item.label}`} item={item} accent={categoryAccent(item.label, itemAccent(item), i)} onOpen={() => openLink(item.link)} />)
               ) : (
                 <>
-                  {HOME_CATEGORY_TILES.map(({ id: categoryId }) => {
+                  {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
-                    return <DeskCategoryTile key={categoryId} tile={tile} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
+                    return <DeskCategoryTile key={categoryId} tile={tile} label={label} accent={categoryAccent(label, null, i)} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  <DeskCategoryTile tile={null} isAll count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+                  <DeskCategoryTile tile={null} isAll label="All Products" accent={categoryAccent('All Products', null, HOME_CATEGORY_TILES.length)} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
             </div>
@@ -571,10 +669,10 @@ export const ShopDesktopHome: React.FC = () => {
         return (
           <section className="shop-desk-promos" aria-label="Offers" style={{ '--promo-cols': balancedColumns(promoCount, PROMO_ROW_MAX) } as React.CSSProperties}>
             {adminPromos.length > 0 ? (
-              adminPromos.map((item, i) => <DeskAdminPromo key={`${i}-${item.label}`} item={item} onOpen={() => openLink(item.link)} />)
+              adminPromos.map((item, i) => <DeskAdminPromo key={`${i}-${item.label}`} item={item} accent={effectiveAccent(itemAccent(item), i)} onOpen={() => openLink(item.link)} />)
             ) : (
               <>
-                <button type="button" className="shop-desk-promo is-sand" onClick={() => navigate('shop-browse')}>
+                <button type="button" className="shop-desk-promo" onClick={() => navigate('shop-browse')} style={accentStyle(accentHex('sky'))}>
                   <span className="shop-desk-promo-icon" aria-hidden="true">
                     <Truck size={20} />
                   </span>
@@ -587,7 +685,7 @@ export const ShopDesktopHome: React.FC = () => {
                     <ArrowRight size={18} />
                   </span>
                 </button>
-                <button type="button" className="shop-desk-promo is-blush" onClick={() => navigate('cart-tab')}>
+                <button type="button" className="shop-desk-promo" onClick={() => navigate('cart-tab')} style={accentStyle(categoryAccent('Coupons', null, 1))}>
                   <span className="shop-desk-promo-icon" aria-hidden="true">
                     <Ticket size={20} />
                   </span>
@@ -611,7 +709,7 @@ export const ShopDesktopHome: React.FC = () => {
           <>
             {!failed &&
               (!loading && dealProducts.length > DEAL_GRID_MAX ? (
-                <DeskRail eyebrow="Today's offers" title="Deals" titleId="shop-desk-deals-title" onSeeAll={() => navigate('shop-browse')}>
+                <DeskRail eyebrow="Today's offers" title="Deals" titleId="shop-desk-deals-title" accent={secAccent('deals')} onSeeAll={() => navigate('shop-browse')}>
                   {dealProducts.map((product) => (
                     <div key={product.id} className="shop-desk-rail-item">
                       <DeskProductCard product={product} />
@@ -619,7 +717,7 @@ export const ShopDesktopHome: React.FC = () => {
                   ))}
                 </DeskRail>
               ) : (
-                <section className="shop-desk-section" aria-labelledby="shop-desk-deals-title">
+                <section className="shop-desk-section" aria-labelledby="shop-desk-deals-title" style={accentStyle(secAccent('deals'))}>
                   <SectionHead id="shop-desk-deals-title" eyebrow="Today's offers" title="Deals" action={<SeeAll label="View all" onClick={() => navigate('shop-browse')} name="deals" />} />
                   {loading ? (
                     <div className={dealGridClass(DEAL_GRID_MAX)} style={dealGridStyle(DEAL_GRID_MAX)} aria-busy="true" aria-hidden="true">
@@ -643,7 +741,7 @@ export const ShopDesktopHome: React.FC = () => {
           </>
         );
       case 'reorder':
-        return <DeskReorderRail catalog={catalog} />;
+        return <DeskReorderRail catalog={catalog} accent={secAccent('reorder')} />;
       case 'product-rails':
         return (
           <>
@@ -662,20 +760,20 @@ export const ShopDesktopHome: React.FC = () => {
               <Notice title="No products are listed yet">Check back soon, or browse the full catalogue.</Notice>
             ) : (
               <>
-                {loading && skinState.recommendationsOn && <DeskSkeletonRail eyebrow={railEyebrow('picks')} title="Picked for your skin" />}
-                {loading && recentIds.length > 0 && <DeskSkeletonRail eyebrow={railEyebrow('continue')} title="Continue browsing" />}
-                {(configuredRows.length > 0 ? configuredRows : rails).map((rail) => (
-                  <DeskProductRail key={rail.id} eyebrow={railEyebrow(rail.id)} title={rail.title} products={rail.products} />
+                {loading && skinState.recommendationsOn && <DeskSkeletonRail eyebrow={railEyebrow('picks')} title="Picked for your skin" accent={railAccent(0)} />}
+                {loading && recentIds.length > 0 && <DeskSkeletonRail eyebrow={railEyebrow('continue')} title="Continue browsing" accent={railAccent(1)} />}
+                {(configuredRows.length > 0 ? configuredRows : rails).map((rail, i) => (
+                  <DeskProductRail key={rail.id} eyebrow={railEyebrow(rail.id)} title={rail.title} accent={railAccent(i)} products={rail.products} />
                 ))}
-                {loading && <DeskSkeletonRail eyebrow={railEyebrow('top')} title="Top Rated" />}
-                {loading && <DeskSkeletonRail eyebrow={railEyebrow('under500')} title="Under ₹500" />}
+                {loading && <DeskSkeletonRail eyebrow={railEyebrow('top')} title="Top Rated" accent={railAccent(2)} />}
+                {loading && <DeskSkeletonRail eyebrow={railEyebrow('under500')} title="Under ₹500" accent={railAccent(3)} />}
               </>
             )}
-            <section className="shop-desk-section" aria-labelledby="shop-desk-concerns-title">
+            <section className="shop-desk-section" aria-labelledby="shop-desk-concerns-title" style={accentStyle(secAccent('concerns'))}>
               <SectionHead id="shop-desk-concerns-title" eyebrow="Shop by concern" title="What does your skin need?" action={<SeeAll onClick={() => navigate('shop-browse')} name="concerns" />} />
               <div className="shop-desk-concerns">
-                {CONCERNS.map(({ id: concernId, label, Icon }) => (
-                  <button key={concernId} type="button" className="shop-desk-concern" onClick={() => navigate('shop-browse', { concern: concernId })}>
+                {CONCERNS.map(({ id: concernId, label, Icon }, i) => (
+                  <button key={concernId} type="button" className="shop-desk-concern" onClick={() => navigate('shop-browse', { concern: concernId })} style={accentStyle(effectiveAccent(null, i))}>
                     <span className="shop-desk-concern-icon" aria-hidden="true">
                       <Icon size={16} />
                     </span>
@@ -688,11 +786,11 @@ export const ShopDesktopHome: React.FC = () => {
           </>
         );
       case 'brands':
-        return <BrandStripPlaceholder settings={blockSettings['brands']} />;
+        return liveBlock('brands', 'tiles', 'Top brands', 'Top brands', 'Shop by brand') ?? <BrandStripPlaceholder settings={blockSettings['brands']} />;
       case 'trust':
-        return <TrustBlockPlaceholder settings={blockSettings['trust']} />;
+        return liveBlock('trust', 'promises', '', 'Why shop with us', 'Our promise') ?? <TrustBlockPlaceholder settings={blockSettings['trust']} />;
       case 'help-gift':
-        return <HelpGiftPlaceholder settings={blockSettings['help-gift']} />;
+        return liveBlock('help-gift', 'cards', '', 'Help, gifts and referrals') ?? <HelpGiftPlaceholder settings={blockSettings['help-gift']} />;
       case 'footer':
         return (
           <footer className="shop-desk-footer" aria-label="Site footer">
@@ -760,7 +858,7 @@ export const ShopDesktopHome: React.FC = () => {
 
   const pinnedTail = (
     <>
-      <section className="shop-desk-scan" aria-labelledby="shop-desk-scan-title">
+      <section className="shop-desk-scan" aria-labelledby="shop-desk-scan-title" style={accentStyle(secAccent('scan'))}>
         <span className="shop-desk-scan-shapes" aria-hidden="true" />
         <div className="shop-desk-scan-copy">
           <span className="shop-desk-scan-tag">
