@@ -176,6 +176,15 @@ export const BLOCK_MODULES: Readonly<Record<string, readonly HomeModuleId[]>> = 
   'help-gift': ['help-gift'],
   trust: ['trust'],
   footer: ['scan', 'footer'],
+  // Blocks added by the admin designer: each draws itself where the admin put it.
+  'festival-strip': ['festival-strip'],
+  'bank-offers': ['bank-offers'],
+  cashback: ['cashback'],
+  partners: ['partners'],
+  stories: ['stories'],
+  sponsored: ['sponsored'],
+  'recently-viewed': ['recently-viewed'],
+  recommended: ['recommended'],
 };
 
 
@@ -184,10 +193,51 @@ export const BLOCK_MODULES: Readonly<Record<string, readonly HomeModuleId[]>> = 
 export function homeSequence(layoutOrder: readonly string[]): HomeModuleId[] {
   const out: HomeModuleId[] = [];
   for (const id of layoutOrder) for (const m of BLOCK_MODULES[id] ?? []) if (!out.includes(m)) out.push(m);
+  // The designer's own "Recently viewed" block replaces the built-in rail, so the customer never sees two.
+  if (out.includes('recently-viewed')) {
+    const r = out.indexOf('recent');
+    if (r >= 0) out.splice(r, 1);
+  }
   if (!out.includes('scan')) {
     const f = out.indexOf('footer');
     if (f >= 0) out.splice(f, 0, 'scan');
     else out.push('scan');
   }
   return out;
+}
+
+// ---- Recently viewed / Recommended blocks (admin designer): the number of products to show, from the block's maxItems.
+
+export const DEFAULT_MAX_ITEMS = 8;
+export const clampMaxItems = (n: unknown): number => (typeof n === 'number' && Number.isInteger(n) && n >= 1 && n <= 24 ? n : DEFAULT_MAX_ITEMS);
+
+// Catalogue products to recommend, ranked from what the customer viewed lately (most recent counts most: same category and
+// same brand score) and from the concern picks (skin quiz). Products already viewed are left out. With no history and no
+// concern picks the list is empty (the block then hides). recentIds is newest first.
+export function recommendedProducts(
+  catalog: SkincareProduct[],
+  recentIds: readonly string[],
+  concernPicks: readonly SkincareProduct[],
+  max: number,
+): SkincareProduct[] {
+  const pool = fullSize(catalog);
+  const byId = new Map(pool.map((p) => [p.id, p] as const));
+  const viewed = recentIds.map((id) => byId.get(id)).filter((p): p is SkincareProduct => Boolean(p));
+  if (viewed.length === 0 && concernPicks.length === 0) return [];
+  const seen = new Set(recentIds);
+  const catScore = new Map<string, number>();
+  const brandScore = new Map<string, number>();
+  viewed.forEach((p, i) => {
+    const w = Math.max(1, 10 - i);
+    catScore.set(p.category, (catScore.get(p.category) ?? 0) + w);
+    brandScore.set(p.brand, (brandScore.get(p.brand) ?? 0) + w / 2);
+  });
+  const picked = new Set(concernPicks.map((p) => p.id));
+  return pool
+    .filter((p) => !seen.has(p.id))
+    .map((p) => ({ p, score: (catScore.get(p.category) ?? 0) + (brandScore.get(p.brand) ?? 0) + (picked.has(p.id) ? 12 : 0) }))
+    .filter((e) => e.score > 0)
+    .sort((a, b) => b.score - a.score || (b.p.rating ?? 0) - (a.p.rating ?? 0))
+    .slice(0, clampMaxItems(max))
+    .map((e) => e.p);
 }

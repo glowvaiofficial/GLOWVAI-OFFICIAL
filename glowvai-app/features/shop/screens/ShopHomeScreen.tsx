@@ -8,12 +8,14 @@ import { useInbox } from '../../../core/notifications/inboxStore';
 import { siteConfig } from '../../../../config/site';
 import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
-import { useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId } from '../lib/useHomeLayout';
+import { ITEM_BLOCK_IDS, useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
+import { NewItemBlock } from '../shared/NewBlocks';
 import { useHomeData } from '../lib/useHomeData';
+import { skinMatchedPicks } from '../lib/firstVisit';
 import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, configuredSocials, homeSequence, mergeFooterSocials, type HomeModuleId } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
 import { getProductThumbUrl } from '../shared/shopUtils';
 import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
@@ -74,7 +76,7 @@ type ShopHomeScreenProps = { embedded?: boolean };
 // Content, pictures, on/off and accents come from the admin layout; empty admin slots show nothing (placeholders only in
 // a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails } = useHomeLayout('mobile');
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails, header: headerSettings } = useHomeLayout('mobile');
   const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
@@ -107,6 +109,18 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
 
   // A concern tab narrows the picks shown under the greeting.
   const concernProducts = useMemo(() => (tab.concern ? catalog.filter((p) => matchesConcern(p, tab.concern)) : []), [catalog, tab.concern]);
+
+  // Recently viewed and Recommended (designer blocks): both hide when empty and honour the block's maxItems (default 8).
+  const recentMax = clampMaxItems(blockSettings['recently-viewed']?.maxItems);
+  const recommendedMax = clampMaxItems(blockSettings['recommended']?.maxItems);
+  const recentList = useMemo(() => {
+    const byId = new Map(catalog.map((p) => [p.id, p] as const));
+    return recentIds.map((id) => byId.get(id)).filter((p): p is SkincareProduct => Boolean(p)).slice(0, recentMax);
+  }, [catalog, recentIds, recentMax]);
+  const recommendedList = useMemo(
+    () => recommendedProducts(catalog, recentIds, skinState.recommendationsOn ? skinMatchedPicks(catalog, skinState.concerns, 12) : [], recommendedMax),
+    [catalog, recentIds, skinState, recommendedMax]
+  );
 
   const accentOf = (id: HomeBlockId) => sectionAccent(id, (blockSettings[id] as (BlockSettings & Accented) | undefined)?.accent);
   const settingsOf = (id: HomeBlockId) => blockSettings[id] as (BlockSettings & Accented) | undefined;
@@ -247,6 +261,10 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
         return <ConcernGrid concerns={CONCERNS} onOpen={(concern) => navigate('shop-browse', { concern })} onAll={() => navigate('shop-browse')} />;
       case 'recent':
         return loading && recentIds.length > 0 ? <SkeletonRow title="Recently viewed" /> : <ProductRow title="Recently viewed" products={recentProducts} accent={itemAccent(null, 3)} />;
+      case 'recently-viewed':
+        return <ProductRow title={blockSettings['recently-viewed']?.title || 'Recently viewed'} products={recentList} accent={accentOf('recently-viewed')} />;
+      case 'recommended':
+        return <ProductRow title={blockSettings['recommended']?.title || 'Recommended for you'} products={recommendedList} accent={accentOf('recommended')} />;
       case 'scan':
         return scanCard;
       case 'brands':
@@ -327,6 +345,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
           </>
         );
       default:
+        if ((ITEM_BLOCK_IDS as readonly string[]).includes(id)) return <NewItemBlock id={id as ItemBlockId} settings={blockSettings[id as ItemBlockId]} wide={false} onOpenLink={openLink} />;
         return null;
     }
   };
@@ -371,7 +390,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
 
   return (
     <div className="shop-screen shop-home gvh">
-      <MobileHomeHeader tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
+      <MobileHomeHeader header={headerSettings} tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
 
       <SkinQuizBanner />
 
