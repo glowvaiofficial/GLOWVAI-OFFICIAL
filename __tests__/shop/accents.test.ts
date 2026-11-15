@@ -127,10 +127,10 @@ test("Mobile and Desktop layouts carry accents the same way", () => {
     assert.equal(d?.accent, "#1E293B");
     assert.equal(d?.items[0].accent, "#F43F5E");
   }
-  // A desktop request with no desktop layout gets the mobile accents.
+  // A desktop request with no desktop layout gets NO mobile accents (PC and phone are designed separately).
   const fallback = chooseLayoutSource({ published: mobile }, "desktop", false);
   assert.equal(fallback.fallback, true);
-  assert.equal(readSectionAccents(fallback.source).trust, "#4F46E5");
+  assert.equal(readSectionAccents(fallback.source).trust, undefined);
 });
 
 test("the layout route serves the section accents, also on its error fallback", () => {
