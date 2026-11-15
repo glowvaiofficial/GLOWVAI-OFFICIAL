@@ -65,8 +65,9 @@ export const orderTone = (order: ShopOrder): OrderTone => {
 
 export const isActiveOrder = (order: ShopOrder) => orderTone(order) === 'active';
 
-// An order can be cancelled from the shop until it is packed; the server checks this again.
-export const canCancel = (order: ShopOrder) => ['PLACED', 'VENDOR_ACCEPTED'].includes(String(order.status).toUpperCase());
+// An order can be cancelled from the shop until it is packed, and an online order while its payment is still pending
+// (its stock and coins come back at once); the server checks this again.
+export const canCancel = (order: ShopOrder) => ['PLACED', 'VENDOR_ACCEPTED', 'PAYMENT_PENDING'].includes(String(order.status).toUpperCase());
 
 export const formatRupee = (amount: number) => `₹${Math.round(Number(amount) || 0).toLocaleString('en-IN')}`;
 
