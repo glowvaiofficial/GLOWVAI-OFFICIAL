@@ -35,8 +35,9 @@ export const PremiumHeader: React.FC<HeaderProps> = ({ title, brand, subtitle, o
       </button>
     )}
     <div className="gvp-head-copy">
-      {brand ? <Wordmark /> : <h1>{title}</h1>}
-      {brand && title && <h1 className="gvp-sr">{title}</h1>}
+      {brand ? <Wordmark className="gvp-head-brand" /> : <h1>{title}</h1>}
+      {/* Phones show the wordmark (as the reference); wider screens already have it in the site header, so the title shows. */}
+      {brand && title && <h1 className="gvp-head-wide-title">{title}</h1>}
       {subtitle && <p>{subtitle}</p>}
     </div>
     {right}

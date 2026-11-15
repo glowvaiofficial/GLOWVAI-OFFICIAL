@@ -42,6 +42,11 @@
 .glowvai-root .gvp .gvp-head-copy h1 { color: var(--gvp-ink); font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
 .glowvai-root .gvp .gvp-head-copy p { margin-top: 2px; color: var(--gvp-muted); font-size: 12.5px; }
 .glowvai-root .gvp .gvp-wordmark { display: inline-block; color: var(--gvp-blue); font-family: var(--gvp-font); font-size: 28px; font-weight: 700; line-height: 1.05; letter-spacing: -.04em; }
+.glowvai-root .gvp .gvp-head-wide-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (min-width: 720px) {
+  .glowvai-root .gvp .gvp-head-brand { display: none; }
+  .glowvai-root .gvp .gvp-head-copy .gvp-head-wide-title { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+}
 .glowvai-root .gvp .gvp-round { display: inline-grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; border: 1px solid var(--gvp-line); border-radius: 50%; background: #fff; color: var(--gvp-ink); }
 .glowvai-root .gvp .gvp-round:hover { background: var(--gvp-sky); }
 .glowvai-root .gvp .gvp-head-total { display: grid; justify-items: end; line-height: 1.15; }
@@ -178,7 +183,8 @@
 
 /* Delivery Details: slots, delivery partner, coins, payment row, items */
 .glowvai-root .gvp .gvp-slots .commerce-slots h3 { color: var(--gvp-ink); font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
-.glowvai-root .gvp .gvp-slots .commerce-slot { min-height: 60px; border-color: var(--gvp-line); border-radius: 14px; font-family: var(--gvp-font); transition: border-color .15s ease, background .15s ease; }
+.glowvai-root .gvp .gvp-slots .commerce-slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.glowvai-root .gvp .gvp-slots .commerce-slot { display: grid; gap: 2px; min-height: 60px; padding: 10px 12px; border: 1px solid var(--gvp-line); background: #fff; color: var(--gvp-ink); text-align: left; border-radius: 14px; font-family: var(--gvp-font); transition: border-color .15s ease, background .15s ease; }
 .glowvai-root .gvp .gvp-slots .commerce-slot:hover { border-color: #b9cdf7; }
 .glowvai-root .gvp .gvp-slots .commerce-slot.is-on { border-color: var(--gvp-blue); background: var(--gvp-blue-tint); box-shadow: inset 0 0 0 1px var(--gvp-blue); }
 .glowvai-root .gvp .gvp-slots .commerce-slot-title { font-weight: 600; }

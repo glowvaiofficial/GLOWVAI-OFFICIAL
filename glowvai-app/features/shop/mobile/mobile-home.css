@@ -68,13 +68,13 @@
 /* ---------- Greeting card ---------- */
 .glowvai-root .gvh .gvh-greet { display: flex; align-items: center; gap: 12px; margin: 8px var(--gv-gutter) 0; padding: 12px 12px 12px 14px; border: 1px solid var(--gvh-line); border-radius: 18px; background: rgba(255, 255, 255, .94); box-shadow: var(--gvh-shadow); }
 .glowvai-root .gvh .gvh-greet-icon { display: inline-grid; flex: 0 0 auto; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: linear-gradient(160deg, #e8f0ff, #d6e4ff); color: var(--gvh-blue); }
-.glowvai-root .gvh .gvh-greet-copy { display: grid; flex: 1 1 auto; min-width: 0; gap: 1px; }
+.glowvai-root .gvh .gvh-greet-copy { display: grid; flex: 1 1 84px; min-width: 70px; gap: 1px; }
 .glowvai-root .gvh .gvh-greet-copy b { overflow: hidden; color: var(--gvh-ink); font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .gvh .gvh-greet-copy small { color: var(--gvh-muted); font-size: 11.5px; }
+.glowvai-root .gvh .gvh-greet-copy small { overflow: hidden; color: var(--gvh-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .gvh .gvh-greet-eta { display: flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 8px; padding-left: 12px; border-left: 1px solid var(--gvh-line); color: var(--gvh-ink); }
 .glowvai-root .gvh .gvh-greet-eta svg { flex: 0 0 auto; }
 .glowvai-root .gvh .gvh-greet-eta span { display: grid; min-width: 0; }
-.glowvai-root .gvh .gvh-greet-eta b { font-size: 12px; font-weight: 500; }
+.glowvai-root .gvh .gvh-greet-eta b { font-size: 12px; font-weight: 500; white-space: nowrap; }
 .glowvai-root .gvh .gvh-greet-eta small { overflow: hidden; color: var(--gvh-muted); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .gvh .gvh-track { display: inline-flex; flex: 0 0 auto; min-height: 40px; align-items: center; gap: 4px; padding: 0 14px; border-radius: 999px; background: var(--gvh-blue); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 6px 14px rgba(0, 87, 251, .25); }
 .glowvai-root .gvh .gvh-track:hover { background: var(--gvh-blue-dark); }
@@ -98,7 +98,7 @@
 .glowvai-root .gvh .gvh-slide-btn { display: inline-flex; min-height: 42px; align-items: center; gap: 6px; margin-top: 6px; padding: 0 18px; border-radius: 999px; background: #0b1b4d; color: #fff; font-size: 13.5px; font-weight: 600; }
 .glowvai-root .gvh .gvh-slide.is-banner .gvh-slide-btn { background: #fff; color: #0b0f1a; }
 .glowvai-root .gvh .gvh-dots { position: absolute; bottom: 12px; left: 18px; z-index: 2; display: flex; gap: 6px; }
-.glowvai-root .gvh .gvh-dots button { width: 8px; height: 8px; padding: 0; border-radius: 999px; background: rgba(11, 27, 77, .22); transition: width .3s ease, background .3s ease; }
+.glowvai-root .gvh .gvh-dots button { width: 8px; min-width: 0; height: 8px; min-height: 0; padding: 0; border-radius: 999px; background: rgba(11, 27, 77, .22); transition: width .3s ease, background .3s ease; }
 .glowvai-root .gvh .gvh-dots button.is-on { width: 22px; background: var(--gvh-blue); }
 .glowvai-root .gvh .gvh-dots button::after { content: ''; position: absolute; inset: -14px -6px; }
 .glowvai-root .gvh .gvh-dots button { position: relative; }
@@ -253,6 +253,13 @@
   .glowvai-root .gvh .gvh-plus { padding: 20px; }
 }
 
+@media (max-width: 440px) {
+  .glowvai-root .gvh .gvh-greet { gap: 8px; padding: 10px 10px 10px 12px; }
+  .glowvai-root .gvh .gvh-greet-icon { width: 36px; height: 36px; }
+  .glowvai-root .gvh .gvh-greet-eta { gap: 6px; padding-left: 8px; }
+  .glowvai-root .gvh .gvh-greet-eta > svg { display: none; }
+  .glowvai-root .gvh .gvh-track { padding: 0 12px; font-size: 12.5px; }
+}
 @media (max-width: 360px) {
   .glowvai-root .gvh .gvh-greet-eta { display: none; }
   .glowvai-root .gvh .gvh-slide-copy { max-width: 74%; }
