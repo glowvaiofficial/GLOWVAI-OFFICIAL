@@ -31,3 +31,13 @@ export function homeLayoutUrl(device: HomeDevice, previewToken: string | null): 
   if (device === 'desktop') parts.push('device=desktop');
   return parts.length > 0 ? `/api/shop/layout?${parts.join('&')}` : '/api/shop/layout';
 }
+
+// How many columns a row of n tiles uses on the desktop home so the rows come out even: at most `max` a row, and when
+// more rows are needed the tiles are spread over them (10 tiles at most 8 a row: two rows of 5, not 8 and 2). A row
+// never leaves empty columns at its end, so 6 category tiles fill the width instead of leaving a gap on the right.
+export function balancedColumns(n: number, max: number): number {
+  const count = Math.max(1, Math.floor(n));
+  const limit = Math.max(1, Math.floor(max));
+  const rows = Math.ceil(count / limit);
+  return Math.ceil(count / rows);
+}
