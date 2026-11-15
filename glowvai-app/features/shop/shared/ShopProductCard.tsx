@@ -3,7 +3,7 @@ import { Clock, Minus, Plus } from 'lucide-react';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { fromPrice } from '../../../../lib/shop/variants';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from './shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, PRODUCT_FALLBACK_URL } from './shopUtils';
 
 interface ShopProductCardProps {
   product: SkincareProduct;
@@ -41,7 +41,7 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
       <div className="shop-product-media">
         <button className="shop-product-open" onClick={() => onOpen(product)} aria-label={`View ${product.name}`}>
           {imageFailed ? (
-            <span className="shop-product-fallback">{product.brand}</span>
+            <img src={PRODUCT_FALLBACK_URL} alt={product.name} width={400} height={400} />
           ) : (
             <img
               src={getProductThumbUrl(product)}

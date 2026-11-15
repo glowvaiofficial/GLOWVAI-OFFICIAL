@@ -311,3 +311,7 @@
   .glowvai-root .gvh .gvh-cat:hover .gvh-cat-media img,
   .glowvai-root .gvh .gvh-price:hover .gvh-price-media img { mix-blend-mode: normal; }
 }
+
+/* Category tile with no picture: brand-blue tile with the GlowVai mark. */
+.glowvai-root .gvh .gvh-cat.is-brand .gvh-cat-media { background: #0057fb; border-color: #0057fb; }
+.glowvai-root .gvh .gvh-cat-media img.gvh-cat-mark { width: 30%; height: auto; mix-blend-mode: normal; object-fit: contain; }

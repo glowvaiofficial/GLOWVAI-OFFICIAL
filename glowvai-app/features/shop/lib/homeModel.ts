@@ -4,7 +4,7 @@
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ScreenName } from '../../../context/contextDefinition';
 import type { HomeBlockId } from './useHomeLayout';
-import { isTrialProduct } from '../shared/shopUtils';
+import { isTrialProduct, hasProductPhoto } from '../shared/shopUtils';
 
 export type HomeCategoryId = SkincareProduct['category'];
 
@@ -29,7 +29,8 @@ export function categoryTiles(catalog: SkincareProduct[]): HomeCategoryTile[] {
   return HOME_CATEGORY_TILES.map(({ id, label }) => {
     const inCategory = catalog.filter((p) => p.category === id);
     const fullSize = inCategory.find((p) => !isTrialProduct(p));
-    return { id, label, count: inCategory.length, sample: fullSize ?? inCategory[0] ?? null };
+    const withPhoto = inCategory.find((p) => !isTrialProduct(p) && hasProductPhoto(p)) ?? inCategory.find(hasProductPhoto);
+    return { id, label, count: inCategory.length, sample: withPhoto ?? fullSize ?? inCategory[0] ?? null };
   });
 }
 

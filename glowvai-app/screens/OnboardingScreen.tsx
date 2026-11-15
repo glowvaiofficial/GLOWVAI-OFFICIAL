@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { browserStore, dismissQuiz } from '../features/shop/lib/firstVisit';
@@ -48,6 +48,12 @@ export const OnboardingScreen: React.FC = () => {
     // The last intro step leads to sign-in. A signed-in account opens the optional skin quiz instead.
     navigate(accountSignedIn ? 'auth-skin-survey' : 'auth-login');
   };
+
+  // The analytics banner would cover the Next button, so it waits (stays hidden) until onboarding is left.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-gv-onboarding', '1');
+    return () => document.documentElement.removeAttribute('data-gv-onboarding');
+  }, []);
 
   const skip = () => {
     dismissQuiz(browserStore());
