@@ -22,7 +22,7 @@ const STEPS = [
 ];
 
 export const ScanIntroScreen: React.FC = () => {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack, accountSignedIn } = useApp();
 
   return (
     <div className="scan-screen">
@@ -65,6 +65,7 @@ export const ScanIntroScreen: React.FC = () => {
             <p className="scan-privacy">
               <ScanFace size={14} /> Your photo is used only for this skin assessment.
             </p>
+            {!accountSignedIn && <p className="scan-privacy">You will sign in with your phone number when you start the scan.</p>}
           </div>
         </div>
       </div>

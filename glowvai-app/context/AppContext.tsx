@@ -11,6 +11,7 @@ import {
   UserProfile,
 } from '../types';
 import { NO_ADDRESS } from '../data/serviceability';
+import { guestAreaAddress, readGuestArea } from '../features/commerce/lib/guestArea';
 import { useAddressStore, toNovAddress } from '../features/commerce/lib/addressStore';
 import { PRODUCTS } from '../data/products';
 import { auth } from '../core/config/firebase';
@@ -112,7 +113,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentAddress, setCurrentAddress] = useState<Address>(() => {
     const { addresses, selectedId } = useAddressStore.getState();
     const saved = addresses.find((a) => a.id === selectedId);
-    return saved ? toNovAddress(saved) : NO_ADDRESS;
+    if (saved) return toNovAddress(saved);
+    // A visitor's chosen area (device only) when no saved address exists.
+    const guest = readGuestArea();
+    return guest ? guestAreaAddress(guest) : NO_ADDRESS;
   });
 
   // Preference
@@ -339,14 +343,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     navigate(SIGN_IN_SCREEN as ScreenName, { returnTo: cur.screen, returnParams: cur.params });
   };
 
-  // Adding to the bag needs a phone account. Signed out, the add waits for sign-in.
-  const addToCart = (product: Product, variantId?: string, withInsurance = false) => {
-    if (accountNow() !== 'phone') {
-      requireSignIn(() => addToCartNow(product, variantId, withInsurance));
-      return;
-    }
-    addToCartNow(product, variantId, withInsurance);
-  };
+  // Guests may fill the bag: it is kept on the device. Sign-in is asked at Checkout (see accountGate requiresSignIn).
+  const addToCart = (product: Product, variantId?: string, withInsurance = false) => addToCartNow(product, variantId, withInsurance);
 
   const addToCartNow = (product: Product, variantId?: string, withInsurance = false) => {
     const chosenVariantId = variantId || product.currentVariantId || product.variants[0].id;
@@ -396,14 +394,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   // Wishlist
-  // Saving to the wishlist needs a phone account. Signed out, the save waits for sign-in.
-  const toggleWishlist = (productId: string) => {
-    if (accountNow() !== 'phone') {
-      requireSignIn(() => toggleWishlistNow(productId));
-      return;
-    }
-    toggleWishlistNow(productId);
-  };
+  // Guests keep a wishlist on the device; it joins the account list at sign-in (syncWishlistWithAccount).
+  const toggleWishlist = (productId: string) => toggleWishlistNow(productId);
 
   const toggleWishlistNow = (productId: string) => {
     const exists = wishlist.includes(productId);
@@ -413,8 +405,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     setWishlist(exists ? wishlist.filter((id) => id !== productId) : [...wishlist, productId]);
     // The device list changes at once; the account copy follows (see wishlistSync).
-    if (exists) pushWishlistRemove(productId);
-    else pushWishlistAdd(productId);
+    if (accountNow() === 'phone') {
+      if (exists) pushWishlistRemove(productId);
+      else pushWishlistAdd(productId);
+    }
     showToast(exists ? 'Removed from saved wishlist' : 'Saved to wishlist');
   };
 

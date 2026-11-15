@@ -31,10 +31,62 @@ const PREVIEW_SCREENS = new Set<string>([
   'categories',
   'product-detail',
   'orders-shared-tracking',
+  // Guests may open the cart (items kept on the device), set a delivery area and read the skin-scan intro. Sign-in is
+  // asked only for Checkout, saving a named address and starting the scan (see requiresSignIn).
+  'cart',
+  'cart-tab',
+  'location-setup',
+  'location-map-picker',
+  'location-serviceability',
+  'scan-tab',
+  'scan-intro',
   'auth-welcome',
   'auth-onboarding',
   ...SIGN_IN_SCREENS,
 ]);
+
+// Actions a guest may take freely and the ones that ask for sign-in. One table, so the buttons and the tests agree.
+// Anything not listed asks for sign-in (default deny).
+export type GuestAction =
+  | 'browse'
+  | 'open-cart'
+  | 'add-to-cart'
+  | 'apply-coupon-preview'
+  | 'set-delivery-area'
+  | 'check-pincode'
+  | 'save-named-address'
+  | 'open-scan-intro'
+  | 'start-scan'
+  | 'upload-scan-photo'
+  | 'wishlist-toggle'
+  | 'checkout'
+  | 'place-order'
+  | 'payment'
+  | 'open-orders'
+  | 'open-account';
+
+const GUEST_ACTIONS: Record<GuestAction, boolean> = {
+  browse: false,
+  'open-cart': false,
+  'add-to-cart': false,
+  'apply-coupon-preview': false,
+  'set-delivery-area': false,
+  'check-pincode': false,
+  'save-named-address': true,
+  'open-scan-intro': false,
+  'start-scan': true,
+  'upload-scan-photo': true,
+  'wishlist-toggle': false,
+  checkout: true,
+  'place-order': true,
+  payment: true,
+  'open-orders': true,
+  'open-account': true,
+};
+
+export function requiresSignIn(action: string): boolean {
+  return Object.prototype.hasOwnProperty.call(GUEST_ACTIONS, action) ? GUEST_ACTIONS[action as GuestAction] : true;
+}
 
 export interface UserLike {
   isAnonymous: boolean;
