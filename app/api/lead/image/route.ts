@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { RETIRED_FORM_ROUTES, retiredRoute } from "@/lib/http/retired";
 import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 import { SessionConfigError, verifySessionToken } from "@/lib/session";
 import { storage } from "@/lib/storage";
@@ -6,6 +7,7 @@ import { storage } from "@/lib/storage";
 export const maxDuration = 30; // 30s timeout for image uploads
 
 export async function POST(req: NextRequest) {
+  if (RETIRED_FORM_ROUTES) return retiredRoute();
   const limited = rateLimit(`lead-image:${clientIp(req)}`, 5, 60_000);
   if (!limited.ok) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limited.retryAfter) } });

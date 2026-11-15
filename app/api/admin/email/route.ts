@@ -24,7 +24,9 @@ async function isSignedIn(): Promise<boolean> {
 }
 
 // Reports whether the email proxy is set up on the server. Only a signed-in admin can ask.
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const limit = rateLimit(`admin-email-status:${clientIp(req)}`, 60, 60_000);
+  if (!limit.ok) return json({ ok: false, error: "Too many requests. Try again later." }, 429);
   if (!(await isSignedIn())) return json({ ok: false, error: "Sign in to the admin first." }, 401);
   const configured = Boolean(process.env.EMAIL_PROXY_URL) && Boolean(process.env.EMAIL_PROXY_SECRET);
   return json({ ok: true, configured });

@@ -47,6 +47,17 @@ export function verifyUnsubscribeToken(token: string): {
   }
 }
 
+/**
+ * The verified, lower-cased email for an unsubscribe token, or null when the token is missing, too long, malformed or
+ * forged. The unsubscribe API accepts only this address, never one sent alongside the token.
+ */
+export function emailFromUnsubscribeToken(token: string): string | null {
+  if (!token || token.length > 1024) return null;
+  const verified = verifyUnsubscribeToken(token);
+  if (!verified.valid || !verified.email || !verified.email.includes("@")) return null;
+  return verified.email.trim().toLowerCase();
+}
+
 export function createConfirmToken(email: string, expiresInMs: number = 48 * 3600 * 1000): string {
   const cleanEmail = email.trim().toLowerCase();
   const expiresAt = Date.now() + expiresInMs;

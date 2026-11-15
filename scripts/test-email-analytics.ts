@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { emailCopy } from "@/config/email-copy";
 import { renderEmail } from "@/lib/email/render";
-import { createUnsubscribeToken, verifyUnsubscribeToken, createConfirmToken, verifyConfirmToken } from "@/lib/email/tokens";
+import { createUnsubscribeToken, verifyUnsubscribeToken, createConfirmToken, verifyConfirmToken, emailFromUnsubscribeToken } from "@/lib/email/tokens";
 import { sanitizeParams } from "@/lib/analytics";
 import { BANNED_ANALYTICS_KEYS } from "@/config/analytics-events";
 
@@ -100,6 +100,11 @@ function runTests() {
     }
   }
 
+  // Marketing emails carry the recipient's signed unsubscribe link in the footer (the page needs the token).
+  const signedLink = "https://glowvai.in/unsubscribe?token=signed_sample_token";
+  const withLink = renderEmail("newsletter_welcome", mockData, "marketing", signedLink);
+  assert(withLink.html.includes(signedLink), "Marketing footer uses the signed unsubscribe link");
+
   // TEST 3: Token Signing & Verification
   console.log("\n3. Testing Signed Unsubscribe and Confirmation Tokens...");
   const sampleEmail = "subscriber@example.com";
@@ -112,6 +117,10 @@ function runTests() {
   const tamperedToken = unsubToken.substring(0, unsubToken.length - 4) + "XXXX";
   const verifiedTampered = verifyUnsubscribeToken(tamperedToken);
   assert(verifiedTampered.valid === false, "Tampered token is rejected");
+
+  assert(emailFromUnsubscribeToken(unsubToken) === sampleEmail, "Unsubscribe token gives back its own email");
+  assert(emailFromUnsubscribeToken(tamperedToken) === null, "Tampered unsubscribe token gives no email");
+  assert(emailFromUnsubscribeToken("") === null, "Missing unsubscribe token gives no email");
 
   const confirmToken = createConfirmToken(sampleEmail, 48 * 3600 * 1000);
   const verifiedConfirm = verifyConfirmToken(confirmToken);

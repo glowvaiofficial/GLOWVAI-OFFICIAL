@@ -16,7 +16,7 @@ import { PRODUCTS } from '../data/products';
 import { auth } from '../core/config/firebase';
 import { ensureCustomerSession } from '../core/services/customerSession';
 import { refreshSavedAddresses } from '../features/commerce/lib/savedAddresses';
-import { pushWishlistAdd, pushWishlistRemove, syncWishlistWithAccount } from '../features/shop/lib/wishlistSync';
+import { pushWishlistAdd, pushWishlistRemove, syncWishlistWithAccount, WISHLIST_KEY } from '../features/shop/lib/wishlistSync';
 import type { ShopProfileAddress } from '../core/services/shopApi';
 import { useCustomerStore, type ActionResult } from '../core/state/customerStore';
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
@@ -26,6 +26,7 @@ import { currentScrollY, queueScrollRestore, rememberScroll } from './scrollMemo
 import { accountStateOf, gateNavigation, startScreenFor, SIGN_IN_SCREEN, type AccountState } from '../features/auth/accountGate';
 import { ensureAccountRecord } from '../features/auth/accountService';
 import { holdAction } from '../features/auth/resumeAction';
+import { applyPendingReferral } from '../features/profile/pendingReferral';
 export { AppContext, type AppContextType, type ScreenName } from './contextDefinition';
 
 const QA_SCREENS: ScreenName[] = ['skin-report', 'home', 'cart', 'checkout', 'customer-details', 'payment-status', 'order-confirmation', 'order-cancelled', 'order-tracking', 'profile', 'order-history'];
@@ -134,7 +135,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Saved products stay on this device (kept in browser storage, read safely: a blocked storage is simply empty).
   const [wishlist, setWishlist] = useState<string[]>(() => {
     try {
-      const saved = JSON.parse(window.localStorage.getItem('glowvai_wishlist_v1') ?? '[]');
+      const saved = JSON.parse(window.localStorage.getItem(WISHLIST_KEY) ?? '[]');
       return Array.isArray(saved) ? saved.filter((id) => typeof id === 'string').slice(0, 200) : [];
     } catch {
       return [];
@@ -142,12 +143,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   useEffect(() => {
     try {
-      window.localStorage.setItem('glowvai_wishlist_v1', JSON.stringify(wishlist.slice(0, 200)));
+      window.localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist.slice(0, 200)));
     } catch {
       // Storage blocked: the list works for this visit only.
     }
   }, [wishlist]);
-  // Once per signed-in session: the device list is merged into the account wishlist, and the saved addresses are read.
+  // Once per signed-in session: the device list and the account wishlist are brought together (the account wins for its
+  // own list, so removals stick; a guest list is merged in), and the saved addresses are read.
   const wishlistRef = useRef(wishlist);
   wishlistRef.current = wishlist;
   useEffect(() => {
@@ -163,9 +165,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       useCustomerStore.getState().reset();
       void useCustomerStore.getState().loadProfile();
       // A phone account gets its record on the server once per device (the route is idempotent).
-      if (next === 'phone') void ensureAccountRecord(signedIn.uid);
+      if (next === 'phone') {
+        void ensureAccountRecord(signedIn.uid);
+        // A friend's code from a share link (glowvai.in/shop?ref=CODE) is applied once the phone account is signed in.
+        void applyPendingReferral().then((outcome) => {
+          if (outcome === 'applied') showToast("Your friend's referral code is applied.");
+        });
+      }
       void refreshSavedAddresses();
-      void syncWishlistWithAccount(wishlistRef.current).then((merged) => {
+      void syncWishlistWithAccount(wishlistRef.current, { uid: signedIn.uid, anonymous: signedIn.isAnonymous }).then((merged) => {
         if (merged) setWishlist(merged.slice(0, 200));
       });
     });

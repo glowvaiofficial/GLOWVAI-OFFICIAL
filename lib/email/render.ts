@@ -24,7 +24,9 @@ export interface RenderedEmail {
 export function renderEmail(
   template: EmailTemplateName,
   data: Record<string, any>,
-  stream: "transactional" | "marketing" = "transactional"
+  stream: "transactional" | "marketing" = "transactional",
+  /** Signed unsubscribe link for this recipient (marketing emails). The page needs the token to unsubscribe. */
+  unsubscribeUrl?: string
 ): RenderedEmail {
   switch (template) {
     case "contact_ack": {
@@ -54,7 +56,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -87,7 +89,7 @@ export function renderEmail(
 
       return {
         subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -141,7 +143,7 @@ export function renderEmail(
 
       return {
         subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -173,7 +175,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -209,7 +211,7 @@ export function renderEmail(
 
       return {
         subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -224,7 +226,7 @@ export function renderEmail(
       const text = `${copy.title}\n\n${copy.body}\n\n${copy.leaveText}`;
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -243,7 +245,7 @@ export function renderEmail(
       const text = `${copy.title}\n\n${copy.body}\nReference: ${ref}`;
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -269,7 +271,7 @@ export function renderEmail(
 
       return {
         subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -292,7 +294,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -323,7 +325,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream, unsubscribeUrl }),
         text,
       };
     }
@@ -346,7 +348,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream: "marketing", unsubscribeUrl: `${SITE_URL}/unsubscribe` }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream: "marketing", unsubscribeUrl }),
         text,
       };
     }
@@ -361,7 +363,7 @@ export function renderEmail(
 
       return {
         subject: copy.subject,
-        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream: "marketing", unsubscribeUrl: `${SITE_URL}/unsubscribe` }),
+        html: renderEmailLayout({ preheader: copy.preheader, title: copy.title, children: htmlContent, stream: "marketing", unsubscribeUrl }),
         text,
       };
     }
@@ -370,7 +372,7 @@ export function renderEmail(
       const defaultTitle = "GLOW VAI Update";
       return {
         subject: "GLOW VAI Notice",
-        html: renderEmailLayout({ preheader: "Notice from GLOW VAI", title: defaultTitle, children: "<p>Thank you for contacting GLOW VAI.</p>", stream }),
+        html: renderEmailLayout({ preheader: "Notice from GLOW VAI", title: defaultTitle, children: "<p>Thank you for contacting GLOW VAI.</p>", stream, unsubscribeUrl }),
         text: "Thank you for contacting GLOW VAI.",
       };
     }

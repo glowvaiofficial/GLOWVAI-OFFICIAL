@@ -4,7 +4,7 @@ import { customerFrom, db, json, limitByIp, limitByUser, text } from "@/lib/shop
 import { planRelease } from "@/lib/shop/platformStock";
 import { readProductStock, writeStockChanges } from "@/lib/shop/platformStockTx";
 import { firestoreRepo, wrapTx } from "@/lib/shop/growth/firestoreRepo";
-import { planLedgerEntry, writeLedgerPlan } from "@/lib/shop/growth/ledger";
+import { releaseCoinsTx } from "@/lib/shop/pendingPayment";
 import { VARIANT_ID_PATTERN, planVariantRelease, reservedProductIds } from "@/lib/shop/variants";
 import { writeVariantStockChanges } from "@/lib/shop/variantStockTx";
 import { notifyCustomer } from "@/lib/shop/notify";
@@ -13,8 +13,10 @@ export const dynamic = "force-dynamic";
 
 // A customer can cancel their own order until it is packed: while it waits for a store (PLACED) or after a store
 // accepted it (VENDOR_ACCEPTED), and only when the admin has not started on it. Stock a store reserved on accept is
-// given back to that store in the same transaction.
-const CANCELLABLE = new Set(["PLACED", "VENDOR_ACCEPTED"]);
+// given back to that store in the same transaction. An online order that is still waiting for its payment
+// (PAYMENT_PENDING) can be cancelled too: its stock and coins come back at once instead of when it expires.
+const CANCELLABLE = new Set(["PLACED", "VENDOR_ACCEPTED", "PAYMENT_PENDING"]);
+const SETTLED_PAYMENT = new Set(["PAID", "PARTIALLY_REFUNDED", "REFUNDED"]);
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const ipLimited = limitByIp(req, "cancel-post", 30);
   if (ipLimited) return ipLimited;
@@ -37,6 +39,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       if (!snap.exists || !o || o.userId !== customer.uid) throw new Error("NOT_FOUND");
       const adminFulfilment = String(overlay.data()?.fulfilment ?? "");
       if (!CANCELLABLE.has(String(o.status)) || (adminFulfilment && adminFulfilment !== "CREATED")) throw new Error("TOO_LATE");
+      // A payment that went through while the order still showed as pending is confirmed, not cancelled here.
+      if (String(o.status) === "PAYMENT_PENDING" && SETTLED_PAYMENT.has(String(o.payment?.status ?? ""))) throw new Error("TOO_LATE");
 
       // Reserved stock goes back to the store. All reads happen before any write (Firestore transaction rule).
       const reservation = (o.stockReservation ?? null) as { vendorUid?: unknown; items?: unknown; releasedAt?: unknown } | null;
@@ -63,33 +67,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const platformChanges = planRelease(reservation, platformStock);
       const variantChanges = planVariantRelease(reservation, platformStock);
 
-      // Coins redeemed on this order go back to the wallet. The entry key is per order, so a second cancel (or a retry)
-      // finds the entry already there and credits nothing more. Read here, written below with the other writes.
-      const coinsBack = Math.floor(Number(o.pricing?.coinsRedeemed ?? 0)) || 0;
-      const coinsPlan = coinsBack > 0
-        ? await planLedgerEntry(wrapTx(tx, store), (path) => repo.ref(path), customer.uid, {
-          type: "CREDIT",
-          source: "ORDER_CANCELLED",
-          amount: coinsBack,
-          idempotencyKey: `cancel:${id}`,
-          reason: `Coins returned for cancelled order ${id}`,
-          orderId: id,
-          actor: "customer",
-        })
-        : null;
-      if (coinsPlan && !coinsPlan.ok) throw new Error("COINS_RETURN_FAILED");
-
       const now = Date.now();
+      // Coins redeemed on this order go back to the wallet, once: nothing is credited when they are already back (for
+      // example after a failed payment), and the entry key is per order and cycle, so a second cancel (or a retry)
+      // credits nothing more. Read here, written below with the other writes.
+      const coins = await releaseCoinsTx(wrapTx(tx, store), (path) => repo.ref(path), o, {
+        uid: customer.uid,
+        orderId: id,
+        reason: `Coins returned for cancelled order ${id}`,
+        actor: "customer",
+        now,
+      });
+
       for (const r of releases) tx.update(r.ref, { stock: FieldValue.increment(r.quantity), updatedAt: now });
       writeStockChanges(tx, store, platformChanges, now);
       writeVariantStockChanges(tx, store, variantChanges, now);
-      if (coinsPlan && coinsPlan.ok) writeLedgerPlan(wrapTx(tx, store), coinsPlan.plan, now);
+      coins.commit();
       tx.update(ref, {
         status: "CANCELLED",
         cancellationReason: reason,
         cancelledBy: "customer",
+        ...(String(o.status) === "PAYMENT_PENDING" ? { closedUnpaid: "CUSTOMER" } : {}),
         updatedAt: now,
         ...(reservation ? { "stockReservation.releasedAt": now } : {}),
+        ...coins.patch,
         events: [...(Array.isArray(o.events) ? o.events : []), { at: now, actor: "Customer", event: `Order cancelled: ${reason}` }],
       });
     });

@@ -1,18 +1,24 @@
 import { useEffect } from 'react';
 import { useCartStore } from '../../../core/state/cartStore';
 import { useCheckoutSession, type BagQuote } from './checkoutSession';
+import { optionalIdToken } from '../../../core/services/customerSession';
 
 // Asks the server what this bag is taken off. The bag goes as product id, variant id and quantity only; the server works
-// out every price itself. The code is optional: with no code, automatic offers still apply.
+// out every price itself. The code is optional: with no code, automatic offers still apply. A signed-in customer's ID
+// token is sent (as with the other customer calls), so per-customer offer and flash-sale limits apply to the quote; a
+// guest is quoted without one.
 export type QuoteResult = { ok: true; bag: BagQuote; subtotal: number } | { ok: false; error: string };
 
 type CartLine = { productId: string; variantId?: string | null; quantity: number };
 
 export async function quoteBag(code: string | null, lines: CartLine[]): Promise<QuoteResult> {
   try {
+    const token = await optionalIdToken();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
     const res = await fetch('/api/shop/offers/quote', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       credentials: 'same-origin',
       body: JSON.stringify({
         code: code ?? '',

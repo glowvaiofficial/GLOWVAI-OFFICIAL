@@ -21,6 +21,8 @@ import { razorpayKeyId } from "./razorpay";
 import type { OfferLine } from "./offers";
 import { resolveBag } from "./offerResolve";
 import { applyFlashSales } from "./flashPricing";
+import { IDEMPOTENCY_COLLECTION, bagFingerprint, idempotentOrderId } from "./pendingPayment";
+import { existingOrderReply, idempotencyRecord, settlePendingBeforeOrder } from "./pendingOrders";
 
 // Thrown inside the order transaction to stop it with a customer message and an HTTP status.
 export class OrderBlocked extends Error {
@@ -34,6 +36,15 @@ export class OrderBlocked extends Error {
 }
 
 class OrderDuplicate extends Error {}
+
+// Thrown inside the order transaction when the request's Idempotency-Key already created an order.
+class OrderReplay extends Error {
+  orderId: string;
+  constructor(orderId: string) {
+    super("replay");
+    this.orderId = orderId;
+  }
+}
 
 export type OrderFailure =
   | "VALIDATION"
@@ -59,6 +70,8 @@ export interface PlaceOrderInput extends ParsedOrderRequest {
   affiliateCode?: string | null;
   // Starts the online payment for the amount (rupees). Only used when paymentMethod is ONLINE.
   startPayment?: (amountRupees: number, orderId: string) => Promise<{ id: string; amount: number; currency: string }>;
+  // The customer's Idempotency-Key record id (see pendingPayment.idempotencyDocId), when the request sent a usable key.
+  idempotencyDocId?: string | null;
   now?: number;
 }
 
@@ -138,22 +151,43 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
   if (!Number.isFinite(tipRaw) || tipRaw < 0 || tipRaw > 500) return fail(400, "TIP_INVALID", "The tip must be between ₹0 and ₹500.");
   const tip = Math.round(tipRaw);
 
+  const coinsRequested = input.coinsRequested;
+  const coinsRedeemed = coinsRequested;
+  const grandTotal = subtotal - discountAmount + deliveryFee + tip - coinsRedeemed;
+  const online = input.paymentMethod === "ONLINE";
+  const idempotencyDocId = input.idempotencyDocId ?? null;
+
+  // The customer's other unpaid online orders (checkout only, not the subscription run): an expired one is closed, one
+  // for a different bag is closed (its stock and coins come back before this order takes them), and one for this same
+  // bag and total is reused, so a retry never creates a second order or takes the coins twice.
+  const bagKey = bagFingerprint({
+    paymentMethod: input.paymentMethod,
+    lines,
+    addressId: input.addressId,
+    address: input.addressId ? null : (input.address as unknown as Record<string, unknown> | null),
+    deliverySlotId: input.deliverySlotId,
+    couponCode: input.couponCode,
+    tip,
+    coinsRequested,
+  });
+  if (!input.subscriptionId && !input.orderId) {
+    const settled = await settlePendingBeforeOrder(store, { uid: input.uid, bagKey, grandTotal, online, now, idempotencyDocId });
+    if (settled.kind === "reused") return { ok: true, body: settled.body };
+    if (settled.kind === "replay") return replayOf(store, settled.orderId);
+  }
+
   // Coins: a quick check on the balance read now (the transaction checks again on a fresh read). The amount is fixed
   // here because the payment amount is set from it.
-  const coinsRequested = input.coinsRequested;
   if (coinsRequested > 0) {
     const wallet = await repo.get(repo.ref(`wallets/${input.uid}`));
     const balance = Number(wallet.data()?.balance ?? 0);
     const cap = maxRedeemable({ itemTotal: subtotal, balance: Number.isFinite(balance) ? balance : 0 });
     if (coinsRequested > cap) return fail(409, "COINS_OVER_CAP", `You can use at most ${cap} coins on this order.`);
   }
-  const coinsRedeemed = coinsRequested;
-  const grandTotal = subtotal - discountAmount + deliveryFee + tip - coinsRedeemed;
 
   const day = new Date(now + 5.5 * 3600000).toISOString().slice(2, 10).replace(/-/g, "");
   const orderId = input.orderId ?? `GV-${day}-${randomBytes(3).toString("hex").toUpperCase()}`;
   // Identifiers the customer and GlowVai use to follow the order: transaction (payment) reference and tracking number.
-  const online = input.paymentMethod === "ONLINE";
   const transactionId = online ? null : `COD-${randomBytes(4).toString("hex").toUpperCase()}`;
   const trackingId = `TRK-${randomBytes(4).toString("hex").toUpperCase()}`;
   // Online orders are created first and become PLACED only when Razorpay confirms the payment (see payments/razorpay).
@@ -208,6 +242,12 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     source: "web_shop",
     ...(input.subscriptionId ? { subscriptionId: input.subscriptionId } : {}),
     events: [{ at: now, actor: "Customer", event: online ? "Payment started (online)" : "Order placed (cash on delivery)" }],
+    // Unpaid-order bookkeeping (lib/shop/pendingPayment.ts): the bag fingerprint for a retry, when the payment window
+    // started, and whether the coins on this order are currently back in the wallet.
+    bagKey,
+    ...(online ? { paymentAttemptAt: now } : {}),
+    coinsReleasedAt: null,
+    coinsReleaseCount: 0,
     createdAt: now,
     updatedAt: now,
   };
@@ -220,6 +260,12 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
       if ((await tx.get(ref)).exists) {
         if (input.orderId) throw new OrderDuplicate("duplicate");
         throw new Error("Order id clash, please retry.");
+      }
+      // The same Idempotency-Key from this customer within 24 hours returns the order it already created.
+      const idemRef = idempotencyDocId ? store.collection(IDEMPOTENCY_COLLECTION).doc(idempotencyDocId) : null;
+      if (idemRef) {
+        const earlier = idempotentOrderId((await tx.get(idemRef)).data(), input.uid, now);
+        if (earlier) throw new OrderReplay(earlier);
       }
       const fresh = await readProductStock(tx, store, productIds);
       for (const it of items) {
@@ -235,11 +281,13 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
       writeVariantStockChanges(tx, store, plan.variantWrites, now);
       coins.commit();
       tx.create(ref, { ...order, stockReservation: orderReservationFor(plan) });
+      if (idemRef) tx.set(idemRef, idempotencyRecord(input.uid, orderId, now));
       tx.set(store.collection("users").doc(input.uid), { lastActiveAt: now, lastOrderAt: now }, { merge: true });
     });
   } catch (err) {
     if (err instanceof OrderBlocked) return fail(err.status, err.code, err.message);
     if (err instanceof OrderDuplicate) return fail(409, "DUPLICATE", "This order was already created.");
+    if (err instanceof OrderReplay) return replayOf(store, err.orderId);
     throw err;
   }
 
@@ -262,6 +310,13 @@ export async function placeOrderCore(store: Firestore, input: PlaceOrderInput): 
     };
   }
   return { ok: true, body: { ok: true, orderId, trackingId, transactionId, pricing: order.pricing, status: order.status } };
+}
+
+// The reply for an order an Idempotency-Key already created.
+async function replayOf(store: Firestore, orderId: string): Promise<PlaceOrderResult> {
+  const snap = await store.collection("orders").doc(orderId).get();
+  if (!snap.exists) return { ok: false, status: 409, code: "DUPLICATE", error: "This order was already created." };
+  return { ok: true, body: existingOrderReply(orderId, snap.data() ?? {}, { replayed: true }) };
 }
 
 // The redeem preview at checkout: the bag is priced here from the catalogue (variants included), the balance is read from
