@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { db, json, limitByIp } from "@/lib/shop/server";
 import { activeSections } from "@/lib/shop/homeContent";
+import { readMaintenance } from "@/lib/shop/homeLayout";
 import { verifyHomePreviewToken } from "@/lib/shop/previewToken";
 
 export const dynamic = "force-dynamic";
@@ -19,12 +20,13 @@ export async function GET(req: NextRequest) {
     return json({ ok: false, error: "This preview link has expired. Open the designer again." }, 403);
   }
   try {
-    const snap = await db().collection("siteContent").doc("home").get();
+    const [snap, layoutSnap] = await Promise.all([db().collection("siteContent").doc("home").get(), db().collection("siteContent").doc("homeLayout").get()]);
+    const maintenance = readMaintenance(layoutSnap.exists ? layoutSnap.data() : undefined);
     const data = snap.exists ? (snap.data() as { published?: { sections?: unknown }; draft?: { sections?: unknown } } | undefined) : undefined;
     const source = isPreview ? data?.draft : data?.published;
     // The draft is shown as if it were live: every enabled section whose window is open now.
     const sections = activeSections(source?.sections, Date.now());
-    const res = json({ ok: true, sections, preview: isPreview });
+    const res = json({ ok: true, sections, maintenance, preview: isPreview });
     res.headers.set(
       "Cache-Control",
       isPreview ? "private, no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=120",
@@ -33,6 +35,6 @@ export async function GET(req: NextRequest) {
     return res;
   } catch {
     // The page still works without banners: the client shows its normal content.
-    return json({ ok: true, sections: [], preview: isPreview });
+    return json({ ok: true, sections: [], maintenance: readMaintenance(undefined), preview: isPreview });
   }
 }
