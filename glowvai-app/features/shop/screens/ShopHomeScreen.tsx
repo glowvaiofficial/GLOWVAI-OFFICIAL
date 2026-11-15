@@ -16,7 +16,7 @@ import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
-import { getProductThumbUrl } from '../shared/shopUtils';
+import { getProductThumbUrl, hasProductPhoto, firstPhotoUrl } from '../shared/shopUtils';
 import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
 import {
@@ -174,15 +174,15 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
                           key={categoryId}
                           label={label}
                           sub={count}
-                          image={tile?.sample ? getProductThumbUrl(tile.sample, 300) : null}
+                          image={tile?.sample && hasProductPhoto(tile.sample) ? getProductThumbUrl(tile.sample, 300) : null}
                           accent={itemAccent({ label }, i)}
                           onOpen={() => navigate('shop-category', { categoryId })}
                         />
                       );
                     })}
-                    {bestsellers.length > 0 && <CategoryTile label="Best sellers" Icon={Star} accent={itemAccent({ label: 'Best sellers' }, 5)} onOpen={() => jumpTo('gvh-bestsellers-title')} />}
-                    {newLaunches.length > 0 && <CategoryTile label="New launches" Icon={PackagePlus} accent={itemAccent({ label: 'New launches' }, 6)} onOpen={() => jumpTo('gvh-new-title')} />}
-                    <CategoryTile label="Shop all" Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
+                    {bestsellers.length > 0 && <CategoryTile label="Best sellers" image={firstPhotoUrl(bestsellers, 300)} Icon={Star} accent={itemAccent({ label: 'Best sellers' }, 5)} onOpen={() => jumpTo('gvh-bestsellers-title')} />}
+                    {newLaunches.length > 0 && <CategoryTile label="New launches" image={firstPhotoUrl(newLaunches, 300)} Icon={PackagePlus} accent={itemAccent({ label: 'New launches' }, 6)} onOpen={() => jumpTo('gvh-new-title')} />}
+                    <CategoryTile label="Shop all" image={firstPhotoUrl(catalog, 300)} Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
                   </>
                 )}
             </div>

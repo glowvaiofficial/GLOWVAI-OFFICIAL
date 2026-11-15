@@ -282,3 +282,6 @@ table {
     min-height: 44px;
   }
 }
+
+/* The analytics banner waits until first-run onboarding is left, so it never covers the Next button. */
+html[data-gv-onboarding] .gv-consent-banner { display: none; }

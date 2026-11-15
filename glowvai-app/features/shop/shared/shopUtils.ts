@@ -4,86 +4,29 @@ import { defaultVariant } from '../../../../lib/shop/variants';
 export const formatRupee = (amount: number) => `₹${Math.round(amount).toLocaleString('en-IN')}`;
 
 // Real photos of the exact catalogue item. The old catalogue images were a handful of stock photos, several
-// showing other brands' products, so every other product gets a generated tile with its brand and name.
+// showing other brands' products, so every other product gets the brand fallback tile.
 const PRODUCT_PHOTOS: Record<string, string> = {
   'prod-03': '/glowvai/assets/products/web/minimalist-salicylic-2.webp',
   'prod-07': '/glowvai/assets/products/web/minimalist-vitamin-b5.webp',
 };
 
-const TILE_COLOURS: Record<SkincareProduct['category'], { bg: string; ink: string; accent: string }> = {
-  Serums: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-  Moisturizers: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-  Suncare: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-  Cleansers: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-  Treatments: { bg: '#eef3ff', ink: '#1d3f9d', accent: '#0057fb' },
-};
-
-// A simple pack outline per category: dropper bottle, jar, tube or pump bottle.
-const PACK_SHAPES: Record<SkincareProduct['category'], string> = {
-  Serums:
-    '<rect x="282" y="70" width="36" height="56" rx="18"/><rect x="272" y="120" width="56" height="34" rx="6"/><rect x="240" y="150" width="120" height="190" rx="22"/>',
-  Moisturizers:
-    '<rect x="215" y="170" width="170" height="44" rx="12"/><rect x="222" y="206" width="156" height="134" rx="24"/>',
-  Suncare:
-    '<rect x="236" y="70" width="128" height="18" rx="5"/><path d="M244 86h112l-6 214H250z"/><rect x="258" y="298" width="84" height="44" rx="10"/>',
-  Cleansers:
-    '<rect x="262" y="74" width="80" height="22" rx="7"/><rect x="288" y="94" width="26" height="44" rx="5"/><rect x="238" y="136" width="124" height="204" rx="26"/>',
-  Treatments:
-    '<rect x="215" y="170" width="170" height="44" rx="12"/><rect x="222" y="206" width="156" height="134" rx="24"/>',
-};
-
-const escapeXml = (text: string) =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-const wrapWords = (text: string, maxChars: number, maxLines: number): string[] => {
-  const lines: string[] = [];
-  let line = '';
-  for (const word of text.split(/\s+/)) {
-    if (line && `${line} ${word}`.length > maxChars) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = line ? `${line} ${word}` : word;
-    }
-  }
-  if (line) lines.push(line);
-  if (lines.length > maxLines) {
-    lines.length = maxLines;
-    lines[maxLines - 1] = `${lines[maxLines - 1]}…`;
-  }
-  return lines;
-};
-
-const tileCache = new Map<string, string>();
-
-const productTile = (product: SkincareProduct): string => {
-  const cached = tileCache.get(product.id);
-  if (cached) return cached;
-  const colours = TILE_COLOURS[product.category] ?? TILE_COLOURS.Serums;
-  const shape = PACK_SHAPES[product.category] ?? PACK_SHAPES.Serums;
-  // The card already prints the product name, so the tile only carries the pack outline and the brand.
-  const brandLines = wrapWords(product.brand.toUpperCase(), 18, 2)
-    .map(
-      (line, i) =>
-        `<text x="300" y="${500 + i * 34}" font-size="26" font-weight="700" letter-spacing="4" fill="${colours.ink}" opacity="0.75">${escapeXml(line)}</text>`
-    )
-    .join('');
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" font-family="Manrope, Segoe UI, Arial, sans-serif" text-anchor="middle">` +
-    `<rect width="600" height="600" fill="${colours.bg}"/>` +
-    `<g fill="${colours.accent}" opacity="0.3" transform="translate(300 250) scale(1.2) translate(-300 -206)">${shape}</g>` +
-    brandLines +
-    '</svg>';
-  const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  tileCache.set(product.id, url);
-  return url;
-};
+// Every product without a photo shows this one brand-blue tile with the GlowVai mark (no per-product placeholder art).
+export const PRODUCT_FALLBACK_URL = '/brand/product-fallback.svg';
 
 // Cart items store a plain URL string, so this always returns one.
 // A product's own photo first; otherwise the built-in photo for that id, otherwise the generated brand tile.
 export const getProductImageUrl = (product: SkincareProduct): string => {
   const own = typeof product.imageSource?.uri === 'string' ? product.imageSource.uri : product.official_brand_image_url;
-  return own || PRODUCT_PHOTOS[product.id] || productTile(product);
+  return own || PRODUCT_PHOTOS[product.id] || PRODUCT_FALLBACK_URL;
+};
+
+// True when the product has a real photo (its own, or a built-in one), not the brand fallback tile.
+export const hasProductPhoto = (product: SkincareProduct): boolean => getProductImageUrl(product) !== PRODUCT_FALLBACK_URL;
+
+// The thumbnail of the first product in the list that has a real photo, or null (the caller then draws the brand tile).
+export const firstPhotoUrl = (products: SkincareProduct[], width = 400): string | null => {
+  const found = products.find(hasProductPhoto);
+  return found ? getProductThumbUrl(found, width) : null;
 };
 
 // Smaller image for cards and tiles: Unsplash URLs are asked for a 400px-wide rendition. Local images are returned as they are.
@@ -137,3 +80,6 @@ export const sortProducts = <T extends { price: number; rating?: number | null }
   if (sort === 'rating') return list.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
   return list;
 };
+
+// The white GlowVai mark, drawn on brand-blue tiles.
+export const BRAND_MARK_URL = '/brand/glowvai-mark-white.png';

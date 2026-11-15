@@ -597,3 +597,7 @@
 .glowvai-root .shop-desk .shop-desk-tab[aria-pressed="true"] .shop-desk-tab-icon{ background: var(--acc, var(--desk-brand)); color: var(--acc-on, #fff); box-shadow: 0 0 0 2px #fff, 0 4px 12px -6px rgba(20, 27, 52, .35); }
 .glowvai-root .shop-desk .shop-desk-tab::after{ background: var(--wash-text); }
 @media (prefers-reduced-motion: reduce){ .glowvai-root .shop-desk .shop-desk-header, .glowvai-root .shop-desk .shop-desk-header::after{ transition: none; } }
+
+/* Category tile with no picture: brand-blue tile with the GlowVai mark. */
+.glowvai-root .shop-desk .shop-desk-cat.is-brand .shop-desk-cat-media{ background: #0057fb; }
+.glowvai-root .shop-desk .shop-desk-cat-media img.shop-desk-cat-mark{ width: 28%; height: auto; padding: 0; mix-blend-mode: normal; object-fit: contain; }

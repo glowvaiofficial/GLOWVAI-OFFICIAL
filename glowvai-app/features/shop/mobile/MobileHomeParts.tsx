@@ -8,7 +8,7 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { HeaderCartButton } from '../shared/HeaderCartButton';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, BRAND_MARK_URL } from '../shared/shopUtils';
 import { HERO_IMAGE, useHomeNavigate } from '../lib/homeCommon';
 import type { PricePointTile } from '../lib/homeModel';
 import type { BlockItem, BlockSettings, HeaderSettings, HeroOverride } from '../lib/useHomeLayout';
@@ -567,10 +567,10 @@ export function FlashSaleRows({ sales, catalog, now, accent }: { sales: FlashSal
 
 // ---------- Categories: pastel accent tiles ----------
 
-export function CategoryTile({ label, accent, onOpen, image, Icon = Sparkles, sub }: { label: string; accent: string; onOpen: () => void; image?: string | null; Icon?: LucideIcon; sub?: string | null }) {
+export function CategoryTile({ label, accent, onOpen, image, sub }: { label: string; accent: string; onOpen: () => void; image?: string | null; Icon?: LucideIcon; sub?: string | null }) {
   return (
-    <button type="button" className="gvh-cat" style={varsStyle(accent)} onClick={onOpen} aria-label={sub ? `${label}, ${sub}` : label}>
-      <span className="gvh-cat-media">{image ? <img src={image} alt="" width={200} height={200} loading="lazy" decoding="async" /> : <Icon size={28} aria-hidden="true" />}</span>
+    <button type="button" className={`gvh-cat${image ? '' : ' is-brand'}`} style={varsStyle(accent)} onClick={onOpen} aria-label={sub ? `${label}, ${sub}` : label}>
+      <span className="gvh-cat-media">{image ? <img src={image} alt="" width={200} height={200} loading="lazy" decoding="async" /> : <img className="gvh-cat-mark" src={BRAND_MARK_URL} alt="" width={32} height={38} decoding="async" />}</span>
       <span className="gvh-cat-label">{label}</span>
     </button>
   );

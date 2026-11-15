@@ -25,7 +25,7 @@ import { accentVars, blockAccent, categoryAccent, isAccent, itemAccent, textOn, 
 import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto, firstPhotoUrl, BRAND_MARK_URL } from '../shared/shopUtils';
 import '../styles/shop-desktop-home.css';
 import '../styles/shop-type.css';
 
@@ -592,14 +592,14 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
 // A category tile: a pastel square in the category's accent with its product photo (or icon), the name below.
 function DeskCategoryTile({ label, accent, photo, Icon, count, onOpen }: { label: string; accent: string; photo: string | null; Icon: LucideIcon; count: string | null; onOpen: () => void }) {
   return (
-    <button type="button" className="shop-desk-cat" onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
-      <span className="shop-desk-cat-media">{photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <Icon size={32} aria-hidden="true" />}</span>
+    <button type="button" className={`shop-desk-cat${photo ? '' : ' is-brand'}`} onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
+      <span className="shop-desk-cat-media">{photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <img className="shop-desk-cat-mark" src={BRAND_MARK_URL} alt="" width={40} height={47} decoding="async" />}</span>
       <strong>{label}</strong>
     </button>
   );
 }
 
-const tilePhoto = (tile: HomeCategoryTile | null) => (tile?.sample ? getProductThumbUrl(tile.sample, 400) : null);
+const tilePhoto = (tile: HomeCategoryTile | null) => (tile?.sample && hasProductPhoto(tile.sample) ? getProductThumbUrl(tile.sample, 400) : null);
 
 // An offer card: the first of the row on a dark gradient of its accent (like the bank offer), the rest on a light tint.
 // The admin's picture sits on the right; the built-in offers draw their icon there.
@@ -911,9 +911,9 @@ export const ShopDesktopHome: React.FC = () => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
                     return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null)} photo={null} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
-                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null)} photo={null} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
-                  <DeskCategoryTile label="All Products" accent={restAccent(null)} photo={null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null)} photo={firstPhotoUrl(bestsellers, 400)} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
+                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null)} photo={firstPhotoUrl(newLaunches, 400)} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
+                  <DeskCategoryTile label="All Products" accent={restAccent(null)} photo={firstPhotoUrl(catalog, 400)} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
             </div>
@@ -1244,7 +1244,7 @@ export const ShopDesktopHome: React.FC = () => {
               <Gem size={20} />
             </span>
             <span className="shop-desk-greet-copy">
-              <strong>{firstName ? `Hi, ${firstName}` : 'Hi there'}</strong>
+              <strong>{firstName ? `Hi, ${firstName}` : 'Welcome to GlowVai'}</strong>
               <span>Discover. Shop. Glow.</span>
             </span>
             <span className="shop-desk-greet-sep" aria-hidden="true" />
