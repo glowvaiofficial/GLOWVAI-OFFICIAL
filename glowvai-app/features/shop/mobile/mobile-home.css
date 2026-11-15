@@ -35,6 +35,8 @@
 .glowvai-root .gvh .gvh-header { position: relative; z-index: 0; margin-bottom: -22px; padding: 12px var(--gv-gutter) 22px; background: linear-gradient(180deg, var(--wash) 0%, var(--wash) 62%, transparent 100%); color: var(--wash-on); transition: --wash .25s ease, --wash-on .25s ease; }
 .glowvai-root .gvh .gvh-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'logo actions' 'loc loc' 'search search'; align-items: center; gap: 10px 12px; }
 .glowvai-root .gvh .gvh-logo { grid-area: logo; display: inline-flex; align-items: center; }
+/* Dark text on a bright accent backdrop: the blue logo would vanish, so draw it in ink. */
+.glowvai-root .gvh .gvh-logo.is-ink img { filter: brightness(0) opacity(0.88); }
 .glowvai-root .gvh .gvh-location { grid-area: loc; display: inline-flex; min-width: 0; max-width: 100%; min-height: 44px; align-items: center; justify-self: start; gap: 4px; padding: 0 4px; color: var(--wash-on); font-size: 13.5px; font-weight: 500; }
 .glowvai-root .gvh .gvh-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .gvh .gvh-location svg { flex: 0 0 auto; }

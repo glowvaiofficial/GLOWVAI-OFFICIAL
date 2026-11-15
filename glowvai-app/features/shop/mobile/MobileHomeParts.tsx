@@ -67,7 +67,7 @@ export function MobileHomeHeader({
   return (
     <header className="gvh-header" style={{ '--wash': tab.accent, '--wash-on': readableTextOn(tab.accent) } as React.CSSProperties}>
       <div className="gvh-top">
-        <span className="gvh-logo">
+        <span className={readableTextOn(tab.accent) === '#FFFFFF' ? 'gvh-logo' : 'gvh-logo is-ink'}>
           <BrandLogo height={26} white={readableTextOn(tab.accent) === '#FFFFFF'} />
         </span>
         {embedded ? (
