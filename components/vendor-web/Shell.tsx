@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
-import { Bell, Boxes, ChartColumn, ClipboardList, House, LifeBuoy, Lightbulb, ShieldCheck, UserRound, Wallet, type LucideProps } from "lucide-react";
+import { Bell, Boxes, ChartColumn, ClipboardList, House, LifeBuoy, Lightbulb, ShieldCheck, UserRound, Wallet, Landmark, type LucideProps } from "lucide-react";
 import { signOutVendor, useVendorSession } from "@/lib/vendor-web/session";
 import { VENDOR_HOME_ROUTES } from "@/lib/vendor-web/routing";
 import { messageForError } from "@/lib/vendor-web/errors";
@@ -24,6 +24,7 @@ export const VENDOR_NAV_ITEMS: readonly VendorNavItem[] = [
   { href: "/vendor/product-requests", label: "Requests", icon: Lightbulb },
   { href: "/vendor/analytics", label: "Analytics", icon: ChartColumn },
   { href: "/vendor/earnings", label: "Earnings", icon: Wallet },
+  { href: "/vendor/payouts", label: "Payouts", icon: Landmark },
   { href: "/vendor/notifications", label: "Notifications", icon: Bell },
   { href: "/vendor/profile", label: "Profile", icon: UserRound },
   { href: "/vendor/support", label: "Support", icon: LifeBuoy },

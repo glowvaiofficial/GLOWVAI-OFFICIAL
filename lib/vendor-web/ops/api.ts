@@ -4,6 +4,7 @@ import { vendorFetch } from "../api";
 import type { DeclineReason } from "./decline";
 import type { ProductRequestPayload } from "./productRequest";
 import type { AnalyticsResult, InventoryLine, OpsOrder, OpsReturn, OrdersPage, ProductRequestView, VariantView } from "./types";
+import type { LedgerResult } from "./ledgerTypes";
 import type { SaveItem } from "./inventory";
 
 export interface StatusResponse {
@@ -74,4 +75,8 @@ export function registerPushToken(token: string): Promise<{ registered: boolean;
     method: "POST",
     body: { token, platform: "web", tokenType: "FCM" },
   });
+}
+
+export function fetchPayouts(): Promise<LedgerResult> {
+  return vendorFetch<LedgerResult>("/payouts");
 }
