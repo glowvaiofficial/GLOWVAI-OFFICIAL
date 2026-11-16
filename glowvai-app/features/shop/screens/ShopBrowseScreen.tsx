@@ -78,7 +78,7 @@ export const ShopBrowseScreen: React.FC = () => {
       counts[item.id] = catalog.filter((p) => p.category === item.id).length;
     }
     return counts;
-  }, []);
+  }, [catalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredProducts = catalog.filter((product) => {
     const q = searchQuery.toLowerCase();

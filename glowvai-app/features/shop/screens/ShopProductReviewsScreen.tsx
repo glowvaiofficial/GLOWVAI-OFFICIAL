@@ -1,6 +1,8 @@
 import React from 'react';
 import { ArrowLeft, PackageSearch, Star } from 'lucide-react';
 import { ProductReviews } from '../../reviews/ProductReviews';
+import { ProductQuestions } from '../../reviews/ProductQuestions';
+import { useIsPc } from '../desktop/useIsPc';
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
@@ -24,6 +26,7 @@ export const ShopProductReviewsScreen: React.FC = () => {
   const catalog = useLiveCatalog();
   const { goBack, navigate, activeParams } = useApp();
   const addItem = useCartStore((state) => state.addItem);
+  const isPc = useIsPc();
 
   const rawId = activeParams?.productId ?? activeParams?.id;
   const product = catalog.find((p) => p.id === rawId);
@@ -117,6 +120,11 @@ export const ShopProductReviewsScreen: React.FC = () => {
 
         <section className="shop-reviews-list" aria-label="Customer reviews">
           <ProductReviews productId={product.id} />
+          {isPc && (
+            <div className="shop-reviews-qa">
+              <ProductQuestions productId={product.id} />
+            </div>
+          )}
         </section>
       </div>
     </div>

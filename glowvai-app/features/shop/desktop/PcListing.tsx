@@ -275,6 +275,20 @@ export const PcListing: React.FC<PcListingProps> = ({ title, subtitle, crumbs, p
             </FacetGroup>
 
             <FacetGroup title="Price">
+              {priceRange.hi > priceRange.lo && (() => {
+                const lo = Math.max(priceRange.lo, minP === '' ? priceRange.lo : Number(minP) || priceRange.lo);
+                const hi = Math.min(priceRange.hi, maxP === '' ? priceRange.hi : Number(maxP) || priceRange.hi);
+                const span = priceRange.hi - priceRange.lo;
+                const step = Math.max(1, Math.round(span / 100));
+                return (
+                  <div className="pc-slider" style={{ ['--lo' as string]: `${((lo - priceRange.lo) / span) * 100}%`, ['--hi' as string]: `${((hi - priceRange.lo) / span) * 100}%` }}>
+                    <div className="pc-slider-track" aria-hidden="true"><i /></div>
+                    <input type="range" min={priceRange.lo} max={priceRange.hi} step={step} value={lo} aria-label="Minimum price" onChange={(e) => { const v = Math.min(Number(e.target.value), hi); setMinP(v <= priceRange.lo ? '' : String(v)); }} />
+                    <input type="range" min={priceRange.lo} max={priceRange.hi} step={step} value={hi} aria-label="Maximum price" onChange={(e) => { const v = Math.max(Number(e.target.value), lo); setMaxP(v >= priceRange.hi ? '' : String(v)); }} />
+                    <div className="pc-slider-ends"><span>₹{lo.toLocaleString('en-IN')}</span><span>₹{hi.toLocaleString('en-IN')}</span></div>
+                  </div>
+                );
+              })()}
               <div className="pc-price-inputs">
                 <label><span>Min ₹</span><input type="number" inputMode="numeric" min={0} value={minP} placeholder={String(priceRange.lo)} onChange={(e) => setMinP(e.target.value)} aria-label="Minimum price" /></label>
                 <i aria-hidden="true">to</i>
