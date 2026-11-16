@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { readBlockStyles, sanitizeLook, sanitizeVideoUrl, type BlockStyle, type LookSettings } from "../../../../lib/shop/layoutStyle";
 import { publishMaintenance } from './maintenance';
 import { DESKTOP_MEDIA_QUERY, forcedHomeDevice, homeLayoutUrl, pickHomeDevice, type HomeDevice } from './homeDevice';
 
@@ -45,6 +46,10 @@ export interface HomeLayoutView {
   header: HeaderSettings;
   // The maintenance switch (also read by the maintenance gate).
   maintenance: MaintenanceState;
+  // Designer style options (lib/shop/layoutStyle.ts): each block style, the global look, the hero video. Empty by default.
+  styles: Record<string, BlockStyle>;
+  look: LookSettings | undefined;
+  heroVideo: string | undefined;
 }
 
 export interface DeliveryMode { label: string; link: string }
@@ -117,7 +122,7 @@ function readSectionAccents(value: unknown): Partial<Record<HomeBlockId, string>
   return out;
 }
 
-export const DEFAULT_LAYOUT_VIEW: HomeLayoutView = { order: DEFAULT_BLOCK_ORDER, settings: {}, rows: [], hero: null, footer: EMPTY_FOOTER_DETAILS, preview: false, fallback: false, sectionAccents: {}, header: EMPTY_HEADER_SETTINGS, maintenance: NO_MAINTENANCE };
+export const DEFAULT_LAYOUT_VIEW: HomeLayoutView = { order: DEFAULT_BLOCK_ORDER, settings: {}, rows: [], hero: null, footer: EMPTY_FOOTER_DETAILS, preview: false, fallback: false, sectionAccents: {}, header: EMPTY_HEADER_SETTINGS, maintenance: NO_MAINTENANCE, styles: {}, look: undefined, heroVideo: undefined };
 
 // The page's view of a layout reply. Each field the reply gets wrong keeps its built-in value.
 export function readLayoutResponse(data: unknown): HomeLayoutView {
@@ -133,6 +138,10 @@ export function readLayoutResponse(data: unknown): HomeLayoutView {
     sectionAccents: readSectionAccents(d.sectionAccents),
     header: readHeaderSettings(d.headerSettings),
     maintenance: readMaintenance(d.maintenance),
+    // Checked again with the same allow-lists the server used; unknown values are dropped.
+    styles: readBlockStyles({ blocks: Object.entries(d.styles && typeof d.styles === "object" ? (d.styles as Record<string, unknown>) : {}).map(([id, style]) => ({ id, settings: { style } })) }),
+    look: sanitizeLook(d.look),
+    heroVideo: sanitizeVideoUrl(d.heroVideo),
   };
 }
 

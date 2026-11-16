@@ -1,3 +1,4 @@
+import { SearchSuggestions, OutOfStockSimilar } from '../shared/StateScreens';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, Mic, Search, SlidersHorizontal, X } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
@@ -326,6 +327,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
                 </span>
                 <h3>{query.trim() ? `No products found for "${query.trim()}"` : 'No products match these filters'}</h3>
                 <p>Check the spelling, or try another ingredient, brand or price range.</p>
+                <SearchSuggestions />
                 <button
                   type="button"
                   className="shop-btn-primary"

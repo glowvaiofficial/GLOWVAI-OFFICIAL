@@ -32,6 +32,8 @@ export interface SkincareProduct {
   subscribable?: boolean;
   // Sizes, shades or packs with their own price and stock. Empty or missing: the product is sold as one item.
   variants?: Variant[];
+  // Units in stock for a product sold as one item (a whole number), or null / missing when stock is not tracked.
+  stock?: number | null;
 }
 
 // Live product list, filled from the database (collection "products", status PUBLISHED). Starts empty.

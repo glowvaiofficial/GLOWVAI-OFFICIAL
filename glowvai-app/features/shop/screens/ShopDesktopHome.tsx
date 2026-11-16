@@ -27,6 +27,9 @@ import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReo
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto, BRAND_MARK_URL } from '../shared/shopUtils';
+import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
+import { HeroExtras, HeroVideo, useHeroDesign } from '../shared/DesignerBanner';
+import { useDesignerCard } from '../shared/designerCard';
 import '../styles/shop-desktop-home.css';
 import '../styles/shop-type.css';
 
@@ -346,9 +349,10 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
   };
   const price = sale ? sale.price : options ? fromPrice(options).price : product.price;
   const mrp = sale ? sale.mrp : options ? 0 : product.originalPrice;
+  const ds = useDesignerCard(product, { discount, hasOptions: Boolean(options), add, open, names: { add: options ? `Add ${product.name}: choose options` : `Add ${product.name} to bag` } });
 
   return (
-    <article className="shop-desk-card">
+    <article className={`shop-desk-card${ds.cls ? ` ${ds.cls}` : ''}`}>
       <div className="shop-desk-card-media">
         {imageFailed ? (
           <span className="shop-desk-card-fallback">{product.brand}</span>
@@ -356,6 +360,7 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
           <img src={getProductThumbUrl(product)} alt="" width={400} height={400} loading="lazy" decoding="async" onError={() => setImageFailed(true)} />
         )}
         {discount > 0 && <span className="shop-desk-card-badge">{discount}% OFF</span>}
+        {ds.overlay}
         <button type="button" className={`shop-desk-heart${saved ? ' is-saved' : ''}`} onClick={() => toggleWishlist(product.id)} aria-pressed={saved} aria-label={saved ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}>
           <Heart size={16} aria-hidden="true" />
         </button>
@@ -383,6 +388,7 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
             {mrp > price && <span className="shop-desk-card-save">Save {formatRupee(mrp - price)}</span>}
           </span>
         )}
+        {ds.extra}
         <div className="shop-desk-card-foot">
           {product.deliveryMinutes ? (
             <span className="shop-desk-card-eta">
@@ -392,7 +398,7 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
           ) : (
             <span />
           )}
-          {!options && quantity > 0 ? (
+          {ds.foot ?? (!options && quantity > 0 ? (
             <span className="shop-desk-stepper" role="group" aria-label={`${product.name}: ${quantity} in bag`}>
               <button type="button" onClick={() => decrementItem(product.id)} aria-label={`Remove one ${product.name}`}>
                 <Minus size={14} aria-hidden="true" />
@@ -407,7 +413,7 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
               Add
               <Plus size={14} aria-hidden="true" />
             </button>
-          )}
+          ))}
         </div>
       </div>
     </article>
@@ -581,6 +587,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
     return () => window.clearInterval(id);
   }, [count, paused]);
   const go = (dir: 1 | -1) => setIndex((i) => (i + dir + count) % count);
+  const design = useHeroDesign();
   return (
     <section className="shop-desk-hero-wrap" aria-label="Featured" aria-roledescription="carousel" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
       {previewing && (
@@ -588,7 +595,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
           Staff preview: these banners are a draft and are not live for customers yet.
         </p>
       )}
-      <div className="shop-desk-hero">
+      <div className="shop-desk-hero" style={{ '--gvd-i': current } as React.CSSProperties}>
         {slides.map((slide, i) => {
           const active = i === current;
           const style = accentStyle(slide.accent, {
@@ -604,6 +611,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
           return (
             <div key={slide.id} className={`shop-desk-slide${slide.cover ? ' is-cover' : ''}${slide.poster ? ' is-poster' : ''}${active ? ' is-active' : ''}`} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${count}`} aria-hidden={!active} style={style}>
               <span className="shop-desk-slide-shapes" aria-hidden="true" />
+              {i === 0 && design.video && <HeroVideo src={design.video} />}
               {slide.image && (
                 <div className="shop-desk-slide-media">
                   <img src={slide.image} alt={slide.imageAlt} width={1891} height={831} fetchPriority={i === 0 ? 'high' : 'low'} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
@@ -645,6 +653,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
           </>
         )}
       </div>
+      <HeroExtras layout={design.layout} slides={slides.map((s) => ({ title: s.title, image: s.image, onOpen: () => (s.href ? window.location.assign(s.href) : s.onOpen()) }))} current={current} onGo={setIndex} ms={SLIDE_MS} nativeArrows />
     </section>
   );
 }
@@ -834,6 +843,7 @@ function Notice({ title, children, action }: { title: string; children: React.Re
 export const ShopDesktopHome: React.FC = () => {
   const layout = useHomeLayout('desktop');
   const { order: layoutOrder, settings: blockSettings, hero: heroOverride, footer: footerDetails, sectionAccents } = layout;
+  const { styles: designerStyles, look: designerLook, heroVideo } = layout;
   const { catalog, feed, loading, failed, noProducts, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData(layout);
   const headerSettings = layout.header;
   // Recently viewed and Recommended (designer blocks): both hide when empty and honour the block's maxItems (default 8).
@@ -1333,6 +1343,7 @@ export const ShopDesktopHome: React.FC = () => {
   );
 
   return (
+    <DesignerStyleProvider styles={designerStyles} look={designerLook} heroVideo={heroVideo}>
     <LucideProvider strokeWidth={1.75}>
       <div className="shop-screen shop-desk">
         <span ref={topRef} className="shop-desk-top" aria-hidden="true" />
@@ -1496,12 +1507,13 @@ export const ShopDesktopHome: React.FC = () => {
             </div>
           )}
           {homeSequence(layoutOrder).filter((id) => id !== 'footer').map((id) => (
-            <React.Fragment key={id}>{renderBlock(id)}</React.Fragment>
+            <React.Fragment key={id}><StyledBlock id={id}>{renderBlock(id)}</StyledBlock></React.Fragment>
           ))}
           {pinnedTail}
         </div>
         {renderBlock('footer')}
       </div>
     </LucideProvider>
+    </DesignerStyleProvider>
   );
 };
