@@ -1,0 +1,149 @@
+/* Website v2, shared building blocks (16 Nov 2026). Loaded last from routes.tsx.
+   Tokens are added here only. Card, chips, buttons, section header, mini-cart, tab bar, toast, skeleton, focus and motion
+   follow the native app: Roboto 400/500/700, one brand blue, rounded 14-22px, soft blue-grey shadows, tinted media panels. */
+
+.glowvai-root{
+  --gv-ease: cubic-bezier(.2, .7, .2, 1);
+  --gv-t: 180ms;
+  --gv-r-card: 20px; --gv-r-media: 14px; --gv-r-ctl: 14px;
+  --gv-shadow-card: 0 1px 2px rgba(11, 27, 63, .04), 0 8px 24px rgba(26, 54, 120, .07);
+  --gv-shadow-card-hover: 0 2px 4px rgba(11, 27, 63, .05), 0 16px 36px rgba(26, 54, 120, .13);
+  --gv-shadow-float: 0 10px 30px rgba(11, 27, 63, .16);
+  --gv-shadow-brand: 0 6px 16px rgba(0, 87, 251, .28);
+  /* Background-body fill: an accent wash (set --wash on a screen, defaults to brand blue) fading into the pearl page. */
+  --gv-page: #f7f9ff;
+  --gv-wash-strength: 10%;
+  --gv-wash-top: color-mix(in srgb, var(--wash, var(--gv-blue)) var(--gv-wash-strength), #ffffff);
+  --gv-page-fill: linear-gradient(180deg, var(--gv-wash-top) 0, var(--gv-page) 340px), radial-gradient(900px 360px at 100% 0, rgba(0, 87, 251, .05), transparent 70%);
+  --gv-skel-a: #e8eefc; --gv-skel-b: #f6f8ff;
+  --gv-save: #14783a; --gv-save-bg: #e6f6ec;
+}
+
+/* ---------- Typography scale utilities (Roboto 400/500/700) ---------- */
+.glowvai-root .gv-t-page{ font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; color: var(--gv-ink); }
+.glowvai-root .gv-t-section{ font-size: 18px; font-weight: 700; line-height: 1.25; letter-spacing: -.005em; color: var(--gv-ink); }
+.glowvai-root .gv-t-body{ font-size: 14px; font-weight: 400; line-height: 1.5; }
+.glowvai-root .gv-t-caption{ font-size: 12px; font-weight: 500; line-height: 1.35; color: var(--gv-muted); }
+.glowvai-root .gv-t-price{ font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--gv-ink); }
+.glowvai-root .shop-screen, .glowvai-root .shop-screen :where(button, input, select, textarea){ font-family: var(--gv-font); }
+
+/* ---------- Page fill ---------- */
+.glowvai-root .shop-screen{ background: var(--gv-page-fill), var(--gv-page); background-repeat: no-repeat; transition: background-color var(--gv-t) ease; }
+.glowvai-root .gv-fill{ background: var(--gv-page-fill), var(--gv-page); background-repeat: no-repeat; }
+
+/* ---------- Focus, hover and press motion ---------- */
+.glowvai-root :where(button, a, [role="button"], input, select, textarea):focus-visible{ outline: 2px solid var(--gv-blue); outline-offset: 2px; box-shadow: 0 0 0 5px rgba(0, 87, 251, .16); }
+.glowvai-root .shop-chip, .glowvai-root .shop-btn-primary, .glowvai-root .shop-btn-secondary, .glowvai-root .shop-icon-btn,
+.glowvai-root .shop-product-add, .glowvai-root .shop-product-add-btn, .glowvai-root .shop-stepper button, .glowvai-root .mini-cart-bar,
+.glowvai-root .shop-product-heart{
+  transition: transform 160ms var(--gv-ease), background-color var(--gv-t) ease, color var(--gv-t) ease, border-color var(--gv-t) ease, box-shadow var(--gv-t) ease;
+}
+.glowvai-root .shop-chip:active, .glowvai-root .shop-btn-primary:active, .glowvai-root .shop-btn-secondary:active, .glowvai-root .shop-icon-btn:active,
+.glowvai-root .shop-product-add:active, .glowvai-root .shop-product-add-btn:active, .glowvai-root .shop-stepper button:active,
+.glowvai-root .mini-cart-bar:active, .glowvai-root .shop-product-heart:active{ transform: scale(.96); }
+
+/* ---------- Buttons and chips ---------- */
+.glowvai-root .shop-btn-primary, .glowvai-root .shop-btn-secondary{ border-radius: var(--gv-r-ctl); font-weight: 700; letter-spacing: .005em; }
+.glowvai-root .shop-btn-primary{ box-shadow: var(--gv-shadow-brand); }
+.glowvai-root .shop-btn-primary:disabled{ background: #b9c8ea; box-shadow: none; }
+.glowvai-root .shop-chip{ min-height: 38px; border-color: var(--gv-hairline); font-weight: 500; box-shadow: 0 1px 2px rgba(11, 27, 63, .04); }
+.glowvai-root .shop-chip.is-active{ font-weight: 700; box-shadow: var(--gv-shadow-brand); }
+@media (hover: hover){
+  .glowvai-root .shop-chip:hover{ background: var(--gv-blue-tint); }
+  .glowvai-root .shop-chip.is-active:hover{ background: var(--gv-blue-dark); }
+  .glowvai-root .shop-btn-primary:hover:not(:disabled){ transform: translateY(-1px); }
+}
+.glowvai-root .gv-badge{ display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; background: var(--gv-blue-tint); color: var(--gv-blue); font-size: 11px; font-weight: 700; line-height: 1.3; }
+.glowvai-root .gv-badge.is-save{ background: var(--gv-save-bg); color: var(--gv-save); }
+
+/* ---------- Section header (matches the app: 18/700 title, blue See all) ---------- */
+.glowvai-root .shop-section-head{ align-items: center; margin-bottom: 14px; }
+.glowvai-root .shop-section-head h2{ font-size: clamp(18px, 1.2vw + 14px, 24px); font-weight: 700; }
+.glowvai-root .shop-section-head button, .glowvai-root .shop-section-head a{ display: inline-flex; align-items: center; gap: 2px; min-height: 36px; font-weight: 500; transition: gap var(--gv-t) var(--gv-ease), color var(--gv-t) ease; }
+@media (hover: hover){ .glowvai-root .shop-section-head button:hover{ gap: 6px; color: var(--gv-blue-dark); } }
+
+/* ---------- Product card (standard and .is-rich) ---------- */
+.glowvai-root .shop-product-card.shop-product-card{ border: 1px solid var(--gv-hairline); border-radius: var(--gv-r-card); background: #fff; box-shadow: var(--gv-shadow-card); transition: transform var(--gv-t) var(--gv-ease), box-shadow var(--gv-t) ease, border-color var(--gv-t) ease; }
+.glowvai-root .shop-product-card.shop-product-card .shop-product-media{ margin: 8px 8px 0; border-radius: var(--gv-r-media); background: var(--gv-blue-tint); aspect-ratio: 1 / 1; }
+.glowvai-root .shop-product-card .shop-product-open{ display: grid; place-items: center; padding: 6px; }
+.glowvai-root .shop-product-card .shop-product-open img{ object-fit: contain; mix-blend-mode: multiply; transition: transform 320ms var(--gv-ease); }
+.glowvai-root .shop-product-card.shop-product-card .shop-product-copy{ gap: 3px; padding: 12px 12px 14px; }
+.glowvai-root .shop-product-card .shop-product-price{ order: -1; margin: 0 0 2px; padding: 0; }
+.glowvai-root .shop-product-card .shop-product-price b{ font-size: 17px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.glowvai-root .shop-product-card .shop-product-price s{ font-size: 12px; font-weight: 400; }
+.glowvai-root .shop-product-card .shop-product-price small{ color: var(--gv-muted); font-size: 12px; font-weight: 500; }
+.glowvai-root .shop-product-card.shop-product-card .shop-product-name{ order: 1; font-size: 14px; font-weight: 500; line-height: 1.3; min-height: 2.6em; }
+.glowvai-root .shop-product-card.shop-product-card .shop-product-brand{ order: 2; color: var(--gv-muted); font-size: 12px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.glowvai-root .shop-product-card .shop-product-volume{ order: 3; font-size: 12px; font-weight: 400; color: var(--gv-muted); }
+.glowvai-root .shop-product-card .shop-product-rate{ order: 4; display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; }
+.glowvai-root .shop-product-card .shop-product-rate b{ display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 999px; background: var(--gv-blue); color: #fff; font-size: 11px; font-weight: 700; }
+.glowvai-root .shop-product-card .shop-product-rate small{ color: var(--gv-muted); font-size: 11px; font-weight: 400; }
+.glowvai-root .shop-product-card .shop-product-save{ order: 5; align-self: flex-start; padding: 2px 8px; border-radius: 999px; background: var(--gv-save-bg); color: var(--gv-save); font-size: 11px; font-weight: 700; }
+.glowvai-root .shop-product-card .shop-product-delivery{ order: 6; font-weight: 500; }
+.glowvai-root .shop-product-card .shop-product-cta{ order: 7; }
+.glowvai-root .shop-product-card.shop-product-card .shop-product-badge{ top: 10px; left: 10px; padding: 3px 9px; border-radius: 999px; background: var(--gv-blue); color: #fff; font-size: 11px; font-weight: 700; box-shadow: 0 2px 6px rgba(0, 87, 251, .3); }
+.glowvai-root .shop-product-heart{ position: absolute; top: 8px; right: 8px; display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--gv-ink); box-shadow: 0 2px 8px rgba(11, 27, 63, .12); backdrop-filter: blur(6px); }
+.glowvai-root .shop-product-heart.is-saved{ color: var(--gv-blue); }
+
+/* Add pill: labelled "Add +" like the app, brand blue, sits on the media corner. */
+.glowvai-root .shop-product-card .shop-product-add{ right: 8px; bottom: 8px; width: auto; min-width: 64px; height: 34px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 2px; border: 1px solid #fff; border-radius: 999px; background: var(--gv-blue); box-shadow: var(--gv-shadow-brand); font-size: 13px; font-weight: 700; }
+.glowvai-root .shop-product-card .shop-product-add svg{ width: 16px; height: 16px; }
+.glowvai-root .shop-product-card .shop-stepper{ right: 8px; bottom: 8px; height: 34px; border: 1px solid #fff; box-shadow: var(--gv-shadow-brand); }
+.glowvai-root .shop-product-card .shop-stepper button{ width: 32px; height: 34px; }
+.glowvai-root .shop-product-card .shop-stepper b{ min-width: 20px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.glowvai-root .shop-product-card .shop-stepper.is-inline{ position: static; width: 100%; height: 40px; border: 0; border-radius: 12px; box-shadow: none; }
+.glowvai-root .shop-product-card .shop-stepper.is-inline button{ height: 40px; }
+.glowvai-root .shop-product-card .shop-product-add-btn{ min-height: 40px; border-radius: 12px; border-width: 1.5px; font-weight: 700; }
+.glowvai-root .shop-product-card.is-rich{ box-shadow: var(--gv-shadow-card); }
+.glowvai-root .shop-product-card.is-rich .shop-product-media{ background: var(--gv-blue-tint); }
+.glowvai-root .shop-product-card.is-rich.is-list .shop-product-media{ flex: 0 0 180px; margin: 10px; }
+@media (hover: hover){
+  .glowvai-root .shop-product-card.shop-product-card:hover{ transform: translateY(-3px); box-shadow: var(--gv-shadow-card-hover); border-color: #cfdcfb; }
+  .glowvai-root .shop-product-card:hover .shop-product-open img{ transform: scale(1.04); }
+  .glowvai-root .shop-product-card .shop-product-add:hover{ background: var(--gv-blue-dark); }
+}
+.glowvai-root .shop-product-card:active{ transform: scale(.985); }
+@media (min-width: 1024px){
+  .glowvai-root .shop-product-card.shop-product-card .shop-product-copy{ padding: 14px 16px 16px; }
+  .glowvai-root .shop-product-card .shop-product-price b{ font-size: 18px; }
+}
+
+/* ---------- Skeleton shimmer and spinner ---------- */
+.glowvai-root .shop-skeleton, .glowvai-root .gv-skel{ border-radius: var(--gv-r-media); background: linear-gradient(100deg, var(--gv-skel-a) 30%, var(--gv-skel-b) 50%, var(--gv-skel-a) 70%); background-size: 240% 100%; animation: gv-shimmer 1.3s ease-in-out infinite; }
+@keyframes gv-shimmer{ from{ background-position: 120% 0; } to{ background-position: -120% 0; } }
+.glowvai-root .gv-spinner{ display: inline-block; width: 22px; height: 22px; border: 2.5px solid var(--gv-blue-tint); border-top-color: var(--gv-blue); border-radius: 50%; animation: gv-spin .7s linear infinite; }
+@keyframes gv-spin{ to{ transform: rotate(360deg); } }
+
+/* ---------- Toast ---------- */
+.glowvai-root .gv-toast{ position: absolute; right: 16px; bottom: 84px; left: 16px; z-index: 300; max-width: 420px; margin: 0 auto; padding: 12px 18px; border-radius: 14px; background: var(--gv-ink); color: #fff; font-size: 13px; font-weight: 500; line-height: 1.35; text-align: center; box-shadow: var(--gv-shadow-float); animation: toast-in 220ms var(--gv-ease) both; }
+
+/* ---------- Mini-cart pill and tab bar (phone) ---------- */
+.glowvai-root .bottom-commerce-shell{ padding: 0 10px calc(10px + var(--safe-bottom)); border-top: 0; background: linear-gradient(180deg, rgba(247, 249, 255, 0), var(--gv-page) 38%); pointer-events: none; }
+.glowvai-root .bottom-commerce-shell > *{ pointer-events: auto; }
+.glowvai-root .mini-cart-bar{ width: 100%; max-width: none; height: 60px; margin: 0 0 8px; padding: 8px 8px 8px 12px; border: 1px solid var(--gv-hairline); border-radius: 20px; background: #fff; color: var(--gv-ink); box-shadow: var(--gv-shadow-float); }
+.glowvai-root .mini-cart-bar:hover{ background: #fff; }
+.glowvai-root .mini-cart-icon{ width: 38px; height: 38px; border-radius: 12px; background: var(--gv-blue-tint); color: var(--gv-blue); }
+.glowvai-root .mini-cart-copy b{ font-size: 15px; }
+.glowvai-root .mini-cart-copy small{ color: var(--gv-muted); font-weight: 500; }
+.glowvai-root .mini-cart-action{ width: 44px; height: 44px; border-radius: 14px; background: var(--gv-blue); color: #fff; box-shadow: var(--gv-shadow-brand); }
+.glowvai-root .quick-bottom-nav{ height: 64px; padding: 6px; border: 1px solid var(--gv-hairline); border-radius: 24px; background: rgba(255, 255, 255, .96); box-shadow: var(--gv-shadow-float); backdrop-filter: blur(10px); }
+.glowvai-root .quick-bottom-nav > button{ border-radius: 18px; color: var(--gv-muted); font-weight: 500; transition: color var(--gv-t) ease, background-color var(--gv-t) ease, transform 160ms var(--gv-ease); }
+.glowvai-root .quick-bottom-nav > button:active{ transform: scale(.94); }
+.glowvai-root .quick-bottom-nav > button.is-active{ background: var(--gv-blue-tint); color: var(--gv-blue); font-weight: 700; }
+.glowvai-root .quick-bottom-nav > button.is-active::after{ display: none; }
+
+/* ---------- Footer (desktop shop footer link polish) ---------- */
+.glowvai-root .shop-desk-footer a, .glowvai-root .shop-desk-footer button{ transition: color var(--gv-t) ease, opacity var(--gv-t) ease, transform 160ms var(--gv-ease); }
+@media (hover: hover){ .glowvai-root .shop-desk-footer a:hover{ color: #fff; } }
+.glowvai-root .shop-desk-footer :focus-visible{ outline-color: #fff; box-shadow: none; }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root *, .glowvai-root *::before, .glowvai-root *::after{ animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .glowvai-root .shop-product-card:hover, .glowvai-root .shop-product-card:active{ transform: none; }
+}
+
+/* Rich cards: price stays on top, the action row sits at the bottom so a row of cards lines up. */
+.glowvai-root .shop-product-card.shop-product-card.shop-product-card .shop-product-price{ margin: 0 0 2px; padding: 0; }
+.glowvai-root .shop-product-card.shop-product-card.shop-product-card .shop-product-cta{ margin-top: auto; padding-top: 8px; }
+.glowvai-root .shop-product-card.is-rich.is-list .shop-product-copy{ justify-content: flex-start; }
