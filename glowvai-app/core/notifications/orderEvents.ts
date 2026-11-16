@@ -151,9 +151,12 @@ const toStored = (next: OrderSnapshot): StoredOrderState => ({
 });
 
 // Compares every order returned now with what was seen before. Returns the events and the new record to keep.
+// `announce` is false for the first load of a browser session: the stored record may be from an earlier visit, so any
+// difference is old news and is recorded silently. Only changes seen after that, in the same session, raise messages.
 export const collectOrderEvents = (
   orders: ServerOrderLike[],
   seen: SeenOrders | null,
+  announce = true,
 ): { events: OrderEvent[]; next: SeenOrders } => {
   const events: OrderEvent[] = [];
   const nextOrders: Record<string, StoredOrderState> = {};
@@ -169,6 +172,10 @@ export const collectOrderEvents = (
       continue;
     }
     const isNew = !prev && snapshot.createdAt >= baselineAt - CLOCK_SLACK_MS;
+    if (!announce) {
+      nextOrders[snapshot.orderId] = toStored(snapshot);
+      continue;
+    }
     for (const kind of eventsForChange(prev, snapshot, isNew)) {
       events.push({ kind, orderId: snapshot.orderId, amount: snapshot.amount, reason: snapshot.reason });
     }
