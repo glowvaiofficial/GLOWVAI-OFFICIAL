@@ -378,3 +378,13 @@
     .glowvai-root .gvh .gvh-section:not([aria-busy="true"]) { animation: gvh-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
   }
 }
+
+/* Category tiles stay calm: white at rest, only a soft accent tint on hover, press and selected (never a solid fill). */
+.glowvai-root .gvh .gvh-cat:not(.is-brand) .gvh-cat-media { background: #fff; border-color: rgba(11, 27, 77, .1); color: var(--gvh-ink); }
+.glowvai-root .gvh .gvh-cat:not(.is-brand):active .gvh-cat-media,
+.glowvai-root .gvh .gvh-cat:not(.is-brand)[aria-pressed="true"] .gvh-cat-media { background: var(--ac-tint); border-color: var(--ac-ring); color: var(--ac-text); transform: scale(.97); }
+.glowvai-root .gvh .gvh-cat:not(.is-brand):active .gvh-cat-media img { mix-blend-mode: multiply; }
+@media (hover: hover) {
+  .glowvai-root .gvh .gvh-cat:not(.is-brand):hover .gvh-cat-media { background: var(--ac-tint); border-color: var(--ac-ring); color: var(--ac-text); transform: translateY(-2px); }
+  .glowvai-root .gvh .gvh-cat:not(.is-brand):hover .gvh-cat-media img { mix-blend-mode: multiply; }
+}
