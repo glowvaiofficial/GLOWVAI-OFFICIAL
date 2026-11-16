@@ -9,21 +9,21 @@
 .glowvai-root .profile-header{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px var(--ds-gutter) 0; background:transparent; }
 .glowvai-root .profile-header-copy{ flex:1 1 160px; min-width:0; }
 .glowvai-root .profile-eyebrow{ display:block; margin-bottom:2px; color:var(--ds-muted); font-size:var(--ds-small); font-weight:700; letter-spacing:.02em; }
-.glowvai-root .profile-title{ color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:800; line-height:1.15; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.glowvai-root .profile-title{ color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:700; line-height:1.15; letter-spacing:-.005em; overflow-wrap:anywhere; }
 .glowvai-root .profile-icon-button{ display:inline-flex; width:44px; height:44px; flex:none; align-items:center; justify-content:center; border:1px solid var(--ds-line); border-radius:50%; background:var(--ds-card); color:var(--ds-ink); transition:background-color .18s ease, border-color .18s ease; }
 .glowvai-root .profile-header > .profile-button{ flex:none; }
 
 .glowvai-root .profile-body{ display:flex; flex-direction:column; gap:var(--ds-gap); padding:20px var(--ds-gutter) 32px; }
-.glowvai-root .profile-label{ color:var(--ds-muted); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.glowvai-root .profile-label{ color:var(--ds-muted); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 /* Section headings: a label that sits in the page flow rather than inside a card. */
-.glowvai-root :is(.profile-body, .profile-side, .profile-main) > .profile-label{ margin-top:calc(var(--ds-section) - var(--ds-gap)); color:var(--ds-ink); font-size:var(--ds-h2); font-weight:800; line-height:1.2; letter-spacing:-.02em; text-transform:none; }
+.glowvai-root :is(.profile-body, .profile-side, .profile-main) > .profile-label{ margin-top:calc(var(--ds-section) - var(--ds-gap)); color:var(--ds-ink); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.005em; text-transform:none; }
 .glowvai-root .profile-body > .profile-label:first-child,
 .glowvai-root .profile-body > :first-child > .profile-label:first-child{ margin-top:0; }
 
 /* Card */
 .glowvai-root .profile-card{ overflow:hidden; border:1px solid var(--ds-line); border-radius:var(--ds-radius); background:var(--ds-card); box-shadow:var(--ds-shadow); }
 .glowvai-root .profile-card-body{ display:flex; flex-direction:column; gap:12px; padding:16px; }
-.glowvai-root .profile-card-title{ color:var(--ds-ink); font-size:16px; font-weight:800; line-height:1.3; letter-spacing:-.02em; }
+.glowvai-root .profile-card-title{ color:var(--ds-ink); font-size:16px; font-weight:700; line-height:1.3; letter-spacing:-.005em; }
 .glowvai-root .profile-card-sub{ color:var(--ds-muted); font-size:13px; line-height:1.5; }
 .glowvai-root .profile-divider{ height:1px; background:var(--ds-line); }
 .glowvai-root .profile-text-link{ display:inline-flex; min-height:44px; align-items:center; align-self:flex-start; color:var(--ds-brand); font-size:14px; font-weight:700; }
@@ -32,13 +32,13 @@
 
 .glowvai-root .profile-user-button{ display:flex; width:100%; min-height:56px; align-items:center; gap:14px; padding:16px; text-align:left; }
 .glowvai-root .profile-user-copy{ display:flex; flex:1; min-width:0; flex-direction:column; align-items:flex-start; gap:4px; }
-.glowvai-root .profile-user-name{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; color:var(--ds-ink); font-size:17px; font-weight:800; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.glowvai-root .profile-user-name{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; color:var(--ds-ink); font-size:17px; font-weight:700; letter-spacing:-.005em; overflow-wrap:anywhere; }
 .glowvai-root .profile-user-phone{ color:var(--ds-muted); font-size:13px; }
-.glowvai-root .profile-hero-avatar{ display:grid; width:52px; height:52px; flex:none; place-items:center; overflow:hidden; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:18px; font-weight:800; }
+.glowvai-root .profile-hero-avatar{ display:grid; width:52px; height:52px; flex:none; place-items:center; overflow:hidden; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:18px; font-weight:700; }
 .glowvai-root .profile-hero-avatar img{ width:100%; height:100%; object-fit:cover; }
 
 /* Badges */
-.glowvai-root .profile-pill{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:var(--ds-pill); background:var(--ds-sky); color:var(--ds-brand); font-size:11px; font-weight:800; white-space:nowrap; }
+.glowvai-root .profile-pill{ display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:var(--ds-pill); background:var(--ds-sky); color:var(--ds-brand); font-size:11px; font-weight:700; white-space:nowrap; }
 .glowvai-root .profile-pill.is-success{ background:var(--ds-success-bg); color:var(--ds-success); }
 .glowvai-root .profile-pill.is-warning{ background:var(--warning-bg); color:var(--warning); }
 .glowvai-root .profile-pill.is-error{ background:var(--ds-danger-bg); color:var(--ds-danger); }
@@ -56,7 +56,7 @@
 .glowvai-root .profile-tile{ display:flex; min-width:0; flex-direction:column; align-items:flex-start; gap:4px; padding:14px; border:1px solid var(--ds-line); border-radius:var(--ds-radius); background:var(--ds-card); box-shadow:var(--ds-shadow); text-align:left; transition:transform .18s ease, box-shadow .18s ease; }
 .glowvai-root .profile-tile-top{ display:flex; width:100%; align-items:center; justify-content:space-between; margin-bottom:8px; color:var(--ds-muted); }
 .glowvai-root .profile-tile-icon{ display:grid; width:38px; height:38px; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); }
-.glowvai-root .profile-tile-label{ color:var(--ds-ink); font-size:14px; font-weight:800; }
+.glowvai-root .profile-tile-label{ color:var(--ds-ink); font-size:14px; font-weight:700; }
 .glowvai-root .profile-tile-note{ color:var(--ds-muted); font-size:12px; }
 
 /* Lists / rows */
@@ -70,7 +70,7 @@
 .glowvai-root .profile-list-title{ color:var(--ds-ink); font-size:14px; font-weight:700; }
 .glowvai-root .profile-list-title.is-danger{ color:var(--ds-danger); }
 .glowvai-root .profile-list-note{ color:var(--ds-muted); font-size:12px; line-height:1.4; }
-.glowvai-root .profile-list-value{ color:var(--ds-muted); font-size:13px; font-weight:600; white-space:nowrap; }
+.glowvai-root .profile-list-value{ color:var(--ds-muted); font-size:13px; font-weight:700; white-space:nowrap; }
 .glowvai-root .profile-list-select{ max-width:150px; height:36px; padding:0 10px; border:1px solid var(--ds-line); border-radius:var(--ds-radius-sm); background:var(--ds-card); font-size:13px; font-weight:700; }
 .glowvai-root .profile-privacy-note{ display:flex; gap:10px; padding:0 16px 14px 66px; color:var(--ds-muted); font-size:12px; line-height:1.5; }
 .glowvai-root .profile-privacy-note svg{ flex:none; color:var(--ds-brand); }
@@ -93,7 +93,7 @@
 .glowvai-root .profile-avatar-button{ position:relative; display:inline-flex; }
 .glowvai-root .profile-hero-avatar-lg{ width:96px; height:96px; font-size:28px; }
 .glowvai-root .profile-avatar-camera{ position:absolute; right:0; bottom:0; display:grid; width:32px; height:32px; place-items:center; border:2px solid #fff; border-radius:50%; background:var(--ds-brand); color:#fff; }
-.glowvai-root .profile-field-error{ color:var(--ds-danger); font-size:13px; font-weight:600; }
+.glowvai-root .profile-field-error{ color:var(--ds-danger); font-size:13px; font-weight:500; }
 .glowvai-root .profile-field-hint{ color:var(--ds-muted); font-size:var(--ds-small); line-height:1.45; }
 
 /* Chips */
@@ -125,22 +125,22 @@
 .glowvai-root .profile-empty-block{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:24px 16px; text-align:center; }
 .glowvai-root .profile-empty-block .profile-empty{ padding:0 0 10px; }
 .glowvai-root .profile-empty-icon{ display:grid; width:56px; height:56px; margin-bottom:6px; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); }
-.glowvai-root .profile-empty-title{ color:var(--ds-ink); font-size:18px; font-weight:800; letter-spacing:-.02em; }
+.glowvai-root .profile-empty-title{ color:var(--ds-ink); font-size:18px; font-weight:700; letter-spacing:-.005em; }
 .glowvai-root .profile-empty-row{ display:flex; flex-direction:column; align-items:center; gap:6px; padding:28px 20px; text-align:center; }
 .glowvai-root .profile-empty-row .profile-list-icon{ width:56px; height:56px; margin-bottom:6px; }
 .glowvai-root .profile-empty-row .profile-list-copy{ align-items:center; gap:6px; }
-.glowvai-root .profile-empty-row .profile-list-title{ font-size:18px; font-weight:800; }
+.glowvai-root .profile-empty-row .profile-list-title{ font-size:18px; font-weight:700; }
 .glowvai-root .profile-empty-row .profile-list-note{ max-width:360px; font-size:14px; line-height:1.5; }
 
 /* Brand panel (referral intro): same gradient family as the home's skin scan block. */
 .glowvai-root .profile-hero{ display:flex; flex-direction:column; gap:8px; padding:20px; border-radius:var(--ds-radius-lg); background:linear-gradient(120deg, var(--ds-brand) 0%, var(--ds-brand-dark) 55%, var(--ds-ink) 100%); color:#fff; }
-.glowvai-root .profile-hero-kicker{ align-self:flex-start; padding:4px 10px; border-radius:var(--ds-pill); background:rgba(255,255,255,.16); color:#d6e2ff; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
-.glowvai-root .profile-hero-title{ margin-top:6px; font-size:var(--ds-h2); font-weight:800; line-height:1.2; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.glowvai-root .profile-hero-kicker{ align-self:flex-start; padding:4px 10px; border-radius:var(--ds-pill); background:rgba(255,255,255,.16); color:#d6e2ff; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.glowvai-root .profile-hero-title{ margin-top:6px; font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.005em; overflow-wrap:anywhere; }
 .glowvai-root .profile-hero-sub{ color:rgba(255,255,255,.85); font-size:14px; line-height:1.5; }
 .glowvai-root .profile-progress{ height:8px; overflow:hidden; border-radius:var(--ds-pill); background:var(--ds-sky); }
 .glowvai-root .profile-progress span{ display:block; height:100%; border-radius:inherit; background:var(--ds-brand); }
 .glowvai-root .profile-stat-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
-.glowvai-root .profile-stat-value{ color:var(--ds-brand); font-size:24px; font-weight:800; letter-spacing:-.02em; }
+.glowvai-root .profile-stat-value{ color:var(--ds-brand); font-size:24px; font-weight:700; letter-spacing:-.005em; }
 .glowvai-root .profile-inline-title{ display:inline-flex; align-items:center; gap:8px; }
 .glowvai-root .profile-inline-title svg, .glowvai-root .profile-title-icon svg{ color:var(--ds-brand); }
 
@@ -153,15 +153,15 @@
 .glowvai-root .profile-file-input{ display:none; }
 
 .glowvai-root .profile-timeline{ display:flex; flex-direction:column; gap:12px; }
-.glowvai-root .profile-timeline-row{ display:flex; align-items:center; gap:10px; color:var(--ds-ink); font-size:13px; font-weight:650; }
-.glowvai-root .profile-timeline-row.is-pending{ color:var(--ds-muted); font-weight:600; }
+.glowvai-root .profile-timeline-row{ display:flex; align-items:center; gap:10px; color:var(--ds-ink); font-size:13px; font-weight:700; }
+.glowvai-root .profile-timeline-row.is-pending{ color:var(--ds-muted); font-weight:500; }
 
 .glowvai-root .profile-faq-question{ display:flex; width:100%; min-height:56px; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; color:var(--ds-ink); font-size:14px; font-weight:700; text-align:left; }
 .glowvai-root .profile-faq-answer{ padding:0 16px 16px; color:var(--ds-muted); font-size:14px; line-height:1.55; }
 .glowvai-root .profile-ticket-button{ display:flex; width:100%; flex-direction:column; gap:6px; padding:16px; text-align:left; }
 .glowvai-root .profile-ticket-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
 .glowvai-root .profile-ticket-title{ color:var(--ds-ink); font-size:15px; font-weight:700; }
-.glowvai-root .profile-ticket-meta{ color:var(--ds-ink); font-size:14px; font-weight:800; }
+.glowvai-root .profile-ticket-meta{ color:var(--ds-ink); font-size:14px; font-weight:700; }
 .glowvai-root .profile-thread{ display:flex; flex-direction:column; gap:8px; padding:12px 16px 16px; border-top:1px solid var(--ds-line); }
 .glowvai-root .profile-bubble{ max-width:85%; padding:8px 12px; border-radius:var(--ds-radius-sm); background:var(--ds-sky); font-size:13px; line-height:1.45; }
 .glowvai-root .profile-bubble.is-user{ align-self:flex-end; background:var(--ds-brand); color:#fff; }
@@ -169,7 +169,7 @@
 .glowvai-root .profile-reply-row{ display:flex; gap:8px; }
 
 .glowvai-root .profile-score{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px; }
-.glowvai-root .profile-score-value{ color:var(--ds-brand); font-size:32px; font-weight:800; letter-spacing:-.03em; }
+.glowvai-root .profile-score-value{ color:var(--ds-brand); font-size:32px; font-weight:700; letter-spacing:-.005em; }
 .glowvai-root .profile-score-value small{ color:var(--ds-muted); font-size:14px; font-weight:700; }
 .glowvai-root .profile-check-row{ display:flex; min-height:56px; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; }
 .glowvai-root .profile-check-row + .profile-check-row{ border-top:1px solid var(--ds-line); }
@@ -188,7 +188,7 @@
 @keyframes profile-spin{ to{ transform:rotate(360deg); } }
 .glowvai-root .profile-modal-backdrop{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(7,27,77,.4); }
 .glowvai-root .profile-modal{ display:flex; width:100%; max-width:400px; flex-direction:column; gap:12px; padding:24px; border-radius:var(--ds-radius-lg); background:var(--ds-card); box-shadow:var(--ds-shadow-hover); }
-.glowvai-root .profile-modal h2{ color:var(--ds-ink); font-size:20px; font-weight:800; letter-spacing:-.02em; }
+.glowvai-root .profile-modal h2{ color:var(--ds-ink); font-size:20px; font-weight:700; letter-spacing:-.005em; }
 .glowvai-root .profile-modal p{ color:var(--ds-muted); font-size:14px; line-height:1.5; }
 
 .glowvai-root .profile-identity{ display:flex; align-items:center; gap:16px; padding:16px; }
@@ -201,7 +201,7 @@
 .glowvai-root .profile-status-head > div{ display:flex; min-width:0; flex-direction:column; gap:6px; }
 .glowvai-root .profile-steps{ display:flex; flex-direction:column; gap:14px; margin:0; padding:0; list-style:none; }
 .glowvai-root .profile-step{ display:flex; align-items:flex-start; gap:12px; color:var(--ds-muted); font-size:14px; line-height:1.5; }
-.glowvai-root .profile-step-number{ display:grid; width:30px; height:30px; flex:none; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:13px; font-weight:800; }
+.glowvai-root .profile-step-number{ display:grid; width:30px; height:30px; flex:none; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:13px; font-weight:700; }
 
 /* Suitability cover check-ins */
 .glowvai-root .profile-empty-state{ align-items:center; width:100%; max-width:480px; margin-inline:auto; padding:28px 20px; text-align:center; }

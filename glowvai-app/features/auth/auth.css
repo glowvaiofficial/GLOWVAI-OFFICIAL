@@ -20,34 +20,34 @@
 .glowvai-root .auth-footer{ position: relative; z-index: 2; display: flex; flex-direction: column; gap: 8px; padding: 12px var(--ds-gutter) calc(12px + var(--safe-bottom, 0px)); border-top: 1px solid var(--ds-line); background: var(--ds-card); }
 .glowvai-root .auth-icon-button{ display: grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border: 1px solid var(--ds-line); border-radius: 50%; background: var(--ds-card); color: var(--ds-ink); }
 .glowvai-root .auth-icon-button svg{ width: 18px; height: 18px; stroke-width: 2.2; }
-.glowvai-root .auth-title{ color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .auth-title{ color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .auth-subtitle{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-body); font-weight: 500; line-height: 1.5; }
-.glowvai-root .auth-strong{ color: var(--ds-ink); font-weight: 750; }
+.glowvai-root .auth-strong{ color: var(--ds-ink); font-weight: 700; }
 .glowvai-root .auth-mono{ font-variant-numeric: tabular-nums; }
 .glowvai-root .auth-hint{ color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-center{ text-align: center; }
-.glowvai-root .auth-label{ display: block; margin-bottom: 6px; color: var(--ds-muted); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-label{ display: block; margin-bottom: 6px; color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .glowvai-root .auth-label-row{ display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .glowvai-root .auth-label-row .auth-label{ margin-bottom: 0; }
-.glowvai-root .auth-section-label{ display: block; margin: 24px 0 8px; color: var(--ds-muted); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-section-label{ display: block; margin: 24px 0 8px; color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .glowvai-root .auth-form-group{ margin-top: 16px; }
-.glowvai-root .auth-page-heading{ display: flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .auth-page-heading{ display: flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .auth-page-heading svg{ width: 18px; height: 18px; color: var(--ds-brand); }
 .glowvai-root .auth-text-button{ display: inline-flex; min-height: 32px; align-items: center; gap: 6px; padding: 4px 0; color: var(--ds-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .auth-text-button svg{ width: 14px; height: 14px; }
 .glowvai-root .auth-text-button:disabled{ color: #98a1b3; cursor: default; }
 .glowvai-root .auth-topbar .auth-text-button, .glowvai-root .auth-footer .auth-text-button{ min-height: 44px; }
-.glowvai-root .auth-dev-hint{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 600; }
+.glowvai-root .auth-dev-hint{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-label-spaced{ margin-top: 20px; }
-.glowvai-root .auth-footer-link{ align-self: center; color: var(--ds-muted); font-size: 13px; font-weight: 600; text-align: center; }
-.glowvai-root .auth-skip-link{ align-self: center; margin-top: 12px; color: var(--ds-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .auth-footer-link{ align-self: center; color: var(--ds-muted); font-size: 13px; font-weight: 500; text-align: center; }
+.glowvai-root .auth-skip-link{ align-self: center; margin-top: 12px; color: var(--ds-muted); font-size: 13px; font-weight: 500; }
 .glowvai-root .auth-resend{ font-size: 13px; }
 .glowvai-root .auth-link{ color: var(--ds-brand); font-weight: 700; }
 .glowvai-root .auth-status-row{ display: flex; min-height: 20px; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: var(--ds-muted); font-size: 13px; font-weight: 500; }
 .glowvai-root .auth-status-row-tight{ margin-top: 12px; justify-content: space-between; }
-.glowvai-root .auth-error{ display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border: 1px solid #f1c5c9; border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 650; }
+.glowvai-root .auth-error{ display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; border: 1px solid #f1c5c9; border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 700; }
 .glowvai-root .auth-error svg{ width: 14px; height: 14px; flex: 0 0 auto; }
-.glowvai-root .auth-field-error{ display: flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--ds-danger); font-size: var(--ds-small); font-weight: 600; }
+.glowvai-root .auth-field-error{ display: flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--ds-danger); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-field-error svg{ width: 12px; height: 12px; }
 .glowvai-root .auth-primary-button{
   display: grid;
@@ -79,10 +79,10 @@
 .glowvai-root .auth-field svg{ width: 18px; height: 18px; flex: 0 0 auto; }
 .glowvai-root .auth-field:focus-within{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); }
 .glowvai-root .auth-field.has-error{ border-color: var(--ds-danger); }
-.glowvai-root .auth-field input{ width: 100%; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ds-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .auth-field input{ width: 100%; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ds-ink); font-size: 16px; font-weight: 500; }
 .glowvai-root .auth-field input::placeholder{ color: #8290aa; font-weight: 500; opacity: 1; }
 .glowvai-root .auth-field-plain{ padding: 0 14px; }
-.glowvai-root .auth-field strong{ color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .auth-field strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 
 /* ── Login ──────────────────────────────────────────────── */
 .glowvai-root .auth-login-hero{ position: relative; flex: 0 0 44%; min-height: 300px; overflow: hidden; background: var(--ds-brand); color: #fff; }
@@ -95,7 +95,7 @@
 .glowvai-root .auth-skip-pill::before{ position: absolute; inset: -7px -4px; content: ''; }
 .glowvai-root .auth-skip-pill-light{ background: var(--ds-card); color: var(--ds-brand); border: 1px solid var(--ds-line); text-transform: none; }
 .glowvai-root .auth-brand-tap{ position: absolute; z-index: 2; top: 84px; left: 0; right: 0; display: flex; justify-content: center; }
-.glowvai-root .auth-brand-wordmark{ font-family: var(--font-brand); font-size: 50px; font-weight: 600; line-height: 1; letter-spacing: -.045em; color: #fff; text-transform: lowercase; }
+.glowvai-root .auth-brand-wordmark{ font-family: var(--font-brand); font-size: 50px; font-weight: 700; line-height: 1; letter-spacing: -.045em; color: #fff; text-transform: lowercase; }
 .glowvai-root .auth-mascot{ position: absolute; z-index: 2; bottom: -10px; width: 104px; height: auto; pointer-events: none; }
 .glowvai-root .auth-mascot-left{ left: 8px; }
 .glowvai-root .auth-mascot-right{ right: 8px; }
@@ -104,9 +104,9 @@
 .glowvai-root .auth-phone-field{ display: grid; height: var(--ds-control); grid-template-columns: 24px auto 1px minmax(0,1fr); align-items: center; gap: 9px; padding: 0 14px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); transition: border-color .18s ease, box-shadow .18s ease; }
 .glowvai-root .auth-phone-field:focus-within{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); }
 .glowvai-root .auth-phone-field.has-error{ border-color: var(--ds-danger); }
-.glowvai-root .auth-phone-field input{ width: 100%; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ds-ink); font-size: 16px; font-weight: 600; letter-spacing: .02em; }
+.glowvai-root .auth-phone-field input{ width: 100%; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ds-ink); font-size: 16px; font-weight: 500; letter-spacing: .02em; }
 .glowvai-root .auth-phone-field input::placeholder{ color: #8290aa; font-weight: 500; opacity: 1; }
-.glowvai-root .auth-phone-field strong{ color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .auth-phone-field strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .auth-flag{ font-size: 15px; line-height: 1; }
 .glowvai-root .auth-chevron{ width: 14px; height: 14px; color: var(--ds-brand); stroke-width: 2.4; }
 .glowvai-root .auth-divider{ width: 1px; height: 28px; background: var(--ds-line); }
@@ -123,10 +123,10 @@
 .glowvai-root .auth-slide{ display: flex; flex: 0 0 100%; min-width: 0; flex-direction: column; padding: 8px var(--ds-gutter) 0; }
 .glowvai-root .auth-slide-image{ position: relative; height: 300px; overflow: hidden; border-radius: var(--ds-radius-lg); background: var(--ds-sky); }
 .glowvai-root .auth-slide-image img{ width: 100%; height: 100%; object-fit: cover; }
-.glowvai-root .auth-slide-badge{ position: absolute; left: 14px; bottom: 14px; padding: 6px 10px; border-radius: var(--ds-pill); background: rgba(255,255,255,.94); color: var(--ds-brand); font-size: 11px; font-weight: 800; letter-spacing: .06em; }
+.glowvai-root .auth-slide-badge{ position: absolute; left: 14px; bottom: 14px; padding: 6px 10px; border-radius: var(--ds-pill); background: rgba(255,255,255,.94); color: var(--ds-brand); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
 .glowvai-root .auth-welcome-panel{ display: flex; flex: 1; min-height: 0; flex-direction: column; }
 .glowvai-root .auth-welcome-copy{ flex: 1; min-height: 0; padding: 0 var(--ds-gutter); }
-.glowvai-root .auth-slide-title{ margin-top: 20px; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .auth-slide-title{ margin-top: 20px; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .auth-slide-body{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-body); font-weight: 500; line-height: 1.5; }
 .glowvai-root .auth-dots{ display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
 .glowvai-root .auth-dot{ position: relative; width: 6px; height: 6px; padding: 0; border-radius: var(--ds-pill); background: #cbd5e6; transition: width .25s ease, background-color .25s ease; }
@@ -146,13 +146,13 @@
 @keyframes auth-progress-fill{ from{ width: 0; } to{ width: 100%; } }
 
 /* ── Cards, list rows, permissions ──────────────────────── */
-.glowvai-root .auth-trust-badge{ display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; margin-bottom: 14px; padding: 5px 10px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 11px; font-weight: 800; letter-spacing: .05em; }
+.glowvai-root .auth-trust-badge{ display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; margin-bottom: 14px; padding: 5px 10px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 11px; font-weight: 700; letter-spacing: .05em; }
 .glowvai-root .auth-trust-badge svg{ width: 13px; height: 13px; }
 .glowvai-root .auth-card{ margin-top: 16px; padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
 .glowvai-root .auth-card-header{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .glowvai-root .auth-card-icon{ display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .auth-card-icon svg{ width: 20px; height: 20px; }
-.glowvai-root .auth-card-title{ color: var(--ds-ink); font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .auth-card-title{ color: var(--ds-ink); font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .auth-card-subtitle{ margin-top: 2px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-card .auth-card-title{ margin-bottom: 4px; }
 .glowvai-root .auth-card-copy{ margin-top: 0; }
@@ -160,7 +160,7 @@
 .glowvai-root .auth-permission-row:first-of-type{ border-top: 0; }
 .glowvai-root .auth-permission-icon{ display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .auth-permission-icon svg{ width: 18px; height: 18px; }
-.glowvai-root .auth-permission-text strong{ color: var(--ds-ink); font-size: 14px; font-weight: 750; }
+.glowvai-root .auth-permission-text strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .auth-permission-text p{ margin-top: 3px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; line-height: 1.4; }
 .glowvai-root .auth-switch{ position: relative; display: inline-block; width: 44px; height: 26px; }
 .glowvai-root .auth-switch input{ position: absolute; inset: 0; z-index: 1; margin: 0; opacity: 0; cursor: pointer; }
@@ -171,7 +171,7 @@
 .glowvai-root .auth-switch input:focus-visible + span{ outline: 2px solid var(--ds-brand); outline-offset: 2px; }
 .glowvai-root .auth-privacy-card{ display: flex; gap: 12px; margin-top: 16px; padding: 16px; border: 1px solid #cfe9da; border-radius: var(--ds-radius); background: #f0faf5; color: var(--ds-success); }
 .glowvai-root .auth-privacy-card svg{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; }
-.glowvai-root .auth-privacy-card strong{ color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .auth-privacy-card strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .auth-privacy-card p{ margin-top: 3px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; line-height: 1.45; }
 .glowvai-root .auth-privacy-card-compact{ align-items: center; margin-top: 16px; padding: 12px 14px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; line-height: 1.45; }
 .glowvai-root .auth-privacy-card-compact svg{ margin-top: 0; color: var(--ds-success); }
@@ -180,14 +180,14 @@
 .glowvai-root .auth-step-header{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 .glowvai-root .auth-step-track{ height: 4px; overflow: hidden; border-radius: var(--ds-pill); background: var(--ds-line); }
 .glowvai-root .auth-step-track > span{ display: block; height: 100%; border-radius: var(--ds-pill); background: var(--ds-brand); transition: width .3s ease; }
-.glowvai-root .auth-step-label{ color: var(--ds-brand); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .auth-step-label{ color: var(--ds-brand); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .glowvai-root .auth-avatar-section{ display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 22px 0 18px; }
-.glowvai-root .auth-avatar{ position: relative; display: grid; width: 72px; height: 72px; place-items: center; overflow: visible; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 26px; font-weight: 800; }
+.glowvai-root .auth-avatar{ position: relative; display: grid; width: 72px; height: 72px; place-items: center; overflow: visible; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 26px; font-weight: 700; }
 .glowvai-root .auth-avatar img{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .glowvai-root .auth-avatar-badge{ position: absolute; right: -2px; bottom: -2px; display: grid; width: 24px; height: 24px; place-items: center; border: 2px solid var(--ds-pearl); border-radius: 50%; background: var(--ds-brand); color: #fff; }
 .glowvai-root .auth-avatar-badge svg{ width: 12px; height: 12px; }
 .glowvai-root .auth-chips{ display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 18px; }
-.glowvai-root .auth-chip{ min-height: 40px; padding: 8px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-pill); background: var(--ds-card); color: var(--ds-ink); font-size: 13px; font-weight: 600; transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
+.glowvai-root .auth-chip{ min-height: 40px; padding: 8px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-pill); background: var(--ds-card); color: var(--ds-ink); font-size: 13px; font-weight: 500; transition: background-color .15s ease, border-color .15s ease, color .15s ease; }
 .glowvai-root .auth-chip.is-selected{ border-color: var(--ds-brand); background: var(--ds-brand); color: #fff; }
 .glowvai-root .auth-concern-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: var(--ds-gap); margin-top: 20px; }
 .glowvai-root .auth-concern{ display: flex; min-height: 104px; flex-direction: column; justify-content: space-between; gap: 10px; padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); text-align: left; transition: border-color .15s ease, background-color .15s ease, box-shadow .18s ease, transform .18s ease; }
@@ -198,7 +198,7 @@
 .glowvai-root .auth-concern.is-selected .auth-concern-icon{ background: var(--ds-card); }
 .glowvai-root .auth-concern-check{ display: grid; width: 20px; height: 20px; place-items: center; border-radius: 50%; background: var(--ds-brand); color: #fff; }
 .glowvai-root .auth-concern-check svg{ width: 12px; height: 12px; stroke-width: 3; }
-.glowvai-root .auth-concern-label{ color: var(--ds-ink); font-size: 14px; font-weight: 750; line-height: 1.3; }
+.glowvai-root .auth-concern-label{ color: var(--ds-ink); font-size: 14px; font-weight: 700; line-height: 1.3; }
 @media (hover: hover){
   .glowvai-root .auth-concern:not(.is-selected):hover{ box-shadow: var(--ds-shadow-hover); transform: translateY(-2px); }
 }
@@ -206,12 +206,12 @@
 /* ── Change phone ───────────────────────────────────────── */
 .glowvai-root .auth-info-banner{ display: flex; gap: 12px; margin-top: 16px; padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .auth-info-banner svg{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; }
-.glowvai-root .auth-info-banner strong{ color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .auth-info-banner strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .auth-info-banner p{ margin-top: 3px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; line-height: 1.45; }
 .glowvai-root .auth-current-phone{ display: flex; align-items: center; gap: 12px; margin-top: 0; }
 .glowvai-root .auth-current-phone > div{ flex: 1; display: grid; gap: 2px; }
 .glowvai-root .auth-current-phone .auth-strong{ font-size: 15px; }
-.glowvai-root .auth-active-badge{ display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 11px; font-weight: 800; }
+.glowvai-root .auth-active-badge{ display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 11px; font-weight: 700; }
 .glowvai-root .auth-active-badge svg{ width: 12px; height: 12px; }
 .glowvai-root .auth-card .auth-field{ margin-top: 6px; }
 .glowvai-root .auth-card-list{ padding-top: 4px; padding-bottom: 4px; }
@@ -219,7 +219,7 @@
 
 /* ── OTP ────────────────────────────────────────────────── */
 .glowvai-root .auth-otp-cells{ display: grid; width: 100%; max-width: 354px; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 8px; margin: 24px auto 0; }
-.glowvai-root .auth-otp-cell{ width: 100%; aspect-ratio: 1 / 1.1; max-height: 56px; min-width: 0; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); color: var(--ds-ink); font-size: 22px; font-weight: 800; text-align: center; outline: 0; transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.glowvai-root .auth-otp-cell{ width: 100%; aspect-ratio: 1 / 1.1; max-height: 56px; min-width: 0; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); color: var(--ds-ink); font-size: 22px; font-weight: 700; text-align: center; outline: 0; transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease; }
 .glowvai-root .auth-otp-cell:focus{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); }
 .glowvai-root .auth-otp-cell.is-filled{ border-color: var(--ds-brand); background: var(--ds-card); }
 .glowvai-root .auth-otp-cell:disabled{ opacity: .6; }
@@ -232,21 +232,21 @@
 /* ── Student verification ───────────────────────────────── */
 .glowvai-root .auth-hero-icon{ position: relative; display: grid; width: 72px; height: 72px; margin: 4px auto 18px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .auth-hero-icon > svg{ width: 32px; height: 32px; }
-.glowvai-root .auth-hero-pill{ position: absolute; bottom: -10px; left: 50%; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--ds-pill); background: var(--ds-card); color: var(--ds-ink); font-size: 11px; font-weight: 750; white-space: nowrap; transform: translateX(-50%); box-shadow: var(--ds-shadow); }
+.glowvai-root .auth-hero-pill{ position: absolute; bottom: -10px; left: 50%; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--ds-pill); background: var(--ds-card); color: var(--ds-ink); font-size: 11px; font-weight: 700; white-space: nowrap; transform: translateX(-50%); box-shadow: var(--ds-shadow); }
 .glowvai-root .auth-hero-pill svg{ width: 12px; height: 12px; color: #f27f78; }
 .glowvai-root .auth-upload{ display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px 16px; border: 1.5px dashed #b9c8ea; border-radius: var(--ds-radius); background: var(--ds-pearl); color: var(--ds-brand); text-align: center; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
 .glowvai-root .auth-upload:hover{ border-color: var(--ds-brand); background: var(--ds-sky); }
 .glowvai-root .auth-upload svg{ width: 26px; height: 26px; }
-.glowvai-root .auth-upload strong{ color: var(--ds-ink); font-size: 14px; font-weight: 750; }
+.glowvai-root .auth-upload strong{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .auth-upload span{ color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-upload.has-error{ border-color: var(--ds-danger); }
 .glowvai-root .auth-uploaded{ display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #cfe9da; border-radius: var(--ds-radius); background: #f0faf5; }
 .glowvai-root .auth-uploaded svg{ width: 24px; height: 24px; color: var(--ds-success); flex: 0 0 auto; }
 .glowvai-root .auth-uploaded > div{ flex: 1; min-width: 0; }
 .glowvai-root .auth-uploaded strong{ display: block; overflow: hidden; color: var(--ds-ink); font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .auth-uploaded p{ color: var(--ds-success); font-size: var(--ds-small); font-weight: 600; }
+.glowvai-root .auth-uploaded p{ color: var(--ds-success); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-replace{ cursor: pointer; }
-.glowvai-root .auth-checkbox-row{ display: flex; align-items: center; gap: 10px; margin-top: 16px; color: var(--ds-ink); font-size: 14px; font-weight: 600; text-align: left; }
+.glowvai-root .auth-checkbox-row{ display: flex; align-items: center; gap: 10px; margin-top: 16px; color: var(--ds-ink); font-size: 14px; font-weight: 500; text-align: left; }
 .glowvai-root .auth-checkbox-row svg{ width: 20px; height: 20px; flex: 0 0 auto; color: var(--ds-brand); }
 
 /* ── Focus & motion ─────────────────────────────────────── */

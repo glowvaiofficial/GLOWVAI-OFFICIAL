@@ -9,20 +9,20 @@
 
 /* Page header: round back button, then the title at page-heading size. No coloured bar. */
 .glowvai-root .shop-header{ display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 16px var(--ds-gutter) 0; }
-.glowvai-root .shop-header h1{ flex: 1; min-width: 0; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; }
-.glowvai-root .shop-header-sub{ display: block; overflow: hidden; margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-header h1{ flex: 1; min-width: 0; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
+.glowvai-root .shop-header-sub{ display: block; overflow: hidden; margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .shop-header-titles{ flex: 1; min-width: 0; }
 .glowvai-root .shop-header-actions{ display: flex; flex-shrink: 0; align-items: center; gap: 8px; margin-left: auto; }
 .glowvai-root .shop-icon-btn{ position: relative; display: grid; flex-shrink: 0; width: 44px; height: 44px; place-items: center; padding: 0; border: 1px solid var(--ds-line); border-radius: 50%; background: var(--ds-card); color: var(--ds-ink); }
 .glowvai-root .shop-icon-btn:hover{ border-color: var(--ds-brand); color: var(--ds-brand); }
-.glowvai-root .shop-icon-count{ position: absolute; top: -4px; right: -4px; display: grid; min-width: 18px; height: 18px; padding: 0 5px; place-items: center; border-radius: var(--ds-pill); background: var(--ds-brand); color: #fff; font-size: 10px; font-weight: 800; }
+.glowvai-root .shop-icon-count{ position: absolute; top: -4px; right: -4px; display: grid; min-width: 18px; height: 18px; padding: 0 5px; place-items: center; border-radius: var(--ds-pill); background: var(--ds-brand); color: #fff; font-size: 10px; font-weight: 700; }
 .glowvai-root .shop-screen button:focus-visible, .glowvai-root .shop-screen input:focus-visible{ outline: 2px solid var(--ds-brand); outline-offset: 2px; }
 
 /* Sections */
 .glowvai-root .shop-section{ padding: var(--ds-section) var(--ds-gutter) 0; }
 .glowvai-root .shop-section-head{ display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-.glowvai-root .shop-section-head h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 800; letter-spacing: -0.02em; }
-.glowvai-root .shop-section-head span{ color: var(--ds-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-section-head h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
+.glowvai-root .shop-section-head span{ color: var(--ds-muted); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-section-head button{ color: var(--ds-brand); font-size: 13px; font-weight: 700; background: none; border: 0; }
 
 /* Card */
@@ -54,7 +54,7 @@
 /* Empty state: centred card, sky icon circle, one action */
 .glowvai-root .shop-empty{ display: grid; justify-items: center; gap: 8px; max-width: 480px; margin: var(--ds-section) auto 0; padding: 32px 24px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); text-align: center; color: var(--ds-muted); }
 .glowvai-root .shop-empty-icon{ display: grid; width: 56px; height: 56px; margin-bottom: 4px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
-.glowvai-root .shop-empty h3, .glowvai-root .shop-empty h2{ color: var(--ds-ink); font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+.glowvai-root .shop-empty h3, .glowvai-root .shop-empty h2{ color: var(--ds-ink); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .glowvai-root .shop-empty p{ max-width: 400px; font-size: 14px; line-height: 1.5; }
 .glowvai-root .shop-empty .shop-btn-primary, .glowvai-root .shop-empty .shop-btn-secondary{ width: auto; min-width: 200px; margin-top: 8px; }
 /* Keeps an empty card off the screen edges on phones. */
@@ -73,7 +73,7 @@
 .glowvai-root .shop-product-open img{ display: block; width: 100%; height: 100%; object-fit: cover; }
 .glowvai-root .shop-product-open:focus-visible, .glowvai-root .shop-product-name:focus-visible{ outline: 2px solid var(--ds-brand); outline-offset: 2px; }
 .glowvai-root .shop-product-fallback{ display: grid; height: 100%; place-items: center; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
-.glowvai-root .shop-product-badge{ position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 10px; font-weight: 800; }
+.glowvai-root .shop-product-badge{ position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 10px; font-weight: 700; }
 .glowvai-root .shop-product-add{ position: absolute; right: 8px; bottom: 8px; display: grid; width: 36px; height: 36px; place-items: center; border: 0; border-radius: 9999px; background: var(--ds-brand); color: #fff; box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,.07)); }
 .glowvai-root .shop-product-add::before{ content: ''; position: absolute; inset: -4px; }
 .glowvai-root .shop-stepper{ position: absolute; right: 8px; bottom: 8px; display: flex; align-items: center; height: 36px; overflow: hidden; border-radius: 9999px; background: var(--ds-brand); color: #fff; }
@@ -84,7 +84,7 @@
 .glowvai-root .shop-product-name{ display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; border: 0; background: none; padding: 0; text-align: left; font-size: 12px; font-weight: 700; line-height: 1.35; color: var(--ds-ink); }
 .glowvai-root .shop-product-volume{ color: var(--ds-muted); font-size: 11px; }
 .glowvai-root .shop-product-price{ display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
-.glowvai-root .shop-product-price b{ color: var(--ds-ink); font-size: 14px; font-weight: 800; }
+.glowvai-root .shop-product-price b{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
 .glowvai-root .shop-product-price s{ color: var(--ds-muted); font-size: 11px; }
 .glowvai-root .shop-product-delivery{ display: inline-flex; align-items: center; gap: 4px; color: var(--ds-success); font-size: 10px; font-weight: 700; }
 

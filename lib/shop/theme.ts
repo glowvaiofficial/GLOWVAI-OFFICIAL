@@ -25,9 +25,9 @@ export const DEFAULT_THEME: ShopTheme = {
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
 // The CSS font stacks for each allowed font. Only fonts the shop already serves.
-// Both names map to the one system UI stack (the shop no longer loads Manrope or Syne): the owner chose the phone's own
-// font, as Amazon and Flipkart use, so a saved theme font can never bring a web font back.
-const SYSTEM_STACK = "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
+// Both names map to the one Roboto stack (the same face the native app renders; the shop no longer loads Manrope or Syne), 
+// so a saved theme font can never bring a web font back.
+const SYSTEM_STACK = "var(--font-roboto), Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif";
 export const FONT_STACKS: Record<ThemeFont, string> = {
   manrope: SYSTEM_STACK,
   syne: SYSTEM_STACK,

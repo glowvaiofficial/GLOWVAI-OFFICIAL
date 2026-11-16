@@ -5,7 +5,7 @@
 .glowvai-root .shop-category-toolbar{ display: grid; gap: 12px; padding: 16px var(--ds-gutter) 0; }
 
 .glowvai-root .shop-category-sort-row{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.glowvai-root .shop-category-count{ color: var(--ds-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .shop-category-count{ color: var(--ds-muted); font-size: 13px; font-weight: 500; }
 
 .glowvai-root .shop-category-sort{ position: relative; }
 .glowvai-root .shop-category-pick-list{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
@@ -13,10 +13,10 @@
 .glowvai-root .shop-category-sort-btn:hover, .glowvai-root .shop-category-sort-btn[aria-expanded="true"]{ border-color: var(--ds-brand); }
 .glowvai-root .shop-category-sort-btn svg{ color: var(--ds-brand); }
 .glowvai-root .shop-category-sort-menu{ position: absolute; top: calc(100% + 6px); right: 0; z-index: 10; display: grid; min-width: 220px; overflow: hidden; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); box-shadow: var(--ds-shadow-hover); }
-.glowvai-root .shop-category-sort-item{ display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border: 0; border-bottom: 1px solid var(--ds-line); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 600; text-align: left; }
+.glowvai-root .shop-category-sort-item{ display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; border: 0; border-bottom: 1px solid var(--ds-line); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 500; text-align: left; }
 .glowvai-root .shop-category-sort-item:hover{ background: var(--ds-pearl); }
 .glowvai-root .shop-category-sort-item:last-child{ border-bottom: 0; }
-.glowvai-root .shop-category-sort-item.is-active{ color: var(--ds-brand); font-weight: 800; }
+.glowvai-root .shop-category-sort-item.is-active{ color: var(--ds-brand); font-weight: 700; }
 
 .glowvai-root .shop-category-main{ padding-top: 16px; }
 
