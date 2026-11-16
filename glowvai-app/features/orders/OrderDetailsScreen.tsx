@@ -148,7 +148,9 @@ export const OrderDetailsScreen: React.FC = () => {
           <section className="orders-card" aria-label="Ratings">
             <RateProductsSection order={order} />
           </section>
+        </div>
 
+        <div className="orders-detail-side">
           {pricing && (
             <>
               <h2 className="orders-section-title">Bill summary</h2>
@@ -175,9 +177,7 @@ export const OrderDetailsScreen: React.FC = () => {
               </section>
             </>
           )}
-        </div>
 
-        <div className="orders-detail-side">
           <section className="orders-card orders-actions-card">
             <h2 className="orders-card-title">Need anything else?</h2>
             <div className="orders-action-grid">

@@ -285,3 +285,8 @@ table {
 
 /* The analytics banner waits until first-run onboarding is left, so it never covers the Next button. */
 html[data-gv-onboarding] .gv-consent-banner { display: none; }
+
+/* While the analytics bar is visible the page keeps clear of it, so it never rests on the last lines or buttons. */
+@media (max-width: 767px) {
+  html[data-gv-consent-open] body { padding-bottom: calc(var(--gv-consent-h, 0px) + 96px); }
+}

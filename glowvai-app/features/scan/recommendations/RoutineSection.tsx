@@ -3,7 +3,8 @@ import { ChevronRight, Package, ShoppingBag } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog, type SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ConcernKey, SkinAnalysisResult } from '../../../core/services/skinModelService';
-import { formatRupee, getProductImageUrl } from '../../shop/shared/shopUtils';
+import { useCartStore } from '../../../core/state/cartStore';
+import { cartLineFor, formatRupee, getProductImageUrl } from '../../shop/shared/shopUtils';
 
 // Routine steps are picked from the shop catalogue, so every name and price shown is a real listing.
 const STEPS: { label: string; category: SkincareProduct['category'] }[] = [
@@ -56,7 +57,8 @@ interface RoutineSectionProps {
 
 /** Four-step routine matched to the concerns the scan found, using live shop listings. */
 export const RoutineSection: React.FC<RoutineSectionProps> = ({ result }) => {
-  const { navigate } = useApp();
+  const { navigate, showToast } = useApp();
+  const addItem = useCartStore((state) => state.addItem);
   const catalog = useLiveCatalog();
   const present = result?.concerns.filter((concern) => concern.present && !(result.hiddenConcerns ?? []).includes(concern.key)).map((concern) => concern.key) ?? [];
 
@@ -79,7 +81,7 @@ export const RoutineSection: React.FC<RoutineSectionProps> = ({ result }) => {
       </div>
       <ol className="scan-routine-list">
         {steps.map((step, index) => (
-          <li key={step.category}>
+          <li key={step.category} className="scan-routine-card">
             <button type="button" className="scan-routine-item" onClick={() => navigate('shop-product', { productId: step.product.id })}>
               <span className="scan-routine-step">{index + 1}</span>
               <RoutineImage product={step.product} />
@@ -91,6 +93,18 @@ export const RoutineSection: React.FC<RoutineSectionProps> = ({ result }) => {
               </span>
               <span className="scan-routine-price">{formatRupee(step.product.price)}</span>
               <ChevronRight size={18} className="scan-routine-chevron" />
+            </button>
+            <button
+              type="button"
+              className="v5-add-bag"
+              aria-label={`Add ${step.product.name} to bag`}
+              onClick={() => {
+                addItem(cartLineFor(step.product));
+                showToast('Added to bag');
+              }}
+            >
+              <ShoppingBag size={15} aria-hidden="true" />
+              Add to bag
             </button>
           </li>
         ))}

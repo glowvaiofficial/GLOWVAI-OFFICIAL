@@ -1,6 +1,6 @@
 import { isPosterOnlyHero } from '../lib/heroPoster';
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgePercent, ChevronDown, Crown, Droplets, Flower2, Gift, Headset, Heart, LayoutGrid, Leaf, MapPin, Minus, Plus, RotateCcw, ScanFace, Search, ShieldCheck, Sparkles, Star, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
+import { ArrowRight, BadgePercent, ChevronDown, Crown, Droplets, Flower2, Gift, Headset, Heart, LayoutGrid, Leaf, MapPin, Minus, Package, Plus, RotateCcw, ScanFace, Search, ShieldCheck, Sparkles, Star, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
@@ -9,7 +9,7 @@ import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rule
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { HeaderCartButton } from '../shared/HeaderCartButton';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, BRAND_MARK_URL } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { HERO_IMAGE, useHomeNavigate } from '../lib/homeCommon';
 import type { PricePointTile } from '../lib/homeModel';
 import type { BlockItem, BlockSettings, HeaderSettings, HeroOverride } from '../lib/useHomeLayout';
@@ -56,7 +56,9 @@ export function MobileHomeHeader({
   embedded,
   unread,
   initial,
+  tabs = HOME_TABS,
 }: {
+  tabs?: readonly HomeTab[];
   header: HeaderSettings;
   tab: HomeTab;
   onTab: (tab: HomeTab) => void;
@@ -115,7 +117,7 @@ export function MobileHomeHeader({
       </div>
 
       <div className="gvh-tabs" role="group" aria-label="Shop by concern">
-        {HOME_TABS.map((t) => {
+        {tabs.map((t) => {
           const selected = t.id === tab.id;
           const isAll = t.id === 'all';
           const Icon = TAB_ICONS[t.id];
@@ -349,7 +351,7 @@ export function PricePoints({ tiles, onOpen }: { tiles: PricePointTile[]; onOpen
       <div className="gvh-prices" style={{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))` }}>
         {tiles.map((t, i) => (
           <button key={t.max} type="button" className="gvh-price" style={varsStyle(itemAccent({ label: t.label }, i + 1))} onClick={() => onOpen(t.max)} aria-label={`${t.label}, ${t.count} ${t.count === 1 ? 'product' : 'products'}`}>
-            <span className="gvh-price-media">{t.sample && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
+            <span className="gvh-price-media">{t.sample && hasProductPhoto(t.sample) && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
             <b>{t.label}</b>
             <small>{t.count} {t.count === 1 ? 'product' : 'products'}</small>
           </button>
@@ -603,10 +605,10 @@ export function FlashSaleRows({ sales, catalog, now, accent }: { sales: FlashSal
 
 // ---------- Categories: pastel accent tiles ----------
 
-export function CategoryTile({ label, accent, onOpen, image, sub }: { label: string; accent: string; onOpen: () => void; image?: string | null; Icon?: LucideIcon; sub?: string | null }) {
+export function CategoryTile({ label, accent, onOpen, image, sub, Icon }: { label: string; accent: string; onOpen: () => void; image?: string | null; Icon?: LucideIcon; sub?: string | null }) {
   return (
     <button type="button" className={`gvh-cat${image ? '' : ' is-brand'}`} style={varsStyle(accent)} onClick={onOpen} aria-label={sub ? `${label}, ${sub}` : label}>
-      <span className="gvh-cat-media">{image ? <img src={image} alt="" width={200} height={200} loading="lazy" decoding="async" /> : <img className="gvh-cat-mark" src={BRAND_MARK_URL} alt="" width={32} height={38} decoding="async" />}</span>
+      <span className="gvh-cat-media">{image ? <img src={image} alt="" width={200} height={200} loading="lazy" decoding="async" /> : <span className="gvh-cat-ico" aria-hidden="true">{Icon ? <Icon size={26} /> : <Package size={26} />}</span>}</span>
       <span className="gvh-cat-label">{label}</span>
     </button>
   );

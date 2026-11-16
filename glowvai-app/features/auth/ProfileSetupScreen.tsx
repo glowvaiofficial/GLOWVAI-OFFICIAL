@@ -49,6 +49,10 @@ export const ProfileSetupScreen: React.FC = () => {
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '50%' }} /></div>
         <span className="auth-step-label">Step 1 of 2: Profile setup</span>
+        <ol className="v5-steps" aria-hidden="true">
+          <li className="is-current">Profile</li>
+          <li className="">Skin quiz</li>
+        </ol>
       </div>
 
       <h1 className="auth-title">Set Up Your Profile</h1>

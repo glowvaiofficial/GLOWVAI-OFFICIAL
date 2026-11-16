@@ -153,6 +153,14 @@ export const ScanCameraScreen: React.FC = () => {
               <p className={`scan-lighting-note scan-lighting-${lighting}`} role="status">
                 {status === 'ready' ? LIGHTING_MESSAGE[lighting] : 'Allow camera access when your browser asks.'}
               </p>
+              <div className="scan-desktop-only">
+                <h2 className="scan-section-label">For a clear scan</h2>
+                <ul className="v5-cam-tips">
+                  <li>Face a window or soft light, not behind you.</li>
+                  <li>Keep your face centred inside the oval.</li>
+                  <li>Remove glasses and hold still for a moment.</li>
+                </ul>
+              </div>
               <button type="button" className="scan-capture-button" onClick={handleCapture} disabled={captureDisabled}>
                 <Camera size={22} />
                 {capturing ? 'Capturing…' : 'Capture photo'}

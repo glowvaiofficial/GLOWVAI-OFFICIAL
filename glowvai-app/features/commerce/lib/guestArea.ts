@@ -2,6 +2,7 @@
 // named address: it has no street, so checkout still asks for a real saved address. Pure parsing and building here;
 // the storage calls take the storage object, so the rules are tested without a browser.
 import type { Address } from '../../../types';
+import { DELIVERY_ETA_MINUTES } from '../../../../lib/shop/delivery';
 
 export const GUEST_AREA_KEY = 'glowvai_guest_area_v1';
 export const GUEST_AREA_ID = 'guest-area';
@@ -68,7 +69,7 @@ export function guestAreaAddress(value: GuestArea): Address {
     city: 'Vijayawada',
     pincode: value.pincode,
     serviceable: isServiceableAreaPincode(value.pincode),
-    deliveryMinutes: 25,
+    deliveryMinutes: DELIVERY_ETA_MINUTES,
     isDefault: false,
   };
 }
