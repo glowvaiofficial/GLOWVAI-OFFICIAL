@@ -46,6 +46,10 @@ export const SkinSurveyScreen: React.FC = () => {
       <div className="auth-step-header">
         <div className="auth-step-track"><span style={{ width: '100%' }} /></div>
         <span className="auth-step-label">Skin quiz (optional)</span>
+        <ol className="v5-steps" aria-hidden="true">
+          <li className="is-done">Profile</li>
+          <li className="is-current">Skin quiz</li>
+        </ol>
       </div>
 
       <h1 className="auth-title">What are your main skin concerns?</h1>

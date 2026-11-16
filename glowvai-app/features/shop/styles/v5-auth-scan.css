@@ -1,0 +1,384 @@
+/* Website v5, onboarding, sign-in and skin scan group (16 Nov 2026): auth as split screens, the scan flow as a centred stepper
+   card, the report as a dashboard, the routine guides as a timeline. Flat white cards, hairline borders, pearl page, one
+   blue accent. No wash, no orbs, no particles, no glass on cards. The blue onboarding slides stay blue (owner's choice).
+   Layout and style only. Loaded once from App.tsx after v5-checkout.css. */
+
+.glowvai-root {
+  --v5s-page: #f6f8fd;
+  --v5s-line: #e3e9f5;
+  --v5s-ink: #0b1b3f;
+  --v5s-muted: #5b6784;
+  --v5s-blue: #0057fb;
+  --v5s-blue-dark: #0046cc;
+  --v5s-tint: #eef3ff;
+}
+
+/* ---------- Page: plain pearl, no accent wash ---------- */
+.glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content > :is(.scan-screen, .rec-screen, .auth-screen, .auth-success, .login-reference-screen),
+.glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content:has(> :is(.scan-screen, .rec-screen, .auth-screen, .auth-success, .login-reference-screen)) {
+  background: var(--v5s-page);
+}
+@media (min-width: 720px) {
+  .glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport:has(.screen-content > :is(.scan-screen, .rec-screen, .auth-screen, .auth-success, .login-reference-screen)) { background: var(--v5s-page); }
+  .glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content > :is(.scan-screen, .rec-screen, .auth-success, .login-reference-screen),
+  .glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content:has(> :is(.scan-screen, .rec-screen, .auth-screen, .auth-success, .login-reference-screen)) { background: transparent; }
+}
+
+/* ---------- Flat white surfaces ---------- */
+.glowvai-root.glowvai-root .app-viewport :is(.auth-card, .auth-concern, .auth-info-banner, .scan-tip-card, .scan-empty-panel, .scan-permission, .scan-diagnostic, .scan-check-list, .scan-dropzone, .scan-summary, .scan-skin-score, .scan-concern-item, .scan-routine-item, .scan-target-card, .rec-card, .rec-timeline-item, .rec-link-list, .rec-ph-card, .rec-cta, .rec-hero) {
+  border: 1px solid var(--v5s-line); background: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.glowvai-root.glowvai-root .app-viewport :is(.auth-card, .auth-concern, .scan-tip-card, .scan-empty-panel, .scan-permission, .scan-dropzone, .scan-skin-score, .rec-card, .rec-timeline-item, .rec-ph-card, .rec-cta, .rec-hero) { border-radius: 12px; }
+.glowvai-root.glowvai-root .app-viewport .scan-dropzone { border: 1.5px dashed #b9c8ea; background: var(--v5s-page); }
+.glowvai-root.glowvai-root .app-viewport .scan-dropzone-active { border-color: var(--v5s-blue); background: var(--v5s-tint); }
+.glowvai-root.glowvai-root .app-viewport .rec-hero { background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .rec-note { background: var(--v5s-tint); border-color: var(--v5s-line); }
+.glowvai-root.glowvai-root .app-viewport .scan-target-card { background: #fff; }
+.glowvai-root.glowvai-root .app-viewport :is(.scan-tip-icon, .scan-permission-icon, .scan-dropzone-icon, .rec-card-icon, .rec-step-badge, .auth-card-icon, .auth-concern-icon, .auth-permission-icon) { background: var(--v5s-tint); }
+
+/* Round icon buttons: flat white, hairline. */
+.glowvai-root.glowvai-root .app-viewport :is(.scan-icon-button, .rec-icon-button, .auth-icon-button, .auth-topbar > button:first-child) {
+  border: 1px solid var(--v5s-line); background: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* Buttons: brand blue, no shadow, 48px tall. */
+.glowvai-root.glowvai-root .app-viewport :is(.scan-primary-button, .scan-secondary-button, .scan-capture-button, .auth-primary-button, .auth-secondary-button, .rec-primary, .login-continue-button) { box-shadow: none; min-height: 48px; }
+.glowvai-root.glowvai-root .app-viewport .scan-primary-button:disabled { background: #b7cbf5; color: #fff; }
+.glowvai-root.glowvai-root .app-viewport .scan-secondary-button { border-width: 1px; }
+
+/* ---------- Phone and tablet: scan header ---------- */
+.glowvai-root.glowvai-root .app-viewport .scan-header {
+  background: #fff; border-bottom: 1px solid var(--v5s-line); -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.glowvai-root.glowvai-root .app-viewport .scan-header-title { font-size: 20px; }
+.glowvai-root.glowvai-root .app-viewport .v5-scan-steps { display: none; }
+@media (min-width: 720px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-header { background: transparent; border-bottom: 0; }
+  .glowvai-root.glowvai-root .app-viewport .scan-header-title { font-size: 24px; }
+}
+
+/* ---------- Scan flow: camera, gallery, preview, intro, tab ---------- */
+@media (max-width: 719px) {
+  /* Camera full width on phones: the frame runs edge to edge. */
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body { padding-inline: 0; }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-video-frame { width: 100%; max-height: none; aspect-ratio: 3 / 4; border-radius: 0; }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-split-side { padding-inline: var(--ds-gutter); }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-permission { width: calc(100% - 2 * var(--ds-gutter)); }
+  .glowvai-root.glowvai-root .app-viewport .scan-preview-frame { max-height: 60vh; }
+}
+.glowvai-root.glowvai-root .app-viewport .scan-video-frame { background: #0b1b3f; border-radius: 12px; }
+.glowvai-root.glowvai-root .app-viewport .scan-guide-oval { border-color: rgba(255, 255, 255, .85); }
+.glowvai-root.glowvai-root .app-viewport .scan-lighting-note { text-align: left; }
+
+.glowvai-root.glowvai-root .app-viewport .v5-cam-tips { display: grid; gap: 10px; margin: 10px 0 0; padding: 0; list-style: none; }
+.glowvai-root.glowvai-root .app-viewport .v5-cam-tips li { position: relative; padding-left: 26px; color: var(--v5s-ink); font-size: 14px; line-height: 1.45; }
+.glowvai-root.glowvai-root .app-viewport .v5-cam-tips li::before { content: ''; position: absolute; left: 0; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--v5s-tint) radial-gradient(circle, var(--v5s-blue) 0 3px, transparent 3.5px); }
+
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-header { padding: 24px max(24px, calc(50% - 560px)) 0; gap: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-body { max-width: 1152px; padding: 24px 24px 56px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen:has(.scan-split) .scan-body { max-width: 1152px; }
+
+  /* One white card per step: content on the left, tips and actions beside it. */
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-split {
+    grid-template-columns: minmax(0, 1fr) 380px; gap: 0; align-items: stretch;
+    border: 1px solid var(--v5s-line); border-radius: 16px; background: #fff; overflow: hidden;
+  }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-split-main { padding: 32px 36px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-split-side {
+    position: static; align-self: stretch; padding: 32px; border: 0; border-left: 1px solid var(--v5s-line); border-radius: 0; background: #fff; box-shadow: none;
+  }
+
+  /* Stepper in the header: Get ready, Take photo, Review. */
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps { display: flex; align-items: center; gap: 8px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li { display: inline-flex; align-items: center; gap: 8px; color: var(--v5s-muted); font-size: 13px; font-weight: 500; }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li + li::before { content: ''; width: 28px; height: 2px; margin-right: 0; background: var(--v5s-line); }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li > span { display: grid; width: 24px; height: 24px; place-items: center; border: 1.5px solid var(--v5s-line); border-radius: 50%; background: #fff; font-size: 12px; font-weight: 700; }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li.is-current { color: var(--v5s-ink); font-weight: 700; }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li.is-current > span { border-color: var(--v5s-blue); background: var(--v5s-blue); color: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li.is-done > span { border-color: var(--v5s-blue); color: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li.is-done + li::before, .glowvai-root.glowvai-root .app-viewport .v5-scan-steps li.is-current::before { background: var(--v5s-blue); }
+
+  /* Camera: live frame on the left (4:3), tips and the capture button on the right. */
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-split { padding: 20px; gap: 0; }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-video-frame { justify-self: stretch; align-self: start; width: 100%; height: auto; max-height: calc(100vh - 220px); aspect-ratio: 4 / 3; }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-split-side { justify-content: flex-start; border-left: 0; padding: 12px 12px 12px 32px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-camera-body .scan-capture-button { margin-top: 8px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-preview-frame { justify-self: center; width: auto; height: min(60vh, 560px); max-height: none; aspect-ratio: 3 / 4; margin: 20px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-dropzone { padding: 56px 24px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-body:has(> .scan-split > .scan-preview-frame) .scan-split-side { justify-content: center; }
+}
+
+/* Tab and intro: tidy typography on the white card. */
+.glowvai-root.glowvai-root .app-viewport .scan-tab-title { font-size: 24px; }
+.glowvai-root.glowvai-root .app-viewport .scan-badge { background: var(--v5s-tint); letter-spacing: .08em; }
+.glowvai-root.glowvai-root .app-viewport .scan-progress { background: var(--v5s-line); }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-tab-screen .scan-tab-title { font-size: 28px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-tab-screen .scan-tab-body { padding-top: 40px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-tab-screen .scan-target-card { padding: 40px 32px; border-style: solid; background: var(--v5s-page); }
+  .glowvai-root.glowvai-root .app-viewport .scan-tab-screen .scan-target-icon { background: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .scan-tab-screen .scan-split-main { gap: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-screen .scan-progress { display: none; }
+  .glowvai-root.glowvai-root .app-viewport .scan-intro-card { display: none; }
+}
+
+/* ---------- Analysing: one centred card, flat orb, progress steps ---------- */
+.glowvai-root.glowvai-root .app-viewport .scan-orb { background: var(--v5s-tint); box-shadow: none; }
+@media (min-width: 720px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-analyzing-body {
+    flex: 0 0 auto; max-width: 520px; margin: 40px auto 56px; padding: 40px 32px; border: 1px solid var(--v5s-line); border-radius: 16px; background: #fff;
+  }
+}
+.glowvai-root.glowvai-root .app-viewport .scan-step-list { gap: 12px; padding: 16px; border-radius: 12px; background: var(--v5s-page); max-width: 360px; }
+
+/* ---------- Failed ---------- */
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-failed-screen .scan-check-list { border: 0; padding: 0; background: transparent; }
+  .glowvai-root.glowvai-root .app-viewport .scan-failed-screen .scan-diagnostic { background: var(--v5s-page); }
+}
+
+/* ---------- Report: dashboard ---------- */
+.glowvai-root.glowvai-root .app-viewport .v5-ring { position: relative; display: grid; flex: 0 0 auto; width: 96px; height: 96px; place-items: center; }
+.glowvai-root.glowvai-root .app-viewport .v5-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.glowvai-root.glowvai-root .app-viewport .v5-ring circle { fill: none; stroke-width: 9; }
+.glowvai-root.glowvai-root .app-viewport .v5-ring-track { stroke: var(--v5s-tint); }
+.glowvai-root.glowvai-root .app-viewport .v5-ring-fill { stroke: var(--v5s-blue); stroke-linecap: round; }
+.glowvai-root.glowvai-root .app-viewport .v5-ring .scan-skin-score-num { font-size: 32px; }
+.glowvai-root.glowvai-root .app-viewport .scan-skin-score { gap: 18px; padding: 16px 20px; }
+.glowvai-root.glowvai-root .app-viewport .scan-skin-score .scan-summary-value { font-size: 18px; }
+.glowvai-root.glowvai-root .app-viewport .scan-summary-value { font-size: 16px; }
+.glowvai-root.glowvai-root .app-viewport .scan-summary { background: #fff; gap: 0; }
+.glowvai-root.glowvai-root .app-viewport .scan-summary-cell + .scan-summary-cell { border-left: 1px solid var(--v5s-line); }
+.glowvai-root.glowvai-root .app-viewport .scan-concern-list { border-radius: 12px; }
+.glowvai-root.glowvai-root .app-viewport .scan-severity-mild, .glowvai-root.glowvai-root .app-viewport .scan-severity-moderate { background: var(--v5s-tint); color: var(--v5s-blue); }
+.glowvai-root.glowvai-root .app-viewport .scan-meter { background: var(--v5s-tint); }
+.glowvai-root.glowvai-root .app-viewport .scan-section-title { font-size: 18px; }
+
+/* Routine rail cards */
+.glowvai-root.glowvai-root .app-viewport .scan-routine { background: transparent; }
+/* Routine rail cards: the card opens the product, Add to bag sits under it. */
+.glowvai-root.glowvai-root .app-viewport .scan-routine-card { display: flex; flex-direction: column; gap: 8px; }
+.glowvai-root.glowvai-root .app-viewport .v5-add-bag {
+  display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--v5s-blue); border-radius: 999px; background: #fff; color: var(--v5s-blue); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, transform .1s ease;
+}
+.glowvai-root.glowvai-root .app-viewport .v5-add-bag:active { transform: scale(.98); }
+@media (hover: hover) {
+  .glowvai-root.glowvai-root .app-viewport .v5-add-bag:hover { background: var(--v5s-blue); color: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .scan-routine-item:hover { transform: none; box-shadow: none; border-color: var(--v5s-blue); background: var(--v5s-tint); }
+}
+.glowvai-root.glowvai-root .app-viewport .scan-routine-list { gap: 12px; }
+
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-body { max-width: 1152px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split {
+    display: flex; flex-direction: column; gap: 32px; border: 0; border-radius: 0; background: transparent; overflow: visible;
+  }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-main {
+    display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 16px; padding: 0; align-items: stretch;
+  }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-main > * { grid-column: 1 / -1; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-main > .scan-skin-score { grid-column: 1; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-main > .scan-skin-score + .scan-summary { grid-column: 2; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-skin-score { padding: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .v5-ring { width: 112px; height: 112px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .v5-ring .scan-skin-score-num { font-size: 36px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-summary-cell { justify-content: center; padding: 20px 12px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-summary-value { font-size: 20px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-concern-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-concern-item { box-shadow: none; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-side { display: flex; flex-direction: column; gap: 16px; padding: 0; border: 0; background: transparent; }
+  /* Product recommendations: a four-card rail across the page. */
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-card { padding: 16px; border: 1px solid var(--v5s-line); border-radius: 12px; background: #fff; gap: 12px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-item {
+    display: grid; grid-template-columns: 1fr; grid-template-areas: 'step' 'img' 'name' 'price'; justify-items: start; align-content: start; gap: 8px; padding: 0; border: 0; background: transparent; min-height: 0; flex: 1;
+  }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-item:hover { background: transparent; border-color: transparent; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-step { grid-area: step; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-image { grid-area: img; width: 100%; height: 132px; padding: 8px; border-radius: 10px; background: var(--v5s-page); object-fit: contain; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-copy { grid-area: name; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-price { grid-area: price; font-size: 18px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-chevron { display: none; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine > .scan-primary-button { width: auto; align-self: flex-start; padding-inline: 28px; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-side > .scan-secondary-button { width: auto; align-self: flex-start; padding-inline: 28px; }
+}
+.glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-split-side .scan-privacy { color: var(--v5s-muted); }
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-routine-list { grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; }
+  .glowvai-root.glowvai-root .app-viewport .scan-report-screen .scan-concern-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Older skin-report: the shop reveal below the report keeps its own markup. */
+.glowvai-root.glowvai-root .app-viewport .skin-report-screen .commerce-color-wash { display: none; }
+
+/* ---------- Routine guides: timeline and product cards ---------- */
+.glowvai-root.glowvai-root .app-viewport .rec-header-title { font-size: 24px; }
+.glowvai-root.glowvai-root .app-viewport .rec-segment-btn { box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .rec-step-badge { border: 1px solid var(--v5s-line); }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .rec-screen > .rec-header, .glowvai-root.glowvai-root .app-viewport .rec-screen > .rec-body { width: 100%; max-width: 1152px; margin-inline: auto; padding-inline: 24px; box-sizing: border-box; }
+  .glowvai-root.glowvai-root .app-viewport .rec-header-title { font-size: 28px; }
+  .glowvai-root.glowvai-root .app-viewport .rec-hero { padding: 28px 32px; }
+
+  /* Timeline: numbered rail down the left, one card per step. */
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline { display: flex; flex-direction: column; gap: 0; max-width: 820px; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline.is-three > .rec-timeline-item, .glowvai-root.glowvai-root .app-viewport .rec-timeline > .rec-timeline-item { flex-direction: row; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-item { position: relative; margin-left: 52px; margin-bottom: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-item > .rec-step-badge { position: absolute; left: -52px; top: 14px; width: 40px; height: 40px; background: var(--v5s-blue); color: #fff; border: 0; z-index: 1; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-item:not(:last-child)::after { content: ''; position: absolute; left: -33px; top: 56px; bottom: -30px; width: 2px; background: var(--v5s-line); }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-item .rec-timeline-copy { padding-left: 0; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-title { font-size: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-desc { font-size: 14px; }
+}
+@media (max-width: 1023px) {
+  .glowvai-root.glowvai-root .app-viewport .rec-timeline-item { align-items: flex-start; }
+}
+
+/* Routine bundle: product list as cards with a sticky total on the right. */
+.glowvai-root.glowvai-root .app-viewport .rec-checkout-total { border-radius: 12px; }
+.glowvai-root.glowvai-root .app-viewport .rec-checkout-thumb { background: var(--v5s-page); }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .rec-checkout .rec-body { grid-template-columns: minmax(0, 1fr) 380px; }
+}
+
+/* Ingredient and patch test cards */
+.glowvai-root.glowvai-root .app-viewport .rec-card.is-warning { background: #fff8e8; border-color: #f0dfb0; }
+.glowvai-root.glowvai-root .app-viewport .rec-ph-band { background: var(--v5s-tint); border-color: var(--v5s-blue); }
+@media (hover: hover) {
+  .glowvai-root.glowvai-root .app-viewport .rec-link:hover { background: var(--v5s-tint); }
+}
+
+/* ---------- Onboarding slides: stay blue, split composition on PC ---------- */
+.glowvai-root.glowvai-root .app-viewport .v5-onb-count { display: none; }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .onboarding-screen .onboarding-sheet {
+    background: #fff !important; --onb-sheet-pad: 56px max(64px, calc(25% - 200px));
+  }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-screen .onboarding-sheet > * { width: 100%; max-width: 480px; margin-inline: 0; }
+  .glowvai-root.glowvai-root .app-viewport .v5-onb-count { display: block; margin: 0 0 16px; color: var(--v5s-muted); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-screen .onboarding-sheet h1 { font-size: 44px !important; letter-spacing: -.02em !important; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-screen .onboarding-sheet h1 + p { margin-top: 16px !important; font-size: 18px !important; line-height: 1.55 !important; max-width: 440px !important; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-dots { gap: 8px !important; margin-top: 40px !important; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-dots > span { width: 56px !important; height: 4px !important; border-radius: 999px !important; background: var(--v5s-line) !important; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-dots > span.is-on { background: var(--v5s-blue) !important; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-next { width: auto !important; min-width: 240px; align-self: flex-start; margin-top: 32px !important; padding-inline: 32px; box-shadow: none; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-skip { width: auto !important; align-self: flex-start; margin-top: 16px !important; padding: 12px 0; text-align: left; }
+  .glowvai-root.glowvai-root .app-viewport .onboarding-skip:hover { color: var(--v5s-blue) !important; }
+}
+@media (hover: hover) {
+  .glowvai-root.glowvai-root .app-viewport .onboarding-next:hover { background: var(--v5s-blue-dark) !important; }
+}
+
+/* ---------- Sign-in, code and details: split screen on PC ---------- */
+.glowvai-root.glowvai-root .app-viewport .v5-hero-art, .glowvai-root.glowvai-root .app-viewport .v5-hero-points { display: none; }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .login-reference-screen { background: var(--v5s-page); }
+  .glowvai-root.glowvai-root .app-viewport .login-reference-hero { position: relative; display: flex; flex-direction: column; flex: 0 0 50%; min-height: 100dvh; overflow: hidden; background: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .login-reference-hero::after, .glowvai-root.glowvai-root .app-viewport .login-orb { display: none; }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-art { display: block; position: relative; flex: 1 1 0; width: 100%; height: 0; min-height: 0; object-fit: cover; object-position: 38% 22%; }
+  /* The brand lockup and benefit lines sit on a solid blue foot under the picture. */
+  .glowvai-root.glowvai-root .app-viewport .login-brand-lockup { position: static; order: 2; transform: none; width: auto; padding: 28px 56px 0; text-align: left; background: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .login-wordmark { margin: 0; font-size: 44px; }
+  .glowvai-root.glowvai-root .app-viewport .login-brand-lockup > p { margin-top: 10px; font-size: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-points { display: grid; order: 3; gap: 12px; margin: 0; padding: 20px 56px 44px; list-style: none; background: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-points li { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 15px; font-weight: 500; }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-points svg { width: 20px; height: 20px; flex: 0 0 auto; stroke-width: 1.75; }
+  .glowvai-root.glowvai-root .app-viewport .login-benefits { display: none; }
+
+  /* The form is a white card centred in the right half. */
+  .glowvai-root.glowvai-root .app-viewport .login-reference-sheet { align-items: center; padding: 48px 32px; background: var(--v5s-page); }
+  .glowvai-root.glowvai-root .app-viewport .login-reference-sheet > * { width: 100%; max-width: 440px; box-sizing: border-box; }
+  .glowvai-root.glowvai-root .app-viewport .login-sheet-copy { margin: 0; padding: 40px 40px 0; border: 1px solid var(--v5s-line); border-bottom: 0; border-radius: 16px 16px 0 0; background: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .login-sheet-copy h1 { font-size: 26px; font-weight: 700; }
+  .glowvai-root.glowvai-root .app-viewport .login-sheet-copy > p { margin-top: 8px; font-size: 14px; line-height: 1.5; }
+  .glowvai-root.glowvai-root .app-viewport .login-reference-form { margin: 0; padding: 24px 40px 36px; border: 1px solid var(--v5s-line); border-top: 0; border-radius: 0 0 16px 16px; background: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .login-reference-sheet > .login-legal-copy { margin-top: 20px; text-align: center; }
+}
+/* Phone, tablet: flat blue hero, no orbs. */
+.glowvai-root.glowvai-root .app-viewport .login-reference-hero::after, .glowvai-root.glowvai-root .app-viewport .login-orb { display: none; }
+.glowvai-root.glowvai-root .app-viewport .login-reference-sheet { box-shadow: none; }
+
+/* Six-box code entry: one real input over six drawn boxes (autofill, paste and keyboard work as before). */
+.glowvai-root.glowvai-root .app-viewport .login-phone-field.v5-otp { position: relative; height: 56px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .login-phone-field.v5-otp:focus-within { box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .v5-otp-cells { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; pointer-events: none; }
+.glowvai-root.glowvai-root .app-viewport .v5-otp-cell { display: grid; place-items: center; border: 1px solid var(--v5s-line); border-radius: 10px; background: #fff; color: var(--v5s-ink); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; transition: border-color .15s ease, box-shadow .15s ease; }
+.glowvai-root.glowvai-root .app-viewport .v5-otp-cell.is-filled { border-color: #b7c3dc; }
+.glowvai-root.glowvai-root .app-viewport .v5-otp:focus-within .v5-otp-cell.is-active { border-color: var(--v5s-blue); box-shadow: 0 0 0 1px var(--v5s-blue); }
+.glowvai-root.glowvai-root .app-viewport .login-phone-field.v5-otp input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; color: transparent; caret-color: transparent; font-size: 22px; letter-spacing: 1em; opacity: 0.01; }
+
+/* ---------- AuthShell screens: profile, quiz, change phone, student, permissions ---------- */
+.glowvai-root.glowvai-root .app-viewport .auth-screen { background: var(--v5s-page); }
+.glowvai-root.glowvai-root .app-viewport .auth-concern { box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .auth-concern.is-selected { background: var(--v5s-tint); box-shadow: inset 0 0 0 1px var(--v5s-blue); }
+.glowvai-root.glowvai-root .app-viewport .auth-chip { box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .auth-field { border-radius: 10px; }
+.glowvai-root.glowvai-root .app-viewport .auth-footer { background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .v5-steps { display: none; }
+.glowvai-root.glowvai-root .app-viewport .auth-brand-art, .glowvai-root.glowvai-root .app-viewport .auth-brand-points { display: none; }
+@media (hover: hover) {
+  .glowvai-root.glowvai-root .app-viewport .auth-concern:not(.is-selected):hover { transform: none; box-shadow: none; border-color: var(--v5s-blue); background: var(--v5s-tint); }
+  .glowvai-root.glowvai-root .app-viewport .auth-chip:not(.is-selected):hover { border-color: var(--v5s-blue); background: var(--v5s-tint); }
+}
+
+@media (min-width: 1024px) {
+  /* Left brand panel: the blue onboarding picture over a solid blue foot with the benefit lines. */
+  .glowvai-root.glowvai-root .app-viewport .auth-screen { padding-left: max(480px, 50%); }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-brand-panel { width: max(480px, 50%); gap: 0; padding: 0; background: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-art { display: block; flex: 1 1 0; width: 100%; height: 0; min-height: 0; object-fit: cover; object-position: 38% 22%; }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-foot { display: flex; flex: 0 0 auto; flex-direction: column; gap: 10px; padding: 28px 56px 44px; background: var(--v5s-blue); }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-panel .auth-brand-wordmark { font-size: 44px; line-height: 1; }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-copy { max-width: none; font-size: 16px; font-weight: 500; }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-points { display: grid; gap: 12px; margin: 10px 0 0; padding: 0; list-style: none; }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-points li { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 15px; font-weight: 500; }
+  .glowvai-root.glowvai-root .app-viewport .auth-brand-points svg { width: 20px; height: 20px; flex: 0 0 auto; stroke-width: 1.75; }
+
+  /* Right: back button, then one white form card (body and footer join into one card). */
+  .glowvai-root.glowvai-root .app-viewport .auth-screen { justify-content: center; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-topbar,
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-body,
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-footer { width: min(100%, 560px); box-sizing: border-box; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-topbar { padding: 0 0 12px; min-height: 0; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-body { padding: 40px 40px 12px; border: 1px solid var(--v5s-line); border-bottom: 0; border-radius: 16px 16px 0 0; background: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-footer { padding: 16px 40px 40px; border: 1px solid var(--v5s-line); border-top: 0; border-radius: 0 0 16px 16px; background: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-body:last-child { border-bottom: 1px solid var(--v5s-line); border-radius: 16px; padding-bottom: 40px; }
+  .glowvai-root.glowvai-root .app-viewport .auth-screen .auth-card, .glowvai-root.glowvai-root .app-viewport .auth-screen .auth-info-banner, .glowvai-root.glowvai-root .app-viewport .auth-screen .auth-privacy-card { box-shadow: none; }
+  .glowvai-root.glowvai-root .app-viewport .auth-concern-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glowvai-root.glowvai-root .app-viewport .auth-title { font-size: 26px; }
+
+  /* Stepper: Profile, then Skin quiz. */
+  .glowvai-root.glowvai-root .app-viewport .auth-step-header { margin-bottom: 28px; }
+  .glowvai-root.glowvai-root .app-viewport .auth-step-label, .glowvai-root.glowvai-root .app-viewport .auth-step-track { display: none; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps { display: flex; align-items: center; gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li { display: inline-flex; align-items: center; gap: 10px; color: var(--v5s-muted); font-size: 13px; font-weight: 700; counter-increment: v5step; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps { counter-reset: v5step; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li::before { content: counter(v5step); display: grid; width: 26px; height: 26px; place-items: center; border: 1.5px solid var(--v5s-line); border-radius: 50%; background: #fff; font-size: 12px; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li + li::after { content: none; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li + li { flex: 1; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li + li { gap: 10px; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li.is-current { color: var(--v5s-ink); }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li.is-current::before { border-color: var(--v5s-blue); background: var(--v5s-blue); color: #fff; }
+  .glowvai-root.glowvai-root .app-viewport .v5-steps li.is-done::before { content: '\2713'; border-color: var(--v5s-blue); color: var(--v5s-blue); }
+}
+
+/* Onboarding success: centred message card on PC. */
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .auth-success { background: var(--v5s-page); }
+  .glowvai-root.glowvai-root .app-viewport .auth-success-icon { background: var(--v5s-tint); color: var(--v5s-blue); }
+}
+
+/* Calm focus ring */
+.glowvai-root .app-viewport :is(.scan-screen, .rec-screen, .auth-screen, .login-reference-screen, .onboarding-screen) :focus-visible { outline: 2px solid var(--v5s-blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root .app-viewport :is(.scan-orb, .scan-step-dot) { animation: none; }
+}
+
+/* Headings focused by a screen change take no ring (the screen itself is the focus target). */
+.glowvai-root.glowvai-root .app-viewport :is(h1, h2)[tabindex]:focus-visible, .glowvai-root.glowvai-root .app-viewport .scan-header-title:focus-visible { outline: none; box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .auth-screen > .auth-topbar { background: transparent; }
+@media (max-width: 719px) {
+  .glowvai-root.glowvai-root .app-viewport .scan-concern-item { border: 0; background: transparent; }
+  .glowvai-root.glowvai-root .app-viewport .scan-concern-item + .scan-concern-item { border-top: 1px solid var(--v5s-line); }
+}

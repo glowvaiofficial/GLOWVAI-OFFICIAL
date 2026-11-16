@@ -115,7 +115,12 @@ export const OtpScreen: React.FC = () => {
 
             <form className="login-reference-form" onSubmit={submit} noValidate>
               <label htmlFor="sign-in-code" className="login-field-label">{OTP_LENGTH}-digit code</label>
-              <div className="login-phone-field is-plain">
+              <div className="login-phone-field is-plain v5-otp">
+                <span className="v5-otp-cells" aria-hidden="true">
+                  {Array.from({ length: OTP_LENGTH }, (_, index) => (
+                    <span key={index} className={`v5-otp-cell${code[index] ? ' is-filled' : ''}${index === Math.min(code.length, OTP_LENGTH - 1) ? ' is-active' : ''}`}>{code[index] ?? ''}</span>
+                  ))}
+                </span>
                 <input
                   id="sign-in-code"
                   type="text"

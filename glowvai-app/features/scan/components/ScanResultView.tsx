@@ -42,7 +42,13 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({ result, onRetake
 
           {result.skinScore && (
             <div className="scan-skin-score">
-              <span className="scan-skin-score-num" aria-label={`Skin score ${result.skinScore.score} out of 100`}>{result.skinScore.score}</span>
+              <span className="v5-ring">
+                <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+                  <circle className="v5-ring-track" cx="60" cy="60" r="52" />
+                  <circle className="v5-ring-fill" cx="60" cy="60" r="52" pathLength={100} strokeDasharray={`${Math.max(0, Math.min(100, result.skinScore.score))} 100`} />
+                </svg>
+                <span className="scan-skin-score-num" aria-label={`Skin score ${result.skinScore.score} out of 100`}>{result.skinScore.score}</span>
+              </span>
               <div>
                 <span className="scan-summary-value">Skin score{result.skinScore.label ? `: ${result.skinScore.label}` : ''}</span>
                 <span className="scan-summary-label">{result.skinScore.caption}</span>
