@@ -10,23 +10,23 @@
 /* Header */
 .glowvai-root .scan-header{ position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px var(--ds-gutter); background: var(--ds-pearl); }
 .glowvai-root .scan-header-text{ min-width: 0; }
-.glowvai-root .scan-header-title{ overflow: hidden; color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .scan-header-subtitle{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 600; }
+.glowvai-root .scan-header-title{ overflow: hidden; color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .scan-header-subtitle{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
 .glowvai-root .scan-icon-button{ display: inline-flex; flex: 0 0 auto; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--ds-line); border-radius: 50%; background: var(--ds-card); color: var(--ds-ink); cursor: pointer; }
 .glowvai-root .scan-icon-button:hover{ background: var(--ds-sky); }
 
 /* Type */
-.glowvai-root .scan-headline{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h2); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; }
+.glowvai-root .scan-headline{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h2); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
 .glowvai-root .scan-lead{ color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
-.glowvai-root .scan-section-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 19px; font-weight: 800; letter-spacing: -.02em; }
-.glowvai-root .scan-section-label{ color: var(--ds-muted); font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
-.glowvai-root .scan-card-title{ color: var(--ds-ink); font-size: 15px; font-weight: 800; }
+.glowvai-root .scan-section-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .scan-section-label{ color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.glowvai-root .scan-card-title{ color: var(--ds-ink); font-size: 15px; font-weight: 700; }
 .glowvai-root .scan-card-body{ margin-top: 4px; color: var(--ds-muted); font-size: 13px; line-height: 1.5; }
 .glowvai-root .scan-privacy{ display: flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 12px; line-height: 1.4; }
 .glowvai-root .scan-disclaimer{ color: var(--ds-muted); font-size: 12px; line-height: 1.5; }
 .glowvai-root .scan-model-note{ color: var(--ds-muted); font-size: 11px; text-align: center; }
-.glowvai-root .scan-error{ color: var(--ds-danger); font-size: 13px; font-weight: 650; }
-.glowvai-root .scan-error-title{ color: var(--ds-danger); font-size: 14px; font-weight: 750; }
+.glowvai-root .scan-error{ color: var(--ds-danger); font-size: 13px; font-weight: 700; }
+.glowvai-root .scan-error-title{ color: var(--ds-danger); font-size: 14px; font-weight: 700; }
 
 /* Buttons */
 .glowvai-root .scan-primary-button, .glowvai-root .scan-secondary-button, .glowvai-root .scan-capture-button{ display: inline-flex; min-height: var(--ds-control); align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0 20px; border-radius: var(--ds-pill); font-family: var(--font-body); font-size: 15px; font-weight: 700; cursor: pointer; transition: background-color .18s ease, opacity .18s ease; }
@@ -44,12 +44,12 @@
 /* Tab screen */
 .glowvai-root .scan-tab-body{ align-items: stretch; padding-top: 24px; }
 .glowvai-root .scan-tab-header{ display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
-.glowvai-root .scan-badge{ display: inline-block; padding: 5px 12px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 10px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; }
-.glowvai-root .scan-tab-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .scan-badge{ display: inline-block; padding: 5px 12px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; }
+.glowvai-root .scan-tab-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.02em; }
 .glowvai-root .scan-tab-subtitle{ max-width: 320px; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .scan-target-card{ display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: linear-gradient(180deg, var(--ds-sky) 0%, var(--ds-card) 100%); box-shadow: var(--ds-shadow); }
 .glowvai-root .scan-target-icon{ display: grid; width: 104px; height: 104px; place-items: center; border: 2px solid var(--ds-brand); border-radius: 50%; background: var(--ds-card); color: var(--ds-brand); }
-.glowvai-root .scan-target-heading{ color: var(--ds-ink); font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .scan-target-heading{ color: var(--ds-ink); font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 .glowvai-root .scan-metric-grid{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .glowvai-root .scan-metric-pill{ display: inline-flex; min-height: 36px; align-items: center; padding: 0 14px; border: 1px solid var(--ds-line); border-radius: var(--ds-pill); background: var(--ds-card); color: var(--ds-ink); font-size: 13px; font-weight: 700; }
 
@@ -77,8 +77,8 @@
 .glowvai-root .scan-video-frame[hidden]{ display: none; }
 .glowvai-root .scan-video{ width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 .glowvai-root .scan-guide-oval{ position: absolute; top: 12%; left: 18%; width: 64%; height: 70%; border: 2px dashed rgba(255,255,255,.75); border-radius: 50%; pointer-events: none; }
-.glowvai-root .scan-video-status{ position: absolute; inset: auto 0 16px; color: #fff; font-size: 13px; font-weight: 650; text-align: center; }
-.glowvai-root .scan-lighting-note{ padding: 10px 12px; border-radius: var(--ds-radius-sm); font-size: 13px; font-weight: 650; text-align: center; }
+.glowvai-root .scan-video-status{ position: absolute; inset: auto 0 16px; color: #fff; font-size: 13px; font-weight: 700; text-align: center; }
+.glowvai-root .scan-lighting-note{ padding: 10px 12px; border-radius: var(--ds-radius-sm); font-size: 13px; font-weight: 700; text-align: center; }
 .glowvai-root .scan-lighting-ok{ background: var(--ds-success-bg); color: var(--ds-success); }
 .glowvai-root .scan-lighting-dark, .glowvai-root .scan-lighting-bright{ background: var(--warning-bg); color: var(--warning); }
 
@@ -93,17 +93,17 @@
 .glowvai-root .scan-preview-frame{ display: flex; overflow: hidden; aspect-ratio: 3 / 4; width: 100%; max-height: 56vh; align-self: center; border-radius: var(--ds-radius-lg); background: var(--ds-sky); }
 .glowvai-root .scan-preview-image{ width: 100%; height: 100%; object-fit: cover; }
 .glowvai-root .scan-preview-empty{ display: grid; flex: 1; place-items: center; color: var(--ds-muted); }
-.glowvai-root .scan-alert{ display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--error-border); border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 650; line-height: 1.45; }
+.glowvai-root .scan-alert{ display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--error-border); border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 700; line-height: 1.45; }
 .glowvai-root .scan-alert-warn{ border-color: var(--ds-line); background: var(--ds-sky); color: var(--ds-ink); }
 .glowvai-root .scan-skin-score{ display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: #fff; box-shadow: var(--ds-shadow); }
-.glowvai-root .scan-skin-score-num{ color: var(--ds-brand); font-family: var(--font-heading); font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.glowvai-root .scan-skin-score-num{ color: var(--ds-brand); font-family: var(--font-heading); font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
 .glowvai-root .scan-skin-score > div{ display: flex; flex-direction: column; gap: 2px; }
 
 /* Analyzing */
 .glowvai-root .scan-analyzing-body{ align-items: center; justify-content: center; text-align: center; }
 .glowvai-root .scan-orb{ display: grid; width: 112px; height: 112px; place-items: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--ds-sky) 55%, #c9d8fb 100%); color: var(--ds-brand); box-shadow: 0 0 0 10px rgba(40,84,197,.06); animation: scan-orb-pulse 1.8s ease-in-out infinite; }
 .glowvai-root .scan-step-list{ display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; margin-top: 8px; list-style: none; text-align: left; }
-.glowvai-root .scan-step-item{ display: flex; align-items: center; gap: 10px; color: var(--ds-muted); font-size: 14px; font-weight: 650; }
+.glowvai-root .scan-step-item{ display: flex; align-items: center; gap: 10px; color: var(--ds-muted); font-size: 14px; font-weight: 700; }
 .glowvai-root .scan-step-item svg{ color: var(--ds-success); flex: 0 0 auto; }
 .glowvai-root .scan-step-active{ color: var(--ds-ink); }
 .glowvai-root .scan-step-done{ color: var(--ds-ink); }
@@ -113,15 +113,15 @@
 .glowvai-root .scan-report-body{ gap: 20px; }
 .glowvai-root .scan-summary{ display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-line); gap: 1px; box-shadow: var(--ds-shadow); }
 .glowvai-root .scan-summary-cell{ display: flex; flex-direction: column; gap: 4px; padding: 14px 8px; background: var(--ds-card); text-align: center; }
-.glowvai-root .scan-summary-label{ color: var(--ds-muted); font-size: 12px; font-weight: 600; }
-.glowvai-root .scan-summary-value{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 16px; font-weight: 800; }
+.glowvai-root .scan-summary-label{ color: var(--ds-muted); font-size: 12px; font-weight: 500; }
+.glowvai-root .scan-summary-value{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 16px; font-weight: 700; }
 .glowvai-root .scan-section{ display: flex; flex-direction: column; gap: 12px; }
 .glowvai-root .scan-concern-list{ display: flex; flex-direction: column; padding: 2px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); list-style: none; }
 .glowvai-root .scan-concern-item{ padding: 14px 0; }
 .glowvai-root .scan-concern-item + .scan-concern-item{ border-top: 1px solid var(--ds-line); }
 .glowvai-root .scan-concern-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .glowvai-root .scan-concern-name{ color: var(--ds-ink); font-size: 14px; font-weight: 700; }
-.glowvai-root .scan-severity{ padding: 3px 10px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-muted); font-size: 11px; font-weight: 750; white-space: nowrap; }
+.glowvai-root .scan-severity{ padding: 3px 10px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-muted); font-size: 11px; font-weight: 700; white-space: nowrap; }
 .glowvai-root .scan-severity-mild{ background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .scan-severity-moderate{ background: var(--ds-sky); color: var(--ds-ink); }
 .glowvai-root .scan-severity-pronounced{ background: var(--ds-danger-bg); color: var(--ds-danger); }
@@ -137,18 +137,18 @@
 @media (hover: hover){
   .glowvai-root .scan-routine-item:hover{ transform: translateY(-2px); box-shadow: var(--ds-shadow-hover); }
 }
-.glowvai-root .scan-routine-step{ display: grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 12px; font-weight: 800; }
+.glowvai-root .scan-routine-step{ display: grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 12px; font-weight: 700; }
 .glowvai-root .scan-routine-image{ display: grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; padding: 3px; border: 1px solid var(--ds-line); border-radius: 10px; background: var(--ds-card); object-fit: contain; }
 .glowvai-root .scan-routine-image.is-fallback{ background: var(--ds-pearl); color: var(--ds-muted); }
 .glowvai-root .scan-routine-copy{ display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
-.glowvai-root .scan-routine-name{ color: var(--ds-muted); font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; }
+.glowvai-root .scan-routine-name{ color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
 .glowvai-root .scan-routine-product{ display: -webkit-box; overflow: hidden; color: var(--ds-ink); font-size: 13px; font-weight: 700; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.glowvai-root .scan-routine-price{ flex: 0 0 auto; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.glowvai-root .scan-routine-price{ flex: 0 0 auto; font-size: 14px; font-weight: 700; white-space: nowrap; }
 .glowvai-root .scan-routine-chevron{ flex: 0 0 auto; color: var(--ds-muted); }
 
 /* Failed */
 .glowvai-root .scan-diagnostic{ display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); }
-.glowvai-root .scan-diagnostic-title{ color: var(--ds-muted); font-size: 11px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; }
+.glowvai-root .scan-diagnostic-title{ color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
 .glowvai-root .scan-diagnostic-row{ color: var(--ds-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; overflow-wrap: anywhere; }
 .glowvai-root .scan-check-list{ display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); list-style: none; }
 .glowvai-root .scan-check-item{ display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ds-muted); }
@@ -166,8 +166,8 @@
 .glowvai-root .scan-tab-header{ padding: 0 8px; }
 .glowvai-root .scan-how-list{ display: flex; flex-direction: column; gap: 14px; list-style: none; }
 .glowvai-root .scan-how-list li{ display: flex; align-items: flex-start; gap: 12px; }
-.glowvai-root .scan-how-list li > span{ display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 800; }
-.glowvai-root .scan-how-list b{ font-size: 14px; font-weight: 750; }
+.glowvai-root .scan-how-list li > span{ display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 700; }
+.glowvai-root .scan-how-list b{ font-size: 14px; font-weight: 700; }
 .glowvai-root .scan-how-list p{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; line-height: 1.45; }
 .glowvai-root .scan-empty-panel{ display: flex; width: 100%; max-width: 480px; flex-direction: column; align-items: center; gap: 12px; margin: 0 auto; padding: 32px 24px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); text-align: center; }
 .glowvai-root .scan-empty-actions{ display: flex; width: 100%; flex-direction: column; gap: 10px; margin-top: 8px; }
@@ -176,7 +176,7 @@
 .glowvai-root .scan-consent-title{ display: flex; align-items: flex-start; gap: 10px; color: var(--ds-brand); }
 .glowvai-root .scan-consent-title svg{ flex: 0 0 auto; margin-top: 1px; }
 .glowvai-root .scan-consent-title .scan-card-title{ color: var(--ds-ink); }
-.glowvai-root .scan-consent-check{ display: flex; min-height: 44px; align-items: flex-start; gap: 10px; color: var(--ds-ink); font-size: 14px; font-weight: 600; line-height: 1.45; cursor: pointer; }
+.glowvai-root .scan-consent-check{ display: flex; min-height: 44px; align-items: flex-start; gap: 10px; color: var(--ds-ink); font-size: 14px; font-weight: 500; line-height: 1.45; cursor: pointer; }
 .glowvai-root .scan-consent-check input{ width: 20px; height: 20px; flex: 0 0 auto; margin-top: 1px; accent-color: var(--ds-brand); }
 .glowvai-root .skin-report-screen{ flex: none; min-height: 100%; }
 .glowvai-root .skin-report-screen .scan-body{ flex: none; overflow: visible; }

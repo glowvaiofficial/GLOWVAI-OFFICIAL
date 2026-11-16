@@ -8,27 +8,27 @@
 .glowvai-root .rec-header{ display:flex; align-items:center; gap:12px; width:100%; padding:16px var(--ds-gutter) 0; box-sizing:border-box; background:transparent; }
 .glowvai-root .rec-header-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
 .glowvai-root .rec-header-eyebrow{ color:var(--ds-muted); font-size:var(--ds-small); font-weight:700; letter-spacing:.02em; }
-.glowvai-root .rec-header-title{ margin:0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:800; line-height:1.15; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.glowvai-root .rec-header-title{ margin:0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:700; line-height:1.15; letter-spacing:-.02em; overflow-wrap:anywhere; }
 .glowvai-root .rec-icon-button{ display:inline-flex; width:44px; height:44px; flex:none; align-items:center; justify-content:center; border:1px solid var(--ds-line); border-radius:50%; background:var(--ds-card); color:var(--ds-ink); transition:background-color .18s ease, border-color .18s ease; }
 .glowvai-root .rec-screen :focus-visible{ outline:2px solid var(--ds-brand); outline-offset:2px; }
 
 .glowvai-root .rec-body{ display:flex; flex-direction:column; gap:var(--ds-gap); width:100%; padding:20px var(--ds-gutter) 32px; box-sizing:border-box; }
 
 /* Section heading */
-.glowvai-root .rec-label{ margin:calc(var(--ds-section) - var(--ds-gap)) 0 0; color:var(--ds-ink); font-size:var(--ds-h2); font-weight:800; line-height:1.2; letter-spacing:-.02em; }
+.glowvai-root .rec-label{ margin:calc(var(--ds-section) - var(--ds-gap)) 0 0; color:var(--ds-ink); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.02em; }
 .glowvai-root .rec-note{ display:flex; align-items:flex-start; gap:10px; margin:0; padding:12px 14px; border:1px solid var(--ds-line); border-radius:var(--ds-radius-sm); background:var(--ds-sky); color:var(--ds-muted); font-size:13px; line-height:1.5; }
 .glowvai-root .rec-note svg{ flex:none; margin-top:2px; color:var(--ds-brand); }
 
 /* Intro panel: soft sky card, the same family as the home's light offer card. */
 .glowvai-root .rec-hero{ display:flex; flex-direction:column; gap:8px; padding:20px; border:1px solid var(--ds-line); border-radius:var(--ds-radius-lg); background:linear-gradient(135deg, var(--ds-card) 0%, var(--ds-sky) 100%); box-shadow:var(--ds-shadow); color:var(--ds-ink); }
 .glowvai-root .rec-kicker{ display:inline-flex; align-self:flex-start; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--ds-line); border-radius:var(--ds-pill); background:var(--ds-card); color:var(--ds-brand); font-size:12px; font-weight:700; }
-.glowvai-root .rec-headline{ margin:6px 0 0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h2); font-weight:800; line-height:1.2; letter-spacing:-.02em; }
+.glowvai-root .rec-headline{ margin:6px 0 0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.02em; }
 .glowvai-root .rec-subtext{ max-width:720px; margin:0; color:var(--ds-muted); font-size:14px; line-height:1.55; }
 
 /* Card */
 .glowvai-root .rec-card{ display:flex; gap:12px; padding:16px; border:1px solid var(--ds-line); border-radius:var(--ds-radius); background:var(--ds-card); box-shadow:var(--ds-shadow); }
 .glowvai-root .rec-card-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:3px; }
-.glowvai-root .rec-card-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:800; letter-spacing:-.01em; line-height:1.3; }
+.glowvai-root .rec-card-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:700; letter-spacing:-.01em; line-height:1.3; }
 .glowvai-root .rec-card-desc{ margin:0; color:var(--ds-muted); font-size:13px; line-height:1.5; }
 .glowvai-root .rec-card.is-warning{ border-color:var(--warning-border); background:var(--warning-bg); box-shadow:none; }
 .glowvai-root .rec-card.is-warning .rec-card-desc{ color:var(--ds-ink); }
@@ -37,8 +37,8 @@
 .glowvai-root .rec-card-icon.is-warning{ background:#fff; color:var(--warning); }
 .glowvai-root .rec-card-icon.is-error{ background:#fff; color:var(--ds-danger); }
 
-.glowvai-root .rec-step-badge{ display:grid; width:38px; height:38px; flex:none; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:13px; font-weight:800; }
-.glowvai-root .rec-step-tag{ margin:0; color:var(--ds-brand); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.glowvai-root .rec-step-badge{ display:grid; width:38px; height:38px; flex:none; place-items:center; border-radius:50%; background:var(--ds-sky); color:var(--ds-brand); font-size:13px; font-weight:700; }
+.glowvai-root .rec-step-tag{ margin:0; color:var(--ds-brand); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 
 /* Morning / evening tabs: pill chips. */
 .glowvai-root .rec-segment{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -50,12 +50,12 @@
 .glowvai-root .rec-pair-list{ display:flex; flex-direction:column; gap:var(--ds-gap); margin:0; padding:0; list-style:none; }
 .glowvai-root .rec-timeline-item{ display:flex; gap:12px; padding:16px; border:1px solid var(--ds-line); border-radius:var(--ds-radius); background:var(--ds-card); box-shadow:var(--ds-shadow); }
 .glowvai-root .rec-timeline-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
-.glowvai-root .rec-timeline-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:800; line-height:1.3; }
+.glowvai-root .rec-timeline-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:700; line-height:1.3; }
 .glowvai-root .rec-timeline-desc{ margin:0; color:var(--ds-muted); font-size:13px; line-height:1.5; }
 .glowvai-root .rec-timeline-note{ display:inline-flex; align-items:center; gap:6px; margin:2px 0 0; color:var(--ds-brand); font-size:12px; font-weight:700; }
 .glowvai-root .rec-timeline-note svg{ flex:none; }
 
-.glowvai-root .rec-pair-status{ margin:0; color:var(--ds-success); font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.glowvai-root .rec-pair-status{ margin:0; color:var(--ds-success); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 .glowvai-root .rec-pair-status.is-warning{ color:var(--warning); }
 
 /* Guide links: a list card with rows. */
@@ -69,8 +69,8 @@
 /* pH reference scale: a neutral track with the typical band highlighted and labelled, not a score bar. */
 .glowvai-root .rec-ph-card{ display:flex; flex-direction:column; gap:12px; padding:16px; border:1px solid var(--ds-line); border-radius:var(--ds-radius); background:var(--ds-card); box-shadow:var(--ds-shadow); }
 .glowvai-root .rec-ph-head{ display:flex; flex-direction:column; gap:2px; }
-.glowvai-root .rec-ph-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:800; }
-.glowvai-root .rec-ph-value{ margin:0; color:var(--ds-muted); font-size:13px; font-weight:650; }
+.glowvai-root .rec-ph-title{ margin:0; color:var(--ds-ink); font-size:15px; font-weight:700; }
+.glowvai-root .rec-ph-value{ margin:0; color:var(--ds-muted); font-size:13px; font-weight:700; }
 .glowvai-root .rec-ph-scale{ display:flex; flex-direction:column; gap:6px; padding-top:4px; }
 .glowvai-root .rec-ph-track{ position:relative; height:20px; margin-top:3px; border-radius:8px; background:var(--ds-pearl); box-shadow:inset 0 0 0 1px var(--ds-line); }
 .glowvai-root .rec-ph-band{ position:absolute; top:-3px; bottom:-3px; border:2px solid var(--ds-brand); border-radius:8px; background:var(--ds-sky); }
@@ -99,11 +99,11 @@
 .glowvai-root .rec-checkout-item small{ color:var(--ds-muted); font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
 .glowvai-root .rec-checkout-item b{ color:var(--ds-ink); font-size:14px; font-weight:700; line-height:1.35; }
 .glowvai-root .rec-checkout-item p{ margin:0; color:var(--ds-muted); font-size:12px; }
-.glowvai-root .rec-checkout-item strong{ color:var(--ds-ink); font-size:16px; font-weight:800; }
+.glowvai-root .rec-checkout-item strong{ color:var(--ds-ink); font-size:16px; font-weight:700; }
 .glowvai-root .rec-checkout-total{ flex-direction:column; gap:8px; }
 .glowvai-root .rec-checkout-total > div{ display:flex; align-items:baseline; justify-content:space-between; }
-.glowvai-root .rec-checkout-total span{ color:var(--ds-muted); font-size:14px; font-weight:650; }
-.glowvai-root .rec-checkout-total b{ color:var(--ds-ink); font-size:20px; font-weight:800; }
+.glowvai-root .rec-checkout-total span{ color:var(--ds-muted); font-size:14px; font-weight:700; }
+.glowvai-root .rec-checkout-total b{ color:var(--ds-ink); font-size:20px; font-weight:700; }
 .glowvai-root .rec-checkout-total p{ margin:0; color:var(--ds-muted); font-size:12px; line-height:1.45; }
 .glowvai-root .rec-checkout-total .rec-primary{ width:100%; margin-top:4px; }
 

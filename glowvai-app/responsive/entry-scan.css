@@ -12,7 +12,7 @@
 .glowvai-root .login-phone-divider{ background: var(--ds-line); }
 .glowvai-root .login-continue-button{ height: var(--ds-control); border-radius: var(--ds-pill); background: var(--ds-brand); box-shadow: none; font-size: 15px; font-weight: 700; }
 .glowvai-root .login-continue-button:hover{ background: var(--ds-brand-dark); }
-.glowvai-root .login-phone-field input{ align-self: stretch; height: 100%; color: var(--ds-ink); font-size: 16px; font-weight: 600; }
+.glowvai-root .login-phone-field input{ align-self: stretch; height: 100%; color: var(--ds-ink); font-size: 16px; font-weight: 500; }
 .glowvai-root .login-sheet-copy > p{ color: var(--ds-muted); font-size: var(--ds-body); }
 .glowvai-root .login-phone-error{ margin-bottom: -8px; color: var(--ds-danger); font-size: var(--ds-small); }
 .glowvai-root .login-legal-copy{ color: var(--ds-muted); font-size: var(--ds-small); }
@@ -21,7 +21,7 @@
 .glowvai-root .otp-back{ width: 44px; height: 44px; }
 .glowvai-root .otp-cells input{ border-radius: var(--ds-radius-sm); }
 .glowvai-root .otp-copy p{ font-size: 13px; }
-.glowvai-root .otp-edit-number{ min-height: 32px; padding: 0 4px; color: #fff; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; }
+.glowvai-root .otp-edit-number{ min-height: 32px; padding: 0 4px; color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .glowvai-root .otp-resend{ font-size: 12px; }
 .glowvai-root .otp-resend button{ min-height: 32px; padding: 0 4px; }
 .glowvai-root .otp-validity{ font-size: 11px; }
@@ -122,6 +122,6 @@
 .glowvai-root .login-field-label{ display: block; margin: 14px 2px 6px; color: var(--ds-ink); font-size: var(--ds-small, 12px); font-weight: 700; }
 .glowvai-root .login-reference-form .login-field-label:first-child{ margin-top: 0; }
 .glowvai-root .login-phone-field.is-plain{ grid-template-columns: minmax(0,1fr); }
-.glowvai-root .login-details-note{ display: flex; align-items: flex-start; gap: 8px; margin: 14px 2px 0; padding: 10px 12px; border-radius: var(--ds-radius-sm, 9px); background: var(--ds-sky, #eef4ff); color: var(--ds-ink, #101c36); font-size: 12px; line-height: 1.45; }
+.glowvai-root .login-details-note{ display: flex; align-items: flex-start; gap: 8px; margin: 14px 2px 0; padding: 10px 12px; border-radius: var(--ds-radius-sm, 9px); background: var(--ds-sky, var(--gv-blue-tint)); color: var(--ds-ink, var(--gv-ink)); font-size: 12px; line-height: 1.45; }
 .glowvai-root .login-details-note svg{ width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: var(--ds-brand, #1459e8); }
 .glowvai-root .login-details-note + .login-phone-error{ margin-top: 10px; }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Same system UI stack as the shop (--gv-font in glowvai-app/glowvai.css); the vendor pages load no web fonts.
+// Same Roboto stack as the shop (--gv-font in glowvai-app/glowvai.css, face loaded in app/layout.tsx).
 const VENDOR_FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
 
 export default function VendorLayout({ children }: { children: ReactNode }) {

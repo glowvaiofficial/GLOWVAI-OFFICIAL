@@ -21,8 +21,8 @@
   background: var(--ds-pearl);
 }
 .glowvai-root .notif-header-copy{ flex: 1; min-width: 0; }
-.glowvai-root .notif-header-copy h1{ font-size: var(--ds-h1); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); }
-.glowvai-root .notif-header-copy p{ margin-top: 2px; font-size: 13px; font-weight: 600; color: var(--ds-muted); }
+.glowvai-root .notif-header-copy h1{ font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); }
+.glowvai-root .notif-header-copy p{ margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--ds-muted); }
 
 .glowvai-root .notif-icon-button{
   display: inline-flex;
@@ -43,7 +43,7 @@
   padding: 0 4px;
   border: 0;
   background: none;
-  color: var(--primary, #0066ff);
+  color: var(--primary, var(--gv-blue));
   font: 700 14px/1 var(--font-body);
   cursor: pointer;
 }
@@ -79,12 +79,12 @@
   justify-content: center;
   border-radius: 12px;
   background: var(--ds-sky);
-  color: var(--primary, #0066ff);
+  color: var(--primary, var(--gv-blue));
 }
 .glowvai-root .notif-prompt-copy{ flex: 1 1 200px; min-width: 0; }
-.glowvai-root .notif-prompt-copy h2{ font-size: 16px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .notif-prompt-copy h2{ font-size: 16px; font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .notif-prompt-copy p{ margin-top: 4px; font-size: 13px; line-height: 1.5; color: var(--ds-muted); }
-.glowvai-root .notif-prompt-message{ color: var(--ds-danger, #c13f4b) !important; font-weight: 600; }
+.glowvai-root .notif-prompt-message{ color: var(--ds-danger, #c13f4b) !important; font-weight: 500; }
 
 .glowvai-root .notif-primary,
 .glowvai-root .notif-secondary{
@@ -94,13 +94,13 @@
   font: 700 14px/1 var(--font-body);
   cursor: pointer;
 }
-.glowvai-root .notif-primary{ border: 0; background: var(--primary, #0066ff); color: #fff; }
+.glowvai-root .notif-primary{ border: 0; background: var(--primary, var(--gv-blue)); color: #fff; }
 .glowvai-root .notif-primary[aria-disabled="true"]{ background: var(--ds-line); color: var(--ds-muted); cursor: not-allowed; }
 .glowvai-root .notif-primary:disabled{ opacity: .7; cursor: wait; }
 .glowvai-root .notif-secondary{ width: 100%; border: 1px solid var(--ds-line); background: var(--ds-card); color: var(--ds-ink); }
 .glowvai-root .notif-secondary:disabled{ opacity: .6; }
 
-.glowvai-root .notif-section-title{ margin-top: 8px; font-size: var(--ds-h2, 20px); font-weight: 800; letter-spacing: -.02em; color: var(--ds-ink); }
+.glowvai-root .notif-section-title{ margin-top: 8px; font-size: var(--ds-h2, 20px); font-weight: 700; letter-spacing: -.02em; color: var(--ds-ink); }
 
 .glowvai-root .notif-pref{
   display: flex;
@@ -125,7 +125,7 @@
   background: var(--ds-line);
   cursor: pointer;
 }
-.glowvai-root .notif-switch.is-on{ background: var(--primary, #0066ff); }
+.glowvai-root .notif-switch.is-on{ background: var(--primary, var(--gv-blue)); }
 .glowvai-root .notif-switch:disabled{ opacity: .45; cursor: not-allowed; }
 .glowvai-root .notif-switch-knob{
   position: absolute;
@@ -140,7 +140,7 @@
 .glowvai-root .notif-switch.is-on .notif-switch-knob{ transform: translateX(20px); }
 
 .glowvai-root .notif-note{ font-size: 12px; line-height: 1.5; color: var(--ds-muted); }
-.glowvai-root .notif-error{ font-size: 13px; font-weight: 600; color: var(--ds-danger, #c13f4b); }
+.glowvai-root .notif-error{ font-size: 13px; font-weight: 500; color: var(--ds-danger, #c13f4b); }
 
 .glowvai-root .notif-list{ display: flex; flex-direction: column; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
 .glowvai-root .notif-item{
@@ -156,11 +156,11 @@
   text-align: left;
   cursor: pointer;
 }
-.glowvai-root .notif-item.is-unread{ border-color: var(--primary, #0066ff); background: var(--ds-sky); }
+.glowvai-root .notif-item.is-unread{ border-color: var(--primary, var(--gv-blue)); background: var(--ds-sky); }
 .glowvai-root .notif-dot{ width: 8px; height: 8px; flex-shrink: 0; margin-top: 6px; border-radius: 50%; background: transparent; }
-.glowvai-root .notif-item.is-unread .notif-dot{ background: var(--primary, #0066ff); }
+.glowvai-root .notif-item.is-unread .notif-dot{ background: var(--primary, var(--gv-blue)); }
 .glowvai-root .notif-item-copy{ display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
-.glowvai-root .notif-item-title{ font-weight: 800; font-size: 15px; }
+.glowvai-root .notif-item-title{ font-weight: 700; font-size: 15px; }
 .glowvai-root .notif-item-body{ font-size: 13px; line-height: 1.45; color: var(--ds-muted); }
 .glowvai-root .notif-item-time{ font-size: 12px; color: var(--ds-muted); }
 .glowvai-root .notif-item > svg{ margin-top: 2px; color: var(--ds-muted); }

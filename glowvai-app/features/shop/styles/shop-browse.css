@@ -9,12 +9,12 @@
 
 /* Category directory: white cards like the home's tiles */
 .glowvai-root .shop-browse-directory{ padding: var(--ds-section) var(--ds-gutter) 0; }
-.glowvai-root .shop-browse-directory h2{ margin-bottom: 12px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 800; letter-spacing: -0.02em; }
+.glowvai-root .shop-browse-directory h2{ margin-bottom: 12px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -0.02em; }
 .glowvai-root .shop-browse-category-grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-gap); }
 .glowvai-root .shop-browse-cat{ position: relative; display: flex; min-width: 0; min-height: 128px; flex-direction: column; align-items: flex-start; gap: 2px; padding: 14px; overflow: hidden; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); color: var(--ds-ink); text-align: left; transition: transform .2s ease, box-shadow .2s ease; }
 .glowvai-root .shop-browse-cat-icon{ display: grid; width: 36px; height: 36px; margin-bottom: 8px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
-.glowvai-root .shop-browse-cat-name{ position: relative; z-index: 1; max-width: 70%; font-size: 14px; font-weight: 800; line-height: 1.3; }
-.glowvai-root .shop-browse-cat-count{ position: relative; z-index: 1; color: var(--ds-muted); font-size: 12px; font-weight: 600; }
+.glowvai-root .shop-browse-cat-name{ position: relative; z-index: 1; max-width: 70%; font-size: 14px; font-weight: 700; line-height: 1.3; }
+.glowvai-root .shop-browse-cat-count{ position: relative; z-index: 1; color: var(--ds-muted); font-size: 12px; font-weight: 500; }
 .glowvai-root .shop-browse-cat-media{ position: absolute; right: -8px; bottom: -8px; width: 72px; height: 72px; overflow: hidden; border-radius: 50%; background: var(--ds-sky); }
 .glowvai-root .shop-browse-cat-media img{ display: block; width: 100%; height: 100%; object-fit: cover; }
 @media (hover: hover){
@@ -40,14 +40,14 @@
 
   .glowvai-root .shop-browse-body{ display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: 28px; padding: 28px var(--ds-gutter) 48px; align-items: start; }
   .glowvai-root .shop-browse-sidebar{ position: sticky; top: 88px; display: block; min-width: 0; padding: 20px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
-  .glowvai-root .shop-browse-sidebar h3{ margin-bottom: 8px; color: var(--ds-muted); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .glowvai-root .shop-browse-sidebar h3{ margin-bottom: 8px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
   .glowvai-root .shop-browse-side-item{ display: flex; width: 100%; min-height: 44px; align-items: center; gap: 10px; padding: 4px 8px; border: 0; border-radius: var(--ds-radius-sm); background: none; color: var(--ds-ink); text-align: left; }
   .glowvai-root .shop-browse-side-item:hover{ background: var(--ds-pearl); }
   .glowvai-root .shop-browse-side-badge{ display: grid; width: 32px; height: 32px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
   .glowvai-root .shop-browse-side-name{ flex: 1; min-width: 0; font-size: 14px; font-weight: 700; }
-  .glowvai-root .shop-browse-side-count{ color: var(--ds-muted); font-size: 12px; font-weight: 600; }
+  .glowvai-root .shop-browse-side-count{ color: var(--ds-muted); font-size: 12px; font-weight: 500; }
   .glowvai-root .shop-browse-side-divider{ height: 1px; margin: 16px 0; background: var(--ds-line); }
-  .glowvai-root .shop-browse-side-concern{ display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; padding: 0 12px; border: 0; border-radius: var(--ds-pill); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 600; text-align: left; }
+  .glowvai-root .shop-browse-side-concern{ display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; padding: 0 12px; border: 0; border-radius: var(--ds-pill); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 500; text-align: left; }
   .glowvai-root .shop-browse-side-concern:hover{ background: var(--ds-pearl); }
   .glowvai-root .shop-browse-side-concern.is-active{ background: var(--ds-brand); color: #fff; font-weight: 700; }
   .glowvai-root .shop-browse-side-clear{ margin-top: 16px; }

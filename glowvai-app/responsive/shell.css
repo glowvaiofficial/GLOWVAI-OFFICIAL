@@ -37,10 +37,10 @@
 
 .glowvai-root .web-header-inner{ display: flex; height: 68px; align-items: center; gap: 12px; max-width: var(--shell-max); margin: 0 auto; padding: 0 var(--shell-gutter); }
 
-.glowvai-root .web-header-back{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; padding: 0 4px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.glowvai-root .web-header-back{ display: inline-flex; flex: 0 0 auto; min-height: 44px; align-items: center; gap: 4px; padding: 0 4px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; text-decoration: none; white-space: nowrap; }
 .glowvai-root .web-header-back:hover{ color: var(--text-primary); }
 
-.glowvai-root .web-header-brand{ flex: 0 0 auto; min-height: 44px; padding: 0 6px; border: 0; border-radius: 8px; background: none; color: var(--ds-ink); font-family: var(--font-brand); font-size: 26px; font-weight: 600; letter-spacing: -.055em; line-height: 1; cursor: pointer; }
+.glowvai-root .web-header-brand{ flex: 0 0 auto; min-height: 44px; padding: 0 6px; border: 0; border-radius: 8px; background: none; color: var(--ds-ink); font-family: var(--font-brand); font-size: 26px; font-weight: 700; letter-spacing: -.055em; line-height: 1; cursor: pointer; }
 
 /* Search sits in the middle like other quick-commerce sites; it opens the search screen. Soft pill, no shadow. */
 .glowvai-root .web-header-search{ display: flex; flex: 1 1 auto; min-width: 0; max-width: 560px; height: 44px; align-items: center; gap: 10px; margin-inline: 8px auto; padding: 0 18px; border: 1px solid #e6e9f0; border-radius: var(--ds-pill); background: #f5f7fb; color: var(--text-secondary); font: 500 14px/1 var(--font-body); text-align: left; cursor: text; }
@@ -60,9 +60,9 @@
 .glowvai-root .web-header-cart{ display: inline-flex; flex: 0 0 auto; min-width: 112px; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--ds-brand); color: #fff; font: 700 14px/1 var(--font-body); cursor: pointer; white-space: nowrap; }
 .glowvai-root .web-header-cart:hover{ background: var(--ds-brand-dark); }
 .glowvai-root .web-header-cart-icon{ position: relative; display: inline-grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; }
-.glowvai-root .web-header-cart-count{ position: absolute; top: -7px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #fff; color: var(--ds-brand); font-size: 11px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--ds-brand); }
+.glowvai-root .web-header-cart-count{ position: absolute; top: -7px; right: -9px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #fff; color: var(--ds-brand); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--ds-brand); }
 .glowvai-root .web-header-cart-copy{ display: grid; gap: 3px; text-align: left; }
-.glowvai-root .web-header-cart-copy b{ font-size: 13px; font-weight: 800; line-height: 1; }
+.glowvai-root .web-header-cart-copy b{ font-size: 13px; font-weight: 700; line-height: 1; }
 .glowvai-root .web-header-cart-copy small{ font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; opacity: .95; }
 
 .glowvai-root .web-header button:focus-visible,

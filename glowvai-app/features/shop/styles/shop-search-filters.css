@@ -7,37 +7,37 @@
 
 /* Search bar and autocomplete */
 .glowvai-root .shop-search-bar-wrap{ position: relative; z-index: 20; }
-.glowvai-root .shop-search-mic{ display: inline-flex; flex-shrink: 0; height: 36px; align-items: center; gap: 6px; padding: 0 10px; border: 0; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 11px; font-weight: 800; }
+.glowvai-root .shop-search-mic{ display: inline-flex; flex-shrink: 0; height: 36px; align-items: center; gap: 6px; padding: 0 10px; border: 0; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 11px; font-weight: 700; }
 .glowvai-root .shop-search-mic.is-listening{ background: var(--ds-danger-bg); color: var(--ds-danger); }
 
 .glowvai-root .shop-search-backdrop{ position: fixed; inset: 0; z-index: 19; border: 0; background: rgba(7, 27, 77, .28); }
 .glowvai-root .shop-search-suggest{ position: absolute; top: calc(100% + 8px); right: 0; left: 0; z-index: 21; padding: 8px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow-hover); }
-.glowvai-root .shop-search-suggest-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 8px 8px; border-bottom: 1px solid var(--ds-line); color: var(--ds-ink); font-size: 13px; font-weight: 800; }
+.glowvai-root .shop-search-suggest-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 8px 8px; border-bottom: 1px solid var(--ds-line); color: var(--ds-ink); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-search-suggest-head span{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .shop-search-suggest-head button{ min-height: 36px; flex-shrink: 0; padding: 0 12px; border: 0; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 800; }
-.glowvai-root .shop-search-suggest-row{ display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px; border: 0; border-bottom: 1px solid var(--ds-line); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 600; text-align: left; }
+.glowvai-root .shop-search-suggest-head button{ min-height: 36px; flex-shrink: 0; padding: 0 12px; border: 0; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 700; }
+.glowvai-root .shop-search-suggest-row{ display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px; border: 0; border-bottom: 1px solid var(--ds-line); background: none; color: var(--ds-ink); font-size: 14px; font-weight: 500; text-align: left; }
 .glowvai-root .shop-search-suggest-row:last-child{ border-bottom: 0; }
 .glowvai-root .shop-search-suggest-row:hover{ background: var(--ds-pearl); }
 .glowvai-root .shop-search-suggest-row > span:first-child{ display: inline-flex; min-width: 0; align-items: center; gap: 10px; }
-.glowvai-root .shop-search-suggest-row > span:last-child{ flex-shrink: 0; color: var(--ds-brand); font-size: 12px; font-weight: 800; }
+.glowvai-root .shop-search-suggest-row > span:last-child{ flex-shrink: 0; color: var(--ds-brand); font-size: 12px; font-weight: 700; }
 .glowvai-root .shop-search-suggest-row svg{ flex-shrink: 0; color: var(--ds-brand); }
 
 /* Filters and results */
 .glowvai-root .shop-search-layout{ display: grid; gap: var(--ds-section); align-items: start; min-width: 0; }
 .glowvai-root .shop-search-filters{ display: grid; gap: 16px; min-width: 0; padding: 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
 .glowvai-root .shop-search-filters-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--ds-line); }
-.glowvai-root .shop-search-filters-head h2{ display: inline-flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: 17px; font-weight: 800; }
+.glowvai-root .shop-search-filters-head h2{ display: inline-flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: 17px; font-weight: 700; }
 .glowvai-root .shop-search-filters-head svg{ color: var(--ds-brand); }
 .glowvai-root .shop-search-filters-head button{ min-height: 36px; padding: 0 4px; border: 0; background: none; color: var(--ds-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-search-group{ min-width: 0; }
-.glowvai-root .shop-search-group h3{ margin-bottom: 10px; color: var(--ds-muted); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.glowvai-root .shop-search-group h3{ margin-bottom: 10px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 /* Phones: each filter group is one swipeable row so the results stay close to the top. */
 .glowvai-root .shop-search-options{ display: flex; gap: 8px; margin: 0 -16px; padding: 0 16px 2px; overflow-x: auto; scroll-padding-inline: 16px; scrollbar-width: none; }
 .glowvai-root .shop-search-options::-webkit-scrollbar{ display: none; }
 
 .glowvai-root .shop-search-results{ display: grid; gap: 16px; min-width: 0; scroll-margin-top: 16px; }
 .glowvai-root .shop-search-toolbar{ display: grid; gap: 12px; }
-.glowvai-root .shop-search-toolbar h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 800; letter-spacing: -0.02em; }
+.glowvai-root .shop-search-toolbar h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -0.02em; }
 .glowvai-root .shop-search-toolbar p{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; overflow-wrap: anywhere; }
 .glowvai-root .shop-search-applied{ display: flex; flex-wrap: wrap; gap: 8px; }
 .glowvai-root .shop-search-applied-chip{ display: inline-flex; min-height: 36px; align-items: center; gap: 4px; padding: 0 4px 0 14px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 700; }
@@ -65,5 +65,5 @@
 .glowvai-root .shop-search-suggest-row.is-active{ background: var(--ds-pearl); }
 .glowvai-root .shop-search-sort{ display: flex; align-items: center; gap: 8px; color: var(--ds-muted); font-size: 13px; font-weight: 500; }
 .glowvai-root .shop-search-sort select{ min-height: 40px; padding: 0 10px; border: 1px solid var(--ds-line, #e6eaf2); border-radius: 10px; background: #fff; color: var(--ds-ink); font: inherit; font-weight: 500; cursor: pointer; }
-.glowvai-root .shop-search-sort select:focus-visible{ outline: 2px solid #0057fb; outline-offset: 2px; }
+.glowvai-root .shop-search-sort select:focus-visible{ outline: 2px solid var(--gv-blue); outline-offset: 2px; }
 @media (min-width: 1024px){ .glowvai-root .shop-search-toolbar{ grid-template-columns: 1fr auto; align-items: center; } .glowvai-root .shop-search-applied{ grid-column: 1 / -1; } }

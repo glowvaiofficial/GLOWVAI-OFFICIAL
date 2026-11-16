@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Fonts: the shop uses the system UI font stack (one token, --gv-font in glowvai-app/glowvai.css); nothing is loaded from a font host.
+// Fonts: the shop uses Roboto, self-hosted by next/font in app/layout.tsx (--font-roboto), through the one token --gv-font in glowvai-app/glowvai.css.
 
 export function generateStaticParams() {
   return [{ slug: [] }];

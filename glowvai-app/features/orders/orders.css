@@ -17,7 +17,7 @@
   padding: 4px var(--ds-gutter) var(--ds-gutter);
 }
 
-.glowvai-root .orders-body h2{ font-size: 17px; font-weight: 800; line-height: 1.3; letter-spacing: -.01em; color: var(--ds-ink); }
+.glowvai-root .orders-body h2{ font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.01em; color: var(--ds-ink); }
 .glowvai-root .orders-body .orders-section-title{ margin-top: 8px; font-size: var(--ds-h2); letter-spacing: -.02em; }
 .glowvai-root .orders-body .orders-section-head .orders-section-title{ margin-top: 0; }
 .glowvai-root .orders-section-head:has(.orders-section-title){ margin-top: 8px; }
@@ -38,8 +38,8 @@
   background: var(--ds-pearl);
 }
 .glowvai-root .orders-header-copy{ flex: 1; min-width: 0; }
-.glowvai-root .orders-header-copy h1{ overflow: hidden; font-size: var(--ds-h1); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
-.glowvai-root .orders-header-copy p{ overflow: hidden; margin-top: 2px; font-size: 13px; font-weight: 600; color: var(--ds-muted); text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-header-copy h1{ overflow: hidden; font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-header-copy p{ overflow: hidden; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--ds-muted); text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .orders-header-right{ display: flex; align-items: center; }
 
 .glowvai-root .orders-icon-button{
@@ -69,12 +69,12 @@
   background: var(--ds-card);
   box-shadow: var(--ds-shadow);
 }
-.glowvai-root .orders-card-title{ margin-bottom: 12px; font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--ds-ink); }
+.glowvai-root .orders-card-title{ margin-bottom: 12px; font-size: 17px; font-weight: 700; letter-spacing: -.01em; color: var(--ds-ink); }
 .glowvai-root .orders-section-head .orders-card-title{ margin-bottom: 0; }
 
 .glowvai-root .orders-card-head{ display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .glowvai-root .orders-card-head > div:first-child{ display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.glowvai-root .orders-card-head > div:first-child strong{ overflow: hidden; font-size: 16px; font-weight: 800; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-card-head > div:first-child strong{ overflow: hidden; font-size: 16px; font-weight: 700; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .orders-card-head > div:first-child span{ font-size: 13px; color: var(--ds-muted); }
 
 .glowvai-root .orders-badge{
@@ -85,7 +85,7 @@
   padding: 5px 10px;
   border-radius: var(--ds-pill);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 .glowvai-root .orders-badge.is-active{ background: var(--ds-sky); color: var(--ds-brand); }
@@ -120,7 +120,7 @@
   color: var(--ds-muted);
 }
 .glowvai-root .orders-summary-row > div{ min-width: 0; }
-.glowvai-root .orders-summary-row strong{ font-size: 16px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-summary-row strong{ font-size: 16px; font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .orders-address-line{
   display: flex;
   align-items: center;
@@ -202,7 +202,7 @@
 /* Order details */
 .glowvai-root .orders-status-card{ display: flex; flex-direction: column; gap: 8px; }
 .glowvai-root .orders-status-head{ display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
-.glowvai-root .orders-status-head strong{ overflow: hidden; font-size: 15px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-status-head strong{ overflow: hidden; font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .orders-meta-row{ display: flex; justify-content: space-between; gap: 16px; font-size: 13px; line-height: 1.45; }
 .glowvai-root .orders-meta-row span{ flex-shrink: 0; color: var(--ds-muted); }
 .glowvai-root .orders-meta-row b{ min-width: 0; color: var(--ds-ink); font-weight: 700; text-align: right; overflow-wrap: anywhere; }
@@ -212,11 +212,11 @@
 .glowvai-root .orders-item-row + .orders-item-row{ border-top: 1px solid var(--ds-line); }
 .glowvai-root .orders-item-row .orders-thumb{ width: 64px; height: 64px; }
 .glowvai-root .orders-item-copy{ display: flex; flex: 1; flex-direction: column; gap: 3px; min-width: 0; }
-.glowvai-root .orders-item-copy b{ font-size: 14px; font-weight: 800; line-height: 1.35; color: var(--ds-ink); }
+.glowvai-root .orders-item-copy b{ font-size: 14px; font-weight: 700; line-height: 1.35; color: var(--ds-ink); }
 .glowvai-root .orders-item-copy small{ font-size: 12px; color: var(--ds-muted); }
 .glowvai-root .orders-item-copy small.is-qty{ font-weight: 700; color: var(--ds-success); }
-.glowvai-root .orders-category{ align-self: flex-start; font-size: 11px; font-weight: 800; letter-spacing: .3px; color: var(--ds-brand); text-transform: uppercase; }
-.glowvai-root .orders-item-price{ flex-shrink: 0; font-size: 14px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-category{ align-self: flex-start; font-size: 11px; font-weight: 700; letter-spacing: .3px; color: var(--ds-brand); text-transform: uppercase; }
+.glowvai-root .orders-item-price{ flex-shrink: 0; font-size: 14px; font-weight: 700; color: var(--ds-ink); }
 
 .glowvai-root .orders-bill-card{ display: flex; flex-direction: column; gap: 10px; }
 .glowvai-root .orders-bill-row{ display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
@@ -224,8 +224,8 @@
 .glowvai-root .orders-bill-row b{ font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .orders-bill-row b.is-discount{ color: var(--ds-success); }
 .glowvai-root .orders-grand-total{ display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--ds-line); }
-.glowvai-root .orders-grand-total span{ font-size: 15px; font-weight: 800; }
-.glowvai-root .orders-grand-total strong{ font-size: 18px; font-weight: 800; }
+.glowvai-root .orders-grand-total span{ font-size: 15px; font-weight: 700; }
+.glowvai-root .orders-grand-total strong{ font-size: 18px; font-weight: 700; }
 
 .glowvai-root .orders-timeline-card{ display: flex; flex-direction: column; gap: 12px; }
 .glowvai-root .orders-timeline-card .orders-card-title{ margin-bottom: 0; }
@@ -239,7 +239,7 @@
 .glowvai-root .orders-vtimeline small{ font-size: 12px; color: var(--ds-muted); }
 .glowvai-root .orders-vtimeline li.is-done b,
 .glowvai-root .orders-vtimeline li.is-current b{ color: var(--ds-ink); }
-.glowvai-root .orders-vtimeline-dot{ display: grid; width: 28px; height: 28px; flex-shrink: 0; place-items: center; border: 2px solid var(--ds-line); border-radius: 50%; background: #fff; color: var(--ds-muted); font-size: 12px; font-weight: 800; }
+.glowvai-root .orders-vtimeline-dot{ display: grid; width: 28px; height: 28px; flex-shrink: 0; place-items: center; border: 2px solid var(--ds-line); border-radius: 50%; background: #fff; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
 .glowvai-root .orders-vtimeline li.is-done .orders-vtimeline-dot{ border-color: var(--ds-brand); background: var(--ds-brand); color: #fff; }
 .glowvai-root .orders-vtimeline li.is-current .orders-vtimeline-dot{ border-color: var(--ds-brand); color: var(--ds-brand); box-shadow: 0 0 0 4px var(--ds-sky); }
 .glowvai-root .orders-cancel-note{ display: flex; align-items: flex-start; gap: 8px; padding: 12px; border-radius: var(--ds-radius-sm); background: var(--ds-danger-bg); color: var(--ds-danger); font-size: 13px; font-weight: 700; line-height: 1.45; }
@@ -274,20 +274,20 @@
 .glowvai-root .orders-eta-icon{ display: grid; width: 48px; height: 48px; flex-shrink: 0; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .18); }
 .glowvai-root .orders-eta-card.is-cancelled .orders-eta-icon{ background: #fff; }
 .glowvai-root .orders-eta-card > div{ display: flex; min-width: 0; flex-direction: column; gap: 4px; }
-.glowvai-root .orders-eta-card small{ font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
-.glowvai-root .orders-eta-card strong{ font-size: 22px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; }
+.glowvai-root .orders-eta-card small{ font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.glowvai-root .orders-eta-card strong{ font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
 .glowvai-root .orders-eta-card p{ display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: .92; }
 
 .glowvai-root .orders-rider-card{ display: flex; align-items: center; gap: 12px; }
 .glowvai-root .orders-rider-avatar{ display: grid; width: 44px; height: 44px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .orders-rider-copy{ display: flex; min-width: 0; flex-direction: column; gap: 2px; }
-.glowvai-root .orders-rider-copy b{ font-size: 15px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-rider-copy b{ font-size: 15px; font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .orders-rider-copy small{ font-size: 13px; color: var(--ds-muted); }
 
 .glowvai-root .orders-route-card{ display: flex; align-items: flex-start; gap: 12px; }
 .glowvai-root .orders-route-card > div{ display: flex; min-width: 0; flex-direction: column; gap: 2px; }
 .glowvai-root .orders-route-card small{ font-size: 12px; font-weight: 700; color: var(--ds-muted); }
-.glowvai-root .orders-route-card b{ font-size: 14px; font-weight: 800; line-height: 1.4; color: var(--ds-ink); }
+.glowvai-root .orders-route-card b{ font-size: 14px; font-weight: 700; line-height: 1.4; color: var(--ds-ink); }
 .glowvai-root .orders-route-card p{ font-size: 13px; color: var(--ds-muted); }
 .glowvai-root .orders-stop-icon{ display: grid; width: 36px; height: 36px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .orders-stop-icon.is-success{ background: var(--ds-success-bg); color: var(--ds-success); }
@@ -299,14 +299,14 @@
 .glowvai-root .orders-mini-row > div{ display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
 .glowvai-root .orders-mini-row b{ font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--ds-ink); }
 .glowvai-root .orders-mini-row small{ font-size: 12px; color: var(--ds-muted); }
-.glowvai-root .orders-mini-row strong{ flex-shrink: 0; font-size: 13px; font-weight: 800; }
+.glowvai-root .orders-mini-row strong{ flex-shrink: 0; font-size: 13px; font-weight: 700; }
 .glowvai-root .orders-paid{ display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--ds-line); font-size: 13px; color: var(--ds-muted); }
-.glowvai-root .orders-paid b{ font-size: 16px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-paid b{ font-size: 16px; font-weight: 700; color: var(--ds-ink); }
 
 .glowvai-root .orders-support-card{ display: flex; flex-direction: column; gap: 12px; }
 .glowvai-root .orders-support-head{ display: flex; align-items: center; gap: 12px; }
 .glowvai-root .orders-support-head > div{ display: flex; flex-direction: column; gap: 2px; }
-.glowvai-root .orders-support-head b{ font-size: 14px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-support-head b{ font-size: 14px; font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .orders-support-head small{ font-size: 12px; color: var(--ds-muted); }
 .glowvai-root .orders-support-icon{ display: grid; width: 40px; height: 40px; flex-shrink: 0; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .orders-support-actions{ display: flex; gap: 8px; }
@@ -324,7 +324,7 @@
 /* Rate */
 .glowvai-root .orders-summary-card{ display: flex; align-items: center; gap: 16px; }
 .glowvai-root .orders-summary-card > div:last-child{ display: flex; min-width: 0; flex-direction: column; gap: 2px; }
-.glowvai-root .orders-summary-card strong{ font-size: 15px; font-weight: 800; color: var(--ds-ink); }
+.glowvai-root .orders-summary-card strong{ font-size: 15px; font-weight: 700; color: var(--ds-ink); }
 .glowvai-root .orders-summary-card span{ font-size: 13px; color: var(--ds-muted); }
 .glowvai-root .orders-summary-card .orders-thumbs{ flex-shrink: 0; }
 .glowvai-root .orders-summary-card .orders-thumb{ width: 44px; height: 44px; }

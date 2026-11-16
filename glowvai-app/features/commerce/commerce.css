@@ -23,7 +23,7 @@
   background: transparent;
 }
 .glowvai-root .commerce-head-copy { min-width: 0; flex: 1; }
-.glowvai-root .commerce-head-copy h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
+.glowvai-root .commerce-head-copy h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.02em; }
 .glowvai-root .commerce-head-copy p { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: var(--ds-muted); font-size: 13px; }
 
 .glowvai-root .commerce-icon-btn {
@@ -50,7 +50,7 @@
   background: var(--ds-card);
   box-shadow: var(--ds-shadow);
 }
-.glowvai-root .commerce-card h2 { color: var(--ds-ink); font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .commerce-card h2 { color: var(--ds-ink); font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
 .glowvai-root .commerce-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 
 .glowvai-root .commerce-link {
@@ -119,8 +119,8 @@
   box-shadow: 0 -8px 24px rgba(26, 54, 120, .06);
 }
 .glowvai-root .commerce-sticky-bar > div { min-width: 0; flex: 1; }
-.glowvai-root .commerce-sticky-bar small { display: block; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 600; }
-.glowvai-root .commerce-sticky-bar b { color: var(--ds-ink); font-size: 18px; font-weight: 800; }
+.glowvai-root .commerce-sticky-bar small { display: block; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
+.glowvai-root .commerce-sticky-bar b { color: var(--ds-ink); font-size: 18px; font-weight: 700; }
 .glowvai-root .commerce-sticky-bar .commerce-primary { padding: 0 16px; }
 .glowvai-root .commerce-sticky-bar .commerce-primary,
 .glowvai-root .commerce-sticky-bar .commerce-ghost { flex: 1; }
@@ -139,7 +139,7 @@
   background: var(--ds-card);
   box-shadow: var(--ds-shadow);
 }
-.glowvai-root .commerce-empty-state h2 { color: var(--ds-ink); font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .commerce-empty-state h2 { color: var(--ds-ink); font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
 .glowvai-root .commerce-empty-state p { color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .commerce-empty-state .commerce-primary { margin-top: 8px; }
 .glowvai-root .commerce-empty-icon {
@@ -162,7 +162,7 @@
   background: var(--ds-success-bg);
   color: var(--ds-success);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 .glowvai-root .commerce-eta-card { display: flex; align-items: center; gap: 12px; border-color: var(--success-border); background: var(--ds-success-bg); }
@@ -206,7 +206,7 @@
   border-radius: 50%;
   background: #fff;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .glowvai-root .commerce-steps li.is-active { color: var(--ds-ink); }
 .glowvai-root .commerce-steps li.is-active > span { border-color: var(--ds-brand); background: var(--ds-brand); color: #fff; }
@@ -260,11 +260,11 @@
   background: var(--ds-sky);
   color: var(--ds-brand);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .glowvai-root .commerce-stepper b { min-width: 20px; font-size: 14px; text-align: center; }
 .glowvai-root .commerce-remove { display: inline-flex; min-height: 44px; align-items: center; gap: 4px; padding: 0 4px; color: var(--ds-danger); font-size: 13px; font-weight: 700; }
-.glowvai-root .commerce-inline-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0 12px; color: var(--ds-muted); font-size: 12px; font-weight: 600; }
+.glowvai-root .commerce-inline-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0 12px; color: var(--ds-muted); font-size: 12px; font-weight: 500; }
 
 .glowvai-root .commerce-coupon-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
 .glowvai-root .commerce-coupon-form .commerce-search input { text-transform: uppercase; letter-spacing: .04em; }
@@ -282,18 +282,18 @@
   background: #fff;
   color: var(--ds-brand);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 .glowvai-root .commerce-chip.is-on { border-color: var(--ds-brand); background: var(--ds-brand); color: #fff; }
-.glowvai-root .commerce-chip-static { padding: 6px 12px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 12px; font-weight: 800; }
+.glowvai-root .commerce-chip-static { padding: 6px 12px; border-radius: var(--ds-pill); background: var(--ds-success-bg); color: var(--ds-success); font-size: 12px; font-weight: 700; }
 
 .glowvai-root .commerce-bill dl { display: grid; gap: 10px; margin-top: 12px; }
 .glowvai-root .commerce-bill dl > div { display: flex; justify-content: space-between; gap: 12px; color: var(--ds-muted); font-size: 14px; }
 .glowvai-root .commerce-bill dd { color: var(--ds-ink); font-weight: 700; }
 .glowvai-root .commerce-bill .is-saving dd { color: var(--ds-success); }
 .glowvai-root .commerce-bill .commerce-bill-total { padding-top: 12px; border-top: 1px dashed var(--ds-line); font-size: 16px; }
-.glowvai-root .commerce-bill .commerce-bill-total dd { font-weight: 800; }
-.glowvai-root .commerce-bill .commerce-bill-total dt { color: var(--ds-ink); font-weight: 800; }
+.glowvai-root .commerce-bill .commerce-bill-total dd { font-weight: 700; }
+.glowvai-root .commerce-bill .commerce-bill-total dt { color: var(--ds-ink); font-weight: 700; }
 .glowvai-root .commerce-bill .is-good { color: var(--ds-success); }
 .glowvai-root .commerce-bill-note { margin-top: 10px; color: var(--ds-muted); font-size: 12px; line-height: 1.4; }
 .glowvai-root .commerce-aside-cta { display: none; margin-top: 16px; }
@@ -301,7 +301,7 @@
 
 /* Review */
 .glowvai-root .commerce-review-line { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--ds-line); }
-.glowvai-root .commerce-review-price { font-size: 14px; font-weight: 800; white-space: nowrap; }
+.glowvai-root .commerce-review-price { font-size: 14px; font-weight: 700; white-space: nowrap; }
 .glowvai-root .commerce-review-line .commerce-thumb { width: 56px; height: 56px; }
 .glowvai-root .commerce-review-line small { color: var(--ds-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .glowvai-root .commerce-review-line h3 { color: var(--ds-ink); font-size: 14px; font-weight: 700; line-height: 1.35; }
@@ -327,7 +327,7 @@
   background: var(--warning-bg);
   color: var(--warning);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.4;
 }
 .glowvai-root .commerce-warn svg { flex: 0 0 auto; margin-top: 1px; }
@@ -340,7 +340,7 @@
   background: var(--ds-sky);
   color: var(--ds-brand);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
   vertical-align: middle;
 }
@@ -350,7 +350,7 @@
 .glowvai-root .commerce-muted { color: var(--ds-muted); font-size: 13px; line-height: 1.4; }
 .glowvai-root p.commerce-muted { display: flex; align-items: flex-start; gap: 6px; }
 .glowvai-root .commerce-muted svg { flex: 0 0 auto; margin-top: 2px; }
-.glowvai-root .commerce-error { color: var(--ds-danger); font-size: 12px; font-weight: 600; font-style: normal; }
+.glowvai-root .commerce-error { color: var(--ds-danger); font-size: 12px; font-weight: 500; font-style: normal; }
 .glowvai-root .commerce-notice { color: var(--ds-muted); font-size: 12px; line-height: 1.45; text-align: center; }
 
 /* Payment method */
@@ -365,9 +365,9 @@
   box-shadow: var(--ds-shadow);
 }
 .glowvai-root .commerce-amount-card span { font-size: 13px; opacity: .85; }
-.glowvai-root .commerce-amount-card b { font-size: 22px; font-weight: 800; }
+.glowvai-root .commerce-amount-card b { font-size: 22px; font-weight: 700; }
 .glowvai-root fieldset.commerce-pay-group { min-width: 0; margin: 0; }
-.glowvai-root .commerce-pay-group legend { float: left; display: flex; width: 100%; align-items: center; gap: 8px; margin-bottom: 8px; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.glowvai-root .commerce-pay-group legend { float: left; display: flex; width: 100%; align-items: center; gap: 8px; margin-bottom: 8px; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .glowvai-root .commerce-pay-options { clear: both; display: grid; gap: 8px; }
 .glowvai-root .commerce-pay-group h2 { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: var(--ds-muted); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
 .glowvai-root .commerce-pay-option {
@@ -405,7 +405,7 @@
   font-size: 12px;
   font-weight: 700;
 }
-.glowvai-root .commerce-brand { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-brand); font-family: var(--font-brand); font-size: 18px; font-weight: 600; letter-spacing: -.04em; text-transform: lowercase; }
+.glowvai-root .commerce-brand { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-brand); font-family: var(--font-brand); font-size: 18px; font-weight: 700; letter-spacing: -.04em; text-transform: lowercase; }
 .glowvai-root .commerce-processing-body {
   display: flex;
   flex: 1;
@@ -417,7 +417,7 @@
 }
 .glowvai-root .commerce-processing-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .glowvai-root .commerce-processing-detail { display: flex; width: 100%; flex-direction: column; }
-.glowvai-root .commerce-processing-body h1 { margin-top: 8px; color: var(--ds-ink); font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .commerce-processing-body h1 { margin-top: 8px; color: var(--ds-ink); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
 .glowvai-root .commerce-processing-body > p { color: var(--ds-muted); font-size: 14px; }
 .glowvai-root .commerce-orb { position: relative; display: grid; width: 136px; height: 136px; margin: 16px 0 8px; place-items: center; }
 .glowvai-root .commerce-orb-pulse { position: absolute; inset: 0; border-radius: 50%; background: rgba(40, 84, 197, .12); animation: commerce-pulse 2s ease-in-out infinite; }
@@ -452,7 +452,7 @@
 .glowvai-root .commerce-result-meta dt { color: var(--ds-muted); }
 .glowvai-root .commerce-processing-summary dd,
 .glowvai-root .commerce-result-meta dd { color: var(--ds-ink); font-weight: 700; text-align: right; overflow-wrap: anywhere; }
-.glowvai-root .commerce-processing-summary .is-muted { color: var(--ds-muted); font-size: 12px; font-weight: 600; }
+.glowvai-root .commerce-processing-summary .is-muted { color: var(--ds-muted); font-size: 12px; font-weight: 500; }
 .glowvai-root .commerce-processing-steps { display: grid; gap: 12px; width: 100%; margin-top: 16px; list-style: none; text-align: left; }
 .glowvai-root .commerce-processing-steps li,
 .glowvai-root .commerce-arrival li { display: flex; align-items: center; gap: 10px; color: var(--ds-muted); font-size: 13px; }
@@ -474,8 +474,8 @@
 .glowvai-root .commerce-result-icon.is-success { background: var(--ds-success-bg); color: var(--ds-success); }
 .glowvai-root .commerce-result-icon.is-failed { background: var(--ds-danger-bg); color: var(--ds-danger); }
 .glowvai-root .commerce-result-icon.is-neutral { background: var(--ds-sky); color: var(--ds-brand); }
-.glowvai-root .commerce-result-body h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 800; line-height: 1.15; letter-spacing: -.02em; }
-.glowvai-root .commerce-kicker { color: var(--ds-danger); font-size: var(--ds-small); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.glowvai-root .commerce-result-body h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.02em; }
+.glowvai-root .commerce-kicker { color: var(--ds-danger); font-size: var(--ds-small); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .glowvai-root .commerce-arrival { width: 100%; text-align: left; }
 .glowvai-root .commerce-arrival > b { font-size: 14px; }
 .glowvai-root .commerce-arrival > p { display: flex; align-items: flex-start; line-height: 1.4; gap: 4px; margin-top: 4px; color: var(--ds-muted); font-size: 12px; }
@@ -491,7 +491,7 @@
 .glowvai-root .commerce-otp span { color: var(--ds-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .glowvai-root .commerce-otp p { color: var(--ds-muted); font-size: 12px; }
 .glowvai-root .commerce-express.is-center { align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
-.glowvai-root .commerce-express.is-center h1 { color: var(--ds-ink); font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .commerce-express.is-center h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
 .glowvai-root .commerce-express.is-center p { max-width: 420px; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .commerce-center-actions { display: flex; width: 100%; max-width: 420px; flex-direction: column; gap: 10px; margin-top: 8px; }
 .glowvai-root .commerce-spinner { width: 40px; height: 40px; border: 3px solid var(--ds-sky); border-top-color: var(--ds-brand); border-radius: 50%; animation: commerce-spin .9s linear infinite; }
@@ -579,7 +579,7 @@
 .glowvai-root .commerce-form > label { display: grid; gap: 6px; }
 .glowvai-root .commerce-field > span,
 .glowvai-root .commerce-form > label > span { color: var(--ds-ink); font-size: 13px; font-weight: 700; }
-.glowvai-root .commerce-field > span em { color: var(--ds-muted); font-style: normal; font-weight: 600; }
+.glowvai-root .commerce-field > span em { color: var(--ds-muted); font-style: normal; font-weight: 500; }
 .glowvai-root .commerce-field input,
 .glowvai-root .commerce-field textarea,
 .glowvai-root .commerce-form input,
@@ -625,7 +625,7 @@
 .glowvai-root .commerce-serve-icon { display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: #fff; }
 .glowvai-root .commerce-serve.is-ok .commerce-serve-icon { color: var(--ds-success); }
 .glowvai-root .commerce-serve.is-no .commerce-serve-icon { color: var(--warning); }
-.glowvai-root .commerce-serve h1 { color: var(--ds-ink); font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .commerce-serve h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
 .glowvai-root .commerce-serve p { color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .commerce-serviceability .commerce-muted svg { color: var(--ds-brand); }
 
@@ -653,7 +653,7 @@
   font-size: 12px;
 }
 .glowvai-root .commerce-address-actions .commerce-link { font-size: 13px; }
-.glowvai-root .commerce-address-actions > span { margin-right: auto; color: var(--ds-muted); font-weight: 600; }
+.glowvai-root .commerce-address-actions > span { margin-right: auto; color: var(--ds-muted); font-weight: 500; }
 .glowvai-root .commerce-address-actions > .commerce-link:first-child:not(.is-danger) { margin-right: auto; }
 .glowvai-root .commerce-address-add-tile {
   display: none;
@@ -697,7 +697,7 @@
 .glowvai-root .commerce-stage-track li { position: relative; display: grid; justify-items: center; gap: 4px; text-align: center; }
 .glowvai-root .commerce-stage-track li:not(:last-child)::after { position: absolute; top: 14px; left: calc(50% + 18px); width: calc(100% - 36px); height: 2px; background: var(--ds-line); content: ""; }
 .glowvai-root .commerce-stage-track li.is-done:not(:last-child)::after { background: var(--ds-success); }
-.glowvai-root .commerce-stage-track li > span { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--ds-line); border-radius: 50%; background: #fff; color: var(--ds-muted); font-size: 12px; font-weight: 800; }
+.glowvai-root .commerce-stage-track li > span { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid var(--ds-line); border-radius: 50%; background: #fff; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
 .glowvai-root .commerce-stage-track li.is-done > span { border-color: var(--ds-success); background: var(--ds-success); color: #fff; }
 .glowvai-root .commerce-stage-track li.is-current > span { border-color: var(--ds-brand); color: var(--ds-brand); }
 .glowvai-root .commerce-stage-track b { color: var(--ds-ink); font-size: 12px; line-height: 1.25; }
@@ -706,7 +706,7 @@
 .glowvai-root .commerce-order-total > div { display: flex; align-items: center; gap: 10px; color: var(--ds-success); }
 .glowvai-root .commerce-order-total small { display: block; color: var(--ds-muted); font-size: var(--ds-small); }
 .glowvai-root .commerce-order-total b { display: block; color: var(--ds-ink); font-size: 14px; }
-.glowvai-root .commerce-order-total > strong { color: var(--ds-ink); font-size: 18px; font-weight: 800; }
+.glowvai-root .commerce-order-total > strong { color: var(--ds-ink); font-size: 18px; font-weight: 700; }
 .glowvai-root .commerce-result-status > .commerce-kicker { color: var(--ds-danger); font-size: var(--ds-small); }
 .glowvai-root .commerce-result-actions .commerce-card { text-align: left; }
 .glowvai-root .commerce-order-placed .commerce-address-body small { display: block; }
@@ -722,4 +722,4 @@
 }
 
 /* Size, shade or pack of a cart or checkout line. */
-.commerce-variant { display: inline-block; color: var(--ds-muted, #667085); font-size: 12px; font-weight: 600; }
+.commerce-variant { display: inline-block; color: var(--ds-muted, #667085); font-size: 12px; font-weight: 500; }
