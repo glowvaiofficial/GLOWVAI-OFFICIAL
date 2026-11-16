@@ -1,0 +1,60 @@
+/* Website v2: product detail, cart and checkout steps. Styling only; tokens come from glowvai.css (--gv-*). */
+
+/* ---------- Checkout step progress (Cart, Delivery, Payment) ---------- */
+.glowvai-root .v2c-steps{ position: relative; display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: 520px; box-sizing: border-box; margin: 0 auto; padding: 14px 16px 6px; list-style: none; }
+.glowvai-root .v2c-step{ position: relative; display: grid; justify-items: center; gap: 6px; color: var(--gv-muted); font-size: 12px; font-weight: 500; }
+.glowvai-root .v2c-step::before{ content: ''; position: absolute; top: 15px; right: 50%; width: 100%; height: 3px; border-radius: 2px; background: var(--gv-hairline, #dce6ff); transition: background .2s ease; }
+.glowvai-root .v2c-step:first-child::before{ display: none; }
+.glowvai-root .v2c-step.is-done::before, .glowvai-root .v2c-step.is-on::before{ background: var(--gv-blue); }
+.glowvai-root .v2c-step-dot{ position: relative; z-index: 1; display: grid; width: 32px; height: 32px; place-items: center; border: 2px solid var(--gv-hairline, #dce6ff); border-radius: 50%; background: #fff; color: var(--gv-muted); font-size: 14px; font-weight: 500; transition: all .2s ease; }
+.glowvai-root .v2c-step.is-on .v2c-step-dot{ border-color: var(--gv-blue); background: var(--gv-blue); color: #fff; box-shadow: 0 4px 12px rgba(0, 87, 251, .28); }
+.glowvai-root .v2c-step.is-done .v2c-step-dot{ border-color: var(--gv-blue); background: var(--gv-blue-tint); color: var(--gv-blue); }
+.glowvai-root .v2c-step.is-on .v2c-step-label{ color: var(--gv-ink); font-weight: 700; }
+
+/* ---------- Cart and checkout cards: depth, rounded, press feedback ---------- */
+.glowvai-root .gvp .gvp-card{ border-radius: 20px; box-shadow: 0 1px 2px rgba(11, 27, 58, .04), 0 10px 28px rgba(11, 27, 58, .06); }
+.glowvai-root .gvp .gvp-line{ transition: background .18s ease; }
+.glowvai-root .gvp .gvp-stepper{ border-radius: 999px; background: var(--gv-blue-tint); border-color: var(--gv-blue); }
+.glowvai-root .gvp .gvp-stepper button{ transition: transform .16s ease; }
+.glowvai-root .gvp .gvp-stepper button:active{ transform: scale(.88); }
+.glowvai-root .gvp .gvp-btn{ border-radius: 16px; transition: transform .16s ease, box-shadow .2s ease, filter .2s ease; }
+.glowvai-root .gvp .gvp-btn:active{ transform: scale(.98); }
+.glowvai-root .gvp .gvp-bar{ box-shadow: 0 -8px 24px rgba(11, 27, 58, .08); backdrop-filter: blur(10px); }
+@media (hover: hover){
+  .glowvai-root .gvp .gvp-btn:not(:disabled):hover{ filter: brightness(1.06); box-shadow: 0 10px 24px rgba(0, 87, 251, .28); }
+}
+
+/* ---------- Product page (phone) ---------- */
+.glowvai-root .shop-product-hero{ border-radius: 22px; background: linear-gradient(160deg, #fff, var(--gv-blue-tint, #eaf1ff)); box-shadow: 0 10px 28px rgba(11, 27, 58, .08); }
+.glowvai-root .shop-product-panel{ border-radius: 20px; box-shadow: 0 1px 2px rgba(11, 27, 58, .04), 0 10px 28px rgba(11, 27, 58, .06); }
+.glowvai-root .shop-product-buybar{ box-shadow: 0 -8px 24px rgba(11, 27, 58, .08); }
+.glowvai-root .shop-product-buybar-btn, .glowvai-root .shop-product-add-btn{ transition: transform .16s ease, box-shadow .2s ease; }
+.glowvai-root .shop-product-buybar-btn:active, .glowvai-root .shop-product-add-btn:active{ transform: scale(.97); }
+
+.glowvai-root .v2p-check-form{ display: flex; gap: 8px; margin-top: 10px; }
+.glowvai-root .v2p-check-form input{ flex: 1 1 auto; width: auto; min-width: 0; min-height: 44px; padding: 0 14px; border: 1px solid var(--gv-hairline, #dce6ff); border-radius: 14px; background: #fff; color: var(--gv-ink); font: inherit; font-size: 14px; }
+.glowvai-root .v2p-check-form input:focus{ outline: 2px solid var(--gv-blue); outline-offset: 1px; }
+.glowvai-root .v2p-check-form button{ flex: 0 0 auto; width: auto; min-height: 44px; padding: 0 20px; border-radius: 14px; }
+.glowvai-root .v2p-check-msg{ margin-top: 8px; font-size: 13px; font-weight: 500; }
+.glowvai-root .v2p-check-msg.is-ok{ color: #1a7f37; }
+.glowvai-root .v2p-check-msg.is-bad, .glowvai-root .v2p-check-msg.is-invalid{ color: #c13f4b; }
+.glowvai-root .v2p-trust{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--gv-hairline, #dce6ff); text-align: center; color: var(--gv-muted); font-size: 12px; font-weight: 500; }
+.glowvai-root .v2p-trust span{ display: grid; justify-items: center; gap: 6px; }
+.glowvai-root .v2p-trust svg{ color: var(--gv-blue); }
+.glowvai-root .v2p-rail{ grid-column: 1 / -1; min-width: 0; margin-top: 4px; }
+.glowvai-root .v2p-rail h2{ margin-bottom: 12px; color: var(--gv-ink); font-size: 18px; font-weight: 700; }
+.glowvai-root .v2p-rail-row{ display: grid; grid-auto-flow: column; grid-auto-columns: minmax(164px, 180px); gap: 12px; padding-bottom: 8px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+.glowvai-root .v2p-rail-row > *{ scroll-snap-align: start; }
+.glowvai-root .v2p-rail-row::-webkit-scrollbar{ display: none; }
+
+/* ---------- Product page (PC) ---------- */
+.glowvai-root .pcp-trust svg{ transition: transform .2s ease; }
+@media (hover: hover){
+  .glowvai-root .pcp-rail-row > *{ transition: transform .2s ease, box-shadow .2s ease; }
+  .glowvai-root .pcp-rail-row > *:hover{ transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .v2c-step-dot, .glowvai-root .v2c-step::before, .glowvai-root .gvp .gvp-btn, .glowvai-root .gvp .gvp-stepper button,
+  .glowvai-root .pcp-rail-row > *{ transition: none; }
+}
