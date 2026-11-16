@@ -14,12 +14,12 @@
 
 .wallet-balance-value span {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .wallet-rate {
   margin: 4px 0 0;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .wallet-notice-text {
@@ -43,16 +43,16 @@
 
 .wallet-preset {
   min-height: 44px;
-  border: 1px solid #0057fb;
+  border: 1px solid var(--gv-blue);
   border-radius: 10px;
   background: #fff;
-  color: #0057fb;
-  font-weight: 600;
+  color: var(--gv-blue);
+  font-weight: 500;
   cursor: pointer;
 }
 
 .wallet-preset[aria-pressed='true'] {
-  background: #0057fb;
+  background: var(--gv-blue);
   color: #fff;
 }
 
@@ -111,7 +111,7 @@
 }
 
 .wallet-notice-info {
-  background: #eef4ff;
+  background: var(--gv-blue-tint);
   color: #1b3a7a;
 }
 

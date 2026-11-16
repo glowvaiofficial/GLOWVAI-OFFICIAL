@@ -48,7 +48,7 @@
   .glowvai-root .auth-screen > .auth-footer{ padding: 16px 48px 56px; background: transparent; }
   .glowvai-root .auth-brand-panel{ display: flex; flex-direction: column; gap: 20px; overflow: hidden; padding: 56px 48px 0; background: var(--ds-brand); color: #fff; }
   .glowvai-root .auth-brand-panel .auth-brand-wordmark{ font-size: 56px; }
-  .glowvai-root .auth-brand-copy{ max-width: 320px; color: rgba(255,255,255,.88); font-size: 17px; font-weight: 600; line-height: 1.5; }
+  .glowvai-root .auth-brand-copy{ max-width: 320px; color: rgba(255,255,255,.88); font-size: 17px; font-weight: 700; line-height: 1.5; }
   .glowvai-root .auth-brand-mascot{ align-self: center; width: min(240px, 70%); height: auto; margin-top: auto; margin-bottom: -4px; }
   .glowvai-root .auth-concern-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .glowvai-root .auth-screen .auth-card, .glowvai-root .auth-screen .auth-info-banner, .glowvai-root .auth-screen .auth-privacy-card{ padding: 20px; }

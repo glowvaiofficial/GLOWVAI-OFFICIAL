@@ -1,7 +1,7 @@
 /* Shop wishlist. Shared shop classes (.shop-screen, .shop-header, .shop-icon-btn, .shop-empty, .shop-product-grid) live in ../shop.css. */
 
 .glowvai-root .shop-wishlist-title{ display: inline-flex; align-items: center; gap: 10px; }
-.glowvai-root .shop-wishlist-count{ display: inline-grid; min-width: 28px; height: 28px; padding: 0 8px; place-items: center; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 14px; font-weight: 800; letter-spacing: 0; }
+.glowvai-root .shop-wishlist-count{ display: inline-grid; min-width: 28px; height: 28px; padding: 0 8px; place-items: center; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 14px; font-weight: 700; letter-spacing: 0; }
 
 .glowvai-root .shop-wishlist-main{ padding: 16px 0 24px; }
 .glowvai-root .shop-wishlist-item{ position: relative; display: flex; min-width: 0; }

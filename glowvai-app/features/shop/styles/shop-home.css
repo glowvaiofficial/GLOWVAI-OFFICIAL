@@ -3,7 +3,7 @@
    Layout rhythm: 16px side gutter on phones, 24px from 720px, 32px from 1024px. Sections are 28px apart on phones and
    40px on desktop. Rails scroll sideways inside themselves only; the page itself never scrolls sideways. */
 
-.glowvai-root .shop-home{ --home-brand: #1447e6; --home-brand-dark: #0f37b8; --home-pearl: #f7f9ff; --home-sky: #eef3ff; --home-ink: #071b4d; --home-muted: #53617d; --home-line: #dce6ff; background: var(--home-pearl); color: var(--home-ink); }
+.glowvai-root .shop-home{ --home-brand: #1447e6; --home-brand-dark: #0f37b8; --home-pearl: #f7f9ff; --home-sky: var(--gv-blue-tint); --home-ink: var(--gv-ink); --home-muted: var(--gv-muted); --home-line: #dce6ff; background: var(--home-pearl); color: var(--home-ink); }
 .glowvai-root .shop-home h1, .glowvai-root .shop-home h2, .glowvai-root .shop-home h3, .glowvai-root .shop-home p{ margin: 0; }
 .glowvai-root .shop-home img{ display: block; }
 .glowvai-root .shop-home .shop-home-sr{ position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -16,8 +16,8 @@
 }
 .glowvai-root .shop-home .shop-home-topbar{ display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-bottom: 14px; }
 .glowvai-root .shop-home .shop-home-location{ min-width: 0; flex: 1; }
-.glowvai-root .shop-home .shop-home-eta{ display: inline-flex; align-items: center; gap: 4px; color: var(--home-brand); font-size: 14px; font-weight: 800; }
-.glowvai-root .shop-home .shop-home-location-btn{ display: flex; max-width: 100%; align-items: center; gap: 2px; margin-top: 2px; padding: 0; border: 0; background: none; color: var(--home-muted); font-size: 13px; font-weight: 600; text-align: left; }
+.glowvai-root .shop-home .shop-home-eta{ display: inline-flex; align-items: center; gap: 4px; color: var(--home-brand); font-size: 14px; font-weight: 700; }
+.glowvai-root .shop-home .shop-home-location-btn{ display: flex; max-width: 100%; align-items: center; gap: 2px; margin-top: 2px; padding: 0; border: 0; background: none; color: var(--home-muted); font-size: 13px; font-weight: 500; text-align: left; }
 .glowvai-root .shop-home .shop-home-location-btn span{ overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .glowvai-root .shop-home .shop-home-location-btn.is-static{ cursor: default; }
 .glowvai-root .shop-home .shop-home-profile{ display: grid; flex-shrink: 0; width: 40px; height: 40px; place-items: center; border: 1px solid #e3e8f2; border-radius: 50%; background: #fff; color: var(--home-ink); }
@@ -33,7 +33,7 @@
 .glowvai-root .shop-home .shop-home-hint:not(.is-visible){ opacity: 0; }
 /* Voice search: a round mic beside the search field. Listening turns it solid with a visible label. */
 .glowvai-root .shop-home .shop-home-voice-wrap{ position: relative; display: inline-flex; flex-shrink: 0; }
-.glowvai-root .shop-home .shop-home-voice{ display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; height: 38px; min-width: 38px; padding: 0; border: 0; border-radius: 19px; background: #fff; color: var(--home-brand); font-size: 13px; font-weight: 800; }
+.glowvai-root .shop-home .shop-home-voice{ display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 6px; height: 38px; min-width: 38px; padding: 0; border: 0; border-radius: 19px; background: #fff; color: var(--home-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-voice:hover{ background: var(--home-sky); }
 .glowvai-root .shop-home .shop-home-voice.is-listening{ justify-content: flex-start; padding: 0 12px; background: var(--home-brand); color: #fff; }
 .glowvai-root .shop-home .shop-home-voice.is-listening{ animation: shop-home-voice-pulse 1.4s ease-in-out infinite; }
@@ -46,7 +46,7 @@
 /* Top bar actions: cart count and profile. */
 .glowvai-root .shop-home .shop-home-top-actions{ display: flex; flex-shrink: 0; align-items: center; gap: 8px; }
 .glowvai-root .shop-home .shop-home-cart{ width: 40px; height: 40px; }
-.glowvai-root .shop-home .shop-home-ai-btn{ display: inline-flex; flex-shrink: 0; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border: 0; border-radius: 14px; background: var(--home-sky); color: var(--home-brand); font-size: 13px; font-weight: 800; }
+.glowvai-root .shop-home .shop-home-ai-btn{ display: inline-flex; flex-shrink: 0; align-items: center; gap: 6px; height: 38px; padding: 0 12px; border: 0; border-radius: 14px; background: var(--home-sky); color: var(--home-brand); font-size: 13px; font-weight: 700; }
 
 /* Quick links repeat the bottom tab bar (phone) and the web header (tablet and desktop), so they are not shown. */
 .glowvai-root .shop-home .shop-home-chips{ display: none; }
@@ -57,8 +57,8 @@
 .glowvai-root .shop-home .shop-home-showcase::after{ content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #c8d9ff 0%, rgba(200, 217, 255, .9) 55%, rgba(200, 217, 255, .25) 100%); }
 .glowvai-root .shop-home .shop-home-showcase-copy{ position: relative; z-index: 1; display: flex; min-height: 236px; max-width: 700px; flex-direction: column; justify-content: center; padding: 22px 20px; }
 .glowvai-root .shop-home .shop-home-showcase-tag{ align-self: flex-start; margin-bottom: 10px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .72); color: #16357c; font-size: 12px; font-weight: 700; }
-.glowvai-root .shop-home .shop-home-showcase h1{ color: var(--home-ink); font-size: 34px; font-weight: 800; line-height: .98; letter-spacing: -.04em; }
-.glowvai-root .shop-home .shop-home-showcase-sub{ margin-top: 8px; color: #17305f; font-size: 14px; font-weight: 600; line-height: 1.35; }
+.glowvai-root .shop-home .shop-home-showcase h1{ color: var(--home-ink); font-size: 34px; font-weight: 700; line-height: .98; letter-spacing: -.005em; }
+.glowvai-root .shop-home .shop-home-showcase-sub{ margin-top: 8px; color: #17305f; font-size: 14px; font-weight: 500; line-height: 1.35; }
 .glowvai-root .shop-home .shop-home-showcase-actions{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .glowvai-root .shop-home .shop-home-btn-dark{ display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--home-ink); color: #fff; font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-btn-light{ display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 18px; border: 1px solid rgba(7, 27, 77, .2); border-radius: 999px; background: rgba(255, 255, 255, .8); color: var(--home-ink); font-size: 13px; font-weight: 700; }
@@ -67,9 +67,9 @@
 /* Section heads and rails */
 .glowvai-root .shop-home .shop-home-section{ margin-top: 28px; }
 .glowvai-root .shop-home .shop-home-section-head{ display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; margin: 0 var(--gv-gutter) 12px; }
-.glowvai-root .shop-home .shop-home-section-head h2{ color: var(--home-ink); font-size: 19px; font-weight: 800; letter-spacing: -.02em; }
+.glowvai-root .shop-home .shop-home-section-head h2{ color: var(--home-ink); font-size: 18px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .shop-home .shop-home-section-titles{ display: grid; gap: 2px; }
-.glowvai-root .shop-home .shop-home-section-titles p{ color: var(--home-muted); font-size: 12px; }
+.glowvai-root .shop-home .shop-home-section-titles p{ color: var(--home-muted); font-size: 12px; font-weight: 500; }
 .glowvai-root .shop-home .shop-home-section-actions{ display: flex; align-items: center; gap: 6px; }
 .glowvai-root .shop-home .shop-home-arrow{ display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid var(--home-line); border-radius: 50%; background: #fff; color: var(--home-brand); }
 .glowvai-root .shop-home .shop-home-see-all{ display: inline-flex; min-height: 44px; flex-shrink: 0; align-items: center; gap: 2px; margin-left: 4px; padding: 0 2px; border: 0; background: none; color: var(--home-brand); font-size: 13px; font-weight: 700; }
@@ -103,13 +103,13 @@
 .glowvai-root .shop-home .shop-home-categories{ display: flex; gap: 10px; overflow-x: auto; padding: 4px var(--gv-gutter) 6px; scroll-padding-inline: var(--gv-gutter); scroll-snap-type: x proximity; scrollbar-width: none; }
 .glowvai-root .shop-home .shop-home-categories::-webkit-scrollbar{ display: none; }
 .glowvai-root .shop-home .shop-home-category{ display: block; flex: 0 0 148px; min-width: 0; padding: 0; border: 0; background: none; color: #fff; text-align: left; scroll-snap-align: start; }
-.glowvai-root .shop-home .shop-home-category-tile{ position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 20px; background: linear-gradient(160deg, var(--tile-accent, #1447e6) 0%, #071b4d 100%); box-shadow: 0 8px 22px rgba(7, 27, 77, .12); }
+.glowvai-root .shop-home .shop-home-category-tile{ position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 20px; background: linear-gradient(160deg, var(--tile-accent, #1447e6) 0%, var(--gv-ink) 100%); box-shadow: 0 8px 22px rgba(7, 27, 77, .12); }
 .glowvai-root .shop-home .shop-home-category-tile > img{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .glowvai-root .shop-home .shop-home-category-fallback{ position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255, 255, 255, .85); }
 .glowvai-root .shop-home .shop-home-category-shade{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 27, 77, 0) 38%, rgba(7, 27, 77, .86) 100%); }
 .glowvai-root .shop-home .shop-home-category-meta{ position: absolute; right: 12px; bottom: 12px; left: 12px; display: grid; gap: 4px; }
-.glowvai-root .shop-home .shop-home-category-label{ color: #fff; font-size: 15px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; }
-.glowvai-root .shop-home .shop-home-category-count{ color: rgba(255, 255, 255, .86); font-size: 12px; font-weight: 600; }
+.glowvai-root .shop-home .shop-home-category-label{ color: #fff; font-size: 15px; font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+.glowvai-root .shop-home .shop-home-category-count{ color: rgba(255, 255, 255, .86); font-size: 12px; font-weight: 500; }
 .glowvai-root .shop-home .shop-home-category-count.is-placeholder{ width: 64px; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .35); }
 @media (hover: hover){
   .glowvai-root .shop-home .shop-home-category:hover .shop-home-category-tile > img{ transform: scale(1.05); }
@@ -118,10 +118,10 @@
 /* Offer cards */
 .glowvai-root .shop-home .shop-home-promos{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px var(--gv-gutter) 0; }
 .glowvai-root .shop-home .shop-home-promo{ position: relative; display: flex; min-height: 0; flex-direction: column; align-items: flex-start; gap: 4px; overflow: hidden; padding: 14px 14px 46px; border: 0; border-radius: 18px; text-align: left; }
-.glowvai-root .shop-home .shop-home-promo.is-dark{ background: #081f68; color: #fff; }
+.glowvai-root .shop-home .shop-home-promo.is-dark{ background: var(--gv-ink); color: #fff; }
 .glowvai-root .shop-home .shop-home-promo.is-light{ background: #e8eaff; color: var(--home-ink); }
 .glowvai-root .shop-home .shop-home-promo-kicker{ font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
-.glowvai-root .shop-home .shop-home-promo-title{ font-size: 16px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.glowvai-root .shop-home .shop-home-promo-title{ font-size: 16px; font-weight: 700; letter-spacing: -.005em; line-height: 1.15; }
 .glowvai-root .shop-home .shop-home-promo-sub{ font-size: 12px; line-height: 1.35; opacity: .85; }
 .glowvai-root .shop-home .shop-home-promo-icon{ position: absolute; right: 12px; bottom: 12px; display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: #fff; color: var(--home-brand); }
 .glowvai-root .shop-home .shop-home-promo-image{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -132,15 +132,15 @@
 .glowvai-root .shop-home .shop-home-deals{ display: flex; gap: 12px; margin: 0; padding: 4px var(--gv-gutter) 6px; overflow-x: auto; scroll-padding-inline: var(--gv-gutter); scroll-snap-type: x proximity; scrollbar-width: none; }
 .glowvai-root .shop-home .shop-home-deals::-webkit-scrollbar{ display: none; }
 .glowvai-root .shop-home .shop-home-deal{ position: relative; display: flex; flex: 0 0 160px; min-width: 0; flex-direction: column; overflow: hidden; scroll-snap-align: start; padding: 0; border: 1px solid #e1e7f3; border-radius: 18px; background: #fff; box-shadow: 0 6px 24px rgba(26, 54, 120, .05); transition: transform .2s ease, box-shadow .2s ease; }
-.glowvai-root .shop-home .shop-home-deal-badge{ position: absolute; top: 10px; left: 10px; z-index: 1; padding: 3px 8px; border-radius: 999px; background: #d7f7d8; color: #16702b; font-size: 10px; font-weight: 800; }
+.glowvai-root .shop-home .shop-home-deal-badge{ position: absolute; top: 10px; left: 10px; z-index: 1; padding: 3px 8px; border-radius: 999px; background: #d7f7d8; color: #16702b; font-size: 10px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-deal-open{ display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 3px; padding: 0; border: 0; background: none; text-align: left; }
 .glowvai-root .shop-home .shop-home-deal-media{ display: grid; aspect-ratio: 1 / 1; place-items: center; overflow: hidden; background: var(--home-sky); }
 .glowvai-root .shop-home .shop-home-deal-media img{ width: 100%; height: 100%; object-fit: cover; }
 .glowvai-root .shop-home .shop-home-deal-brand{ padding: 10px 12px 0; color: var(--home-muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.glowvai-root .shop-home .shop-home-deal-name{ display: -webkit-box; min-height: 34px; padding: 0 12px; overflow: hidden; color: var(--home-ink); font-size: 13px; font-weight: 700; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.glowvai-root .shop-home .shop-home-deal-name{ display: -webkit-box; min-height: 34px; padding: 0 12px; overflow: hidden; color: var(--home-ink); font-size: 14px; font-weight: 500; line-height: 1.35; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .glowvai-root .shop-home .shop-home-deal-price{ display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; padding: 0 12px; margin-top: 2px; }
-.glowvai-root .shop-home .shop-home-deal-price b{ color: var(--home-ink); font-size: 15px; font-weight: 800; }
-.glowvai-root .shop-home .shop-home-deal-price s{ color: #8d95a7; font-size: 11px; }
+.glowvai-root .shop-home .shop-home-deal-price b{ color: var(--home-ink); font-size: 16px; font-weight: 700; }
+.glowvai-root .shop-home .shop-home-deal-price s{ color: #8d95a7; font-size: 12px; }
 .glowvai-root .shop-home .shop-home-deal-add{ height: 36px; margin: 10px 12px 12px; border: 1.5px solid var(--home-brand); border-radius: 999px; background: #fff; color: var(--home-brand); font-size: 13px; font-weight: 700; transition: background .15s ease, color .15s ease; }
 .glowvai-root .shop-home .shop-home-deal-add:hover{ background: var(--home-brand); color: #fff; }
 
@@ -153,8 +153,8 @@
 
 /* Face scan card: one primary action, with the privacy line that matches how this build analyses the photo */
 .glowvai-root .shop-home .shop-home-scan{ position: relative; display: grid; justify-items: start; overflow: hidden; margin: 28px var(--gv-gutter) 0; padding: 22px 20px; border-radius: 22px; background: radial-gradient(120% 90% at 100% 0%, rgba(157, 196, 255, .35) 0%, rgba(157, 196, 255, 0) 55%), linear-gradient(135deg, var(--home-brand) 0%, var(--home-brand-dark) 50%, var(--home-ink) 100%); color: #fff; box-shadow: 0 18px 40px rgba(7, 27, 77, .18); }
-.glowvai-root .shop-home .shop-home-scan-tag{ display: inline-flex; align-items: center; gap: 6px; color: #b9ccff; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
-.glowvai-root .shop-home .shop-home-scan h2{ margin: 10px 0 8px; font-size: 22px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; }
+.glowvai-root .shop-home .shop-home-scan-tag{ display: inline-flex; align-items: center; gap: 6px; color: #b9ccff; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.glowvai-root .shop-home .shop-home-scan h2{ margin: 10px 0 8px; font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
 .glowvai-root .shop-home .shop-home-scan h2 span{ color: #9dc4ff; }
 .glowvai-root .shop-home .shop-home-scan-body{ font-size: 14px; line-height: 1.5; opacity: .9; }
 .glowvai-root .shop-home .shop-home-scan-privacy{ display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, .12); font-size: 13px; line-height: 1.4; }
@@ -169,14 +169,14 @@
 .glowvai-root .shop-home .shop-home-footer-brand{ display: grid; align-content: start; gap: 10px; padding: 28px var(--gv-gutter); background: var(--ds-brand-dark); color: #fff; }
 .glowvai-root .shop-home .shop-home-footer-logo{ display: inline-flex; align-items: center; gap: 8px; }
 .glowvai-root .shop-home .shop-home-footer-logo svg{ color: #bcd5ff; }
-.glowvai-root .shop-home .shop-home-footer-logo strong{ font-family: var(--font-heading); font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+.glowvai-root .shop-home .shop-home-footer-logo strong{ font-family: var(--font-heading); font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
 .glowvai-root .shop-home .shop-home-footer-brand > p{ margin: 0; color: #dce8ff; font-size: 14px; line-height: 1.5; }
 .glowvai-root .shop-home .shop-home-footer-social{ display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-.glowvai-root .shop-home .shop-home-footer-social a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
+.glowvai-root .shop-home .shop-home-footer-social a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 500; text-decoration: none; }
 .glowvai-root .shop-home .shop-home-footer-social a:hover{ background: rgba(255, 255, 255, .14); text-decoration: underline; }
 .glowvai-root .shop-home .shop-home-footer-brand a:focus-visible{ outline-color: #fff; }
 .glowvai-root .shop-home .shop-home-footer-store{ display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-.glowvai-root .shop-home .shop-home-footer-store a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid #fff; border-radius: 8px; background: #000; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
+.glowvai-root .shop-home .shop-home-footer-store a{ display: inline-flex; min-height: 40px; align-items: center; padding: 0 16px; border: 1px solid #fff; border-radius: 8px; background: #000; color: #fff; font-size: 13px; font-weight: 500; text-decoration: none; }
 .glowvai-root .shop-home .shop-home-footer-store a:hover{ background: #222; text-decoration: underline; }
 .glowvai-root .shop-home .shop-home-footer-company{ margin: 4px 0 0; }
 .glowvai-root .shop-home .shop-home-footer-cols{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 20px; padding: 28px var(--gv-gutter) 8px; }
@@ -189,7 +189,7 @@
 .glowvai-root .shop-home .shop-home-footer-bottom{ padding: 16px var(--gv-gutter) 20px; border-top: 1px solid rgba(7, 27, 77, .12); color: var(--ds-muted); font-size: 12px; line-height: 1.5; }
 
 .glowvai-root .shop-home .shop-home-end{ display: grid; justify-items: center; gap: 4px; margin: 20px var(--gv-gutter) 0; padding: 28px 20px 12px; text-align: center; color: var(--home-brand); }
-.glowvai-root .shop-home .shop-home-end h2{ margin-top: 8px; color: var(--home-ink); font-size: 18px; font-weight: 800; }
+.glowvai-root .shop-home .shop-home-end h2{ margin-top: 8px; color: var(--home-ink); font-size: 18px; font-weight: 700; }
 .glowvai-root .shop-home .shop-home-end > p{ color: var(--home-muted); font-size: 13px; }
 .glowvai-root .shop-home .shop-home-end-btn{ display: inline-flex; min-height: 46px; align-items: center; gap: 8px; margin-top: 16px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--home-brand); color: #fff; font-size: 14px; font-weight: 700; }
 
@@ -247,11 +247,11 @@
   .glowvai-root .shop-home .shop-home-promos{ gap: 16px; margin-top: 20px; }
   .glowvai-root .shop-home .shop-home-section{ margin-top: 40px; }
   .glowvai-root .shop-home .shop-home-section-head{ margin-bottom: 16px; }
-  .glowvai-root .shop-home .shop-home-section-head h2{ font-size: 26px; }
+  .glowvai-root .shop-home .shop-home-section-head h2{ font-size: 20px; }
   .glowvai-root .shop-home .shop-home-section-titles p{ font-size: 14px; }
   .glowvai-root .shop-home .shop-home-section-actions .shop-home-arrow{ display: none; }
   .glowvai-root .shop-home .shop-home-deals{ gap: 20px; }
-  .glowvai-root .shop-home .shop-home-deal-name{ font-size: 15px; }
+  .glowvai-root .shop-home .shop-home-deal-name{ font-size: 14px; }
   .glowvai-root .shop-home .shop-home-deal-price b{ font-size: 18px; }
   .glowvai-root .shop-home .shop-home-rail{ display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; overflow: visible; padding-left: var(--gv-gutter); padding-right: var(--gv-gutter); }
   .glowvai-root .shop-home .shop-home-rail-item{ flex: none; width: auto; }
@@ -287,7 +287,7 @@
   margin: 12px 16px 0;
   padding: 12px 14px;
   border-radius: 14px;
-  background: #eaf1ff;
+  background: var(--gv-blue-tint);
   color: var(--ds-ink, #0b1220);
 }
 .glowvai-root .shop-home .shop-quiz-banner-icon {
@@ -328,5 +328,5 @@
   padding: 0 4px;
   color: var(--ds-muted, #475569);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }

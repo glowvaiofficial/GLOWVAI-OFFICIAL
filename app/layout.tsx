@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Familjen_Grotesk, Inter } from "next/font/google";
+import { Familjen_Grotesk, Inter, Roboto } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
@@ -16,6 +16,15 @@ const displayFont = Familjen_Grotesk({
   variable: "--font-display",
   display: "swap",
   weight: ["600", "700"],
+  preload: true,
+});
+
+// Roboto for the shop: the same face the native app renders on Android. Self-hosted by next/font, exposed as --font-roboto.
+const shopFont = Roboto({
+  subsets: ["latin"],
+  variable: "--font-roboto",
+  display: "swap",
+  weight: ["400", "500", "700"],
   preload: true,
 });
 
@@ -99,7 +108,7 @@ export default async function RootLayout({
   const locationData = await getLocationFromIP();
 
   return (
-    <html lang="en-IN" className={`${displayFont.variable} ${bodyFont.variable}`}>
+    <html lang="en-IN" className={`${displayFont.variable} ${bodyFont.variable} ${shopFont.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
