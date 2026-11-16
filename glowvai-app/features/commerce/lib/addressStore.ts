@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Address } from '../../../types';
 import { VIJAYAWADA_AREAS } from '../../../data/serviceability';
+import { DELIVERY_ETA_MINUTES } from '../../../../lib/shop/delivery';
 import type { SavedAddressView } from '../../../core/services/shopApi';
 
 // Saved delivery addresses are the server's list (users/{uid}/addresses, at most five, one default). This store keeps a
@@ -75,7 +76,7 @@ export const toNovAddress = (a: SavedAddress): Address => ({
   city: a.city,
   pincode: a.pincode,
   serviceable: isServiceablePincode(a.pincode),
-  deliveryMinutes: etaMinutesFor(a.fullAddress) ?? 12,
+  deliveryMinutes: etaMinutesFor(a.fullAddress) ?? DELIVERY_ETA_MINUTES,
   isDefault: a.isDefault,
 });
 

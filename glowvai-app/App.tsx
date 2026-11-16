@@ -43,6 +43,7 @@ import './features/shop/styles/v5-home.css';
 import './features/shop/styles/v5-catalogue.css';
 import './features/shop/styles/v5-checkout.css';
 import './features/shop/styles/v5-auth-scan.css';
+import './features/shop/styles/v5-audit.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();

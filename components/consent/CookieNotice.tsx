@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { captureUtmParameters } from "@/lib/analytics/utm";
@@ -25,6 +25,27 @@ export interface ConsentState {
 export function CookieNotice() {
   const [showBanner, setShowBanner] = useState(false);
   const pathname = usePathname();
+  const barRef = useRef<HTMLDivElement>(null);
+  const visible = showBanner && !isCookieNoticeHidden(pathname);
+
+  // While the bar is visible the page reserves the space it covers (see .gv-consent-open in globals.css), so it never
+  // sits on top of the last lines or buttons of a page. Removed again when the choice is saved.
+  useEffect(() => {
+    if (!visible) return;
+    const root = document.documentElement;
+    const apply = () => {
+      const h = barRef.current?.getBoundingClientRect().height ?? 0;
+      root.style.setProperty("--gv-consent-h", `${Math.ceil(h)}px`);
+    };
+    root.setAttribute("data-gv-consent-open", "");
+    apply();
+    window.addEventListener("resize", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      root.removeAttribute("data-gv-consent-open");
+      root.style.removeProperty("--gv-consent-h");
+    };
+  }, [visible]);
 
   useEffect(() => {
     // Capture UTM parameters into sessionStorage on load
@@ -77,30 +98,33 @@ export function CookieNotice() {
 
   return (
     <div
+      ref={barRef}
       role="dialog"
       aria-label="Privacy and analytics choice"
-      className="gv-consent-banner fixed bottom-24 md:bottom-4 left-3 right-[76px] sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[18px] md:rounded-[24px] p-3 md:p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)]"
+      className="gv-consent-banner fixed bottom-24 md:bottom-4 left-3 right-[76px] sm:right-auto z-[60] sm:w-[360px] bg-white text-ink border border-ink/15 rounded-[14px] md:rounded-[24px] p-2 md:p-5 shadow-[0_8px_24px_rgba(10,27,77,.10)] max-md:flex max-md:items-center max-md:gap-2"
     >
-      <h2 className={`${isShopPath(pathname) ? "" : "font-display "}font-semibold text-sm md:text-base text-ink`}>Analytics, your choice</h2>
-      <p className="mt-1 md:mt-1.5 text-xs md:text-sm leading-snug md:leading-relaxed text-ink-muted line-clamp-2 md:line-clamp-none">
+      <div className="max-md:min-w-0 max-md:flex-1">
+      <h2 className={`${isShopPath(pathname) ? "" : "font-display "}font-semibold text-sm md:text-base text-ink max-md:sr-only`}>Analytics, your choice</h2>
+      <p className="md:mt-1.5 text-xs md:text-sm leading-snug md:leading-relaxed text-ink-muted line-clamp-2 md:line-clamp-none">
         We use analytics to see which pages help people. We never send your name, phone, email or photos.{" "}
         <Link href="/privacy#cookies" className="gv-link-inline text-brand underline underline-offset-[3px] font-medium">
           Privacy policy
         </Link>
         .
       </p>
-      <div className="mt-3 md:mt-4 grid grid-cols-2 gap-2 md:gap-3">
+      </div>
+      <div className="max-md:flex max-md:shrink-0 max-md:gap-1.5 md:mt-4 md:grid md:grid-cols-2 md:gap-3">
         <button
           id="btn-accept-analytics"
           onClick={() => updateConsent(true)}
-          className="min-h-11 px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="min-h-11 px-3 md:px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           Accept
         </button>
         <button
           id="btn-decline-analytics"
           onClick={() => updateConsent(false)}
-          className="min-h-11 px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="min-h-11 px-3 md:px-4 rounded-[10px] border-[1.5px] border-ink/25 bg-white text-ink text-[0.9375rem] font-semibold hover:border-ink transition-colors cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           Reject
         </button>

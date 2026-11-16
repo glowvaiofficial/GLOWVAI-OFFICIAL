@@ -16,9 +16,10 @@ import { skinMatchedPicks } from '../lib/firstVisit';
 import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
+import { catalogReady, hideEmpty } from '../lib/hideEmpty';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
 import { getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
-import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
+import { HOME_TABS, activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
 import {
   ALL_ICON,
@@ -90,6 +91,8 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const unread = useInbox((s) => s.unreadCount);
   const orders = useCustomerStore((s) => s.orders);
   const [tab, setTab] = useState<HomeTab>(() => homeTab('for-you'));
+  // A concern tab with no matching product is hidden once the catalogue has loaded (the selected tab always stays).
+  const visibleTabs = hideEmpty(HOME_TABS, (t) => (!t.concern || t.id === tab.id ? 1 : catalog.filter((p) => matchesConcern(p, t.concern)).length), catalogReady(loading, failed));
 
   // "Track Order" needs the signed-in customer's orders; the list is loaded once if no screen has loaded it yet.
   useEffect(() => {
@@ -173,7 +176,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
                   ))
                 : (
                   <>
-                    {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
+                    {hideEmpty(HOME_CATEGORY_TILES, (c) => tiles.find((t) => t.id === c.id)?.count ?? 0, catalogReady(loading, failed)).map(({ id: categoryId, label }, i) => {
                       const tile = tiles.find((t) => t.id === categoryId) ?? null;
                       const count = loading || failed ? null : `${tile?.count ?? 0} ${tile?.count === 1 ? 'product' : 'products'}`;
                       return (
@@ -398,7 +401,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   return (
     <DesignerStyleProvider styles={designerStyles} look={designerLook} heroVideo={heroVideo}>
     <div className="shop-screen shop-home gvh">
-      <MobileHomeHeader header={headerSettings} tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
+      <MobileHomeHeader tabs={visibleTabs} header={headerSettings} tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
 
       <SkinQuizBanner />
 
