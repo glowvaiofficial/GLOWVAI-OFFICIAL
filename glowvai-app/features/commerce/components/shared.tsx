@@ -33,7 +33,7 @@ export const DeliveryPill: React.FC<{ minutes?: number }> = ({ minutes }) => (
   </span>
 );
 
-const STEP_LABELS = ['Cart', 'Review', 'Pay'];
+const STEP_LABELS = ['Cart', 'Address', 'Payment'];
 
 // Checkout progress: step is 1 (cart), 2 (review) or 3 (pay).
 export const CheckoutSteps: React.FC<{ step: 1 | 2 | 3 }> = ({ step }) => (
