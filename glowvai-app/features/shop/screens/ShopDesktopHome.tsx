@@ -1,6 +1,6 @@
 import { isPosterOnlyHero } from '../lib/heroPoster';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
+import { ArrowRight, ArrowUp, BadgePercent, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
@@ -347,6 +347,7 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
           <b>{formatRupee(price)}</b>
           {mrp > price && <s aria-label={`MRP ${formatRupee(mrp)}`}>{formatRupee(mrp)}</s>}
         </span>
+        <span className="shop-desk-card-brand">{product.brand}</span>
         <button type="button" className="shop-desk-card-name" onClick={open}>
           {product.name}
         </button>
@@ -493,19 +494,46 @@ const TABS: { id: TabId; label: string; Icon: LucideIcon }[] = [
   { id: 'for-you', label: 'For You', Icon: Sparkles },
   ...HOME_CATEGORY_TILES.map(({ id, label }) => ({ id: id as TabId, label, Icon: CATEGORY_ICON[id] ?? Sparkles })),
 ];
+// The in-page section links in the sticky header (they show once the page is scrolled); a link to a section not on the page does nothing.
+const JUMPS = [
+  { id: 'shop-desk-today-title', label: 'Deals of the day' },
+  { id: 'shop-desk-deals-title', label: 'Top deals' },
+  { id: 'shop-desk-bestsellers-title', label: 'Best sellers' },
+  { id: 'shop-desk-new-title', label: 'New launches' },
+  { id: 'shop-desk-concerns-title', label: 'Shop by concern' },
+  { id: 'shop-desk-brands-title', label: 'Brands' },
+];
 const tabAccent = (index: number) => (index <= 0 ? BRAND : categoryAccent(TABS[index]?.label ?? '', null, index - 1));
 
-function CategoryTabs({ selected, onSelect, onShopAll }: { selected: TabId; onSelect: (id: TabId) => void; onShopAll: () => void }) {
+function CategoryTabs({ selected, onSelect, onShopAll, tiles, onOpen }: { selected: TabId; onSelect: (id: TabId) => void; onShopAll: () => void; tiles: { id: string; count: number; sample: SkincareProduct | null }[]; onOpen: (categoryId: string) => void }) {
   return (
     <nav className="shop-desk-tabs" aria-label="Categories">
-      {TABS.map(({ id, label, Icon }, i) => (
-        <button key={id} type="button" className="shop-desk-tab" aria-pressed={selected === id} onClick={() => onSelect(id)} style={accentStyle(tabAccent(i))}>
-          <span className="shop-desk-tab-icon" aria-hidden="true">
-            <Icon size={20} />
-          </span>
-          <span>{label}</span>
-        </button>
-      ))}
+      {TABS.map(({ id, label, Icon }, i) => {
+        const tile = id === 'for-you' ? null : tiles.find((t) => t.id === id) ?? null;
+        return (
+          <div key={id} className="shop-desk-tab-wrap">
+            <button type="button" className="shop-desk-tab" aria-pressed={selected === id} onClick={() => onSelect(id)} style={accentStyle(tabAccent(i))}>
+              <span className="shop-desk-tab-icon" aria-hidden="true">
+                <Icon size={20} />
+              </span>
+              <span>{label}</span>
+            </button>
+            {tile && (
+              <div className="shop-desk-mega">
+                {tile.sample && hasProductPhoto(tile.sample) && <img src={getProductThumbUrl(tile.sample, 200)} alt="" width={88} height={88} loading="lazy" decoding="async" />}
+                <span className="shop-desk-mega-copy">
+                  <strong>{label}</strong>
+                  <small>{tile.count} {tile.count === 1 ? 'product' : 'products'}</small>
+                </span>
+                <button type="button" onClick={() => onOpen(id)}>
+                  Shop {label.toLowerCase()}
+                  <ArrowRight size={14} aria-hidden="true" />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
       <button type="button" className="shop-desk-tab" onClick={onShopAll} style={accentStyle(BRAND)}>
         <span className="shop-desk-tab-icon" aria-hidden="true">
           <Boxes size={20} />
@@ -810,6 +838,10 @@ export const ShopDesktopHome: React.FC = () => {
   const { sale, left } = useLiveFlashSale();
   const { firstName, activeOrderId } = useGreeting(accountSignedIn);
   const [tab, setTab] = useState<TabId>('for-you');
+  const suggestions = useMemo(() => {
+    const own = (headerSettings.searchHints ?? []).map((h) => String(h).replace(/^search (for )?/i, '').replace(/["\u2026]|\.\.\./g, '').trim()).filter(Boolean);
+    return Array.from(new Set(own)).slice(0, 6);
+  }, [headerSettings.searchHints]);
 
   const topRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -893,10 +925,10 @@ export const ShopDesktopHome: React.FC = () => {
   };
 
   // Scrolls to a rail of this page (the Best sellers and New launches category tiles).
-  const jumpTo = (elementId: string) => {
+  const jumpTo = (elementId: string, block: 'center' | 'start' = 'center') => {
     const el = document.getElementById(elementId);
-    if (!el) return navigate('shop-browse');
-    el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
+    if (!el) return block === 'start' ? undefined : navigate('shop-browse');
+    el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block });
   };
 
   const renderBlock = (id: HomeModuleId): React.ReactNode => {
@@ -904,7 +936,33 @@ export const ShopDesktopHome: React.FC = () => {
       case 'hero':
         return (
           <>
-            <HeroCarousel slides={slides} previewing={previewing} />
+            <div className="shop-desk-hero-row">
+              <HeroCarousel slides={slides} previewing={previewing} />
+              <aside className="shop-desk-side" aria-label="Quick offers">
+                <button type="button" className="shop-desk-side-tile is-scan" onClick={() => navigate('scan-camera')}>
+                  <span className="shop-desk-side-kicker">
+                    <ScanFace size={14} aria-hidden="true" />
+                    Face scan
+                  </span>
+                  <strong>Find the routine that fits your skin</strong>
+                  <span className="shop-desk-side-go">
+                    Start skin check
+                    <ArrowRight size={14} aria-hidden="true" />
+                  </span>
+                </button>
+                <button type="button" className="shop-desk-side-tile" onClick={() => navigate('cart-tab')}>
+                  <span className="shop-desk-side-kicker">
+                    <Ticket size={14} aria-hidden="true" />
+                    Coupon
+                  </span>
+                  <strong>Flat ₹{COUPON_VALUES.GLOW50} off with GLOW50</strong>
+                  <span className="shop-desk-side-go">
+                    Apply in your cart
+                    <ArrowRight size={14} aria-hidden="true" />
+                  </span>
+                </button>
+              </aside>
+            </div>
             {!failed && tab === 'for-you' && (loading ? <DeskSkeletonRail title="Deals of the day" /> : todayDeals.length > 0 ? <DeskProductRail icon={Zap} title="Deals of the day" titleId="shop-desk-today-title" accent={secAccent('deals')} products={todayDeals} /> : null)}
           </>
         );
@@ -1073,9 +1131,9 @@ export const ShopDesktopHome: React.FC = () => {
       case 'scan':
         return scanCard;
       case 'brands':
-        return liveBlock('brands', 'tiles', 'Top brands', 'Top brands', Gem) ?? <BrandStripPlaceholder settings={blockSettings['brands']} />;
+        return liveBlock('brands', 'tiles', 'Top brands', 'Top brands', Gem) ?? (layout.preview || catalogBrands.length === 0 ? <BrandStripPlaceholder settings={blockSettings['brands']} /> : brandStrip);
       case 'trust':
-        return liveBlock('trust', 'promises', '', 'Why shop with us', ShieldCheck) ?? <TrustBlockPlaceholder settings={blockSettings['trust']} />;
+        return liveBlock('trust', 'promises', '', 'Why shop with us', ShieldCheck) ?? (layout.preview ? <TrustBlockPlaceholder settings={blockSettings['trust']} /> : trustStrip);
       case 'help-gift': {
         const settings = blockSettings['help-gift'];
         return settings && settings.items.length > 0 ? <DeskHelpGift settings={settings} accent={secAccent('help-gift')} /> : <HelpGiftPlaceholder settings={settings} />;
@@ -1083,6 +1141,10 @@ export const ShopDesktopHome: React.FC = () => {
       case 'footer':
         return (
           <footer className="shop-desk-footer" aria-label="Site footer">
+            <button type="button" className="shop-desk-totop" onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}>
+              <ArrowUp size={16} aria-hidden="true" />
+              Back to top
+            </button>
             <div className="shop-desk-footer-inner">
               <div className="shop-desk-footer-brand">
                 <span className="shop-desk-footer-logo">
@@ -1113,6 +1175,18 @@ export const ShopDesktopHome: React.FC = () => {
                 )}
               </div>
               <nav className="shop-desk-footer-cols" aria-label="Footer links">
+                <section className="shop-desk-footer-col">
+                  <h3>Categories</h3>
+                  <ul>
+                    {HOME_CATEGORY_TILES.map(({ id: categoryId, label }) => (
+                      <li key={categoryId}>
+                        <button type="button" onClick={() => navigate('shop-category', { categoryId })}>
+                          {label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
                 {HOME_FOOTER_GROUPS.map((group) => (
                   <section key={group.title} className="shop-desk-footer-col">
                     <h3>{group.title}</h3>
@@ -1144,6 +1218,60 @@ export const ShopDesktopHome: React.FC = () => {
         return null;
     }
   };
+
+  // Shown to customers while the admin has set no brands: the brands in the live catalogue, most products first.
+  const catalogBrands = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of catalog) if (p.brand) counts.set(p.brand, (counts.get(p.brand) ?? 0) + 1);
+    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 12);
+  }, [catalog]);
+  const brandStrip = (
+    <section className="shop-desk-section" aria-labelledby="shop-desk-brands-title" style={accentStyle(secAccent('brands'))}>
+      <SectionHead id="shop-desk-brands-title" icon={Gem} title={blockSettings['brands']?.title || 'Shop by brand'} action={<SeeAll onClick={() => navigate('shop-browse')} name="brands" />} />
+      <div className="shop-desk-brand-row">
+        {catalogBrands.map(([brand, count]) => (
+          <button key={brand} type="button" className="shop-desk-brand" onClick={() => navigate('shop-browse', { brand })}>
+            <span className="shop-desk-brand-mark" aria-hidden="true">{brand.charAt(0).toUpperCase()}</span>
+            <strong>{brand}</strong>
+            <small>{count} {count === 1 ? 'product' : 'products'}</small>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+  // Facts only: the delivery rule, the coupon, the delivery time of the chosen address and the scan's own limits.
+  const trustStrip = (
+    <section className="shop-desk-trust" aria-label="Why shop with GlowVAI">
+      <div>
+        <Truck size={22} aria-hidden="true" />
+        <span>
+          <strong>Free delivery</strong>
+          <small>On orders above ₹{FREE_DELIVERY_ABOVE}</small>
+        </span>
+      </div>
+      <div>
+        <Clock size={22} aria-hidden="true" />
+        <span>
+          <strong>{deliveryEta ? `Delivery in ${deliveryEta} mins` : 'Delivery to your door'}</strong>
+          <small>{deliveryEta ? 'To your selected address' : 'Set your location for the time'}</small>
+        </span>
+      </div>
+      <div>
+        <BadgePercent size={22} aria-hidden="true" />
+        <span>
+          <strong>Flat ₹{COUPON_VALUES.GLOW50} off</strong>
+          <small>Use code GLOW50 in your cart</small>
+        </span>
+      </div>
+      <div>
+        <ShieldCheck size={22} aria-hidden="true" />
+        <span>
+          <strong>Private skin check</strong>
+          <small>A cosmetic check, not a diagnosis</small>
+        </span>
+      </div>
+    </section>
+  );
 
   const scanCard = (
   <section className="shop-desk-scan" aria-labelledby="shop-desk-scan-title" style={accentStyle(secAccent('scan'))}>
@@ -1190,13 +1318,32 @@ export const ShopDesktopHome: React.FC = () => {
       <div className="shop-screen shop-desk">
         <span ref={topRef} className="shop-desk-top" aria-hidden="true" />
         <header className={`shop-desk-header${scrolled ? ' is-scrolled' : ''}`} style={accentStyle(headerAccent)}>
+          <div className="shop-desk-utility">
+            <div className="shop-desk-utility-inner">
+              <span>
+                <Truck size={14} aria-hidden="true" />
+                Free delivery on orders above ₹{FREE_DELIVERY_ABOVE}
+              </span>
+              <span>
+                <BadgePercent size={14} aria-hidden="true" />
+                Use code GLOW50 for ₹{COUPON_VALUES.GLOW50} off
+              </span>
+              <button type="button" onClick={() => navigate('scan-camera')}>
+                <ScanFace size={14} aria-hidden="true" />
+                Free AI skin check
+              </button>
+            </div>
+          </div>
           <div className="shop-desk-header-inner">
             <button type="button" className="shop-desk-logo" onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })} aria-label="glowvai shop home">
               <BrandLogo height={34} white={textOn(headerAccent) === '#FFFFFF'} />
             </button>
             <button type="button" className="shop-desk-delivery" onClick={() => navigate('location-setup')} aria-label={`Delivery location: ${userLocation}. Change`}>
-              <MapPin size={18} aria-hidden="true" />
-              <span className="shop-desk-delivery-place">{userCity}</span>
+              <MapPin size={22} aria-hidden="true" />
+              <span className="shop-desk-delivery-copy">
+                <small>{deliveryEta ? `Delivery in ${deliveryEta} mins` : 'Delivery to'}</small>
+                <span className="shop-desk-delivery-place">{userCity}</span>
+              </span>
               <ChevronDown size={16} aria-hidden="true" />
             </button>
             <div className="shop-desk-search">
@@ -1205,6 +1352,26 @@ export const ShopDesktopHome: React.FC = () => {
                 <SearchHint hints={headerSettings.searchHints} />
               </button>
               <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
+              <div className="shop-desk-suggest" role="region" aria-label="Search suggestions">
+                {suggestions.length > 0 && <p className="shop-desk-suggest-title">Popular searches</p>}
+                <div className="shop-desk-suggest-list">
+                  {suggestions.map((q) => (
+                    <button key={q} type="button" onClick={() => navigate('shop-search-filters', { q })}>
+                      <Search size={14} aria-hidden="true" />
+                      {q}
+                    </button>
+                  ))}
+                </div>
+                <p className="shop-desk-suggest-title">Shop by concern</p>
+                <div className="shop-desk-suggest-list">
+                  {CONCERNS.map(({ id: concernId, label, Icon }) => (
+                    <button key={concernId} type="button" onClick={() => navigate('shop-browse', { concern: concernId })}>
+                      <Icon size={14} aria-hidden="true" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             <DeliveryModeSwitch header={headerSettings} wide />
             <nav className="shop-desk-actions" aria-label="Account and cart">
@@ -1248,8 +1415,17 @@ export const ShopDesktopHome: React.FC = () => {
             </nav>
           </div>
           <div className="shop-desk-tabs-row">
-            <CategoryTabs selected={tab} onSelect={setTab} onShopAll={() => navigate('shop-browse')} />
+            <CategoryTabs selected={tab} onSelect={setTab} onShopAll={() => navigate('shop-browse')} tiles={tiles} onOpen={(categoryId) => navigate('shop-category', { categoryId })} />
           </div>
+          <nav className="shop-desk-jump" aria-label="Jump to a section">
+            <div className="shop-desk-jump-inner">
+              {JUMPS.map((j) => (
+                <button key={j.id} type="button" onClick={() => jumpTo(j.id, 'start')}>
+                  {j.label}
+                </button>
+              ))}
+            </div>
+          </nav>
         </header>
 
         <div ref={mainRef} className="shop-desk-main">
