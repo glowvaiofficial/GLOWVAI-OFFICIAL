@@ -7,6 +7,7 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import { CONCERN_KEYWORDS } from '../lib/firstVisit';
+import { hideEmpty } from '../lib/hideEmpty';
 import { SearchSuggestions } from '../shared/StateScreens';
 import { PcListing } from '../desktop/PcListing';
 import { useIsPc } from '../desktop/useIsPc';
@@ -80,6 +81,9 @@ export const ShopBrowseScreen: React.FC = () => {
     return counts;
   }, [catalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Categories with no products are hidden once the catalogue has loaded.
+  const shownCategories = hideEmpty(categoryItems, (c) => categoryCounts[c.id] ?? 0, catalog.length > 0);
+
   const filteredProducts = catalog.filter((product) => {
     const q = searchQuery.toLowerCase();
     const matchesSearch =
@@ -137,7 +141,7 @@ export const ShopBrowseScreen: React.FC = () => {
         }
         topSlot={
           <div className="pc-cats">
-            {categoryItems.map((cat) => (
+            {shownCategories.map((cat) => (
               <button key={cat.id} type="button" className="pc-cat" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
                 <span className="pc-cat-ico">{cat.imageUri ? <img src={cat.imageUri} alt="" width={40} height={40} loading="lazy" /> : <cat.Icon size={18} />}</span>
                 <span style={{ minWidth: 0 }}>
@@ -154,7 +158,7 @@ export const ShopBrowseScreen: React.FC = () => {
 
   const showResults = searchQuery.trim() !== '' || hasActiveFilters || showAll;
   const railItems = [
-    ...categoryItems.map((c) => ({ id: c.id, name: c.name.split(' & ')[0].split(' ')[0], full: c.name, count: categoryCounts[c.id] ?? 0, img: c.imageUri, Icon: c.Icon })),
+    ...shownCategories.map((c) => ({ id: c.id, name: c.name.split(' & ')[0].split(' ')[0], full: c.name, count: categoryCounts[c.id] ?? 0, img: c.imageUri, Icon: c.Icon })),
     { id: '__all', name: 'All products', full: 'All products', count: catalog.length, img: catalog[0] ? getProductThumbUrl(catalog[0]) : '', Icon: LayoutGrid },
   ];
   const activeRail = railItems.find((r) => r.id === railCat) ?? railItems[0];
@@ -167,6 +171,8 @@ export const ShopBrowseScreen: React.FC = () => {
       return kws.some((k) => hay.includes(k));
     }).length;
   };
+
+  const shownConcerns = hideEmpty(SKIN_CONCERNS, (c) => (c.id === 'all' || c.id === selectedConcern ? 1 : concernCount(c.id)), catalog.length > 0);
 
   return (
     <div className="shop-screen shop-browse v2-browse">
@@ -195,7 +201,7 @@ export const ShopBrowseScreen: React.FC = () => {
       </div>
 
       <div className="v2-chips shop-chip-row shop-browse-chip-row">
-        {SKIN_CONCERNS.map((concern) => {
+        {shownConcerns.map((concern) => {
           const isSelected = selectedConcern === concern.id;
           return (
             <button
@@ -287,7 +293,7 @@ export const ShopBrowseScreen: React.FC = () => {
                   )}
                   <h3 className="v2-concern-title">Shop by concern</h3>
                   <ul className="v2-concerns">
-                    {SKIN_CONCERNS.filter((c) => c.id !== 'all').map((c) => (
+                    {shownConcerns.filter((c) => c.id !== 'all').map((c) => (
                       <li key={c.id}>
                         <button type="button" onClick={() => setSelectedConcern(c.id)}>
                           <span>{c.label}</span>

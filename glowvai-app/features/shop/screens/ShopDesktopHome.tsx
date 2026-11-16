@@ -25,9 +25,10 @@ import { useHomeData } from '../lib/useHomeData';
 import { balancedColumns } from '../lib/homeDevice';
 import { accentVars, blockAccent, isAccent, itemAccent, type AccentName } from '../lib/desktopAccents';
 import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
+import { catalogReady, hideEmpty } from '../lib/hideEmpty';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto, BRAND_MARK_URL } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
 import { HeroExtras, HeroVideo, useHeroDesign } from '../shared/DesignerBanner';
 import { useDesignerCard } from '../shared/designerCard';
@@ -534,10 +535,10 @@ const JUMPS = [
 // One accent: every tab underlines in brand blue.
 const tabAccent = (_index: number) => BRAND;
 
-function CategoryTabs({ selected, onSelect, onShopAll, tiles, onOpen }: { selected: TabId; onSelect: (id: TabId) => void; onShopAll: () => void; tiles: { id: string; count: number; sample: SkincareProduct | null }[]; onOpen: (categoryId: string) => void }) {
+function CategoryTabs({ selected, onSelect, onShopAll, tiles, onOpen, ready }: { ready: boolean; selected: TabId; onSelect: (id: TabId) => void; onShopAll: () => void; tiles: { id: string; count: number; sample: SkincareProduct | null }[]; onOpen: (categoryId: string) => void }) {
   return (
     <nav className="shop-desk-tabs" aria-label="Categories">
-      {TABS.map(({ id, label, Icon }, i) => {
+      {hideEmpty(TABS, (t) => (t.id === 'for-you' ? 1 : tiles.find((x) => x.id === t.id)?.count ?? 0), ready).map(({ id, label, Icon }, i) => {
         const tile = id === 'for-you' ? null : tiles.find((t) => t.id === id) ?? null;
         return (
           <div key={id} className="shop-desk-tab-wrap">
@@ -667,7 +668,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
 function DeskCategoryTile({ label, accent, photo, Icon, count, onOpen }: { label: string; accent: string; photo: string | null; Icon: LucideIcon; count: string | null; onOpen: () => void }) {
   return (
     <button type="button" className={`shop-desk-cat${photo ? '' : ' is-brand'}`} onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
-      <span className="shop-desk-cat-media">{photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <img className="shop-desk-cat-mark" src={BRAND_MARK_URL} alt="" width={40} height={47} decoding="async" />}</span>
+      <span className="shop-desk-cat-media">{photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <span className="shop-desk-cat-ico" aria-hidden="true"><Icon size={32} /></span>}</span>
       <strong>{label}</strong>
     </button>
   );
@@ -822,7 +823,7 @@ function DeskPricePoints({ tiles, onOpen }: { tiles: PricePointTile[]; onOpen: (
           <button key={t.max} type="button" className="shop-desk-price" style={accentStyle(coolSectionAccent('prices'))} onClick={() => onOpen(t.max)} aria-label={`${t.label}, ${t.count} ${t.count === 1 ? 'product' : 'products'}`}>
             <b>{t.label}</b>
             <small>{t.count} {t.count === 1 ? 'product' : 'products'}</small>
-            <span className="shop-desk-price-media">{t.sample && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
+            <span className="shop-desk-price-media">{t.sample && hasProductPhoto(t.sample) && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
           </button>
         ))}
       </div>
@@ -857,6 +858,8 @@ export const ShopDesktopHome: React.FC = () => {
     () => recommendedProducts(catalog, recentIds, skinState.recommendationsOn ? skinMatchedPicks(catalog, skinState.concerns, 12) : [], clampMaxItems(blockSettings['recommended']?.maxItems)),
     [catalog, recentIds, skinState, blockSettings]
   );
+  // Categories with no products are hidden once the catalogue has loaded.
+  const visibleCategories = hideEmpty(HOME_CATEGORY_TILES, (c) => tiles.find((t) => t.id === c.id)?.count ?? 0, catalogReady(loading, failed));
   const adminCategories = blockSettings['categories']?.items ?? [];
   const adminPromos = blockSettings['promos']?.items ?? [];
 
@@ -1012,12 +1015,12 @@ export const ShopDesktopHome: React.FC = () => {
         return (
           <section className="shop-desk-section is-tight" aria-label="Shop by category" style={accentStyle(secAccent('categories'))}>
             <SectionHead title={blockSettings['categories']?.title || 'Shop by category'} action={<SeeAll label="All categories" onClick={() => navigate('shop-browse')} name="categories" />} />
-            <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(adminCategories.length > 0 ? adminCategories.length : HOME_CATEGORY_TILES.length + 2 + (bestsellers.length > 0 ? 1 : 0) + (newLaunches.length > 0 ? 1 : 0) + (dealProducts.length > 0 ? 1 : 0), CATEGORY_ROW_MAX) } as React.CSSProperties}>
+            <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(adminCategories.length > 0 ? adminCategories.length : visibleCategories.length + 2 + (bestsellers.length > 0 ? 1 : 0) + (newLaunches.length > 0 ? 1 : 0) + (dealProducts.length > 0 ? 1 : 0), CATEGORY_ROW_MAX) } as React.CSSProperties}>
               {adminCategories.length > 0 ? (
                 adminCategories.map((item, i) => <DeskCategoryTile key={`${i}-${item.label}`} label={item.label} accent={restAccent(itemAccent(item), i)} photo={item.image || null} Icon={Sparkles} count={item.sub || null} onOpen={() => openLink(item.link)} />)
               ) : (
                 <>
-                  {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
+                  {visibleCategories.map(({ id: categoryId, label }, i) => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
                     return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null, i)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
@@ -1211,7 +1214,7 @@ export const ShopDesktopHome: React.FC = () => {
                 <section className="shop-desk-footer-col">
                   <h3>Categories</h3>
                   <ul>
-                    {HOME_CATEGORY_TILES.map(({ id: categoryId, label }) => (
+                    {visibleCategories.map(({ id: categoryId, label }) => (
                       <li key={categoryId}>
                         <button type="button" onClick={() => navigate('shop-category', { categoryId })}>
                           {label}
@@ -1434,7 +1437,7 @@ export const ShopDesktopHome: React.FC = () => {
             </nav>
           </div>
           <div className="shop-desk-tabs-row">
-            <CategoryTabs selected={tab} onSelect={setTab} onShopAll={() => navigate('shop-browse')} tiles={tiles} onOpen={(categoryId) => navigate('shop-category', { categoryId })} />
+            <CategoryTabs selected={tab} onSelect={setTab} onShopAll={() => navigate('shop-browse')} tiles={tiles} ready={catalogReady(loading, failed)} onOpen={(categoryId) => navigate('shop-category', { categoryId })} />
           </div>
           <nav className="shop-desk-jump" aria-label="Jump to a section">
             <div className="shop-desk-jump-inner">

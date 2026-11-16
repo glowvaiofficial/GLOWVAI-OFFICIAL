@@ -77,7 +77,7 @@ function ScanScreen({ go }: ScreenProps) {
           <>
             <div className="flex items-end justify-between">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-muted">Sample result</p>
+                <p className="inline-block rounded-full bg-ink/[0.06] px-2 py-0.5 text-[11px] font-semibold text-ink-muted">Example result</p>
                 <p className="font-display font-semibold text-4xl leading-none text-ink">84</p>
               </div>
               <div className="text-right text-[11px] text-ink-muted space-y-0.5">
