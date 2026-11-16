@@ -60,6 +60,15 @@ export const OnboardingScreen: React.FC = () => {
     navigate('shop-home');
   };
 
+  // Escape does the same as "Skip, show me products", so keyboard users are never stuck on the intro.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') skip();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   return (
     <main className="onboarding-screen" style={{ position: 'relative', flex: 1, minHeight: '100%', overflow: 'hidden', background: '#0861f7' }}>
       <div className="onboarding-media" style={{ position: 'absolute', inset: 'var(--onb-hero-inset, 0 0 35% 0)', overflow: 'hidden' }}>
