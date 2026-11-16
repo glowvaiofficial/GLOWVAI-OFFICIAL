@@ -16,7 +16,7 @@ import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
-import { getProductThumbUrl, hasProductPhoto, firstPhotoUrl } from '../shared/shopUtils';
+import { getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
 import {
@@ -77,7 +77,7 @@ type ShopHomeScreenProps = { embedded?: boolean };
 // a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
   const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails, header: headerSettings } = useHomeLayout('mobile');
-  const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
+  const { catalog, feed, loading, failed, noProducts, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
 
@@ -149,7 +149,12 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const renderBlock = (id: HomeModuleId): React.ReactNode => {
     switch (id) {
       case 'hero':
-        return <HeroCarousel hero={heroOverride as (HeroOverride & Accented) | null} deliveryEta={deliveryEta} accent={(heroOverride as (HeroOverride & Accented) | null)?.accent || accentOf('hero')} />;
+        return (
+          <>
+            <HeroCarousel hero={heroOverride as (HeroOverride & Accented) | null} deliveryEta={deliveryEta} accent={(heroOverride as (HeroOverride & Accented) | null)?.accent || accentOf('hero')} />
+            {!failed && !tab.concern && (loading ? <SkeletonRow title="Deals of the day" /> : <ProductRow id="gvh-today-title" title="Deals of the day" sub="Biggest savings today" products={todayDeals} accent={accentOf('deals')} icon={<Zap size={18} aria-hidden="true" className="gvh-zap" fill="currentColor" />} onSeeAll={() => navigate('shop-browse')} />)}
+          </>
+        );
       case 'mini-banners':
         // Shown as "Trending" tiles once the admin publishes items; a placeholder only in a staff preview.
         return hasItems('mini-banners') ? <TrendingBlock settings={settingsOf('mini-banners')!} accent={accentOf('mini-banners')} onOpenLink={openLink} /> : <MiniBannersPlaceholder settings={blockSettings['mini-banners']} />;
@@ -180,9 +185,9 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
                         />
                       );
                     })}
-                    {bestsellers.length > 0 && <CategoryTile label="Best sellers" image={firstPhotoUrl(bestsellers, 300)} Icon={Star} accent={itemAccent({ label: 'Best sellers' }, 5)} onOpen={() => jumpTo('gvh-bestsellers-title')} />}
-                    {newLaunches.length > 0 && <CategoryTile label="New launches" image={firstPhotoUrl(newLaunches, 300)} Icon={PackagePlus} accent={itemAccent({ label: 'New launches' }, 6)} onOpen={() => jumpTo('gvh-new-title')} />}
-                    <CategoryTile label="Shop all" image={firstPhotoUrl(catalog, 300)} Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
+                    {bestsellers.length > 0 && <CategoryTile label="Best sellers" image={extraTiles.best ? getProductThumbUrl(extraTiles.best, 300) : null} Icon={Star} accent={itemAccent({ label: 'Best sellers' }, 5)} onOpen={() => jumpTo('gvh-bestsellers-title')} />}
+                    {newLaunches.length > 0 && <CategoryTile label="New launches" image={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 300) : null} Icon={PackagePlus} accent={itemAccent({ label: 'New launches' }, 6)} onOpen={() => jumpTo('gvh-new-title')} />}
+                    <CategoryTile label="Shop all" image={extraTiles.all ? getProductThumbUrl(extraTiles.all, 300) : null} Icon={ALL_ICON} accent={itemAccent({ label: 'Shop all' }, 7)} onOpen={() => navigate('shop-browse')} />
                   </>
                 )}
             </div>

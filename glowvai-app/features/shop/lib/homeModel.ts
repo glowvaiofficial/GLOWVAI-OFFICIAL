@@ -4,7 +4,7 @@
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import type { ScreenName } from '../../../context/contextDefinition';
 import type { HomeBlockId } from './useHomeLayout';
-import { isTrialProduct, hasProductPhoto } from '../shared/shopUtils';
+import { isTrialProduct, hasProductPhoto, getProductImageUrl, getDiscountPercent } from '../shared/shopUtils';
 
 export type HomeCategoryId = SkincareProduct['category'];
 
@@ -25,13 +25,42 @@ export interface HomeCategoryTile {
   sample: SkincareProduct | null;
 }
 
+// First product with a photo that no earlier tile already shows (by product and by picture), so tiles never repeat a picture.
+export function freshPhotoProduct(products: SkincareProduct[], used: Set<string>): SkincareProduct | null {
+  const pick = products.find((p) => hasProductPhoto(p) && !used.has(p.id) && !used.has(getProductImageUrl(p)));
+  if (pick) {
+    used.add(pick.id);
+    used.add(getProductImageUrl(pick));
+  }
+  return pick ?? null;
+}
+
 export function categoryTiles(catalog: SkincareProduct[]): HomeCategoryTile[] {
+  const used = new Set<string>();
   return HOME_CATEGORY_TILES.map(({ id, label }) => {
     const inCategory = catalog.filter((p) => p.category === id);
     const fullSize = inCategory.find((p) => !isTrialProduct(p));
-    const withPhoto = inCategory.find((p) => !isTrialProduct(p) && hasProductPhoto(p)) ?? inCategory.find(hasProductPhoto);
+    const fresh = freshPhotoProduct(inCategory.filter((p) => !isTrialProduct(p)), used) ?? freshPhotoProduct(inCategory, used);
+    const withPhoto = fresh ?? inCategory.find((p) => !isTrialProduct(p) && hasProductPhoto(p)) ?? inCategory.find(hasProductPhoto);
     return { id, label, count: inCategory.length, sample: withPhoto ?? fullSize ?? inCategory[0] ?? null };
   });
+}
+
+// The pictures for the Best sellers, New launches and Shop all tiles: different products from the category tiles and
+// from each other where the catalogue allows. Falls back to the list's first photo only when nothing else is left.
+export function extraTilePhotos(tiles: HomeCategoryTile[], lists: { bestsellers: SkincareProduct[]; newLaunches: SkincareProduct[]; all: SkincareProduct[] }): { best: SkincareProduct | null; fresh: SkincareProduct | null; all: SkincareProduct | null } {
+  const used = new Set<string>();
+  for (const t of tiles) if (t.sample) { used.add(t.sample.id); used.add(getProductImageUrl(t.sample)); }
+  const take = (list: SkincareProduct[]) => freshPhotoProduct(list, used) ?? list.find(hasProductPhoto) ?? null;
+  return { best: take(lists.bestsellers), fresh: take(lists.newLaunches), all: take(lists.all) };
+}
+
+// "Deals of the day": the products with the biggest rupee saving against their own MRP (full-size, real discounts only).
+export function dealsOfTheDay(catalog: SkincareProduct[], limit = 8): SkincareProduct[] {
+  return fullSize(catalog)
+    .filter((p) => getDiscountPercent(p) > 0 && p.originalPrice > p.price)
+    .sort((a, b) => b.originalPrice - b.price - (a.originalPrice - a.price))
+    .slice(0, limit);
 }
 
 export interface RailCandidate {

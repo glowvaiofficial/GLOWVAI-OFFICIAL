@@ -604,3 +604,18 @@
 .glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-shapes{ display: none; }
 .glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-media{ width: 100%; }
 .glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-media img{ -webkit-mask-image: none; mask-image: none; object-position: center; }
+
+/* ---------- Home lift: tighter greeting, product card rating and saving ---------- */
+.glowvai-root .shop-desk .shop-desk-greet{ margin-top: 10px; padding: 6px 12px 6px 8px; gap: 12px; }
+.glowvai-root .shop-desk .shop-desk-greet-icon{ width: 34px; height: 34px; }
+.glowvai-root .shop-desk .shop-desk-greet-copy{ gap: 0; }
+.glowvai-root .shop-desk .shop-desk-greet-copy strong{ font-size: 15px; }
+.glowvai-root .shop-desk .shop-desk-greet-copy > span{ font-size: 12.5px; }
+.glowvai-root .shop-desk .shop-desk-section{ margin-top: 22px; }
+.glowvai-root .shop-desk .shop-desk-card-meta{ display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 1px; }
+.glowvai-root .shop-desk .shop-desk-card-rating{ display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 6px; background: #17753a; color: #fff; font-size: 11.5px; font-weight: 600; line-height: 16px; }
+.glowvai-root .shop-desk .shop-desk-card-rating small{ color: rgba(255, 255, 255, .85); font-size: 10.5px; }
+.glowvai-root .shop-desk .shop-desk-card-save{ color: var(--desk-success); font-size: 12px; font-weight: 600; }
+.glowvai-root .shop-desk .shop-desk-add:active,
+.glowvai-root .shop-desk .shop-desk-stepper button:active{ transform: scale(.94); }
+.glowvai-root .shop-desk .shop-desk-add{ transition: transform var(--desk-fast) var(--desk-ease), background-color var(--desk-fast) var(--desk-ease); }

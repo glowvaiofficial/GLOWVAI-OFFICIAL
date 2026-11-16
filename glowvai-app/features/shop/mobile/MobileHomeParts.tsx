@@ -409,6 +409,18 @@ export function HomeProductCard({ product, sale, accent }: { product: SkincarePr
           {product.brand ? `${product.brand} ` : ''}
           {product.name}
         </button>
+        {(product.rating !== null || (mrp > price && !options)) && (
+          <p className="gvh-card-meta">
+            {product.rating !== null && (
+              <span className="gvh-rating" aria-label={`Rated ${product.rating.toFixed(1)} out of 5`}>
+                <Star size={10} aria-hidden="true" fill="currentColor" />
+                {product.rating.toFixed(1)}
+                {product.reviewCount ? <small>({product.reviewCount})</small> : null}
+              </span>
+            )}
+            {mrp > price && !options && <span className="gvh-save">Save {formatRupee(mrp - price)}</span>}
+          </p>
+        )}
         <div className="gvh-card-foot">
           {!options && quantity > 0 ? (
             <span className="gvh-stepper" aria-label={`${quantity} in cart`}>
