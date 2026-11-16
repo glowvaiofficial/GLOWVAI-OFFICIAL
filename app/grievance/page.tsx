@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description: DESC,
   alternates: { canonical: `${SITE_URL}/grievance` },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Grievance Redressal Officer | GLOW VAI",
     description: DESC,
     url: `${SITE_URL}/grievance`,

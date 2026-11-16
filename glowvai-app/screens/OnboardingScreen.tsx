@@ -4,9 +4,9 @@ import { useApp } from '../context/AppContext';
 import { browserStore, dismissQuiz } from '../features/shop/lib/firstVisit';
 import { BrandLogo } from '../shared/BrandLogo';
 import '../responsive/entry-scan.css';
-const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.png';
-const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.png';
-const progressHero = '/glowvai/assets/onboarding/hero-progress-v2.png';
+const skinHero = '/glowvai/assets/onboarding/hero-skin-v2.webp';
+const deliveryHero = '/glowvai/assets/onboarding/hero-delivery-v2.webp';
+const progressHero = '/glowvai/assets/onboarding/hero-progress-v2.webp';
 
 const steps = [
   {
@@ -84,7 +84,7 @@ export const OnboardingScreen: React.FC = () => {
         </h1>
         <p style={{ maxWidth: 360, marginTop: 15, color: 'var(--ds-muted)', fontSize: 16, lineHeight: 1.55 }}>{item.body}</p>
 
-        <div aria-label={`Step ${step + 1} of ${steps.length}`} style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 23 : 30 }}>
+        <div role="img" aria-label={`Step ${step + 1} of ${steps.length}`} style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: step === 2 ? 23 : 30 }}>
           {steps.map((_, index) => <span key={index} aria-hidden="true" style={{ width: 11, height: 11, borderRadius: '50%', background: index === step ? 'var(--ds-brand)' : 'var(--ds-line)', transition: 'background-color .2s ease' }} />)}
         </div>
 

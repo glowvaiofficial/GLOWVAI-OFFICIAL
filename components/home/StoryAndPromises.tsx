@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Section, SectionTitle } from "./shared";
 import { assetConfig } from "@/config/assets";
 import { getAssetPath } from "@/lib/utils";
@@ -36,12 +36,10 @@ export function StorySection() {
           {storyParagraphs.map((p) => (
             <p key={p}>{p}</p>
           ))}
-          <Link href="/our-story" className="inline-block mt-2">
-            <Button variant="outline" size="md">
+          <ButtonLink href="/our-story" variant="outline" size="md" className="mt-2">
               <span>Read our full story</span>
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </Button>
-          </Link>
+            </ButtonLink>
         </div>
 
         <ul className="lg:col-span-6 lg:col-start-7 border-t border-ink/20">
@@ -115,11 +113,9 @@ export function PromisesSection() {
           <p className="text-ink-muted max-w-[62ch]">{referralStrip.terms}</p>
         </div>
         <div className="md:col-span-3 md:text-right">
-          <Link href="/referral" className="block">
-            <Button variant="dark" size="md" className="w-full md:w-auto">
+          <ButtonLink href="/referral" variant="dark" size="md" className="w-full md:w-auto whitespace-normal text-center py-2">
               <span>{referralStrip.button}</span>
-            </Button>
-          </Link>
+            </ButtonLink>
         </div>
       </div>
     </Section>

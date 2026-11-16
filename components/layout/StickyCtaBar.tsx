@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { getAssetPath } from "@/lib/utils";
 
 export function StickyCtaBar() {
@@ -52,11 +52,9 @@ export function StickyCtaBar() {
             <p className="text-[12px] text-ink-muted">Routine in 15 min</p>
           </div>
         </div>
-        <Link href="/face-analysis" tabIndex={visible ? 0 : -1} data-track="scan_cta_click" data-track-location="sticky_bar">
-          <Button variant="primary" size="sm">
+        <ButtonLink href="/face-analysis" tabIndex={visible ? 0 : -1} data-track="scan_cta_click" data-track-location="sticky_bar" variant="primary" size="sm">
             <span>Scan my face</span>
-          </Button>
-        </Link>
+          </ButtonLink>
       </div>
     </div>
   );

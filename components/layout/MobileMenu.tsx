@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { navLinks } from "@/config/nav";
 import { BRAND_NAME } from "@/config/site";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { X, ShoppingBag, ArrowRight } from "lucide-react";
 import { getAssetPath } from "@/lib/utils";
 
@@ -115,11 +115,9 @@ export function MobileMenu({
 
       {/* Bottom Action Area & Contact Info */}
       <div className="space-y-3 pt-4 border-t border-ink/10">
-        <Link href="/face-analysis" onClick={onClose} className="block w-full">
-          <Button variant="primary" size="md" className="w-full">
+        <ButtonLink href="/face-analysis" onClick={onClose} variant="primary" size="md" className="w-full">
             <span>Scan my face</span>
-          </Button>
-        </Link>
+          </ButtonLink>
 
         <button
           onClick={() => {

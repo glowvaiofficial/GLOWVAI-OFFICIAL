@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Section, Eyebrow, SectionTitle } from "./shared";
 import { MEDICAL_NOTE } from "@/config/privacy-copy";
 import { howSteps, scanTips } from "@/config/home-content";
@@ -73,12 +73,10 @@ export function HowItWorks() {
       </div>
 
       <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-x-8 gap-y-4">
-        <Link href="/face-analysis" data-track="scan_cta_click" data-track-location="how_it_works">
-          <Button variant="primary" size="lg" className="w-full sm:w-auto">
+        <ButtonLink href="/face-analysis" data-track="scan_cta_click" data-track-location="how_it_works" variant="primary" size="lg" className="w-full sm:w-auto">
             <span>Start free scan</span>
             <ArrowRight className="w-5 h-5" aria-hidden="true" />
-          </Button>
-        </Link>
+          </ButtonLink>
         <a
           href="#what-we-check"
           className="gv-link-inline font-medium text-ink underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-brand"

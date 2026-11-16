@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight, ScanLine } from "lucide-react";
 import { SITE_URL } from "@/lib/site-url";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { ConcernProducts } from "@/components/concerns/ConcernProducts";
 import { concernPages, concernBySlug } from "@/config/concerns";
 import { filterProducts } from "@/lib/catalog";
@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description: c.intro,
     alternates: { canonical: `${SITE_URL}/concerns/${c.slug}` },
-    openGraph: { title: `${title} | GLOW VAI`, description: c.intro, url: `${SITE_URL}/concerns/${c.slug}` },
+    openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: `${title} | GLOW VAI`, description: c.intro, url: `${SITE_URL}/concerns/${c.slug}` },
   };
 }
 
@@ -75,12 +76,10 @@ export default async function ConcernLandingPage({ params }: { params: Promise<{
             </h1>
             <p className="mt-6 text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] leading-[1.5] text-ink-muted max-w-[50ch]">{c.intro}</p>
             <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-4">
-              <Link href="#products">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+              <ButtonLink href="#products" variant="primary" size="lg" className="w-full sm:w-auto">
                   <span>See {products.length} product{products.length === 1 ? "" : "s"}</span>
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </Link>
+                </ButtonLink>
               <Link href="/face-analysis" className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
                 <ScanLine className="w-4 h-4" aria-hidden="true" />
                 Not sure? Take the free scan
