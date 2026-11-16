@@ -1,0 +1,114 @@
+/* Website v2: Categories, category, browse, search and wishlist polish. Matches the native app Categories screen.
+   Tokens come from glowvai.css (--gv-blue, --gv-blue-tint, --gv-ink, --gv-muted, --gv-hairline). Roboto 400/500/700 only. */
+
+/* Blue sticky header with the search box, like the app */
+.glowvai-root .v2-bluebar{ position: sticky; top: 0; z-index: 8; display: grid; gap: 12px; padding-bottom: 14px; background: linear-gradient(180deg, var(--gv-blue) 0%, #0a63ff 100%); box-shadow: 0 6px 18px rgba(0, 87, 251, .22); border-radius: 0 0 22px 22px; }
+.glowvai-root .v2-bluebar .shop-header{ padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+.glowvai-root .v2-bluebar .shop-header h1{ color: #fff; font-size: 22px; }
+.glowvai-root .v2-bluebar .shop-icon-btn{ border-color: rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .16); color: #fff; transition: transform .18s ease, background .18s ease; }
+.glowvai-root .v2-bluebar .shop-icon-btn:active{ transform: scale(.94); }
+.glowvai-root .v2-bluebar .shop-input{ margin: 0 var(--ds-gutter); border: 0; border-radius: 16px; box-shadow: 0 4px 14px rgba(0, 30, 120, .18); }
+.glowvai-root .v2-bluebar .shop-input:focus-within{ box-shadow: 0 0 0 2px #fff, 0 4px 14px rgba(0, 30, 120, .25); }
+
+/* Concern chips */
+.glowvai-root .v2-chips{ padding-top: 14px; padding-bottom: 4px; }
+.glowvai-root .v2-chips .shop-chip{ min-height: 40px; border-color: var(--gv-hairline); font-weight: 500; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
+.glowvai-root .v2-chips .shop-chip:active{ transform: scale(.96); }
+.glowvai-root .v2-chips .shop-chip.is-active{ border-color: var(--gv-blue); background: var(--gv-blue-tint); color: var(--gv-blue); font-weight: 700; }
+
+/* Shop by category: rail + pane */
+.glowvai-root .v2-cats{ padding: 18px var(--ds-gutter) 0; }
+.glowvai-root .v2-cats-title{ margin-bottom: 12px; color: var(--gv-ink); font-size: 20px; font-weight: 700; letter-spacing: -.005em; }
+.glowvai-root .v2-cats-card{ display: grid; grid-template-columns: 92px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--gv-hairline); border-radius: 22px; background: #fff; box-shadow: 0 8px 24px rgba(11, 27, 63, .07); }
+.glowvai-root .v2-rail{ display: flex; flex-direction: column; border-right: 1px solid var(--gv-hairline); background: #f7f9ff; }
+.glowvai-root .v2-rail-item{ position: relative; display: grid; justify-items: center; gap: 4px; padding: 12px 4px; border: 0; background: none; color: var(--gv-ink); transition: background .18s ease, transform .16s ease; }
+.glowvai-root .v2-rail-item:active{ transform: scale(.97); }
+.glowvai-root .v2-rail-item.is-active{ background: var(--gv-blue-tint); }
+.glowvai-root .v2-rail-item.is-active::before{ content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 4px; border-radius: 0 4px 4px 0; background: var(--gv-blue); }
+.glowvai-root .v2-rail-img{ display: grid; width: 56px; height: 56px; place-items: center; overflow: hidden; border: 2px solid var(--gv-hairline); border-radius: 50%; background: #fff; color: var(--gv-blue); transition: border-color .18s ease, box-shadow .18s ease; }
+.glowvai-root .v2-rail-img img{ display: block; width: 100%; height: 100%; object-fit: contain; }
+.glowvai-root .v2-rail-item.is-active .v2-rail-img{ border-color: var(--gv-blue); box-shadow: 0 4px 12px rgba(0, 87, 251, .25); }
+.glowvai-root .v2-rail-name{ max-width: 100%; overflow: hidden; font-size: 12px; font-weight: 500; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .v2-rail-item.is-active .v2-rail-name{ color: var(--gv-blue); font-weight: 700; }
+.glowvai-root .v2-rail-count{ min-width: 22px; padding: 1px 7px; border-radius: 999px; background: #e9edf6; color: var(--gv-muted); font-size: 12px; font-weight: 700; }
+.glowvai-root .v2-rail-item.is-active .v2-rail-count{ background: var(--gv-blue); color: #fff; }
+.glowvai-root .v2-skel-line{ width: 44px; height: 10px; border-radius: 6px; }
+.glowvai-root .v2-rail-item.is-skel .v2-rail-img{ border-color: transparent; }
+
+.glowvai-root .v2-pane{ min-width: 0; padding: 12px; }
+.glowvai-root .v2-hero{ display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; padding: 14px; border: 0; border-radius: 18px; background: linear-gradient(135deg, var(--gv-blue-tint) 0%, #dfe9ff 100%); color: var(--gv-ink); text-align: left; transition: transform .18s ease, box-shadow .18s ease; }
+.glowvai-root .v2-hero:active{ transform: scale(.985); }
+.glowvai-root .v2-hero-copy{ display: grid; min-width: 0; gap: 2px; }
+.glowvai-root .v2-hero-copy b{ font-size: 18px; font-weight: 700; line-height: 1.2; }
+.glowvai-root .v2-hero-copy small{ color: var(--gv-muted); font-size: 14px; font-weight: 400; }
+.glowvai-root .v2-hero-link{ display: inline-flex; align-items: center; gap: 2px; margin-top: 8px; color: var(--gv-blue); font-size: 14px; font-weight: 700; }
+.glowvai-root .v2-hero-img{ display: grid; width: 84px; height: 84px; flex-shrink: 0; place-items: center; overflow: hidden; border-radius: 16px; background: #fff; box-shadow: 0 6px 16px rgba(0, 40, 140, .15); color: var(--gv-blue); }
+.glowvai-root .v2-hero-img img{ display: block; width: 100%; height: 100%; object-fit: contain; }
+.glowvai-root .v2-hero-skel{ height: 112px; border-radius: 18px; }
+.glowvai-root .v2-concern-title{ margin: 18px 4px 10px; color: var(--gv-muted); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.glowvai-root .v2-concerns{ display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.glowvai-root .v2-concerns button{ display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 14px; border: 1px solid var(--gv-hairline); border-radius: 14px; background: #fff; color: var(--gv-ink); font-size: 14px; font-weight: 500; text-align: left; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+.glowvai-root .v2-concerns button:active{ transform: scale(.98); background: var(--gv-blue-tint); }
+.glowvai-root .v2-concerns b{ color: var(--gv-muted); font-size: 14px; font-weight: 500; }
+
+/* Results and empty states */
+.glowvai-root .v2-browse .shop-browse-banner{ border-radius: 14px; background: var(--gv-blue-tint); }
+.glowvai-root .v2-browse .shop-browse-products-head h2{ font-size: 18px; }
+.glowvai-root .v2-browse .v2-empty{ border-radius: 22px; box-shadow: 0 8px 24px rgba(11, 27, 63, .07); }
+.glowvai-root .v2-browse .v2-empty .gvd-suggest{ width: 100%; }
+.glowvai-root .v2-browse .shop-category-sort-btn{ font-weight: 500; transition: transform .16s ease; }
+.glowvai-root .v2-browse .shop-category-sort-btn:active{ transform: scale(.96); }
+
+@media (min-width: 720px){
+  .glowvai-root .v2-cats-card{ grid-template-columns: 120px minmax(0, 1fr); }
+  .glowvai-root .v2-pane{ padding: 18px; }
+  .glowvai-root .v2-hero-img{ width: 120px; height: 120px; }
+}
+
+/* Wishlist: premium rows */
+.glowvai-root .shop-wishlist-count{ background: var(--gv-blue-tint); color: var(--gv-blue); }
+.glowvai-root .shop-wishlist-list{ gap: 14px; padding: 16px var(--ds-gutter); }
+.glowvai-root .shop-wishlist-row{ border-color: var(--gv-hairline); border-radius: 18px; box-shadow: 0 6px 18px rgba(11, 27, 63, .06); transition: transform .18s ease, box-shadow .18s ease; }
+.glowvai-root .shop-wishlist-thumb{ border-radius: 14px; background: var(--gv-blue-tint); }
+.glowvai-root .shop-wishlist-brand{ color: var(--gv-muted); font-weight: 500; }
+.glowvai-root .shop-wishlist-name, .glowvai-root .shop-wishlist-price{ color: var(--gv-ink); }
+.glowvai-root .shop-wishlist-price{ font-size: 16px; }
+.glowvai-root .shop-wishlist-remove{ border-color: var(--gv-hairline); border-radius: 14px; background: #fff; color: var(--gv-muted); font-weight: 500; transition: transform .16s ease, color .16s ease, border-color .16s ease; }
+.glowvai-root .shop-wishlist-remove:hover{ border-color: #c13f4b; color: #c13f4b; }
+.glowvai-root .shop-wishlist-remove:active{ transform: scale(.96); }
+@media (hover: hover){
+  .glowvai-root .shop-wishlist-row:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(11, 27, 63, .1); }
+}
+@media (min-width: 1024px){
+  .glowvai-root .shop-wishlist-list{ display: grid; max-width: 1200px; margin: 0 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glowvai-root .shop-wishlist-row{ grid-template-columns: 96px minmax(0, 1fr) auto; align-items: center; }
+  .glowvai-root .shop-wishlist-thumb{ width: 96px; height: 96px; }
+  .glowvai-root .shop-wishlist-actions{ grid-column: auto; flex-direction: column; }
+}
+
+/* Search and filters (phone): blue-tinted filter card, softer controls */
+.glowvai-root .shop-search-filters{ border-color: var(--gv-hairline); border-radius: 22px; box-shadow: 0 8px 24px rgba(11, 27, 63, .06); }
+.glowvai-root .shop-search .shop-chip{ font-weight: 500; transition: transform .16s ease, background .16s ease; }
+.glowvai-root .shop-search .shop-chip:active{ transform: scale(.96); }
+.glowvai-root .shop-search .shop-chip.is-active{ border-color: var(--gv-blue); background: var(--gv-blue-tint); color: var(--gv-blue); font-weight: 700; }
+.glowvai-root .shop-search-bottom{ box-shadow: 0 -8px 24px rgba(11, 27, 63, .08); }
+
+/* PC: same polish on the filter sidebar, sort bar, cards and states */
+@media (min-width: 1024px){
+  .glowvai-root .pc-browse{ background: linear-gradient(180deg, var(--gv-blue-tint) 0, #f7f9ff 260px); }
+  .glowvai-root .pc-title-row h1{ font-size: 28px; }
+  .glowvai-root .pc-filters{ border-color: var(--gv-hairline); border-radius: 22px; box-shadow: 0 8px 24px rgba(11, 27, 63, .07); }
+  .glowvai-root .pc-filters-head{ border-radius: 22px 22px 0 0; }
+  .glowvai-root .pc-sortbar{ border-color: var(--gv-hairline); border-radius: 18px; box-shadow: 0 6px 18px rgba(11, 27, 63, .06); }
+  .glowvai-root .pc-cat{ border-color: var(--gv-hairline); border-radius: 18px; box-shadow: 0 4px 14px rgba(11, 27, 63, .05); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  .glowvai-root .pc-cat:hover{ transform: translateY(-3px); border-color: var(--gv-blue); box-shadow: 0 12px 28px rgba(0, 87, 251, .14); }
+  .glowvai-root .pc-cat:active{ transform: scale(.98); }
+  .glowvai-root .pc-state{ border: 1px solid var(--gv-hairline); border-radius: 22px; box-shadow: 0 8px 24px rgba(11, 27, 63, .07); }
+  .glowvai-root .pc-skel{ border-color: var(--gv-hairline); border-radius: 18px; }
+  .glowvai-root .pc-pill, .glowvai-root .pc-chip{ transition: transform .16s ease, background .16s ease, border-color .16s ease; }
+  .glowvai-root .pc-pill:active{ transform: scale(.96); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .v2-browse *, .glowvai-root .shop-wishlist-row, .glowvai-root .pc-cat{ transition: none !important; animation-duration: .01ms !important; }
+}

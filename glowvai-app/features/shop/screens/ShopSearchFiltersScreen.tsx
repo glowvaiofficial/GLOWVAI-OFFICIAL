@@ -9,6 +9,7 @@ import { SEARCH_SORT_LABELS, sortProducts, type SearchSort } from '../shared/sho
 import { PcListing } from '../desktop/PcListing';
 import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-search-filters.css';
+import '../styles/v2-browse.css';
 
 const SUGGEST_LIST_ID = 'shop-search-suggestions';
 const REAL_CATEGORIES = ['Serums', 'Cleansers', 'Moisturizers', 'Suncare', 'Treatments'];

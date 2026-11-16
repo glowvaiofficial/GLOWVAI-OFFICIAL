@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Activity, Check, Droplet, Leaf, Search, ShoppingBag, Sparkles, Sun, X } from 'lucide-react';
+import { Activity, Check, ChevronRight, Droplet, LayoutGrid, Leaf, Search, ShoppingBag, Sparkles, Sun, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
@@ -7,9 +7,11 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import { CONCERN_KEYWORDS } from '../lib/firstVisit';
+import { SearchSuggestions } from '../shared/StateScreens';
 import { PcListing } from '../desktop/PcListing';
 import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-browse.css';
+import '../styles/v2-browse.css';
 
 // Each tile shows the first full-size catalogue product in that category, as on the shop home.
 const categoryImage = (catalog: SkincareProduct[], id: string) => {
@@ -50,6 +52,8 @@ export const ShopBrowseScreen: React.FC = () => {
   const [selectedConcern, setSelectedConcern] = useState(
     params.concern && VALID_CONCERN_IDS.has(params.concern) ? params.concern : 'all'
   );
+  const [showAll, setShowAll] = useState(false);
+  const [railCat, setRailCat] = useState('Serums');
   const [selectedBrand, setSelectedBrand] = useState<string | null>(params.brand ?? null);
   // A price point from the home ("Under ₹499") narrows the list to products priced below it.
   const readMaxPrice = (v: string | undefined) => (v && /^d{2,5}$/.test(v) ? Number(v) : null);
@@ -101,6 +105,7 @@ export const ShopBrowseScreen: React.FC = () => {
     setSelectedConcern('all');
     setSelectedBrand(null);
     setMaxPrice(null);
+    setShowAll(false);
   };
 
   const hasActiveFilters = Boolean(selectedBrand) || selectedConcern !== 'all' || maxPrice !== null;
@@ -147,16 +152,31 @@ export const ShopBrowseScreen: React.FC = () => {
     );
   }
 
-  return (
-    <div className="shop-screen shop-browse">
-      <header className="shop-header shop-browse-header">
-        <h1>All Categories</h1>
-        <button type="button" className="shop-icon-btn" onClick={() => navigate('cart-tab')} aria-label="Open cart">
-          <ShoppingBag size={20} />
-        </button>
-      </header>
+  const showResults = searchQuery.trim() !== '' || hasActiveFilters || showAll;
+  const railItems = [
+    ...categoryItems.map((c) => ({ id: c.id, name: c.name.split(' & ')[0].split(' ')[0], full: c.name, count: categoryCounts[c.id] ?? 0, img: c.imageUri, Icon: c.Icon })),
+    { id: '__all', name: 'All products', full: 'All products', count: catalog.length, img: catalog[0] ? getProductThumbUrl(catalog[0]) : '', Icon: LayoutGrid },
+  ];
+  const activeRail = railItems.find((r) => r.id === railCat) ?? railItems[0];
+  const loadingCatalog = catalog.length === 0;
+  const concernCount = (id: string) => {
+    const kws = CONCERN_KEYWORDS[id];
+    if (!kws) return catalog.length;
+    return catalog.filter((p) => {
+      const hay = `${p.name} ${p.description} ${p.keyActives.join(' ')}`.toLowerCase();
+      return kws.some((k) => hay.includes(k));
+    }).length;
+  };
 
-      <div className="shop-browse-toolbar">
+  return (
+    <div className="shop-screen shop-browse v2-browse">
+      <div className="v2-bluebar">
+        <header className="shop-header shop-browse-header">
+          <h1>{showResults ? 'Search & browse' : 'Categories'}</h1>
+          <button type="button" className="shop-icon-btn" onClick={() => navigate('cart-tab')} aria-label="Open cart">
+            <ShoppingBag size={20} />
+          </button>
+        </header>
         <label className="shop-input shop-browse-search">
           <Search size={18} />
           <input
@@ -164,6 +184,7 @@ export const ShopBrowseScreen: React.FC = () => {
             placeholder="Search categories, products & active ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search products"
           />
           {searchQuery && (
             <button type="button" className="shop-input-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
@@ -171,64 +192,30 @@ export const ShopBrowseScreen: React.FC = () => {
             </button>
           )}
         </label>
+      </div>
 
-        <div className="shop-chip-row shop-browse-chip-row">
-          {SKIN_CONCERNS.map((concern) => {
-            const isSelected = selectedConcern === concern.id;
-            return (
-              <button
-                key={concern.id}
-                type="button"
-                className={`shop-chip${isSelected ? ' is-active' : ''}`}
-                aria-pressed={isSelected}
-                onClick={() => setSelectedConcern(concern.id)}
-              >
-                {concern.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="v2-chips shop-chip-row shop-browse-chip-row">
+        {SKIN_CONCERNS.map((concern) => {
+          const isSelected = selectedConcern === concern.id;
+          return (
+            <button
+              key={concern.id}
+              type="button"
+              className={`shop-chip${isSelected ? ' is-active' : ''}`}
+              aria-pressed={isSelected}
+              onClick={() => {
+                setSelectedConcern(concern.id);
+                if (concern.id === 'all') setShowAll(false);
+              }}
+            >
+              {isSelected && <Check size={14} />}
+              {concern.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="shop-browse-body">
-        <aside className="shop-browse-sidebar" aria-label="Filters">
-          <h3>Shop by Category</h3>
-          {categoryItems.map((cat) => (
-            <button key={cat.id} type="button" className="shop-browse-side-item" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
-              <span className="shop-browse-side-badge">
-                <cat.Icon size={15} />
-              </span>
-              <span className="shop-browse-side-name">{cat.name}</span>
-              <span className="shop-browse-side-count">{categoryCounts[cat.id] ?? 0}</span>
-            </button>
-          ))}
-
-          <div className="shop-browse-side-divider" />
-
-          <h3>Shop by Concern</h3>
-          {SKIN_CONCERNS.map((concern) => {
-            const isSelected = selectedConcern === concern.id;
-            return (
-              <button
-                key={concern.id}
-                type="button"
-                className={`shop-browse-side-concern${isSelected ? ' is-active' : ''}`}
-                aria-pressed={isSelected}
-                onClick={() => setSelectedConcern(concern.id)}
-              >
-                {concern.label}
-                {isSelected && <Check size={16} />}
-              </button>
-            );
-          })}
-
-          {hasActiveFilters && (
-            <button type="button" className="shop-btn-secondary shop-browse-side-clear" onClick={clearFilters}>
-              Clear all filters
-            </button>
-          )}
-        </aside>
-
         <main className="shop-browse-main">
           {selectedBrand && (
             <div className="shop-browse-banner">
@@ -252,62 +239,100 @@ export const ShopBrowseScreen: React.FC = () => {
             </div>
           )}
 
-          <section className="shop-browse-directory">
-            <h2>Browse Skincare Directory</h2>
-            <div className="shop-browse-category-grid">
-              {categoryItems.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  className="shop-browse-cat"
-                  onClick={() => navigate('shop-category', { categoryId: cat.id })}
-                >
-                  <span className="shop-browse-cat-icon">
-                    <cat.Icon size={16} />
-                  </span>
-                  <span className="shop-browse-cat-name">{cat.name}</span>
-                  <span className="shop-browse-cat-count">{itemsLabel(categoryCounts[cat.id] ?? 0)}</span>
-                  {cat.imageUri && (
-                    <span className="shop-browse-cat-media">
-                      <img src={cat.imageUri} alt="" width={140} height={140} loading="lazy" decoding="async" />
-                    </span>
+          {!showResults ? (
+            <section className="v2-cats" aria-label="Shop by category">
+              <h2 className="v2-cats-title">Shop by category</h2>
+              <div className="v2-cats-card">
+                <div className="v2-rail" role="tablist" aria-label="Categories">
+                  {loadingCatalog
+                    ? Array.from({ length: 5 }, (_, i) => (
+                        <div key={i} className="v2-rail-item is-skel" aria-hidden="true">
+                          <span className="shop-skeleton v2-rail-img" />
+                          <span className="shop-skeleton v2-skel-line" />
+                        </div>
+                      ))
+                    : railItems.map((r) => (
+                        <button
+                          key={r.id}
+                          type="button"
+                          role="tab"
+                          aria-selected={activeRail.id === r.id}
+                          className={`v2-rail-item${activeRail.id === r.id ? ' is-active' : ''}`}
+                          onClick={() => setRailCat(r.id)}
+                        >
+                          <span className="v2-rail-img">{r.img ? <img src={r.img} alt="" width={64} height={64} loading="lazy" decoding="async" /> : <r.Icon size={22} />}</span>
+                          <span className="v2-rail-name">{r.name}</span>
+                          <span className="v2-rail-count">{r.count}</span>
+                        </button>
+                      ))}
+                </div>
+                <div className="v2-pane" role="tabpanel">
+                  {loadingCatalog ? (
+                    <div className="shop-skeleton v2-hero-skel" aria-busy="true" />
+                  ) : (
+                    <button
+                      type="button"
+                      className="v2-hero"
+                      onClick={() => (activeRail.id === '__all' ? setShowAll(true) : navigate('shop-category', { categoryId: activeRail.id }))}
+                    >
+                      <span className="v2-hero-copy">
+                        <b>{activeRail.full}</b>
+                        <small>{itemsLabel(activeRail.count)}</small>
+                        <span className="v2-hero-link">
+                          See all <ChevronRight size={16} />
+                        </span>
+                      </span>
+                      <span className="v2-hero-img">{activeRail.img ? <img src={activeRail.img} alt="" width={120} height={120} loading="lazy" decoding="async" /> : <activeRail.Icon size={32} />}</span>
+                    </button>
                   )}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="shop-browse-products">
-            <div className="shop-section-head shop-browse-products-head">
-              <h2>{selectedConcern !== 'all' ? concernLabel : 'All products'}</h2>
-              <span>
-                {filteredProducts.length} {filteredProducts.length === 1 ? 'result' : 'results'}
-              </span>
-            </div>
-
-            {filteredProducts.length === 0 ? (
-              <div className="shop-empty">
-                <span className="shop-empty-icon">
-                  <Search size={24} />
+                  <h3 className="v2-concern-title">Shop by concern</h3>
+                  <ul className="v2-concerns">
+                    {SKIN_CONCERNS.filter((c) => c.id !== 'all').map((c) => (
+                      <li key={c.id}>
+                        <button type="button" onClick={() => setSelectedConcern(c.id)}>
+                          <span>{c.label}</span>
+                          <b>{loadingCatalog ? '' : concernCount(c.id)}</b>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <section className="shop-browse-products">
+              <div className="shop-section-head shop-browse-products-head">
+                <h2>{selectedConcern !== 'all' ? concernLabel : 'All products'}</h2>
+                <span>
+                  {filteredProducts.length} {filteredProducts.length === 1 ? 'result' : 'results'}
                 </span>
-                <h3>No products found</h3>
-                <p>We couldn't find any products matching "{emptyHint}".</p>
-                <button type="button" className="shop-btn-primary" onClick={clearFilters}>
-                  Clear Filters
-                </button>
               </div>
-            ) : (
-              <div className="shop-product-grid">
-                {filteredProducts.map((product) => (
-                  <ShopProductCard
-                    key={product.id}
-                    product={product}
-                    onOpen={(p) => navigate('shop-product', { productId: p.id })}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
+
+              {filteredProducts.length === 0 ? (
+                <div className="shop-empty v2-empty">
+                  <span className="shop-empty-icon">
+                    <Search size={24} />
+                  </span>
+                  <h3>No products found</h3>
+                  <p>We couldn't find any products matching "{emptyHint}".</p>
+                  <SearchSuggestions />
+                  <button type="button" className="shop-btn-primary" onClick={clearFilters}>
+                    Clear Filters
+                  </button>
+                </div>
+              ) : (
+                <div className="shop-product-grid">
+                  {filteredProducts.map((product) => (
+                    <ShopProductCard
+                      key={product.id}
+                      product={product}
+                      onOpen={(p) => navigate('shop-product', { productId: p.id })}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </main>
       </div>
     </div>
