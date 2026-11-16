@@ -322,3 +322,59 @@
 /* Category tile with no picture: brand-blue tile with the GlowVai mark. */
 .glowvai-root .gvh .gvh-cat.is-brand .gvh-cat-media { background: #0057fb; border-color: #0057fb; }
 .glowvai-root .gvh .gvh-cat-media img.gvh-cat-mark { width: 30%; height: auto; mix-blend-mode: normal; object-fit: contain; }
+
+/* ---------- Home lift: denser first screen, richer cards, press feedback, scroll reveal ---------- */
+/* Compact greeting: one slim line so deals and categories reach the first screen. */
+.glowvai-root .gvh .gvh-greet { margin-top: 6px; padding: 6px 10px 6px 8px; gap: 8px; border-radius: 14px; }
+.glowvai-root .gvh .gvh-greet-icon { width: 28px; height: 28px; }
+.glowvai-root .gvh .gvh-greet-icon svg { width: 15px; height: 15px; }
+.glowvai-root .gvh .gvh-greet-copy b { font-size: 14px; }
+.glowvai-root .gvh .gvh-greet-copy small { display: none; }
+.glowvai-root .gvh .gvh-greet-eta { padding-left: 8px; }
+.glowvai-root .gvh .gvh-track { min-height: 32px; padding: 0 12px; font-size: 12.5px; }
+@media (max-width: 440px) {
+  .glowvai-root .gvh .gvh-greet { padding: 6px 10px 6px 8px; }
+  .glowvai-root .gvh .gvh-greet-icon { width: 28px; height: 28px; }
+}
+/* Slimmer hero on phones, tighter rhythm between sections. */
+@media (max-width: 719px) {
+  .glowvai-root .shop-home.gvh .gvh-hero { margin-top: 8px; border-radius: 18px; }
+  .glowvai-root .gvh .gvh-slide { min-height: 168px; }
+  .glowvai-root .gvh .gvh-slide-copy { padding: 14px 16px 28px; gap: 4px; }
+  .glowvai-root .gvh .gvh-slide h1,
+  .glowvai-root .gvh .gvh-slide strong { font-size: 24px; }
+  .glowvai-root .gvh .gvh-slide-btn { min-height: 36px; margin-top: 2px; }
+  .glowvai-root .gvh .gvh-dots { bottom: 9px; }
+}
+.glowvai-root .gvh .gvh-section { margin-top: 16px; }
+.glowvai-root .gvh .gvh-cats-section { margin-top: 12px; }
+.glowvai-root .gvh .gvh-cats { gap: 10px 8px; }
+.glowvai-root .gvh .gvh-head { margin-bottom: 6px; }
+
+/* Product card: rating chip, saving line, firmer add button. */
+.glowvai-root .gvh .gvh-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; min-height: 18px; }
+.glowvai-root .gvh .gvh-rating { display: inline-flex; align-items: center; gap: 2px; padding: 1px 6px; border-radius: 5px; background: var(--gvh-green); color: #fff; font-size: 10.5px; font-weight: 600; line-height: 16px; }
+.glowvai-root .gvh .gvh-rating small { color: rgba(255, 255, 255, .85); font-size: 9.5px; }
+.glowvai-root .gvh .gvh-save { color: var(--gvh-green); font-size: 11px; font-weight: 600; }
+.glowvai-root .gvh .gvh-add { border: 1.5px solid var(--gvh-blue); background: #fff; color: var(--gvh-blue); transition: background .15s ease, color .15s ease, transform .12s ease; }
+.glowvai-root .gvh .gvh-add:hover { background: var(--gvh-blue); color: #fff; }
+.glowvai-root .gvh .gvh-add:active,
+.glowvai-root .gvh .gvh-stepper button:active,
+.glowvai-root .gvh .gvh-heart:active { transform: scale(.92); }
+.glowvai-root .gvh .gvh-card:not(.is-skel):active { transform: scale(.985); }
+.glowvai-root .gvh .gvh-heart { transition: transform .12s ease, color .15s ease; }
+.glowvai-root .gvh .gvh-cat:active .gvh-cat-media { transform: scale(.96); }
+
+/* Skeleton: a soft shimmer instead of a plain pulse. */
+.glowvai-root .gvh .gvh-card.is-skel .gvh-card-media,
+.glowvai-root .gvh .gvh-skel-line { background: linear-gradient(100deg, #eef2fb 30%, #f8faff 50%, #eef2fb 70%); background-size: 200% 100%; animation: gvh-shimmer 1.3s linear infinite; }
+.glowvai-root .gvh .gvh-card.is-skel { animation: none; }
+@keyframes gvh-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* Scroll reveal: sections rise in as they enter the screen. Pure CSS, so nothing stays hidden where it is unsupported. */
+@keyframes gvh-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .glowvai-root .gvh .gvh-section:not([aria-busy="true"]) { animation: gvh-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+  }
+}

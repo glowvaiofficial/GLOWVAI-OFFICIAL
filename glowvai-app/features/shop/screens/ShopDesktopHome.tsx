@@ -26,7 +26,7 @@ import { accentVars, blockAccent, categoryAccent, isAccent, itemAccent, textOn, 
 import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
-import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto, firstPhotoUrl, BRAND_MARK_URL } from '../shared/shopUtils';
+import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto, BRAND_MARK_URL } from '../shared/shopUtils';
 import '../styles/shop-desktop-home.css';
 import '../styles/shop-type.css';
 
@@ -351,6 +351,18 @@ function DeskProductCard({ product, sale }: { product: SkincareProduct; sale?: {
           {product.name}
         </button>
         <small className="shop-desk-card-size">{options ? `${options.length} options` : product.volume || product.brand}</small>
+        {(product.rating !== null || mrp > price) && (
+          <span className="shop-desk-card-meta">
+            {product.rating !== null && (
+              <span className="shop-desk-card-rating" aria-label={`Rated ${product.rating.toFixed(1)} out of 5`}>
+                <Star size={11} aria-hidden="true" fill="currentColor" />
+                {product.rating.toFixed(1)}
+                {product.reviewCount ? <small>({product.reviewCount})</small> : null}
+              </span>
+            )}
+            {mrp > price && <span className="shop-desk-card-save">Save {formatRupee(mrp - price)}</span>}
+          </span>
+        )}
         <div className="shop-desk-card-foot">
           {product.deliveryMinutes ? (
             <span className="shop-desk-card-eta">
@@ -775,7 +787,7 @@ function Notice({ title, children, action }: { title: string; children: React.Re
 export const ShopDesktopHome: React.FC = () => {
   const layout = useHomeLayout('desktop');
   const { order: layoutOrder, settings: blockSettings, hero: heroOverride, footer: footerDetails, sectionAccents } = layout;
-  const { catalog, feed, loading, failed, noProducts, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData(layout);
+  const { catalog, feed, loading, failed, noProducts, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData(layout);
   const headerSettings = layout.header;
   // Recently viewed and Recommended (designer blocks): both hide when empty and honour the block's maxItems (default 8).
   const recentList = useMemo(() => {
@@ -890,7 +902,12 @@ export const ShopDesktopHome: React.FC = () => {
   const renderBlock = (id: HomeModuleId): React.ReactNode => {
     switch (id) {
       case 'hero':
-        return <HeroCarousel slides={slides} previewing={previewing} />;
+        return (
+          <>
+            <HeroCarousel slides={slides} previewing={previewing} />
+            {!failed && tab === 'for-you' && (loading ? <DeskSkeletonRail title="Deals of the day" /> : todayDeals.length > 0 ? <DeskProductRail icon={Zap} title="Deals of the day" titleId="shop-desk-today-title" accent={secAccent('deals')} products={todayDeals} /> : null)}
+          </>
+        );
       case 'mini-banners': {
         // Trending Now: the admin's mini banners as pastel tiles.
         const settings = blockSettings['mini-banners'];
@@ -915,9 +932,9 @@ export const ShopDesktopHome: React.FC = () => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
                     return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null)} photo={firstPhotoUrl(bestsellers, 400)} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
-                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null)} photo={firstPhotoUrl(newLaunches, 400)} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
-                  <DeskCategoryTile label="All Products" accent={restAccent(null)} photo={firstPhotoUrl(catalog, 400)} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null)} photo={extraTiles.best ? getProductThumbUrl(extraTiles.best, 400) : null} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
+                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null)} photo={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 400) : null} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
+                  <DeskCategoryTile label="All Products" accent={restAccent(null)} photo={extraTiles.all ? getProductThumbUrl(extraTiles.all, 400) : null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
             </div>

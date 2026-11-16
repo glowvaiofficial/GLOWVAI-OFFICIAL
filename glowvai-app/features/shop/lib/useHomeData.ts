@@ -5,7 +5,7 @@ import { useProductFeedStatus } from '../../../core/services/productFeed';
 import { parsePriceBand, pickDeals } from '../../../../lib/shop/homeLayout';
 import { browserStore, firstVisitState, skinMatchedPicks } from './firstVisit';
 import { readRecentlyViewed } from './recentlyViewed';
-import { bestsellerList, categoryTiles, newLaunchList, pricePointTiles } from './homeModel';
+import { bestsellerList, categoryTiles, dealsOfTheDay, extraTilePhotos, newLaunchList, pricePointTiles } from './homeModel';
 import type { HomeLayoutView } from './useHomeLayout';
 import { getDiscountPercent, isTrialProduct } from '../shared/shopUtils';
 
@@ -40,6 +40,7 @@ export function useHomeData(layout: Pick<HomeLayoutView, 'settings' | 'rows'>) {
 
   const lists = useMemo(() => buildCatalogLists(catalog), [catalog]);
   const tiles = useMemo(() => categoryTiles(catalog), [catalog]);
+  const todayDeals = useMemo(() => dealsOfTheDay(catalog), [catalog]);
 
   // The customer's history and quiz answers are read once per app session, not on every visit to the home. A product
   // opened from here would otherwise add a "Continue browsing" rail on Back and move the page under the customer.
@@ -59,6 +60,7 @@ export function useHomeData(layout: Pick<HomeLayoutView, 'settings' | 'rows'>) {
   // Each rail has its own order, so a product can sit in more than one (as on any store home). Recently viewed is the customer's own history.
   const bestsellers = useMemo(() => bestsellerList(catalog).slice(0, 12), [catalog]);
   const newLaunches = useMemo(() => newLaunchList(catalog).slice(0, 12), [catalog]);
+  const extraTiles = useMemo(() => extraTilePhotos(tiles, { bestsellers, newLaunches, all: catalog }), [tiles, bestsellers, newLaunches, catalog]);
   const picks = useMemo(() => picksCandidates.slice(0, 10), [picksCandidates]);
   const pricePoints = useMemo(() => pricePointTiles(catalog), [catalog]);
 
@@ -84,5 +86,5 @@ export function useHomeData(layout: Pick<HomeLayoutView, 'settings' | 'rows'>) {
   const adminDealProducts = useMemo(() => pickDeals(adminDeals, catalog), [adminDeals, catalog]);
   const dealProducts = adminDeals.length > 0 ? adminDealProducts : lists.DEAL_PRODUCTS;
 
-  return { catalog, feed, loading, failed, noProducts, lists, tiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts: continueCandidates, configuredRows, adminDeals, dealProducts };
+  return { catalog, feed, loading, failed, noProducts, lists, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts: continueCandidates, configuredRows, adminDeals, dealProducts };
 }
