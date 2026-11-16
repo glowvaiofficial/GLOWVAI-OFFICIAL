@@ -15,7 +15,7 @@
    movement stops for people who prefer reduced motion. */
 
 .glowvai-root .shop-screen.shop-desk{
-  --desk-max: 1560px;
+  --desk-max: 1440px;
   --desk-pad: 24px;
   --desk-section: 26px;
   --desk-gap: 14px;
@@ -429,7 +429,7 @@
 .glowvai-root .shop-desk .shop-desk-footer-pills a{ display: inline-flex; min-height: 36px; align-items: center; padding: 0 16px; border: 1px solid rgba(255, 255, 255, .24); border-radius: 999px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; transition: background-color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease); }
 .glowvai-root .shop-desk .shop-desk-footer-pills.is-store a{ border-radius: var(--desk-r-sm); background: #000; }
 .glowvai-root .shop-desk .shop-desk-footer-pills a:hover{ border-color: rgba(255, 255, 255, .6); background: rgba(255, 255, 255, .08); }
-.glowvai-root .shop-desk .shop-desk-footer-cols{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+.glowvai-root .shop-desk .shop-desk-footer-cols{ display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px; }
 .glowvai-root .shop-desk .shop-desk-footer-col h3{ margin: 0 0 14px; color: #fff; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .glowvai-root .shop-desk .shop-desk-footer-col ul{ display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
 .glowvai-root .shop-desk .shop-desk-footer-col a,
@@ -619,3 +619,127 @@
 .glowvai-root .shop-desk .shop-desk-add:active,
 .glowvai-root .shop-desk .shop-desk-stepper button:active{ transform: scale(.94); }
 .glowvai-root .shop-desk .shop-desk-add{ transition: transform var(--desk-fast) var(--desk-ease), background-color var(--desk-fast) var(--desk-ease); }
+
+/* ================================================================ PC home rebuild (Amazon / Zepto / Nykaa class) ====== */
+/* Utility strip above the header: facts only (delivery rule, coupon, the free skin check). It folds away once scrolled. */
+.glowvai-root .shop-desk .shop-desk-utility{ max-height: 36px; overflow: hidden; border-bottom: 1px solid rgba(255, 255, 255, .16); background: rgba(0, 0, 0, .14); color: var(--wash-text, #fff); font-size: 12.5px; font-weight: 600; transition: max-height var(--desk-mid) var(--desk-ease), opacity var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled .shop-desk-utility{ max-height: 0; border-bottom-width: 0; opacity: 0; }
+.glowvai-root .shop-desk .shop-desk-utility-inner{ display: flex; height: 36px; align-items: center; gap: 28px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 0 var(--desk-pad); box-sizing: border-box; }
+.glowvai-root .shop-desk .shop-desk-utility-inner > *{ display: inline-flex; align-items: center; gap: 6px; opacity: .95; }
+.glowvai-root .shop-desk .shop-desk-utility-inner button{ margin-left: auto; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Delivery chip with two lines */
+.glowvai-root .shop-desk .shop-desk-delivery{ max-width: 230px; gap: 8px; padding: 4px 12px 4px 10px; border-radius: 14px; }
+.glowvai-root .shop-desk .shop-desk-delivery-copy{ display: grid; min-width: 0; gap: 1px; text-align: left; }
+.glowvai-root .shop-desk .shop-desk-delivery-copy small{ font-size: 11.5px; font-weight: 600; line-height: 1.2; opacity: .85; }
+.glowvai-root .shop-desk .shop-desk-delivery-place{ font-size: 15px; font-weight: 800; line-height: 1.2; }
+
+/* Big search with a suggestions panel */
+.glowvai-root .shop-desk .shop-desk-search{ position: relative; height: 52px; border-radius: 14px; border-color: transparent; box-shadow: 0 6px 18px -10px rgba(0, 20, 80, .55); }
+.glowvai-root .shop-desk .shop-desk-suggest{ position: absolute; top: calc(100% + 8px); right: 0; left: 0; z-index: 130; padding: 16px 18px 18px; border: 1px solid var(--desk-line); border-radius: 16px; background: var(--desk-surface); color: var(--desk-ink); box-shadow: var(--desk-shadow-hover); opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity var(--desk-mid) var(--desk-ease), transform var(--desk-mid) var(--desk-ease), visibility 0s linear var(--desk-mid); }
+.glowvai-root .shop-desk .shop-desk-suggest::before{ content: ''; position: absolute; top: -10px; right: 0; left: 0; height: 10px; }
+.glowvai-root .shop-desk .shop-desk-search:hover .shop-desk-suggest,
+.glowvai-root .shop-desk .shop-desk-search:focus-within .shop-desk-suggest{ opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.glowvai-root .shop-desk .shop-desk-suggest-title{ margin: 0 0 8px; color: var(--desk-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.glowvai-root .shop-desk .shop-desk-suggest-title:not(:first-child){ margin-top: 14px; }
+.glowvai-root .shop-desk .shop-desk-suggest-list{ display: flex; flex-wrap: wrap; gap: 8px; }
+.glowvai-root .shop-desk .shop-desk-suggest-list button{ display: inline-flex; min-height: 36px; align-items: center; gap: 8px; padding: 0 14px; border: 1px solid var(--desk-line); border-radius: 999px; background: var(--desk-muted-surface); color: var(--desk-ink); font-size: 13.5px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), border-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-suggest-list button svg{ color: var(--desk-brand); }
+.glowvai-root .shop-desk .shop-desk-suggest-list button:hover{ border-color: var(--desk-brand); background: #eef3ff; color: var(--desk-brand); }
+
+/* Category strip with a hover panel */
+.glowvai-root .shop-desk .shop-desk-tabs{ overflow: visible; justify-content: flex-start; }
+.glowvai-root .shop-desk .shop-desk-tab-wrap{ position: relative; display: flex; }
+.glowvai-root .shop-desk .shop-desk-mega{ position: absolute; top: calc(100% - 4px); left: 50%; z-index: 125; display: flex; min-width: 300px; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--desk-line); border-radius: 16px; background: var(--desk-surface); color: var(--desk-ink); box-shadow: var(--desk-shadow-hover); opacity: 0; visibility: hidden; transform: translate(-50%, 6px); transition: opacity var(--desk-mid) var(--desk-ease), transform var(--desk-mid) var(--desk-ease), visibility 0s linear var(--desk-mid); }
+.glowvai-root .shop-desk .shop-desk-tab-wrap:hover .shop-desk-mega,
+.glowvai-root .shop-desk .shop-desk-tab-wrap:focus-within .shop-desk-mega{ opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+.glowvai-root .shop-desk .shop-desk-mega img{ width: 72px; height: 72px; flex: 0 0 auto; border-radius: 12px; background: var(--desk-muted-surface); object-fit: contain; mix-blend-mode: multiply; }
+.glowvai-root .shop-desk .shop-desk-mega-copy{ display: grid; gap: 2px; text-align: left; }
+.glowvai-root .shop-desk .shop-desk-mega-copy strong{ font-size: 16px; font-weight: 800; }
+.glowvai-root .shop-desk .shop-desk-mega-copy small{ color: var(--desk-muted); font-size: 13px; }
+.glowvai-root .shop-desk .shop-desk-mega > button{ display: inline-flex; margin-left: auto; min-height: 36px; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--desk-brand); color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+/* Sticky section links: appear once the page is scrolled */
+.glowvai-root .shop-desk .shop-desk-jump{ display: none; border-top: 1px solid rgba(255, 255, 255, .18); }
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled .shop-desk-jump{ display: block; }
+.glowvai-root .shop-desk .shop-desk-jump-inner{ display: flex; gap: 8px; max-width: calc(var(--desk-max) + var(--desk-pad) * 2); margin: 0 auto; padding: 8px var(--desk-pad); box-sizing: border-box; overflow-x: auto; scrollbar-width: none; }
+.glowvai-root .shop-desk .shop-desk-jump-inner button{ flex: 0 0 auto; min-height: 30px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; background: rgba(255, 255, 255, .12); color: var(--wash-text, #fff); font-size: 13px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-jump-inner button:hover{ background: #fff; color: var(--desk-brand); }
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled{ margin-bottom: 0; }
+.glowvai-root .shop-desk .shop-desk-header::after{ display: none; }
+
+/* Hero with side tiles */
+.glowvai-root .shop-desk .shop-desk-hero-row{ display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--desk-gap); margin-top: 14px; }
+.glowvai-root .shop-desk .shop-desk-hero-row .shop-desk-hero-wrap{ margin-top: 0; min-width: 0; }
+.glowvai-root .shop-desk .shop-desk-hero-row .shop-desk-hero{ height: 100%; min-height: 260px; }
+.glowvai-root .shop-desk .shop-desk-side{ display: grid; grid-template-rows: 1fr 1fr; gap: var(--desk-gap); }
+.glowvai-root .shop-desk .shop-desk-side-tile{ position: relative; display: flex; min-width: 0; flex-direction: column; justify-content: space-between; gap: 10px; padding: 18px 20px; overflow: hidden; border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: linear-gradient(135deg, #fff 0%, #eef3ff 100%); color: var(--desk-ink); text-align: left; box-shadow: var(--desk-shadow); transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-side-tile.is-scan{ border-color: transparent; background: linear-gradient(135deg, #0057fb 0%, #0a3fc2 100%); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-side-kicker{ display: inline-flex; width: fit-content; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(0, 87, 251, .1); color: var(--desk-brand); font-size: 12px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-side-tile.is-scan .shop-desk-side-kicker{ background: rgba(255, 255, 255, .18); color: #fff; }
+.glowvai-root .shop-desk .shop-desk-side-tile strong{ font-size: 19px; font-weight: 800; line-height: 1.25; letter-spacing: -.01em; }
+.glowvai-root .shop-desk .shop-desk-side-go{ display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; color: var(--desk-brand); }
+.glowvai-root .shop-desk .shop-desk-side-tile.is-scan .shop-desk-side-go{ color: #fff; }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-side-tile:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); } }
+
+/* Product cards: brand line */
+.glowvai-root .shop-desk .shop-desk-card-brand{ overflow: hidden; color: var(--desk-faint); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-card-badge{ top: 10px; bottom: auto; background: var(--desk-brand); color: #fff; }
+
+/* Brands (from the catalogue while the admin has none) */
+.glowvai-root .shop-desk .shop-desk-brand-row{ display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--desk-gap); }
+.glowvai-root .shop-desk .shop-desk-brand{ display: grid; min-width: 0; justify-items: start; gap: 2px; padding: 16px; border: 1px solid var(--desk-line); border-radius: var(--desk-r); background: var(--desk-surface); color: var(--desk-ink); text-align: left; box-shadow: var(--desk-shadow); transition: transform var(--desk-mid) var(--desk-ease), box-shadow var(--desk-mid) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-brand-mark{ display: grid; width: 44px; height: 44px; margin-bottom: 8px; place-items: center; border-radius: 12px; background: #eef3ff; color: var(--desk-brand); font-size: 20px; font-weight: 800; }
+.glowvai-root .shop-desk .shop-desk-brand strong{ max-width: 100%; overflow: hidden; font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .shop-desk .shop-desk-brand small{ color: var(--desk-muted); font-size: 12.5px; }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-brand:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); } }
+
+/* Trust strip */
+.glowvai-root .shop-desk .shop-desk-trust{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: var(--desk-section); border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); box-shadow: var(--desk-shadow); }
+.glowvai-root .shop-desk .shop-desk-trust > div{ display: flex; align-items: center; gap: 14px; padding: 20px 22px; }
+.glowvai-root .shop-desk .shop-desk-trust > div + div{ border-left: 1px solid var(--desk-line); }
+.glowvai-root .shop-desk .shop-desk-trust svg{ flex: 0 0 auto; width: 44px; height: 44px; padding: 11px; box-sizing: border-box; border-radius: 12px; background: #eef3ff; color: var(--desk-brand); }
+.glowvai-root .shop-desk .shop-desk-trust span{ display: grid; gap: 2px; }
+.glowvai-root .shop-desk .shop-desk-trust strong{ font-size: 15px; font-weight: 700; }
+.glowvai-root .shop-desk .shop-desk-trust small{ color: var(--desk-muted); font-size: 13px; }
+
+/* Footer */
+.glowvai-root .shop-desk .shop-desk-totop{ display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border: 0; background: rgba(255, 255, 255, .07); color: #fff; font-size: 14px; font-weight: 600; transition: background-color var(--desk-fast) var(--desk-ease); }
+.glowvai-root .shop-desk .shop-desk-totop:hover{ background: rgba(255, 255, 255, .14); }
+
+@media (max-width: 1279px){
+  .glowvai-root .shop-desk .shop-desk-hero-row{ grid-template-columns: minmax(0, 1fr) 260px; }
+  .glowvai-root .shop-desk .shop-desk-brand-row{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-utility-inner{ gap: 18px; }
+}
+@media (max-width: 1099px){
+  .glowvai-root .shop-desk .shop-desk-hero-row{ grid-template-columns: minmax(0, 1fr) 220px; }
+  .glowvai-root .shop-desk .shop-desk-side-tile strong{ font-size: 16px; }
+  .glowvai-root .shop-desk .shop-desk-trust{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-trust > div:nth-child(3){ border-left: 0; }
+  .glowvai-root .shop-desk .shop-desk-trust > div:nth-child(n + 3){ border-top: 1px solid var(--desk-line); }
+  .glowvai-root .shop-desk .shop-desk-delivery-copy small{ display: none; }
+}
+@media (max-width: 899px){
+  .glowvai-root .shop-desk .shop-desk-hero-row{ grid-template-columns: 1fr; }
+  .glowvai-root .shop-desk .shop-desk-side{ grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+  .glowvai-root .shop-desk .shop-desk-tabs{ overflow-x: auto; }
+  .glowvai-root .shop-desk .shop-desk-mega, .glowvai-root .shop-desk .shop-desk-suggest, .glowvai-root .shop-desk .shop-desk-utility, .glowvai-root .shop-desk .shop-desk-jump{ display: none !important; }
+  .glowvai-root .shop-desk .shop-desk-brand-row{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-footer-cols{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root .shop-desk :is(.shop-desk-suggest, .shop-desk-mega, .shop-desk-utility, .shop-desk-side-tile, .shop-desk-brand){ transition: none !important; }
+  .glowvai-root .shop-desk :is(.shop-desk-side-tile, .shop-desk-brand):hover{ transform: none !important; }
+}
+
+/* 1024-1099px: icon-only scan and cart so the search keeps its width. */
+@media (min-width: 900px) and (max-width: 1099px){
+  .glowvai-root .shop-desk .shop-desk-header-inner{ gap: 10px; }
+  .glowvai-root .shop-desk .shop-desk-actions{ gap: 4px; }
+  .glowvai-root .shop-desk .shop-desk-scan-pill{ width: 40px; justify-content: center; padding: 0; font-size: 0; gap: 0; }
+  .glowvai-root .shop-desk .shop-desk-cart{ min-width: 0; padding: 0 12px; }
+  .glowvai-root .shop-desk .shop-desk-cart > span:not(.shop-desk-cart-copy){ display: none; }
+  .glowvai-root .shop-desk .shop-desk-action.is-icon{ width: 38px; }
+  .glowvai-root .shop-desk .shop-desk-delivery{ max-width: 130px; }
+}
