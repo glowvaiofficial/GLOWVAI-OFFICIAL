@@ -1,3 +1,4 @@
+import { coolSectionAccent, coolAccent } from "@/lib/shop/accents";
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -148,10 +149,10 @@ describe("accent colours stay readable", () => {
 
   test("section and item accents: the admin's, else the defaults", () => {
     assert.equal(sectionAccent("deals", "#abcdef"), "#ABCDEF");
-    assert.equal(sectionAccent("deals", ""), "#0057FB");
-    assert.equal(sectionAccent("offers", "nope"), "#0057FB");
+    assert.equal(sectionAccent("deals", ""), coolSectionAccent("deals"));
+    assert.equal(sectionAccent("offers", "nope"), coolSectionAccent("offers"));
     assert.equal(itemAccent({ accent: "#112233", label: "Serums" }, 3), "#112233");
-    assert.equal(itemAccent({ label: "Serums" }, 3), "#0057FB");
-    assert.equal(itemAccent({ label: "Something" }, 9), "#0057FB");
+    assert.equal(itemAccent({ label: "Serums" }, 3), coolAccent(3));
+    assert.equal(itemAccent({ label: "Something" }, 9), coolAccent(9));
   });
 });
