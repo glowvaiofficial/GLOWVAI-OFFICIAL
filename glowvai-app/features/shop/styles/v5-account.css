@@ -1,0 +1,199 @@
+/* Website v5, account group (16 Nov 2026): orders, tracking, returns, profile, settings, help, referrals, subscriptions,
+   wallet, notifications, privacy, devices, payment methods and gift cards, built like a PC "Your account" area: a sticky
+   account menu on the left, flat white cards on a pearl page, hairline borders, one blue accent. Layout and style only.
+   Loaded once from App.tsx after v5-checkout.css. */
+
+.glowvai-root {
+  --v5a-page: #f6f8fd;
+  --v5a-line: #e3e9f5;
+  --v5a-ink: #0b1b3f;
+  --v5a-muted: #5b6784;
+  --v5a-blue: #0057fb;
+  --v5a-tint: #eef3ff;
+}
+
+/* ---------- Page: plain pearl, no wash ---------- */
+.glowvai-root.glowvai-root.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content > :is(.profile-screen, .orders-screen, .settings-page, .notif-screen, .trk-screen),
+.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content:has(> :is(.profile-screen, .orders-screen, .settings-page, .notif-screen, .trk-screen)) {
+  background: var(--v5a-page);
+}
+.glowvai-root.glowvai-root.glowvai-root .app-viewport :is(.profile-header, .orders-header, .settings-header, .notif-header) { background: transparent; }
+.glowvai-root.glowvai-root .app-viewport :is(.profile-header, .orders-header, .settings-header, .notif-header) > button:first-child,
+.glowvai-root.glowvai-root .app-viewport :is(.profile-icon-button, .orders-icon-button) {
+  border: 1px solid var(--v5a-line); background: #fff; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+
+/* ---------- Surfaces: flat white cards, hairline border ---------- */
+.glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .settings-page, .notif-screen, .trk-screen) :is(
+  .profile-card, .profile-glow-card, .profile-tile, .orders-card, .orders-order-card, .orders-eta-card, .orders-empty-state, .orders-status-card,
+  .settings-card, .settings-list, .notif-item, .notif-card, .notif-empty, .notif-prompt, .wallet-card, .wallet-balance, .trk-card, .gvp-card) {
+  border: 1px solid var(--v5a-line); background: #fff; border-radius: 12px; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .settings-page, .notif-screen) :is(.profile-card, .profile-tile, .orders-order-card, .notif-item) { transform: none; }
+.glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .settings-page, .notif-screen, .trk-screen) :is(.profile-glow-card) { background: #fff; }
+.glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .settings-page, .notif-screen) :is(.profile-summary-row, .orders-summary-row) { background: var(--v5a-page); }
+@media (hover: hover) {
+  .glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .notif-screen) :is(.profile-tile, .orders-order-card, .notif-item):hover { transform: none; box-shadow: none; border-color: #b9c9ee; }
+  .glowvai-root.glowvai-root .app-viewport :is(.profile-list-item, .settings-row):hover { background: var(--v5a-tint); }
+}
+/* Profile header banner: a flat brand-blue card, no ornament. */
+.glowvai-root.glowvai-root .app-viewport .profile-side > .profile-card:first-child:has(.profile-user-name) { background: var(--v5a-blue); border: 0; box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .profile-side > .profile-card:first-child::after { display: none; }
+.glowvai-root.glowvai-root .app-viewport .profile-side > .profile-card:first-child:not(:has(.profile-user-name)) { background: #fff; border: 1px solid var(--v5a-line); }
+
+/* Buttons and chips: brand blue, no glow */
+.glowvai-root.glowvai-root .app-viewport :is(.profile-screen, .orders-screen, .settings-page, .notif-screen) :is(.profile-button, .orders-primary-button, .orders-secondary-button, .orders-danger-button, .settings-button) { box-shadow: none; }
+
+/* ---------- Account menu (rendered by AccountMenu.tsx; hidden below 1024px) ---------- */
+.glowvai-root .v5a-menu { display: none; }
+
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .screen-content:has(> .v5a-menu) {
+    display: grid; grid-template-columns: 248px minmax(0, 1fr); column-gap: 24px; align-content: start; align-items: start;
+    padding: 24px max(24px, calc((100% - 1280px) / 2)) 0;
+  }
+  .glowvai-root .v5a-menu {
+    display: block; grid-column: 1; grid-row: 1; position: sticky; top: 24px; align-self: start;
+    border: 1px solid var(--v5a-line); border-radius: 12px; background: #fff; overflow: hidden;
+  }
+  .glowvai-root.glowvai-root .app-viewport .screen-content:has(> .v5a-menu) > :not(.v5a-menu) { grid-column: 2; grid-row: 1; min-width: 0; width: 100%; max-width: none; margin: 0; background: transparent; }
+  .glowvai-root .v5a-menu-user { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--v5a-line); }
+  .glowvai-root .v5a-menu-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--v5a-tint); color: var(--v5a-blue); font-size: 15px; font-weight: 700; }
+  .glowvai-root .v5a-menu-who { display: flex; flex-direction: column; min-width: 0; }
+  .glowvai-root .v5a-menu-who small { color: var(--v5a-muted); font-size: 12px; font-weight: 500; }
+  .glowvai-root .v5a-menu-who strong { overflow: hidden; color: var(--v5a-ink); font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  .glowvai-root .v5a-menu-list { margin: 0; padding: 8px; list-style: none; }
+  .glowvai-root .v5a-menu-list button {
+    display: flex; width: 100%; min-height: 44px; align-items: center; gap: 12px; padding: 0 12px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--v5a-ink); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .glowvai-root .v5a-menu-list button svg { flex: none; color: var(--v5a-muted); }
+  .glowvai-root .v5a-menu-list button:hover { background: var(--v5a-page); }
+  .glowvai-root .v5a-menu-list button:active { transform: scale(.98); }
+  .glowvai-root .v5a-menu-list button.is-active { background: var(--v5a-tint); color: var(--v5a-blue); font-weight: 700; box-shadow: inset 3px 0 0 var(--v5a-blue); }
+  .glowvai-root .v5a-menu-list button.is-active svg { color: var(--v5a-blue); }
+  .glowvai-root .v5a-menu-list button:focus-visible { outline: 2px solid var(--v5a-blue); outline-offset: -2px; }
+}
+
+/* ---------- PC: content column beside the menu ---------- */
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root.glowvai-root .app-viewport:has(.screen-content > .v5a-menu) { background: var(--v5a-page); }
+  .glowvai-root.glowvai-root .app-viewport .screen-content > :is(.profile-screen, .orders-screen, .settings-page, .notif-screen) { min-height: 0; padding: 0 0 48px; }
+  /* Page header: title left, 28px, back button kept */
+  .glowvai-root.glowvai-root .app-viewport :is(.profile-header, .orders-header, .settings-header, .notif-header) { position: static; min-height: 0; padding: 0 0 16px; margin: 0; }
+  .glowvai-root.glowvai-root .app-viewport :is(.profile-title, .orders-header-copy h1, .settings-title, .notif-title) { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+  /* Bodies fill the column */
+  .glowvai-root.glowvai-root .app-viewport :is(.profile-body, .orders-body, .notif-body, .settings-layout) { max-width: none; margin: 0; padding: 0; }
+  .glowvai-root.glowvai-root .app-viewport .profile-body:not(:has(> .profile-side)) { max-width: none; }
+  .glowvai-root.glowvai-root .app-viewport .privacy-screen .profile-body { max-width: none; margin: 0; }
+  .glowvai-root.glowvai-root .app-viewport .settings-page { max-width: none; margin: 0; padding: 0 0 48px; }
+  .glowvai-root.glowvai-root .app-viewport .settings-page > :is(.settings-card, .settings-list) { max-width: none; }
+  .glowvai-root.glowvai-root .app-viewport .profile-body:has(> .profile-side) { grid-template-columns: 320px minmax(0, 1fr); gap: 0 24px; }
+  .glowvai-root.glowvai-root .app-viewport .profile-body:has(> .profile-side) > .profile-side { position: static; }
+  .glowvai-root.glowvai-root .app-viewport .profile-card-body { padding: 20px; }
+}
+
+/* ---------- Orders ---------- */
+.glowvai-root.glowvai-root .app-viewport .orders-card[aria-label="Ratings"]:empty { display: none; }
+.glowvai-root.glowvai-root .app-viewport .orders-segment button { box-shadow: none; transition: border-color .15s ease, background-color .15s ease; }
+.glowvai-root.glowvai-root .app-viewport .orders-segment button:not(.is-active):hover { border-color: var(--v5a-blue); background: var(--v5a-tint); }
+.glowvai-root.glowvai-root .app-viewport .orders-badge { box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .orders-action-tile { box-shadow: none; border: 1px solid var(--v5a-line); background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .orders-action-tile:hover { border-color: var(--v5a-blue); background: var(--v5a-tint); }
+.glowvai-root.glowvai-root .app-viewport .orders-primary-button { box-shadow: none; }
+
+@media (min-width: 1024px) {
+  /* List: filter chips in one row, order cards as full-width rows */
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-segment { width: auto; max-width: none; flex-wrap: wrap; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-segment button { flex: none; min-height: 40px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-order-card { grid-template-columns: minmax(0, 1fr) 200px; padding: 20px 24px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-open { grid-template-columns: minmax(0, 1fr) 180px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-open > .orders-summary-row { background: transparent; padding: 0; justify-content: flex-end; text-align: right; border-left: 1px solid var(--v5a-line); padding-left: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-open > .orders-summary-row > svg { display: none; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-open > .orders-summary-row .orders-address-line { justify-content: flex-end; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-strip { grid-column: 1; max-width: 480px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-actions > button { min-height: 44px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-card-actions { align-self: center; }
+  /* Detail: items left, bill and actions in a sticky column on the right */
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail:not(.is-empty) .orders-body { grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-detail-side { top: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-detail-side .orders-section-title { margin: 0 0 -4px; font-size: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-items-card { padding: 8px 20px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-item-row { padding: 16px 0; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-item-row .orders-thumb { width: 72px; height: 72px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-action-grid { grid-template-columns: 1fr; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-action-tile { justify-content: flex-start; min-height: 44px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail .orders-card { padding: 20px; }
+  /* Rate and return: a readable form column */
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-rate .orders-body { gap: 16px; }
+}
+
+/* ---------- Tracking: flat cards, no loop animation, blue only ---------- */
+.glowvai-root.glowvai-root .app-viewport .trk-premium .trk-card { box-shadow: none; border-color: var(--v5a-line); border-radius: 12px; background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .trk-premium .trk-add { background: var(--v5a-blue); box-shadow: none; }
+.glowvai-root.glowvai-root .app-viewport .trk-premium .trk-scooter { animation: none; background: var(--v5a-tint); }
+.glowvai-root.glowvai-root .app-viewport .trk-premium .trk-rider-avatar { background: var(--v5a-tint); color: var(--v5a-blue); }
+.glowvai-root.glowvai-root .app-viewport .trk-premium .trk-round-btn.is-head { border: 1px solid var(--v5a-line); box-shadow: none; }
+
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .screen-content > .trk-premium { width: 100%; max-width: 1328px; margin: 0 auto; padding: 24px 24px 48px; box-sizing: border-box; }
+  .glowvai-root.glowvai-root .app-viewport .trk-premium .trk-head { padding: 0 0 16px; }
+  .glowvai-root.glowvai-root .app-viewport .trk-premium .trk-grid { padding: 0; gap: 24px; }
+  /* Shared tracking link: a centred, readable card (no account menu on a public page) */
+  .glowvai-root.glowvai-root .app-viewport .screen-content:not(:has(> .v5a-menu)) > .orders-screen { width: 100%; max-width: 760px; margin: 0 auto; padding: 24px 24px 48px; box-sizing: border-box; }
+  .glowvai-root.glowvai-root .app-viewport .screen-content:not(:has(> .v5a-menu)) > .orders-screen .orders-body { max-width: none; padding: 0; }
+  .glowvai-root.glowvai-root .app-viewport .screen-content:not(:has(> .v5a-menu)) > .orders-screen.is-detail:not(.is-empty) .orders-body { display: flex; flex-direction: column; align-items: stretch; }
+  /* Return or replace: one readable form column */
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-detail:not(.is-empty) .orders-body:not(:has(> .orders-detail-main)) { display: flex; flex-direction: column; align-items: stretch; max-width: 760px; }
+}
+
+/* ---------- Settings rows and toggles: brand blue, hairline rows ---------- */
+.glowvai-root.glowvai-root .app-viewport .settings-switch-control[aria-checked='true'] { background: var(--v5a-blue); }
+.glowvai-root.glowvai-root .app-viewport .settings-switch-control:focus-visible { outline: 2px solid var(--v5a-blue); outline-offset: 2px; }
+.glowvai-root.glowvai-root .app-viewport .settings-row { border-bottom-color: var(--v5a-line); }
+.glowvai-root.glowvai-root .app-viewport .settings-row-icon { background: var(--v5a-tint); color: var(--v5a-blue); border-radius: 50%; }
+.glowvai-root.glowvai-root .app-viewport .settings-row.is-current { background: var(--v5a-tint); }
+.glowvai-root.glowvai-root .app-viewport .settings-banner { border-radius: 8px; }
+/* Referral and other brand panels: flat brand blue, no gradient */
+.glowvai-root.glowvai-root .app-viewport .profile-hero { background: var(--v5a-blue); box-shadow: none; border-radius: 12px; }
+.glowvai-root.glowvai-root .app-viewport .profile-glow-card { background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .profile-code-row { background: var(--v5a-page); }
+.glowvai-root.glowvai-root .app-viewport .profile-button { box-shadow: none; }
+
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .settings-layout { grid-template-columns: 300px minmax(0, 1fr); gap: 24px; }
+}
+
+/* ---------- Wallet, buttons rows ---------- */
+.glowvai-root.glowvai-root .app-viewport .wallet-balance { background: var(--v5a-tint); border-color: #cfdcfb; }
+.glowvai-root.glowvai-root .app-viewport .wallet-balance-value { color: var(--v5a-ink); font-size: 36px; }
+.glowvai-root.glowvai-root .app-viewport .wallet-preset { min-height: 44px; border: 1px solid #b7c3dc; border-radius: 8px; background: #fff; color: var(--v5a-ink); font-size: 14px; font-weight: 700; transition: border-color .15s ease, background-color .15s ease; }
+.glowvai-root.glowvai-root .app-viewport .wallet-preset:hover:not(:disabled) { border-color: var(--v5a-blue); background: var(--v5a-tint); }
+.glowvai-root.glowvai-root .app-viewport .wallet-preset[aria-pressed='true'] { border-color: var(--v5a-blue); background: var(--v5a-blue); color: #fff; }
+.glowvai-root.glowvai-root .app-viewport .wallet-field input { border: 1px solid #b7c3dc; border-radius: 8px; background: #fff; }
+.glowvai-root.glowvai-root .app-viewport .wallet-pay { background: var(--v5a-blue); color: #fff; border: 0; }
+.glowvai-root.glowvai-root .app-viewport .wallet-pay:disabled { background: #b7c3dc; opacity: 1; }
+.glowvai-root.glowvai-root .app-viewport .profile-button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.glowvai-root.glowvai-root .app-viewport .profile-button-row > .profile-button { flex: 1 1 140px; }
+.glowvai-root.glowvai-root .app-viewport .profile-button.is-outline { border: 1px solid var(--v5a-blue); }
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .profile-screen:has(.profile-card[aria-label^="Subscription to"]) .profile-main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .profile-screen:has(.profile-card[aria-label^="Subscription to"]) .profile-main > :not(.profile-card) { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1024px) {
+  /* The settings hub shows a panel beside its list: stack the panel's own columns */
+  .glowvai-root.glowvai-root .app-viewport .settings-detail .profile-body:has(> .profile-side) { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .glowvai-root.glowvai-root .app-viewport .settings-detail .profile-body:has(> .profile-side) > :is(.profile-side, .profile-main) { grid-column: 1; grid-row: auto; }
+  .glowvai-root.glowvai-root .app-viewport .settings-detail .profile-screen { min-height: 0; padding: 0; background: transparent; }
+  .glowvai-root.glowvai-root .app-viewport .settings-detail .profile-main .profile-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Tablet: filter chips on one row, order cards one per row */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-segment { width: auto; max-width: none; flex-wrap: wrap; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-segment button { flex: none; min-height: 40px; }
+  .glowvai-root.glowvai-root .app-viewport .orders-screen.is-list .orders-grid { grid-template-columns: minmax(0, 1fr); }
+}

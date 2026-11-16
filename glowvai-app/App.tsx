@@ -7,6 +7,7 @@ import { useApp } from './context/useApp';
 import { AndroidStatusBar } from './components/common/AndroidStatusBar';
 import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
+import { AccountMenu, showsAccountMenu } from './components/common/AccountMenu';
 import { portedRoutes } from './routes';
 import { startProductFeed } from './core/services/productFeed';
 import { ProductFeedNotice } from './components/common/ProductFeedNotice';
@@ -42,6 +43,7 @@ import './features/shop/styles/v4-allscreens.css';
 import './features/shop/styles/v5-home.css';
 import './features/shop/styles/v5-catalogue.css';
 import './features/shop/styles/v5-checkout.css';
+import './features/shop/styles/v5-account.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();
@@ -139,7 +141,7 @@ const AppContent: React.FC = () => {
       <WebHeader />
       <ProductFeedNotice />
       <OfflineNotice />
-      <div className="screen-content">{renderScreen()}</div>
+      <div className="screen-content">{showsAccountMenu(currentScreen) && <AccountMenu />}{renderScreen()}</div>
       <BottomNavBar />
       {toastMessage && (
         <div className="gv-toast" role="status" aria-live="polite">
