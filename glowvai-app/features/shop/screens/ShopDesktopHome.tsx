@@ -1,3 +1,4 @@
+import { isPosterOnlyHero } from '../lib/heroPoster';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -505,7 +506,7 @@ function CategoryTabs({ selected, onSelect, onShopAll }: { selected: TabId; onSe
 
 // ---------------------------------------------------------------- Hero carousel
 
-type Slide = { id: string; tag: string; title: string; subtitle: string; ctaLabel: string; image: string; cover: boolean; background: string; textColor: string; accent: string; imageAlt: string; href: string | null; onOpen: () => void };
+type Slide = { poster?: boolean; id: string; tag: string; title: string; subtitle: string; ctaLabel: string; image: string; cover: boolean; background: string; textColor: string; accent: string; imageAlt: string; href: string | null; onOpen: () => void };
 
 // The hero and the admin's banners as one carousel at the full column width: one slide at a time with a slow crossfade,
 // dots and arrows, moving on every few seconds, pausing while the pointer or focus is on it, and still for people who
@@ -542,13 +543,14 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
             </>
           );
           return (
-            <div key={slide.id} className={`shop-desk-slide${slide.cover ? ' is-cover' : ''}${active ? ' is-active' : ''}`} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${count}`} aria-hidden={!active} style={style}>
+            <div key={slide.id} className={`shop-desk-slide${slide.cover ? ' is-cover' : ''}${slide.poster ? ' is-poster' : ''}${active ? ' is-active' : ''}`} role="group" aria-roledescription="slide" aria-label={`${i + 1} of ${count}`} aria-hidden={!active} style={style}>
               <span className="shop-desk-slide-shapes" aria-hidden="true" />
               {slide.image && (
                 <div className="shop-desk-slide-media">
                   <img src={slide.image} alt={slide.imageAlt} width={1891} height={831} fetchPriority={i === 0 ? 'high' : 'low'} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
                 </div>
               )}
+              {!slide.poster && (
               <div className="shop-desk-slide-copy">
                 {slide.tag && <p className="shop-desk-slide-tag">{slide.tag}</p>}
                 {i === 0 ? <h1 id="shop-desk-hero-title">{highlightOffer(slide.title)}</h1> : <h2>{highlightOffer(slide.title)}</h2>}
@@ -564,6 +566,7 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
                     </button>
                   ))}
               </div>
+              )}
             </div>
           );
         })}
@@ -832,6 +835,7 @@ export const ShopDesktopHome: React.FC = () => {
   const slides: Slide[] = [
     {
       id: 'hero',
+      poster: isPosterOnlyHero(heroOverride),
       tag: 'Discover. Shop. Glow.',
       title: heroOverride?.title || 'Glow your way.',
       subtitle: heroOverride?.subtitle || (deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.'),
