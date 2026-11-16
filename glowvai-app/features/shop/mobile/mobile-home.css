@@ -3,7 +3,7 @@
    (--ac, --ac-tint, --ac-ring, --ac-text, --ac-g1, --ac-g2) worked out in accentTheme.ts, so admin colours stay readable.
    16px side gutter on phones, 24px from 720px. Rows scroll sideways inside themselves; the page never does. */
 
-@property --wash { syntax: '<color>'; inherits: true; initial-value: var(--gv-blue); }
+@property --wash { syntax: '<color>'; inherits: true; initial-value: #0057fb; }
 @property --wash-on { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
 
 .glowvai-root .shop-home.gvh {
