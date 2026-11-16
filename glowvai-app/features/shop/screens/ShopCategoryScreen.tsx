@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowUpDown, Check, ChevronDown, ChevronUp, LayoutGrid, Sear
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
+import { PcListing } from '../desktop/PcListing';
+import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-category.css';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -25,6 +27,7 @@ export const ShopCategoryScreen: React.FC = () => {
   const { navigate, goBack, activeParams } = useApp();
   const categoryId: string = activeParams?.categoryId ?? activeParams?.id ?? '';
 
+  const isPc = useIsPc();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popularity');
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
@@ -64,6 +67,38 @@ export const ShopCategoryScreen: React.FC = () => {
   }
 
   const q = searchQuery.trim().toLowerCase();
+  if (isPc) {
+    const inCategory = catalog.filter((p) => p.category === categoryId);
+    return (
+      <PcListing
+        key={categoryId}
+        title={categoryLabel}
+        subtitle={`${inCategory.length} ${inCategory.length === 1 ? 'product' : 'products'} in ${categoryLabel}`}
+        crumbs={[
+          { label: 'Home', onClick: () => navigate('shop-home') },
+          { label: 'All Categories', onClick: () => navigate('shop-browse') },
+          { label: categoryLabel },
+        ]}
+        products={inCategory.filter((p) => !q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q))}
+        lockedCategory
+        scopeChip={q ? { label: `"${searchQuery.trim()}"`, onClear: () => setSearchQuery('') } : null}
+        emptyHint={q ? searchQuery.trim() : undefined}
+        onOpen={(p) => navigate('shop-product', { productId: p.id })}
+        searchSlot={
+          <label className="shop-input shop-category-search">
+            <Search size={18} />
+            <input type="text" placeholder={`Search in ${categoryLabel}`} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            {searchQuery && (
+              <button type="button" className="shop-input-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
+                <X size={16} />
+              </button>
+            )}
+          </label>
+        }
+      />
+    );
+  }
+
   const products = catalog.filter((p) => {
     if (p.category !== categoryId) return false;
     if (!q) return true;

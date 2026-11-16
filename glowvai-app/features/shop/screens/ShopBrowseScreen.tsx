@@ -7,6 +7,8 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { getProductThumbUrl, isTrialProduct } from '../shared/shopUtils';
 import { CONCERN_KEYWORDS } from '../lib/firstVisit';
+import { PcListing } from '../desktop/PcListing';
+import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-browse.css';
 
 // Each tile shows the first full-size catalogue product in that category, as on the shop home.
@@ -41,6 +43,7 @@ export const ShopBrowseScreen: React.FC = () => {
   const catalog = useLiveCatalog();
   const categoryItems = CATEGORY_ITEMS.map((item) => ({ ...item, imageUri: categoryImage(catalog, item.id) }));
   const { navigate, activeParams } = useApp();
+  const isPc = useIsPc();
   const params: Record<string, string | undefined> = activeParams ?? {};
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,6 +107,45 @@ export const ShopBrowseScreen: React.FC = () => {
   const concernLabel = SKIN_CONCERNS.find((c) => c.id === selectedConcern)?.label ?? '';
   const emptyHint = searchQuery || selectedBrand || (maxPrice !== null ? `under ₹${maxPrice}` : '') || (selectedConcern !== 'all' ? concernLabel : '');
   const itemsLabel = (n: number) => `${n} ${n === 1 ? 'item' : 'items'}`;
+
+  if (isPc) {
+    return (
+      <PcListing
+        title={selectedConcern !== 'all' ? concernLabel : 'All products'}
+        subtitle="Browse the full GlowVai range. Filter by category, brand, concern, price and more."
+        crumbs={[{ label: 'Home', onClick: () => navigate('shop-home') }, { label: 'All Categories' }]}
+        products={catalog.filter((p) => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()))}
+        initial={{ concern: selectedConcern, brand: selectedBrand, maxPrice }}
+        scopeChip={searchQuery ? { label: `"${searchQuery}"`, onClear: () => setSearchQuery('') } : null}
+        emptyHint={searchQuery || undefined}
+        onOpen={(p) => navigate('shop-product', { productId: p.id })}
+        searchSlot={
+          <label className="shop-input shop-browse-search">
+            <Search size={18} />
+            <input type="text" placeholder="Search categories, products & active ingredients..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            {searchQuery && (
+              <button type="button" className="shop-input-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
+                <X size={16} />
+              </button>
+            )}
+          </label>
+        }
+        topSlot={
+          <div className="pc-cats">
+            {categoryItems.map((cat) => (
+              <button key={cat.id} type="button" className="pc-cat" onClick={() => navigate('shop-category', { categoryId: cat.id })}>
+                <span className="pc-cat-ico">{cat.imageUri ? <img src={cat.imageUri} alt="" width={40} height={40} loading="lazy" /> : <cat.Icon size={18} />}</span>
+                <span style={{ minWidth: 0 }}>
+                  <b>{cat.name}</b>
+                  <small>{itemsLabel(categoryCounts[cat.id] ?? 0)}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        }
+      />
+    );
+  }
 
   return (
     <div className="shop-screen shop-browse">

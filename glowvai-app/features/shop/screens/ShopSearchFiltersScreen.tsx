@@ -5,6 +5,8 @@ import { useLiveCatalog, type SkincareProduct } from '../../../core/data/indianS
 import { rankSuggestions } from '../../../../lib/shop/suggest';
 import { ShopProductCard } from '../shared/ShopProductCard';
 import { SEARCH_SORT_LABELS, sortProducts, type SearchSort } from '../shared/shopUtils';
+import { PcListing } from '../desktop/PcListing';
+import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-search-filters.css';
 
 const SUGGEST_LIST_ID = 'shop-search-suggestions';
@@ -34,6 +36,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   // Brand options come from the live products; the other groups are fixed.
   const filterGroups = FILTER_GROUPS.map((g) => (g.key === 'brand' ? { ...g, options: ['All', ...STOCKED_BRANDS] } : g));
   const { navigate, goBack, activeParams } = useApp();
+  const isPc = useIsPc();
 
   // A query handed over from the home voice search starts the search.
   const [query, setQuery] = useState<string>(() => (typeof activeParams?.q === 'string' ? activeParams.q : ''));
@@ -136,6 +139,98 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const count = results.length;
   const showResults = () => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+  const searchBar = (
+  <div className="shop-search-bar-wrap">
+    <div className="shop-input shop-search-bar">
+      <Search size={18} />
+      <input
+        type="text"
+        role="combobox"
+        aria-expanded={showSuggest}
+        aria-controls={SUGGEST_LIST_ID}
+        aria-autocomplete="list"
+        aria-activedescendant={showSuggest && activeSuggestion >= 0 ? `${SUGGEST_LIST_ID}-${activeSuggestion}` : undefined}
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setActiveSuggestion(-1);
+          setIsSearchFocused(true);
+        }}
+        onKeyDown={onSearchKey}
+        onFocus={() => setIsSearchFocused(true)}
+        placeholder="Search by ingredient, product or brand..."
+        aria-label="Search products"
+      />
+      {query.length > 0 && (
+        <button type="button" className="shop-input-clear" onClick={() => setQuery('')} aria-label="Clear search">
+          <X size={16} />
+        </button>
+      )}
+      {voiceSupported && (
+        <button
+          type="button"
+          className={`shop-search-mic${isListening ? ' is-listening' : ''}`}
+          onClick={() => {
+            setIsSearchFocused(true);
+            handleVoiceSearch();
+          }}
+          aria-label="Voice search"
+        >
+          <Mic size={18} />
+          {isListening && <span>Listening...</span>}
+        </button>
+      )}
+    </div>
+
+    {showSuggest && (
+      <>
+        <button type="button" className="shop-search-backdrop" onClick={closeSuggest} aria-label="Close suggestions" tabIndex={-1} />
+        <ul id={SUGGEST_LIST_ID} role="listbox" aria-label="Suggested products" className="shop-search-suggest">
+          {suggestions.map((product, index) => (
+            <li
+              key={product.id}
+              id={`${SUGGEST_LIST_ID}-${index}`}
+              role="option"
+              aria-selected={index === activeSuggestion}
+              className={index === activeSuggestion ? 'shop-search-suggest-row is-active' : 'shop-search-suggest-row'}
+              // The input keeps focus while a suggestion is picked; the choice is made on press.
+              onMouseDown={(e) => {
+                e.preventDefault();
+                openSuggestion(product);
+              }}
+              onMouseEnter={() => setActiveSuggestion(index)}
+            >
+              <span>
+                <Search size={14} /> {product.name}
+              </span>
+              <span>{product.brand}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </div>
+  );
+
+  if (isPc) {
+    const qTrim = query.trim();
+    return (
+      <PcListing
+        title={qTrim ? `Results for "${qTrim}"` : 'Search'}
+        subtitle={qTrim ? undefined : 'Search by ingredient, product or brand'}
+        crumbs={[{ label: 'Home', onClick: () => navigate('shop-home') }, { label: 'Search' }]}
+        products={catalog.filter((p) => {
+          const q = qTrim.toLowerCase();
+          return !q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.keyActives.some((a) => a.toLowerCase().includes(q));
+        })}
+        scopeChip={qTrim ? { label: `"${qTrim}"`, onClear: () => setQuery('') } : null}
+        emptyHint={qTrim || undefined}
+        onOpen={(p) => navigate('shop-product', { productId: p.id })}
+        searchSlot={searchBar}
+      />
+    );
+  }
+
   return (
     <div className="shop-screen shop-search">
       <header className="shop-header">
@@ -146,76 +241,7 @@ export const ShopSearchFiltersScreen: React.FC = () => {
       </header>
 
       <div className="shop-search-body">
-        <div className="shop-search-bar-wrap">
-          <div className="shop-input shop-search-bar">
-            <Search size={18} />
-            <input
-              type="text"
-              role="combobox"
-              aria-expanded={showSuggest}
-              aria-controls={SUGGEST_LIST_ID}
-              aria-autocomplete="list"
-              aria-activedescendant={showSuggest && activeSuggestion >= 0 ? `${SUGGEST_LIST_ID}-${activeSuggestion}` : undefined}
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setActiveSuggestion(-1);
-                setIsSearchFocused(true);
-              }}
-              onKeyDown={onSearchKey}
-              onFocus={() => setIsSearchFocused(true)}
-              placeholder="Search by ingredient, product or brand..."
-              aria-label="Search products"
-            />
-            {query.length > 0 && (
-              <button type="button" className="shop-input-clear" onClick={() => setQuery('')} aria-label="Clear search">
-                <X size={16} />
-              </button>
-            )}
-            {voiceSupported && (
-              <button
-                type="button"
-                className={`shop-search-mic${isListening ? ' is-listening' : ''}`}
-                onClick={() => {
-                  setIsSearchFocused(true);
-                  handleVoiceSearch();
-                }}
-                aria-label="Voice search"
-              >
-                <Mic size={18} />
-                {isListening && <span>Listening...</span>}
-              </button>
-            )}
-          </div>
-
-          {showSuggest && (
-            <>
-              <button type="button" className="shop-search-backdrop" onClick={closeSuggest} aria-label="Close suggestions" tabIndex={-1} />
-              <ul id={SUGGEST_LIST_ID} role="listbox" aria-label="Suggested products" className="shop-search-suggest">
-                {suggestions.map((product, index) => (
-                  <li
-                    key={product.id}
-                    id={`${SUGGEST_LIST_ID}-${index}`}
-                    role="option"
-                    aria-selected={index === activeSuggestion}
-                    className={index === activeSuggestion ? 'shop-search-suggest-row is-active' : 'shop-search-suggest-row'}
-                    // The input keeps focus while a suggestion is picked; the choice is made on press.
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      openSuggestion(product);
-                    }}
-                    onMouseEnter={() => setActiveSuggestion(index)}
-                  >
-                    <span>
-                      <Search size={14} /> {product.name}
-                    </span>
-                    <span>{product.brand}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
+        {searchBar}
 
         <div className="shop-search-layout">
           <aside className="shop-search-filters">
