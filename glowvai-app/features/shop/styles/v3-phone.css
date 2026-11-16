@@ -1,0 +1,280 @@
+/* Website v3, phone widths (16 Nov 2026): liquid glass, accent containers, calm interaction, one spacing rhythm.
+   Loaded last (routes.tsx), so it only restyles. Scope: phones and small tablets (under 1024px) plus the shared bottom nav
+   and mini-cart. Rules: gutter 16px (20px from 600px), section rhythm 16/24, tap targets 44px, no hover lift or scale,
+   a 0.98 press, surfaces are glass over the accent wash, brand blue stays the action colour only (no warm hues). */
+
+/* ---------- Tokens ---------- */
+.glowvai-root {
+  --v3-gap: 16px;
+  --v3-gap-lg: 24px;
+  --v3-glass: rgba(255, 255, 255, .66);
+  --v3-glass-strong: rgba(255, 255, 255, .78);
+  --v3-glass-edge: rgba(255, 255, 255, .7);
+  --v3-glass-hi: inset 0 1px 0 rgba(255, 255, 255, .75);
+  --v3-glass-shadow: 0 10px 30px rgba(11, 27, 77, .08);
+  --v3-blur: blur(18px) saturate(1.6);
+  --v3-blur-sm: blur(12px) saturate(1.5);
+  /* Default section accent for screens that have no admin accent of their own (cool: indigo). */
+  --v3-ac: #6366f1;
+  --v3-ac-tint: #eef0ff;
+  --v3-ac-ring: #dde1ff;
+  --v3-ac-text: #3f43b8;
+  --v3-solid: rgba(255, 255, 255, .94);
+}
+/* Gutter: the one site token (app/globals.css), 16px on phones and 24px from 720px. */
+
+/* ---------- Calm interaction: no lift, no zoom on hover, anywhere under 1024px ---------- */
+@media (hover: hover) {
+  .glowvai-root :is(.gvh-card, .gvh-cat, .gvh-cat-media, .gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo, .gvh-trend, .gvh-brand,
+    .shop-product-card, .shop-browse-cat, .shop-home-concern, .shop-wishlist-row, .shop-wishlist-item .shop-product-card, .shop-wishlist-heart,
+    .shop-btn-primary, .profile-tile, .orders-order-card, .notif-item, .gvn-card, .pc-cat):hover {
+    transform: none !important;
+  }
+  .glowvai-root :is(.shop-product-card, .gvn-story, .shop-home-category):hover :is(img) { transform: none !important; }
+  /* A quiet colour shift instead: border takes the accent. */
+  .glowvai-root .gvh :is(.gvh-card:not(.is-skel), .gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo.is-light, .gvh-trend):hover {
+    border-color: var(--ac, var(--v3-ac)); background-color: color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 60%, rgba(255, 255, 255, .6));
+    color: var(--gv-ink); box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow);
+  }
+  .glowvai-root .gvh :is(.gvh-price, .gvh-offer, .gvh-promo.is-light):hover :is(b, small, span) { color: inherit; }
+  .glowvai-root .gvh .gvh-price:hover b { color: var(--ac-text, var(--v3-ac-text)); }
+  .glowvai-root .gvh .gvh-concern-tile:hover .gvh-concern-icon { background: var(--ac-tint, var(--v3-ac-tint)); color: var(--ac-text, var(--v3-ac-text)); }
+  .glowvai-root .gvh .gvh-price:hover .gvh-price-media img { mix-blend-mode: multiply; }
+  .glowvai-root .gvh .gvh-cat:not(.is-brand):hover .gvh-cat-media { transform: none; }
+  .glowvai-root .gvh .gvh-add:hover { background: var(--gv-blue-dark, #0046cc); color: #fff; }
+}
+/* Touch and pointer: the one press feedback, a 0.98 settle. */
+.glowvai-root .gvh :is(.gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo.is-light, .gvh-trend):active { transform: scale(.98); background: color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 70%, rgba(255, 255, 255, .5)); border-color: var(--ac, var(--v3-ac)); color: var(--gv-ink); }
+.glowvai-root .gvh :is(.gvh-price, .gvh-offer, .gvh-promo.is-light):active :is(b, small, span) { color: inherit; }
+.glowvai-root .gvh .gvh-price:active b { color: var(--ac-text, var(--v3-ac-text)); }
+.glowvai-root .gvh .gvh-concern-tile:active .gvh-concern-icon { background: var(--ac-tint, var(--v3-ac-tint)); color: var(--ac-text, var(--v3-ac-text)); }
+.glowvai-root .gvh .gvh-price:active .gvh-price-media img { mix-blend-mode: multiply; }
+.glowvai-root :is(.gvh-card:not(.is-skel), .gvh-tab, .gvh-scan-in, .mini-cart-bar, .quick-bottom-nav > button, .shop-btn-primary, .shop-chip, .shop-icon-btn):active { transform: scale(.98); }
+.glowvai-root .gvh .gvh-cat:active .gvh-cat-media { transform: scale(.98); }
+/* No scroll reveal: every section is visible straight away. */
+.glowvai-root .gvh .gvh-section { animation: none !important; opacity: 1 !important; transform: none !important; }
+/* Clear focus ring, accent-aware. */
+.glowvai-root :where(button, a, [role="button"], input, select, textarea):focus-visible { outline: 2px solid var(--gv-blue); outline-offset: 2px; box-shadow: none; }
+
+/* ---------- Home (phone): page wash, rhythm, gutters ---------- */
+@media (max-width: 1023px) {
+  .glowvai-root .shop-home.gvh {
+    padding-bottom: var(--v3-gap);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--wash, #7aa7ff) 24%, #fff) 0, color-mix(in srgb, var(--wash, #7aa7ff) 9%, #f6f8fd) 340px, #f6f8fd 700px);
+  }
+  /* The column is narrower than the window on tablets: let the page tint reach both edges. */
+  .glowvai-root .screen-content:has(> .shop-home.gvh) { background: color-mix(in srgb, #7aa7ff 10%, #f6f8fd); }
+
+  /* Header: the accent wash with a glass search, glass pills. Never touches the screen edge (gutter + safe area). */
+  .glowvai-root .gvh .gvh-header { padding: calc(12px + env(safe-area-inset-top, 0px)) max(var(--gv-gutter), env(safe-area-inset-right, 0px)) 8px max(var(--gv-gutter), env(safe-area-inset-left, 0px)); margin-bottom: 0; }
+  .glowvai-root .gvh .gvh-top { gap: 12px; }
+  .glowvai-root .gvh .gvh-search,
+  .glowvai-root .gvh .gvh-greet,
+  .glowvai-root .gvh .shop-quiz-banner {
+    border: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong); -webkit-backdrop-filter: var(--v3-blur); backdrop-filter: var(--v3-blur);
+    box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow);
+  }
+  .glowvai-root .gvh .gvh-search { height: 52px; box-shadow: var(--v3-glass-hi), 0 8px 24px rgba(11, 27, 77, .1); }
+  .glowvai-root .gvh .gvh-tabs { margin: 12px calc(-1 * max(var(--gv-gutter), env(safe-area-inset-left, 0px))) 0; padding: 4px max(var(--gv-gutter), env(safe-area-inset-left, 0px)) 2px; scroll-padding-inline: var(--gv-gutter); }
+  .glowvai-root .gvh .gvh-tab {
+    flex: 0 0 auto; min-height: 44px; border: 1px solid var(--v3-glass-edge); background: var(--v3-glass); box-shadow: var(--v3-glass-hi);
+    -webkit-backdrop-filter: var(--v3-blur-sm); backdrop-filter: var(--v3-blur-sm);
+  }
+  .glowvai-root .gvh .gvh-tab.is-on { border-color: transparent; box-shadow: 0 6px 16px rgba(11, 27, 77, .16); }
+  .glowvai-root .gvh .gvh-location { min-height: 44px; }
+  .glowvai-root .gvh .gvh-scan-in, .glowvai-root .gvh .gvh-scan-pill, .glowvai-root .gvh .gvh-plus-cta { min-height: 44px; }
+  .glowvai-root .gvh .gvh-slide-btn { min-height: 44px; }
+  .glowvai-root .gvh .gvh-avatar { width: 44px; height: 44px; }
+  .glowvai-root .gvh .gvh-logo { min-height: 44px; }
+
+  /* Section rhythm: 16px between header blocks, 24px between sections; every block sits inside the 16px gutter. */
+  .glowvai-root .gvh .shop-quiz-banner { margin: var(--v3-gap) var(--gv-gutter) 0; }
+  .glowvai-root .gvh .gvh-greet { margin: 0 var(--gv-gutter) 0; padding: 8px 12px 8px 10px; }
+  .glowvai-root .shop-home.gvh .gvh-hero { margin: var(--v3-gap) var(--gv-gutter) 0; border-radius: 22px; }
+  .glowvai-root .gvh .gvh-section { margin-top: var(--v3-gap-lg); }
+  .glowvai-root .gvh .gvh-cats-section { margin-top: var(--v3-gap-lg); }
+  .glowvai-root .gvh .gvh-head { margin: 0 var(--gv-gutter) 12px; }
+  .glowvai-root .gvh .gvh-promos { margin: var(--v3-gap-lg) var(--gv-gutter) 0; gap: 12px; }
+  .glowvai-root .gvh :is(.gvh-rail, .gvh-trend-row, .gvh-offer-row) { padding: 4px var(--gv-gutter) 8px; gap: 12px; scroll-padding-inline: var(--gv-gutter); }
+  .glowvai-root .gvh :is(.gvh-cats, .gvh-brands, .gvh-plus-list, .gvh-prices, .gvh-concerns) { padding-inline: var(--gv-gutter); }
+  .glowvai-root .gvh .gvh-cats { gap: 16px 10px; }
+  .glowvai-root .gvh .gvh-concerns, .glowvai-root .gvh .gvh-prices { gap: 12px; }
+  .glowvai-root .gvh .gvh-plus-list { gap: 12px; }
+  .glowvai-root .gvh .gvh-trust { margin: var(--v3-gap-lg) var(--gv-gutter) 0; }
+  .glowvai-root .gvh .gvh-trust .gvh-head { margin-inline: var(--v3-gap); }
+  .glowvai-root .gvh .gvh-trust-row { padding: 0 var(--v3-gap); }
+  .glowvai-root .gvh .gvh-scan, .glowvai-root .gvh .gvh-end, .glowvai-root .gvh .gvh-notice { margin-inline: var(--gv-gutter); }
+
+  /* Tiles are accent glass: a tinted translucent fill, accent ring, the section's accent for text and icons. */
+  .glowvai-root .gvh :is(.gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo.is-light, .gvh-trend) {
+    border: 1px solid color-mix(in srgb, var(--ac-ring, var(--v3-ac-ring)) 80%, #fff);
+    background: linear-gradient(150deg, color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 72%, transparent), color-mix(in srgb, var(--ac-ring, var(--v3-ac-ring)) 46%, transparent));
+    -webkit-backdrop-filter: var(--v3-blur-sm); backdrop-filter: var(--v3-blur-sm);
+    box-shadow: var(--v3-glass-hi), 0 6px 18px rgba(11, 27, 77, .06);
+    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .12s ease;
+  }
+  .glowvai-root .gvh .gvh-concern-tile { min-height: 56px; }
+  .glowvai-root .gvh .gvh-trust, .glowvai-root .gvh .gvh-cat-media {
+    background: var(--v3-glass-strong); border: 1px solid var(--v3-glass-edge);
+    box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow);
+  }
+  .glowvai-root .gvh .gvh-trust { -webkit-backdrop-filter: var(--v3-blur); backdrop-filter: var(--v3-blur); }
+  .glowvai-root .gvh .gvh-cat:not(.is-brand) .gvh-cat-media { background: var(--v3-glass-strong); border-color: var(--v3-glass-edge); }
+  .glowvai-root .gvh .gvh-cat:not(.is-brand):active .gvh-cat-media { background: var(--ac-tint, var(--v3-ac-tint)); border-color: var(--ac-ring, var(--v3-ac-ring)); }
+
+  /* Product cards stay crisp white; the picture well is a faint accent glass. */
+  .glowvai-root .gvh .gvh-card { border: 1px solid rgba(255, 255, 255, .9); background: #fff; box-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 22px rgba(11, 27, 77, .07); }
+  .glowvai-root .gvh .gvh-card-media { background: linear-gradient(160deg, color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 80%, #fff), color-mix(in srgb, var(--ac-ring, var(--v3-ac-ring)) 55%, #fff)); }
+  .glowvai-root .gvh .gvh-add { min-height: 44px; }
+  .glowvai-root .gvh .gvh-stepper { height: 44px; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--gv-ink); }
+  .glowvai-root .gvh .gvh-stepper button { min-width: 44px; min-height: 44px; }
+  .glowvai-root .gvh .gvh-heart { min-width: 44px; min-height: 44px; }
+  .glowvai-root .gvh .gvh-card-body { padding: 12px; gap: 6px; }
+  .glowvai-root .gvh .gvh-slide-copy { padding: 16px 16px 32px; }
+}
+/* Narrow phones (320 to 359): cards and tiles shrink so nothing is cramped or clipped. */
+@media (max-width: 359px) {
+  .glowvai-root .gvh .gvh-cats { gap: 14px 6px; }
+  .glowvai-root .gvh .gvh-cat-label { font-size: 12px; }
+  .glowvai-root .gvh .gvh-promo { padding: 12px 40px 12px 12px; }
+  .glowvai-root .gvh .gvh-promo-title { font-size: 16px; }
+  .glowvai-root .gvh .gvh-concern-tile { padding: 8px 10px; gap: 8px; font-size: 12px; }
+  .glowvai-root .gvh .gvh-trust-row { padding: 0 8px; gap: 4px; }
+  .glowvai-root .gvh .gvh-trust-item b { font-size: 12px; }
+  .glowvai-root .gvh .gvh-plus { flex-wrap: wrap; padding: 14px; }
+  .glowvai-root .gvh .gvh-plus-cta { margin-left: 56px; }
+  .glowvai-root .gvh .gvh-greet-copy { min-width: 0; }
+  .glowvai-root .gvh .gvh-slide h1, .glowvai-root .gvh .gvh-slide strong { font-size: 22px; }
+}
+
+/* ---------- Shared bottom nav and mini-cart: glass pills, safe-area aware, one height budget ---------- */
+.glowvai-root .bottom-commerce-shell {
+  padding: 0 max(10px, env(safe-area-inset-right, 0px)) calc(8px + var(--safe-bottom)) max(10px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(180deg, rgba(246, 248, 253, 0), rgba(246, 248, 253, .85) 38%);
+  pointer-events: none;
+}
+.glowvai-root .bottom-commerce-shell > * { pointer-events: auto; }
+.glowvai-root .mini-cart-bar,
+.glowvai-root .quick-bottom-nav {
+  border: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong);
+  -webkit-backdrop-filter: var(--v3-blur); backdrop-filter: var(--v3-blur);
+  box-shadow: var(--v3-glass-hi), 0 10px 30px rgba(11, 27, 77, .12);
+}
+.glowvai-root .mini-cart-bar { height: 60px; min-height: 44px; margin-bottom: 8px; }
+.glowvai-root .mini-cart-bar:hover { background: var(--v3-glass-strong); }
+.glowvai-root .mini-cart-icon { background: var(--v3-ac-tint); color: var(--v3-ac-text); }
+.glowvai-root .quick-bottom-nav { height: 64px; border-radius: 28px; }
+.glowvai-root .quick-bottom-nav > button { min-height: 44px; padding: 6px 2px; }
+.glowvai-root .quick-bottom-nav > button.is-active { color: var(--gv-blue); }
+.glowvai-root .quick-bottom-nav > button:nth-child(3) svg { border-color: rgba(255, 255, 255, .9); }
+@media (hover: hover) {
+  .glowvai-root .quick-bottom-nav > button:not(.is-active):hover { color: var(--gv-ink); background: color-mix(in srgb, var(--v3-ac-tint) 70%, transparent); border-radius: 18px; }
+}
+@media (max-width: 359px) {
+  .glowvai-root .bottom-commerce-shell { padding-inline: 6px; }
+  .glowvai-root .quick-bottom-nav > button { font-size: 11px; letter-spacing: -.01em; }
+  .glowvai-root .quick-bottom-nav > button > span { overflow: visible; text-overflow: clip; }
+  .glowvai-root .mini-cart-bar { padding: 8px 8px 8px 12px; gap: 8px; }
+  .glowvai-root .mini-cart-copy b { font-size: 16px; }
+  .glowvai-root .mini-cart-action { padding: 0 12px 0 16px; font-size: 15px; }
+}
+
+/* ---------- Other phone screens: accent glass instead of the generic blue ---------- */
+@media (max-width: 1023px) {
+  /* Categories / browse / search / wishlist header: glass tinted by the screen accent, ink text. */
+  .glowvai-root .v2-bluebar {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--v3-ac) 30%, rgba(255, 255, 255, .72)) 0%, color-mix(in srgb, var(--v3-ac) 14%, rgba(255, 255, 255, .7)) 100%);
+    border: 1px solid var(--v3-glass-edge); border-top: 0;
+    -webkit-backdrop-filter: var(--v3-blur); backdrop-filter: var(--v3-blur);
+    box-shadow: var(--v3-glass-hi), 0 10px 30px rgba(11, 27, 77, .1);
+  }
+  .glowvai-root .v2-bluebar .shop-header { padding-inline: var(--gv-gutter); }
+  .glowvai-root .v2-bluebar .shop-header h1 { color: var(--gv-ink); }
+  .glowvai-root .v2-bluebar .shop-icon-btn { border-color: var(--v3-glass-edge); background: var(--v3-glass); color: var(--gv-ink); }
+  .glowvai-root .v2-bluebar .shop-input { margin-inline: var(--gv-gutter); border: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong); box-shadow: var(--v3-glass-hi), 0 6px 18px rgba(11, 27, 77, .08); }
+  .glowvai-root .v2-chips .shop-chip { min-height: 44px; background: var(--v3-glass); }
+  .glowvai-root .v2-chips .shop-chip.is-active { border-color: var(--v3-ac); background: var(--v3-ac-tint); color: var(--v3-ac-text); box-shadow: none; }
+  .glowvai-root .v2-cats { padding: var(--v3-gap-lg) var(--gv-gutter) 0; }
+  .glowvai-root .v2-cats-card { border: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong); box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow); }
+  .glowvai-root .v2-rail { background: color-mix(in srgb, var(--v3-ac-tint) 55%, transparent); }
+  .glowvai-root .v2-rail-item { min-height: 44px; }
+  .glowvai-root .v2-rail-item.is-active { background: var(--v3-ac-tint); }
+  .glowvai-root .v2-rail-item.is-active::before { background: var(--v3-ac); }
+  .glowvai-root .v2-rail-img { color: var(--v3-ac-text); }
+  .glowvai-root .v2-rail-item.is-active .v2-rail-img { border-color: var(--v3-ac); box-shadow: 0 4px 12px color-mix(in srgb, var(--v3-ac) 28%, transparent); }
+  .glowvai-root .v2-rail-item.is-active .v2-rail-name { color: var(--v3-ac-text); }
+  .glowvai-root .v2-rail-item.is-active .v2-rail-count { background: var(--v3-ac); color: #fff; }
+  .glowvai-root .v2-hero { background: linear-gradient(135deg, var(--v3-ac-tint) 0%, var(--v3-ac-ring) 100%); }
+
+  /* Product, cart, checkout, account, orders: gutters and glass bars */
+  .glowvai-root .shop-header, .glowvai-root .commerce-header { padding-inline: var(--gv-gutter); }
+  .glowvai-root .shop-product-layout { grid-template-columns: minmax(0, 1fr); }
+  .glowvai-root .shop-product-layout > * { min-width: 0; }
+  .glowvai-root .shop-product-panel, .glowvai-root .shop-product-hero { border-color: var(--v3-glass-edge); }
+  .glowvai-root .shop-product-hero { background: linear-gradient(160deg, color-mix(in srgb, var(--v3-ac-tint) 85%, #fff), color-mix(in srgb, var(--v3-ac-ring) 55%, #fff)); }
+  .glowvai-root .shop-product-buybar, .glowvai-root .shop-search-bottom, .glowvai-root .commerce-sticky-action, .glowvai-root .checkout-v3-footer {
+    padding-left: max(var(--gv-gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gv-gutter), env(safe-area-inset-right, 0px));
+    border-top: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong);
+    -webkit-backdrop-filter: var(--v3-blur); backdrop-filter: var(--v3-blur);
+    box-shadow: var(--v3-glass-hi), 0 -8px 24px rgba(11, 27, 77, .06);
+  }
+  .glowvai-root :is(.shop-product-buybar, .commerce-sticky-action, .checkout-v3-footer) button { min-height: 48px; }
+  /* Last content clears the sticky bars. */
+  .glowvai-root .shop-product-layout { padding-bottom: var(--v3-gap-lg); }
+  .glowvai-root .commerce-screen, .glowvai-root .cart-screen { padding-bottom: calc(var(--gv-sticky-cta, 72px) + var(--v3-gap) + var(--safe-bottom)); }
+  .glowvai-root .profile-v3, .glowvai-root .orders-v3 { padding-bottom: calc(var(--v3-gap-lg) + var(--safe-bottom)); }
+  .glowvai-root .orders-list { padding: var(--v3-gap) var(--gv-gutter); gap: 12px; }
+
+  /* Account screens: accent glass cards (account = violet, orders = teal, notifications = indigo). */
+  .glowvai-root .profile-screen { --v3-ac: #8b5cf6; --v3-ac-tint: #f1ecff; --v3-ac-ring: #e2d8ff; --v3-ac-text: #5b3fc4; }
+  .glowvai-root .orders-screen { --v3-ac: #14b8a6; --v3-ac-tint: #e4f7f4; --v3-ac-ring: #c9efe9; --v3-ac-text: #0b6f64; }
+  .glowvai-root :is(.profile-screen, .orders-screen, .notif-screen) {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--v3-ac) 18%, #fff) 0, color-mix(in srgb, var(--v3-ac) 6%, #f6f8fd) 280px, #f6f8fd 600px);
+  }
+  .glowvai-root :is(.profile-card, .profile-glow-card, .profile-tile, .orders-order-card, .notif-card, .notif-item) {
+    border: 1px solid var(--v3-glass-edge); background: var(--v3-glass-strong);
+    box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow);
+    -webkit-backdrop-filter: var(--v3-blur-sm); backdrop-filter: var(--v3-blur-sm);
+  }
+  .glowvai-root .profile-side > .profile-card:first-child {
+    border: 1px solid var(--v3-glass-edge);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--v3-ac) 30%, rgba(255, 255, 255, .7)), color-mix(in srgb, var(--v3-ac) 12%, rgba(255, 255, 255, .72)));
+    color: var(--gv-ink); box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow);
+  }
+  .glowvai-root .profile-side > .profile-card:first-child :is(h1, h2, h3, p, span, small, b, strong) { color: var(--gv-ink); }
+  .glowvai-root :is(.profile-tile, .orders-order-card, .notif-item, .orders-card-open) { min-height: 44px; }
+}
+@media (max-width: 1023px) and (hover: hover) {
+  .glowvai-root :is(.profile-tile, .orders-order-card, .notif-item):hover { border-color: var(--v3-ac); box-shadow: var(--v3-glass-hi), var(--v3-glass-shadow); }
+}
+
+/* ---------- Tap targets (44px) for the common small controls ---------- */
+@media (max-width: 1023px) {
+  .glowvai-root :is(.shop-icon-btn, .shop-stepper button, .shop-chip, .shop-product-heart) { min-width: 44px; min-height: 44px; }
+  .glowvai-root .shop-chip { min-width: 0; padding-inline: 16px; }
+}
+
+/* ---------- Fallbacks ---------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glowvai-root {
+    --v3-glass: rgba(255, 255, 255, .92); --v3-glass-strong: rgba(255, 255, 255, .92);
+  }
+  .glowvai-root .gvh :is(.gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo.is-light, .gvh-trend) { background: color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 80%, #fff); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .glowvai-root { --v3-glass: #fff; --v3-glass-strong: #fff; --v3-glass-edge: rgba(11, 27, 77, .18); --v3-solid: #fff; }
+  .glowvai-root :is(.gvh-search, .gvh-greet, .shop-quiz-banner, .gvh-tab, .gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo, .gvh-trend, .gvh-trust, .mini-cart-bar, .quick-bottom-nav,
+    .v2-bluebar, .v2-cats-card, .shop-product-buybar, .shop-search-bottom, .commerce-sticky-action, .checkout-v3-footer, .profile-card, .profile-tile, .orders-order-card, .notif-item) {
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  .glowvai-root :is(.gvh-price, .gvh-concern-tile, .gvh-offer, .gvh-promo.is-light, .gvh-trend) { background: color-mix(in srgb, var(--ac-tint, var(--v3-ac-tint)) 80%, #fff); }
+  .glowvai-root .bottom-commerce-shell { background: #f6f8fd; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root :is(.gvh, .mini-cart-bar, .quick-bottom-nav) * { transition: none !important; }
+}
+
+/* Tablet portrait (720 to 1023): the phone home uses the whole window so the gutter is the only margin. */
+@media (min-width: 720px) and (max-width: 1023px) {
+  .glowvai-root .screen-content > .shop-home.gvh { max-width: none; }
+}
