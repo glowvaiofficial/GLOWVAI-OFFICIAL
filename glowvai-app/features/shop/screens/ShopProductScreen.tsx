@@ -13,6 +13,8 @@ import { SubscribePanel } from '../../profile/SubscriptionsScreen';
 
 // Most units one customer can add in one go (the server enforces the same cap).
 const MAX_QTY = 10;
+import { PcProduct } from '../desktop/PcProduct';
+import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-product.css';
 
 // Shop category ids mapped to the names used on the browse screen.
@@ -27,6 +29,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 // Everything on this screen comes from the product's own catalogue entry. Sections without data are not shown.
 export const ShopProductScreen: React.FC = () => {
   const catalog = useLiveCatalog();
+  const isPc = useIsPc();
   const { navigate, goBack, activeParams, currentAddress, wishlist, toggleWishlist, showToast } = useApp();
   const rawId = activeParams?.productId ?? activeParams?.id;
   const productId = typeof rawId === 'string' ? rawId : undefined;
@@ -131,6 +134,70 @@ export const ShopProductScreen: React.FC = () => {
 
   const openReviews = () => navigate('shop-product-reviews', { productId: product.id });
 
+  const variantsNode = (
+    options && selected ? (
+      <fieldset className="shop-product-variants">
+        <legend className="shop-variants-legend">Choose an option</legend>
+        <div className="shop-variants-grid">
+          {options.map((v) => {
+            const sellable = isSellable(v);
+            const checked = v.id === selected.id;
+            return (
+              <label key={v.id} className={`shop-variant${checked ? ' is-selected' : ''}${sellable ? '' : ' is-out'}`}>
+                <input
+                  type="radio"
+                  name={`variant-${product.id}`}
+                  value={v.id}
+                  checked={checked}
+                  disabled={!sellable}
+                  onChange={() => setVariantId(v.id)}
+                />
+                <span className="shop-variant-label">{v.label}</span>
+                <span className="shop-variant-price">{formatRupee(v.price)}</span>
+                {!sellable && <span className="shop-variant-out">Out of stock</span>}
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
+    ) : null
+  );
+
+  const subscribeNode = canBuy && showSubscribe ? <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} /> : null;
+
+  if (isPc) {
+    return (
+      <PcProduct
+        key={product.id}
+        product={product}
+        catalog={catalog}
+        categoryLabel={categoryLabel}
+        heroImage={heroImage}
+        price={price}
+        mrp={mrp}
+        discount={discount}
+        optionNoun={optionNoun}
+        hasOptions={Boolean(options)}
+        stockState={stockState}
+        canBuy={canBuy}
+        qty={qty}
+        maxQty={maxQty}
+        setQuantity={setQuantity}
+        inCartCount={inCartCount}
+        cartTotalCount={cartTotalCount}
+        isWishlisted={isWishlisted}
+        deliverTo={deliverTo}
+        variantsNode={variantsNode}
+        subscribeNode={subscribeNode}
+        navigate={navigate}
+        onToggleWishlist={() => toggleWishlist(product.id)}
+        onShare={handleShare}
+        onAdd={handleAddToCart}
+        onBuyNow={handleBuyNow}
+      />
+    );
+  }
+
   return (
     <div className="shop-screen shop-product">
       <header className="shop-header">
@@ -196,32 +263,7 @@ export const ShopProductScreen: React.FC = () => {
               </div>
             )}
 
-            {options && selected && (
-              <fieldset className="shop-product-variants">
-                <legend className="shop-variants-legend">Choose an option</legend>
-                <div className="shop-variants-grid">
-                  {options.map((v) => {
-                    const sellable = isSellable(v);
-                    const checked = v.id === selected.id;
-                    return (
-                      <label key={v.id} className={`shop-variant${checked ? ' is-selected' : ''}${sellable ? '' : ' is-out'}`}>
-                        <input
-                          type="radio"
-                          name={`variant-${product.id}`}
-                          value={v.id}
-                          checked={checked}
-                          disabled={!sellable}
-                          onChange={() => setVariantId(v.id)}
-                        />
-                        <span className="shop-variant-label">{v.label}</span>
-                        <span className="shop-variant-price">{formatRupee(v.price)}</span>
-                        {!sellable && <span className="shop-variant-out">Out of stock</span>}
-                      </label>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            )}
+            {variantsNode}
 
             <div className="shop-product-pricebar">
               <span className="shop-product-price-now">{formatRupee(price)}</span>
@@ -328,7 +370,7 @@ export const ShopProductScreen: React.FC = () => {
           </button>
         </section>
 
-        {canBuy && showSubscribe && <SubscribePanel productId={product.id} productName={product.name} variantId={selected?.id ?? null} />}
+        {subscribeNode}
 
         <section className="shop-product-reviews-block" aria-label="Customer reviews" style={{ padding: '16px' }}>
           <ProductReviews productId={product.id} />
