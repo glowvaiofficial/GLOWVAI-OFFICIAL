@@ -138,23 +138,7 @@ const AppContent: React.FC = () => {
       <div className="screen-content">{renderScreen()}</div>
       <BottomNavBar />
       {toastMessage && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '76px',
-            left: '20px',
-            right: '20px',
-            backgroundColor: '#1E293B',
-            color: '#FFFFFF',
-            padding: '10px 16px',
-            borderRadius: '10px',
-            fontSize: '12px',
-            fontWeight: 600,
-            textAlign: 'center',
-            boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.25)',
-            zIndex: 300,
-          }}
-        >
+        <div className="gv-toast" role="status" aria-live="polite">
           {toastMessage}
         </div>
       )}

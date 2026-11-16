@@ -84,7 +84,7 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
           </span>
         ) : (
           <button className="shop-product-add" onClick={addToCart} aria-label={options ? `Choose options for ${product.name}` : `Add ${product.name} to cart`}>
-            <Plus size={18} />
+            Add <Plus size={16} />
           </button>
         )}
       </div>
@@ -108,13 +108,13 @@ export const ShopProductCard: React.FC<ShopProductCardProps> = ({ product, onOpe
             </>
           )}
         </div>
-        {rich && product.rating !== null && (
+        {product.rating !== null && (
           <span className="shop-product-rate">
             <b><Star size={11} fill="currentColor" /> {product.rating.toFixed(1)}</b>
             {product.reviewCount ? <small>({product.reviewCount.toLocaleString('en-IN')})</small> : null}
           </span>
         )}
-        {rich && !options && product.originalPrice > product.price && (
+        {!options && product.originalPrice > product.price && (
           <small className="shop-product-save">You save {formatRupee(product.originalPrice - product.price)}</small>
         )}
         {product.deliveryMinutes ? (
