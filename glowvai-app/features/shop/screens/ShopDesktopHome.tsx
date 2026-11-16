@@ -160,7 +160,11 @@ function useRevealOnScroll(rootRef: React.RefObject<HTMLElement | null>) {
       { rootMargin: '0px 0px -6% 0px', threshold: 0.01 }
     );
     const seen = new WeakSet<Element>();
+    // Nothing is hidden until the visitor actually scrolls: a page that is captured or read without scrolling (full-page
+    // screenshot, print, link preview, an inner scroll box) must show every section, never an empty gap.
+    let armed = false;
     const track = () => {
+      if (!armed) return;
       for (const child of Array.from(root.children)) {
         if (seen.has(child) || !(child instanceof HTMLElement)) continue;
         seen.add(child);
@@ -169,10 +173,25 @@ function useRevealOnScroll(rootRef: React.RefObject<HTMLElement | null>) {
         io.observe(child);
       }
     };
-    track();
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      cleanupInput();
+      track();
+    };
+    const inputs = ['wheel', 'touchmove', 'keydown', 'scroll'] as const;
+    const cleanupInput = () => inputs.forEach((t) => window.removeEventListener(t, arm, true));
+    inputs.forEach((t) => window.addEventListener(t, arm, { capture: true, passive: true }));
+    const showAll = () => {
+      io.disconnect();
+      root.querySelectorAll<HTMLElement>(':scope > [data-desk-reveal="wait"]').forEach((el) => { el.dataset.deskReveal = 'in'; });
+    };
+    window.addEventListener('beforeprint', showAll);
     const mo = new MutationObserver(track);
     mo.observe(root, { childList: true });
     return () => {
+      cleanupInput();
+      window.removeEventListener('beforeprint', showAll);
       io.disconnect();
       mo.disconnect();
     };

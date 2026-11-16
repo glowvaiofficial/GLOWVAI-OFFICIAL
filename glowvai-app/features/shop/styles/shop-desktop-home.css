@@ -743,3 +743,8 @@
   .glowvai-root .shop-desk .shop-desk-action.is-icon{ width: 38px; }
   .glowvai-root .shop-desk .shop-desk-delivery{ max-width: 130px; }
 }
+
+/* Print and no-script: every section is shown, never held back for a scroll reveal. */
+@media print{
+  .glowvai-root .shop-desk .shop-desk-main > [data-desk-reveal]{ opacity: 1 !important; transform: none !important; }
+}
