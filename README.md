@@ -90,3 +90,18 @@ npm run start
 ## Repository Sync
 
 Repository URL: [https://github.com/Sathveek123/GLOWVAI-](https://github.com/Sathveek123/GLOWVAI-)
+
+---
+
+## Docs (status 16 Nov 2026)
+
+Note: the sections above describe the original landing-page build (WhatsApp ordering, first font and palette choices). The live `/shop`, its designer-driven home and the vendor portal are documented here:
+
+- [docs/WEBSITE-OVERVIEW.md](docs/WEBSITE-OVERVIEW.md): status and timeline
+- [docs/WEBSITE-SCREENS.md](docs/WEBSITE-SCREENS.md): every page and shop screen
+- [docs/WEBSITE-HOME-DESIGN.md](docs/WEBSITE-HOME-DESIGN.md): phone and PC home, designer data model, `/api/shop/layout`
+- [docs/WEBSITE-DESIGN-SYSTEM.md](docs/WEBSITE-DESIGN-SYSTEM.md): fonts, colour tokens, motion, accessibility
+- [docs/WEBSITE-ARCHITECTURE.md](docs/WEBSITE-ARCHITECTURE.md): folders, API security and rate limits, Firebase, deploy, tests
+- [docs/VENDOR-PORTAL.md](docs/VENDOR-PORTAL.md): vendor web portal pages and API
+- [docs/VENDOR-APP.md](docs/VENDOR-APP.md): the vendor mobile app
+- [docs/WEBSITE-KNOWN-ISSUES-AND-NEXT.md](docs/WEBSITE-KNOWN-ISSUES-AND-NEXT.md): honest issues and next steps
