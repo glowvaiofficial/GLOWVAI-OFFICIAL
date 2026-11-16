@@ -6,6 +6,8 @@ import { ShopProductCard } from '../shared/ShopProductCard';
 import { PcListing } from '../desktop/PcListing';
 import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-category.css';
+import '../styles/v2-browse.css';
+import { SearchSuggestions } from '../shared/StateScreens';
 
 const CATEGORY_LABELS: Record<string, string> = {
   Serums: 'Serums & Actives',
@@ -118,7 +120,8 @@ export const ShopCategoryScreen: React.FC = () => {
   });
 
   return (
-    <div className="shop-screen shop-category">
+    <div className="shop-screen shop-category v2-browse">
+      <div className="v2-bluebar">
       <header className="shop-header shop-category-header">
         <button type="button" className="shop-icon-btn" onClick={goBack} aria-label="Go back">
           <ArrowLeft size={20} />
@@ -128,8 +131,6 @@ export const ShopCategoryScreen: React.FC = () => {
           <ShoppingBag size={20} />
         </button>
       </header>
-
-      <div className="shop-category-toolbar">
         <label className="shop-input shop-category-search">
           <Search size={18} />
           <input
@@ -144,7 +145,9 @@ export const ShopCategoryScreen: React.FC = () => {
             </button>
           )}
         </label>
+      </div>
 
+      <div className="shop-category-toolbar">
         <div className="shop-category-sort-row">
           <span className="shop-category-count">{products.length} {products.length === 1 ? 'product' : 'products'}</span>
           <div className="shop-category-sort">
@@ -186,12 +189,13 @@ export const ShopCategoryScreen: React.FC = () => {
 
       <main className="shop-category-main">
         {products.length === 0 ? (
-          <div className="shop-empty">
+          <div className="shop-empty v2-empty">
             <span className="shop-empty-icon">
               <Search size={24} />
             </span>
             <h3>No products found</h3>
             <p>{searchQuery ? `Nothing matches "${searchQuery}" in ${categoryLabel}.` : `No products in ${categoryLabel} yet.`}</p>
+            <SearchSuggestions />
             {searchQuery && (
               <button type="button" className="shop-btn-primary" onClick={() => setSearchQuery('')}>
                 Clear search

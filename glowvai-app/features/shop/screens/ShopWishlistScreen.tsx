@@ -6,6 +6,7 @@ import { useCartStore } from '../../../core/state/cartStore';
 import { formatRupee, getProductThumbUrl } from '../shared/shopUtils';
 import { fromPrice, isSellable } from '../../../../lib/shop/variants';
 import '../styles/shop-wishlist.css';
+import '../styles/v2-browse.css';
 
 // The shopper's saved products (device copy, synced to the account; see features/shop/lib/wishlistSync). Prices and
 // availability come from the live catalogue only. A saved product that is no longer in the catalogue is labelled as
