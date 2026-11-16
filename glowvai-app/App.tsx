@@ -38,6 +38,7 @@ import { OrderDetailsScreen } from './features/orders/OrderDetailsScreen';
 import { OrderTrackingScreen } from './features/orders/OrderTrackingScreen';
 import { PaymentSuccessScreen } from './features/commerce/PaymentResultScreens';
 import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen';
+import './features/shop/styles/v4-allscreens.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();
