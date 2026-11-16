@@ -37,7 +37,7 @@
 
 .glowvai-root .shop-search-results{ display: grid; gap: 16px; min-width: 0; scroll-margin-top: 16px; }
 .glowvai-root .shop-search-toolbar{ display: grid; gap: 12px; }
-.glowvai-root .shop-search-toolbar h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -0.02em; }
+.glowvai-root .shop-search-toolbar h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .shop-search-toolbar p{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; overflow-wrap: anywhere; }
 .glowvai-root .shop-search-applied{ display: flex; flex-wrap: wrap; gap: 8px; }
 .glowvai-root .shop-search-applied-chip{ display: inline-flex; min-height: 36px; align-items: center; gap: 4px; padding: 0 4px 0 14px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 700; }

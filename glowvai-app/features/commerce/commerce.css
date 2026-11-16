@@ -23,7 +23,7 @@
   background: transparent;
 }
 .glowvai-root .commerce-head-copy { min-width: 0; flex: 1; }
-.glowvai-root .commerce-head-copy h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.02em; }
+.glowvai-root .commerce-head-copy h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.005em; }
 .glowvai-root .commerce-head-copy p { display: flex; align-items: center; gap: 4px; margin-top: 4px; color: var(--ds-muted); font-size: 13px; }
 
 .glowvai-root .commerce-icon-btn {
@@ -417,7 +417,7 @@
 }
 .glowvai-root .commerce-processing-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .glowvai-root .commerce-processing-detail { display: flex; width: 100%; flex-direction: column; }
-.glowvai-root .commerce-processing-body h1 { margin-top: 8px; color: var(--ds-ink); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .commerce-processing-body h1 { margin-top: 8px; color: var(--ds-ink); font-size: 22px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .commerce-processing-body > p { color: var(--ds-muted); font-size: 14px; }
 .glowvai-root .commerce-orb { position: relative; display: grid; width: 136px; height: 136px; margin: 16px 0 8px; place-items: center; }
 .glowvai-root .commerce-orb-pulse { position: absolute; inset: 0; border-radius: 50%; background: rgba(40, 84, 197, .12); animation: commerce-pulse 2s ease-in-out infinite; }
@@ -474,7 +474,7 @@
 .glowvai-root .commerce-result-icon.is-success { background: var(--ds-success-bg); color: var(--ds-success); }
 .glowvai-root .commerce-result-icon.is-failed { background: var(--ds-danger-bg); color: var(--ds-danger); }
 .glowvai-root .commerce-result-icon.is-neutral { background: var(--ds-sky); color: var(--ds-brand); }
-.glowvai-root .commerce-result-body h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.02em; }
+.glowvai-root .commerce-result-body h1 { color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.15; letter-spacing: -.005em; }
 .glowvai-root .commerce-kicker { color: var(--ds-danger); font-size: var(--ds-small); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .glowvai-root .commerce-arrival { width: 100%; text-align: left; }
 .glowvai-root .commerce-arrival > b { font-size: 14px; }
@@ -491,7 +491,7 @@
 .glowvai-root .commerce-otp span { color: var(--ds-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .glowvai-root .commerce-otp p { color: var(--ds-muted); font-size: 12px; }
 .glowvai-root .commerce-express.is-center { align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
-.glowvai-root .commerce-express.is-center h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .commerce-express.is-center h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .commerce-express.is-center p { max-width: 420px; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .commerce-center-actions { display: flex; width: 100%; max-width: 420px; flex-direction: column; gap: 10px; margin-top: 8px; }
 .glowvai-root .commerce-spinner { width: 40px; height: 40px; border: 3px solid var(--ds-sky); border-top-color: var(--ds-brand); border-radius: 50%; animation: commerce-spin .9s linear infinite; }
@@ -625,7 +625,7 @@
 .glowvai-root .commerce-serve-icon { display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: #fff; }
 .glowvai-root .commerce-serve.is-ok .commerce-serve-icon { color: var(--ds-success); }
 .glowvai-root .commerce-serve.is-no .commerce-serve-icon { color: var(--warning); }
-.glowvai-root .commerce-serve h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .commerce-serve h1 { color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .commerce-serve p { color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .commerce-serviceability .commerce-muted svg { color: var(--ds-brand); }
 

@@ -21,7 +21,7 @@
   background: var(--ds-pearl);
 }
 .glowvai-root .notif-header-copy{ flex: 1; min-width: 0; }
-.glowvai-root .notif-header-copy h1{ font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); }
+.glowvai-root .notif-header-copy h1{ font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; color: var(--ds-ink); }
 .glowvai-root .notif-header-copy p{ margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--ds-muted); }
 
 .glowvai-root .notif-icon-button{
@@ -100,7 +100,7 @@
 .glowvai-root .notif-secondary{ width: 100%; border: 1px solid var(--ds-line); background: var(--ds-card); color: var(--ds-ink); }
 .glowvai-root .notif-secondary:disabled{ opacity: .6; }
 
-.glowvai-root .notif-section-title{ margin-top: 8px; font-size: var(--ds-h2, 20px); font-weight: 700; letter-spacing: -.02em; color: var(--ds-ink); }
+.glowvai-root .notif-section-title{ margin-top: 8px; font-size: var(--ds-h2, 20px); font-weight: 700; letter-spacing: -.005em; color: var(--ds-ink); }
 
 .glowvai-root .notif-pref{
   display: flex;

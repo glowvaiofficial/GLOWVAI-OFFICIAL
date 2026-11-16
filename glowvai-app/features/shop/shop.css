@@ -9,7 +9,7 @@
 
 /* Page header: round back button, then the title at page-heading size. No coloured bar. */
 .glowvai-root .shop-header{ display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 16px var(--ds-gutter) 0; }
-.glowvai-root .shop-header h1{ flex: 1; min-width: 0; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
+.glowvai-root .shop-header h1{ flex: 1; min-width: 0; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
 .glowvai-root .shop-header-sub{ display: block; overflow: hidden; margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .shop-header-titles{ flex: 1; min-width: 0; }
 .glowvai-root .shop-header-actions{ display: flex; flex-shrink: 0; align-items: center; gap: 8px; margin-left: auto; }
@@ -21,7 +21,7 @@
 /* Sections */
 .glowvai-root .shop-section{ padding: var(--ds-section) var(--ds-gutter) 0; }
 .glowvai-root .shop-section-head{ display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
-.glowvai-root .shop-section-head h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -0.02em; }
+.glowvai-root .shop-section-head h2{ color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .shop-section-head span{ color: var(--ds-muted); font-size: 13px; font-weight: 700; }
 .glowvai-root .shop-section-head button{ color: var(--ds-brand); font-size: 13px; font-weight: 700; background: none; border: 0; }
 

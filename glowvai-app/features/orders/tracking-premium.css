@@ -12,7 +12,7 @@
 .glowvai-root .trk-premium .trk-head { display: flex; align-items: center; gap: 12px; padding: 12px var(--ds-gutter) 10px; }
 .glowvai-root .trk-premium .trk-head-copy { display: grid; flex: 1; min-width: 0; line-height: 1.1; }
 .glowvai-root .trk-premium .trk-head .gvp-wordmark { color: var(--gv-ink); font-size: 26px; }
-.glowvai-root .trk-premium .trk-head-order { color: var(--gv-ink); font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .trk-premium .trk-head-order { color: var(--gv-ink); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .trk-premium .trk-head-sub { margin-top: 2px; overflow: hidden; color: var(--gvp-muted); font-size: 13.5px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .trk-premium .trk-round-btn { display: inline-grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; border: 1px solid var(--gvp-line); border-radius: 50%; background: #fff; color: var(--gvp-ink); text-decoration: none; }
 .glowvai-root .trk-premium .trk-round-btn:hover { background: var(--gvp-sky); }
@@ -42,7 +42,7 @@
 .glowvai-root .trk-premium .trk-status-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .glowvai-root .trk-premium .trk-status-copy { min-width: 0; }
 .glowvai-root .trk-premium .trk-eta-label { color: var(--gvp-muted); font-size: 16px; font-weight: 500; }
-.glowvai-root .trk-premium .trk-eta { color: var(--gvp-blue); font-size: 44px; font-weight: 700; line-height: 1.05; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.glowvai-root .trk-premium .trk-eta { color: var(--gvp-blue); font-size: 44px; font-weight: 700; line-height: 1.05; letter-spacing: -.005em; font-variant-numeric: tabular-nums; }
 .glowvai-root .trk-premium .trk-eta.is-window { font-size: 26px; letter-spacing: -.01em; }
 .glowvai-root .trk-premium .trk-status-headline { margin-top: 8px; color: var(--gv-ink); font-size: 22px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; }
 .glowvai-root .trk-premium .trk-status.is-cancelled .trk-status-headline { margin-top: 0; color: var(--gvp-red); }
@@ -127,7 +127,7 @@
 .glowvai-root .trk-premium.is-map .trk-sheet { position: relative; display: grid; gap: 14px; padding-top: 22px; animation: trk-sheet-in .45s cubic-bezier(.2, .8, .2, 1) both; }
 .glowvai-root .trk-premium .trk-handle { position: absolute; top: 8px; left: 50%; width: 44px; height: 5px; border-radius: 999px; background: #d5dbe7; transform: translateX(-50%); }
 .glowvai-root .trk-premium .trk-sheet-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.glowvai-root .trk-premium .trk-sheet-title { color: var(--gv-ink); font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -.02em; }
+.glowvai-root .trk-premium .trk-sheet-title { color: var(--gv-ink); font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -.005em; }
 .glowvai-root .trk-premium .trk-tile { display: grid; flex: 0 0 auto; min-width: 96px; justify-items: center; padding: 12px 14px; border-radius: 18px; background: linear-gradient(160deg, #22a456, #15803d); color: #fff; box-shadow: 0 10px 22px rgba(21, 128, 61, .28); }
 .glowvai-root .trk-premium .trk-tile b { font-size: 38px; font-weight: 700; line-height: 1; }
 .glowvai-root .trk-premium .trk-tile small { font-size: 15px; font-weight: 500; }

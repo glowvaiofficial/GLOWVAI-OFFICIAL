@@ -34,7 +34,7 @@
 .glowvai-root .pc-crumbs button:hover{ color: var(--ds-brand); text-decoration: underline; }
 .glowvai-root .pc-crumbs span[aria-current]{ color: var(--ds-ink); font-weight: 700; }
 .glowvai-root .pc-title-row{ display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin: 12px 0 16px; }
-.glowvai-root .pc-title-row h1{ color: var(--ds-ink); font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.glowvai-root .pc-title-row h1{ color: var(--ds-ink); font-size: 28px; font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .pc-title-row p{ margin-top: 4px; color: var(--ds-muted); font-size: 14px; }
 .glowvai-root .pc-search-slot{ flex: 1; max-width: 640px; }
 
@@ -159,7 +159,7 @@
 .glowvai-root .pcp-stage.is-zoom .pcp-zoom-hint{ display: none; }
 .glowvai-root .pcp-info{ min-width: 0; }
 .glowvai-root .pcp-brand{ padding: 0; border: 0; background: none; color: var(--ds-brand); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.glowvai-root .pcp-title{ margin-top: 6px; color: var(--ds-ink); font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
+.glowvai-root .pcp-title{ margin-top: 6px; color: var(--ds-ink); font-size: 28px; font-weight: 700; letter-spacing: -.005em; line-height: 1.25; }
 .glowvai-root .pcp-rate{ display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .glowvai-root .pcp-price{ display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--ds-line); }
 .glowvai-root .pcp-price .shop-product-price-now{ font-size: 32px; }
@@ -201,6 +201,6 @@
 .glowvai-root .pcp-steps li::before{ content: counter(step); position: absolute; left: 0; top: 0; display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .pcp-muted{ color: var(--ds-muted); }
 .glowvai-root .pcp-rail{ margin-top: 32px; }
-.glowvai-root .pcp-rail h2{ margin-bottom: 14px; color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.glowvai-root .pcp-rail h2{ margin-bottom: 14px; color: var(--ds-ink); font-size: 20px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .pcp-rail-row{ display: grid; grid-auto-flow: column; grid-auto-columns: minmax(212px, 232px); gap: 16px; padding-bottom: 8px; overflow-x: auto; scrollbar-width: thin; }
 .glowvai-root .pcp-extra{ margin-top: 32px; }

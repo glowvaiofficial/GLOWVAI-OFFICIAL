@@ -8,21 +8,21 @@
 .glowvai-root .rec-header{ display:flex; align-items:center; gap:12px; width:100%; padding:16px var(--ds-gutter) 0; box-sizing:border-box; background:transparent; }
 .glowvai-root .rec-header-copy{ display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; }
 .glowvai-root .rec-header-eyebrow{ color:var(--ds-muted); font-size:var(--ds-small); font-weight:700; letter-spacing:.02em; }
-.glowvai-root .rec-header-title{ margin:0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:700; line-height:1.15; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.glowvai-root .rec-header-title{ margin:0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h1); font-weight:700; line-height:1.15; letter-spacing:-.005em; overflow-wrap:anywhere; }
 .glowvai-root .rec-icon-button{ display:inline-flex; width:44px; height:44px; flex:none; align-items:center; justify-content:center; border:1px solid var(--ds-line); border-radius:50%; background:var(--ds-card); color:var(--ds-ink); transition:background-color .18s ease, border-color .18s ease; }
 .glowvai-root .rec-screen :focus-visible{ outline:2px solid var(--ds-brand); outline-offset:2px; }
 
 .glowvai-root .rec-body{ display:flex; flex-direction:column; gap:var(--ds-gap); width:100%; padding:20px var(--ds-gutter) 32px; box-sizing:border-box; }
 
 /* Section heading */
-.glowvai-root .rec-label{ margin:calc(var(--ds-section) - var(--ds-gap)) 0 0; color:var(--ds-ink); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.02em; }
+.glowvai-root .rec-label{ margin:calc(var(--ds-section) - var(--ds-gap)) 0 0; color:var(--ds-ink); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.005em; }
 .glowvai-root .rec-note{ display:flex; align-items:flex-start; gap:10px; margin:0; padding:12px 14px; border:1px solid var(--ds-line); border-radius:var(--ds-radius-sm); background:var(--ds-sky); color:var(--ds-muted); font-size:13px; line-height:1.5; }
 .glowvai-root .rec-note svg{ flex:none; margin-top:2px; color:var(--ds-brand); }
 
 /* Intro panel: soft sky card, the same family as the home's light offer card. */
 .glowvai-root .rec-hero{ display:flex; flex-direction:column; gap:8px; padding:20px; border:1px solid var(--ds-line); border-radius:var(--ds-radius-lg); background:linear-gradient(135deg, var(--ds-card) 0%, var(--ds-sky) 100%); box-shadow:var(--ds-shadow); color:var(--ds-ink); }
 .glowvai-root .rec-kicker{ display:inline-flex; align-self:flex-start; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--ds-line); border-radius:var(--ds-pill); background:var(--ds-card); color:var(--ds-brand); font-size:12px; font-weight:700; }
-.glowvai-root .rec-headline{ margin:6px 0 0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.02em; }
+.glowvai-root .rec-headline{ margin:6px 0 0; color:var(--ds-ink); font-family:var(--font-heading); font-size:var(--ds-h2); font-weight:700; line-height:1.2; letter-spacing:-.005em; }
 .glowvai-root .rec-subtext{ max-width:720px; margin:0; color:var(--ds-muted); font-size:14px; line-height:1.55; }
 
 /* Card */

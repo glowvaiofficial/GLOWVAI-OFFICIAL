@@ -18,7 +18,7 @@
 }
 
 .glowvai-root .orders-body h2{ font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.01em; color: var(--ds-ink); }
-.glowvai-root .orders-body .orders-section-title{ margin-top: 8px; font-size: var(--ds-h2); letter-spacing: -.02em; }
+.glowvai-root .orders-body .orders-section-title{ margin-top: 8px; font-size: var(--ds-h2); letter-spacing: -.005em; }
 .glowvai-root .orders-body .orders-section-head .orders-section-title{ margin-top: 0; }
 .glowvai-root .orders-section-head:has(.orders-section-title){ margin-top: 8px; }
 .glowvai-root .orders-section-head{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -38,7 +38,7 @@
   background: var(--ds-pearl);
 }
 .glowvai-root .orders-header-copy{ flex: 1; min-width: 0; }
-.glowvai-root .orders-header-copy h1{ overflow: hidden; font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-header-copy h1{ overflow: hidden; font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; color: var(--ds-ink); text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .orders-header-copy p{ overflow: hidden; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--ds-muted); text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .orders-header-right{ display: flex; align-items: center; }
 
@@ -275,7 +275,7 @@
 .glowvai-root .orders-eta-card.is-cancelled .orders-eta-icon{ background: #fff; }
 .glowvai-root .orders-eta-card > div{ display: flex; min-width: 0; flex-direction: column; gap: 4px; }
 .glowvai-root .orders-eta-card small{ font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
-.glowvai-root .orders-eta-card strong{ font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
+.glowvai-root .orders-eta-card strong{ font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
 .glowvai-root .orders-eta-card p{ display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: .92; }
 
 .glowvai-root .orders-rider-card{ display: flex; align-items: center; gap: 12px; }

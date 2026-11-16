@@ -4,7 +4,7 @@
 .glowvai-root .gvn{--ink:var(--gv-ink);--muted:#5b6478;--line:#e6eaf2;margin:14px 0;padding:0 16px;box-sizing:border-box}
 .glowvai-root .gvn.is-wide{margin:22px 0;padding:0}
 .glowvai-root .gvn-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.glowvai-root .gvn-head h2{margin:0;font-family:var(--gv-font);font-weight:700;font-size:16px;line-height:22px;color:var(--ink)}
+.glowvai-root .gvn-head h2{margin:0;font-family:var(--gv-font);font-weight:700;font-size:18px;line-height:24px;color:var(--ink)}
 .glowvai-root .gvn.is-wide .gvn-head h2{font-size:18px;line-height:24px}
 .glowvai-root .gvn-arrows{display:inline-flex;gap:6px}
 .glowvai-root .gvn-arrows button{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--ink);cursor:pointer}

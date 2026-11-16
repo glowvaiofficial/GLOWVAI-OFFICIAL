@@ -3,7 +3,7 @@
 /* Welcome, onboarding, login and OTP. These screens hide the web header, so they fill the whole window.
    Phone: readability and touch fixes on top of glowvai.css. Tablet: full-window, stacked. Desktop (1024px+): full-window split. */
 .glowvai-root .login-reference-sheet{ background: var(--ds-pearl); color: var(--ds-ink); }
-.glowvai-root .login-sheet-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .login-sheet-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .login-phone-field{ height: var(--ds-control); grid-template-columns: 24px auto 1px minmax(0,1fr); padding: 0 14px; border-color: var(--ds-line); border-radius: var(--ds-radius-sm); background: var(--ds-card); box-shadow: none; }
 .glowvai-root .login-phone-field:focus-within{ border-color: var(--ds-brand); box-shadow: 0 0 0 1px var(--ds-brand); }
 .glowvai-root .login-phone-field.has-error{ border-color: var(--ds-danger); }
@@ -96,7 +96,7 @@
   .glowvai-root .otp-entry-panel{ display: flex; min-width: 0; align-items: center; justify-content: center; padding: 56px; background: var(--ds-pearl); color: var(--ds-ink); }
   .glowvai-root .otp-entry-inner{ width: 100%; max-width: 440px; }
   .glowvai-root .otp-entry-panel .otp-copy{ margin-top: 0; text-align: left; }
-  .glowvai-root .otp-entry-panel .otp-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.02em; }
+  .glowvai-root .otp-entry-panel .otp-copy h1{ color: var(--ds-ink); font-size: var(--ds-h1); letter-spacing: -.005em; }
   .glowvai-root .otp-entry-panel .otp-copy p{ margin-top: 10px; color: var(--ds-muted); font-size: var(--ds-body); }
   .glowvai-root .otp-entry-panel .otp-copy strong{ color: var(--ds-ink); }
   .glowvai-root .otp-entry-panel .otp-edit-number{ padding: 0; color: var(--ds-brand); }

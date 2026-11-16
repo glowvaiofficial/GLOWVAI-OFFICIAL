@@ -340,7 +340,7 @@
 .glowvai-root .gvp .gvp-confirm-art-item.is-current .gvp-confirm-art-dot { border: 0; background: var(--gvp-blue); box-shadow: 0 0 0 7px rgba(0, 87, 251, .14); animation: gvp-pulse 1.8s ease-in-out infinite; }
 .glowvai-root .gvp .gvp-confirm-art.is-cancelled .gvp-confirm-art-icon { background: #f1f3f8; color: #9aa3b5; box-shadow: none; transform: none; }
 @keyframes gvp-pulse { 0%, 100% { box-shadow: 0 0 0 5px rgba(0, 87, 251, .16); } 50% { box-shadow: 0 0 0 11px rgba(0, 87, 251, .06); } }
-.glowvai-root .gvp .gvp-confirm-title { margin-top: 26px; color: var(--gv-ink); font-size: 30px; font-weight: 700; line-height: 1.15; letter-spacing: -.025em; animation: gvp-rise .4s cubic-bezier(.2, .7, .2, 1) both; }
+.glowvai-root .gvp .gvp-confirm-title { margin-top: 26px; color: var(--gv-ink); font-size: 30px; font-weight: 700; line-height: 1.15; letter-spacing: -.005em; animation: gvp-rise .4s cubic-bezier(.2, .7, .2, 1) both; }
 .glowvai-root .gvp .gvp-confirm-sub { max-width: 400px; margin-top: 10px; color: var(--gvp-muted); font-size: 16px; line-height: 1.55; }
 .glowvai-root .gvp .gvp-confirm-steps { position: relative; display: grid; width: 100%; max-width: 420px; grid-template-columns: repeat(3, 1fr); margin: 30px 0 0; padding: 0; list-style: none; }
 .glowvai-root .gvp .gvp-confirm-steps li { position: relative; display: grid; justify-items: center; gap: 10px; color: var(--gvp-faint); font-size: 14px; line-height: 1.35; }
@@ -377,7 +377,7 @@
 .glowvai-root .gvp .gvp-result-meta dd { color: var(--gvp-ink); font-weight: 500; }
 
 .glowvai-root .gvp.gvp-processing .commerce-processing-head .commerce-brand { color: var(--gvp-blue); font-family: var(--gvp-font); font-weight: 700; letter-spacing: -.03em; }
-.glowvai-root .gvp.gvp-processing .commerce-processing-hero h1 { color: var(--gv-ink); font-family: var(--gvp-font); font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .gvp.gvp-processing .commerce-processing-hero h1 { color: var(--gv-ink); font-family: var(--gvp-font); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .gvp.gvp-processing .commerce-processing-summary { border-color: var(--gvp-line); border-radius: var(--gvp-radius); background: #fff; }
 
 @media (min-width: 1024px) {

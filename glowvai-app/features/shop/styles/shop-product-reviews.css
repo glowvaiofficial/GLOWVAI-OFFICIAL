@@ -9,7 +9,7 @@
 
 /* Rating summary: catalogue rating and count only */
 .glowvai-root .shop-reviews-summary{ display: flex; align-items: center; gap: 16px; padding: 20px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); }
-.glowvai-root .shop-reviews-score-value{ color: var(--ds-ink); font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+.glowvai-root .shop-reviews-score-value{ color: var(--ds-ink); font-size: 44px; font-weight: 700; line-height: 1; letter-spacing: -.005em; }
 .glowvai-root .shop-reviews-score-meta{ display: grid; gap: 6px; min-width: 0; }
 .glowvai-root .shop-reviews-stars{ display: inline-flex; gap: 2px; color: var(--shop-reviews-star); }
 .glowvai-root .shop-reviews-stars svg:not(.is-on){ color: var(--ds-line); }

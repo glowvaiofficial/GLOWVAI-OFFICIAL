@@ -9,7 +9,7 @@
 
 /* Category directory: white cards like the home's tiles */
 .glowvai-root .shop-browse-directory{ padding: var(--ds-section) var(--ds-gutter) 0; }
-.glowvai-root .shop-browse-directory h2{ margin-bottom: 12px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -0.02em; }
+.glowvai-root .shop-browse-directory h2{ margin-bottom: 12px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .shop-browse-category-grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-gap); }
 .glowvai-root .shop-browse-cat{ position: relative; display: flex; min-width: 0; min-height: 128px; flex-direction: column; align-items: flex-start; gap: 2px; padding: 14px; overflow: hidden; border: 1px solid var(--ds-line); border-radius: var(--ds-radius); background: var(--ds-card); box-shadow: var(--ds-shadow); color: var(--ds-ink); text-align: left; transition: transform .2s ease, box-shadow .2s ease; }
 .glowvai-root .shop-browse-cat-icon{ display: grid; width: 36px; height: 36px; margin-bottom: 8px; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }

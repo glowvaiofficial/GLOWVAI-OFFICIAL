@@ -10,15 +10,15 @@
 /* Header */
 .glowvai-root .scan-header{ position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 12px var(--ds-gutter); background: var(--ds-pearl); }
 .glowvai-root .scan-header-text{ min-width: 0; }
-.glowvai-root .scan-header-title{ overflow: hidden; color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .scan-header-title{ overflow: hidden; color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .scan-header-subtitle{ margin-top: 2px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
 .glowvai-root .scan-icon-button{ display: inline-flex; flex: 0 0 auto; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid var(--ds-line); border-radius: 50%; background: var(--ds-card); color: var(--ds-ink); cursor: pointer; }
 .glowvai-root .scan-icon-button:hover{ background: var(--ds-sky); }
 
 /* Type */
-.glowvai-root .scan-headline{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h2); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
+.glowvai-root .scan-headline{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h2); font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
 .glowvai-root .scan-lead{ color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
-.glowvai-root .scan-section-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .scan-section-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: 19px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .scan-section-label{ color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
 .glowvai-root .scan-card-title{ color: var(--ds-ink); font-size: 15px; font-weight: 700; }
 .glowvai-root .scan-card-body{ margin-top: 4px; color: var(--ds-muted); font-size: 13px; line-height: 1.5; }
@@ -45,7 +45,7 @@
 .glowvai-root .scan-tab-body{ align-items: stretch; padding-top: 24px; }
 .glowvai-root .scan-tab-header{ display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .glowvai-root .scan-badge{ display: inline-block; padding: 5px 12px; border-radius: var(--ds-pill); background: var(--ds-sky); color: var(--ds-brand); font-size: 10px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; }
-.glowvai-root .scan-tab-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .scan-tab-title{ color: var(--ds-ink); font-family: var(--font-heading); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .scan-tab-subtitle{ max-width: 320px; color: var(--ds-muted); font-size: 14px; line-height: 1.5; }
 .glowvai-root .scan-target-card{ display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg); background: linear-gradient(180deg, var(--ds-sky) 0%, var(--ds-card) 100%); box-shadow: var(--ds-shadow); }
 .glowvai-root .scan-target-icon{ display: grid; width: 104px; height: 104px; place-items: center; border: 2px solid var(--ds-brand); border-radius: 50%; background: var(--ds-card); color: var(--ds-brand); }

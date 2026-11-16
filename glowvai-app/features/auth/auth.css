@@ -20,7 +20,7 @@
 .glowvai-root .auth-footer{ position: relative; z-index: 2; display: flex; flex-direction: column; gap: 8px; padding: 12px var(--ds-gutter) calc(12px + var(--safe-bottom, 0px)); border-top: 1px solid var(--ds-line); background: var(--ds-card); }
 .glowvai-root .auth-icon-button{ display: grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border: 1px solid var(--ds-line); border-radius: 50%; background: var(--ds-card); color: var(--ds-ink); }
 .glowvai-root .auth-icon-button svg{ width: 18px; height: 18px; stroke-width: 2.2; }
-.glowvai-root .auth-title{ color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .auth-title{ color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .auth-subtitle{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-body); font-weight: 500; line-height: 1.5; }
 .glowvai-root .auth-strong{ color: var(--ds-ink); font-weight: 700; }
 .glowvai-root .auth-mono{ font-variant-numeric: tabular-nums; }
@@ -31,7 +31,7 @@
 .glowvai-root .auth-label-row .auth-label{ margin-bottom: 0; }
 .glowvai-root .auth-section-label{ display: block; margin: 24px 0 8px; color: var(--ds-muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .glowvai-root .auth-form-group{ margin-top: 16px; }
-.glowvai-root .auth-page-heading{ display: flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .auth-page-heading{ display: flex; align-items: center; gap: 8px; color: var(--ds-ink); font-size: var(--ds-h2); font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .auth-page-heading svg{ width: 18px; height: 18px; color: var(--ds-brand); }
 .glowvai-root .auth-text-button{ display: inline-flex; min-height: 32px; align-items: center; gap: 6px; padding: 4px 0; color: var(--ds-brand); font-size: 13px; font-weight: 700; }
 .glowvai-root .auth-text-button svg{ width: 14px; height: 14px; }
@@ -126,7 +126,7 @@
 .glowvai-root .auth-slide-badge{ position: absolute; left: 14px; bottom: 14px; padding: 6px 10px; border-radius: var(--ds-pill); background: rgba(255,255,255,.94); color: var(--ds-brand); font-size: 11px; font-weight: 700; letter-spacing: .06em; }
 .glowvai-root .auth-welcome-panel{ display: flex; flex: 1; min-height: 0; flex-direction: column; }
 .glowvai-root .auth-welcome-copy{ flex: 1; min-height: 0; padding: 0 var(--ds-gutter); }
-.glowvai-root .auth-slide-title{ margin-top: 20px; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+.glowvai-root .auth-slide-title{ margin-top: 20px; color: var(--ds-ink); font-size: var(--ds-h1); font-weight: 700; letter-spacing: -.005em; line-height: 1.2; }
 .glowvai-root .auth-slide-body{ margin-top: 8px; color: var(--ds-muted); font-size: var(--ds-body); font-weight: 500; line-height: 1.5; }
 .glowvai-root .auth-dots{ display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
 .glowvai-root .auth-dot{ position: relative; width: 6px; height: 6px; padding: 0; border-radius: var(--ds-pill); background: #cbd5e6; transition: width .25s ease, background-color .25s ease; }
@@ -152,7 +152,7 @@
 .glowvai-root .auth-card-header{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .glowvai-root .auth-card-icon{ display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--ds-sky); color: var(--ds-brand); }
 .glowvai-root .auth-card-icon svg{ width: 20px; height: 20px; }
-.glowvai-root .auth-card-title{ color: var(--ds-ink); font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+.glowvai-root .auth-card-title{ color: var(--ds-ink); font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
 .glowvai-root .auth-card-subtitle{ margin-top: 2px; color: var(--ds-muted); font-size: var(--ds-small); font-weight: 500; }
 .glowvai-root .auth-card .auth-card-title{ margin-bottom: 4px; }
 .glowvai-root .auth-card-copy{ margin-top: 0; }
