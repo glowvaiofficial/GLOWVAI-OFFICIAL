@@ -189,3 +189,13 @@ describe("desktop layout follows the home design", () => {
     for (const { hex } of ACCENT_PALETTE) assert.ok(contrast("#FFFFFF", accentDeep(hex)) >= 4.5, hex);
   });
 });
+
+describe("scroll reveal never leaves the page blank", () => {
+  const src = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../glowvai-app/features/shop/screens/ShopDesktopHome.tsx"), "utf8");
+  test("sections are only hidden after the visitor scrolls, and shown for print", () => {
+    assert.match(src, /let armed = false/);
+    assert.match(src, /if \(!armed\) return;/);
+    assert.match(src, /'wheel', 'touchmove', 'keydown', 'scroll'/);
+    assert.match(src, /beforeprint/);
+  });
+});
