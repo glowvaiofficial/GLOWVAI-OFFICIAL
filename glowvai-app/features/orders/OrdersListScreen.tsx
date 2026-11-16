@@ -49,6 +49,29 @@ const StatusBadge: React.FC<{ order: ShopOrder }> = ({ order }) => {
   );
 };
 
+// A four-step strip on a card: placed, packed, on the way, delivered. It only shows where the saved status already is.
+const PROGRESS_STEPS = ['Placed', 'Packed', 'On the way', 'Delivered'];
+const progressStep = (status: string): number => {
+  const value = String(status).toUpperCase();
+  if (value.includes('DELIVERED')) return 4;
+  if (value.includes('OUT_FOR') || value.includes('PICKED') || value.includes('TRANSIT') || value.includes('ARRIV')) return 3;
+  if (value.includes('PACK') || value.includes('ACCEPT') || value.includes('READY') || value.includes('ASSIGN')) return 2;
+  return 1;
+};
+const OrderProgress: React.FC<{ order: ShopOrder }> = ({ order }) => {
+  const step = progressStep(order.status);
+  return (
+    <ol className="orders-strip" aria-label={`Order progress: ${PROGRESS_STEPS[step - 1]}`}>
+      {PROGRESS_STEPS.map((label, index) => (
+        <li key={label} className={index + 1 < step ? 'is-done' : index + 1 === step ? 'is-current' : ''}>
+          <span className="orders-strip-bar" aria-hidden="true" />
+          <span className="orders-strip-label">{label}</span>
+        </li>
+      ))}
+    </ol>
+  );
+};
+
 const Thumbs: React.FC<{ order: ShopOrder }> = ({ order }) => {
   const extra = order.items.length - MAX_THUMBS;
   return (
@@ -85,6 +108,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onOpen, onTrack, onBuyAgai
           <StatusBadge order={order} />
         </div>
         <Thumbs order={order} />
+        {tone === 'active' && <OrderProgress order={order} />}
         <div className="orders-summary-row">
           <div>
             <strong>{formatRupee(orderTotal(order))}</strong>

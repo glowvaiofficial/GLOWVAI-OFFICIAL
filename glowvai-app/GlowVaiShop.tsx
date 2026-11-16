@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import './glowvai.css';
 import './responsive/shell.css';
+import './features/shop/styles/v2-account.css';
 import { MaintenanceGate } from './features/shop/MaintenanceGate';
 
 // The NOV FINAL app is client-only: it relies on browser APIs and keeps all screen state in the browser.

@@ -1,0 +1,95 @@
+/* Website v2, account area: profile, orders, notifications, scan intro, sign-in. Styling only, layered over the screen CSS.
+   Colours come from the shared --gv / --ds tokens, plus soft blue tints derived from the brand blue. */
+
+/* Page wash: a soft sky fade at the top that melts into the page background, like the app's account screens. */
+.glowvai-root :is(.profile-screen, .orders-screen, .notif-screen){
+  background:
+    radial-gradient(120% 220px at 50% 0, rgba(0, 87, 251, .09) 0, rgba(0, 87, 251, 0) 100%),
+    linear-gradient(180deg, #eef3ff 0, var(--ds-pearl) 260px);
+  background-repeat: no-repeat;
+}
+
+/* Cards: soft depth, 18-22px corners, press scale on tap, lift on hover (pointer devices only). */
+.glowvai-root :is(.profile-card, .profile-glow-card, .profile-tile, .orders-order-card, .notif-card, .notif-item){
+  border-color: rgba(0, 87, 251, .10);
+  box-shadow: 0 1px 2px rgba(11, 27, 63, .04), 0 8px 24px rgba(26, 54, 120, .06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+}
+.glowvai-root :is(.profile-tile, .notif-item, .profile-user-button, .orders-card-open):active{ transform: scale(.985); }
+@media (hover: hover){
+  .glowvai-root :is(.profile-tile, .orders-order-card, .notif-item):hover{ transform: translateY(-2px); box-shadow: 0 2px 4px rgba(11, 27, 63, .04), 0 16px 34px rgba(26, 54, 120, .12); border-color: rgba(0, 87, 251, .22); }
+}
+
+/* Profile header: brand blue banner with the avatar ringed in white. */
+.glowvai-root .profile-side > .profile-card:first-child{
+  position: relative;
+  border: 0;
+  background: linear-gradient(135deg, #0057fb 0%, #1f73ff 100%);
+  box-shadow: 0 14px 30px rgba(0, 87, 251, .26);
+}
+.glowvai-root .profile-side > .profile-card:first-child::after{
+  content: ''; position: absolute; right: -40px; top: -50px; width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255, 255, 255, .10); pointer-events: none;
+}
+.glowvai-root .profile-side > .profile-card:first-child .profile-user-name{ color: #fff; font-size: 18px; font-weight: 700; }
+.glowvai-root .profile-side > .profile-card:first-child .profile-user-phone{ color: rgba(255, 255, 255, .82); }
+.glowvai-root .profile-side > .profile-card:first-child .profile-chevron{ color: #fff; }
+.glowvai-root .profile-side > .profile-card:first-child .profile-hero-avatar{ box-shadow: 0 0 0 3px rgba(255, 255, 255, .85); background: #fff; }
+@media (hover: hover){
+  .glowvai-root .profile-side > .profile-card:first-child:hover{ transform: none; }
+}
+
+.glowvai-root .profile-label{ letter-spacing: .06em; }
+.glowvai-root .profile-tile-icon, .glowvai-root .profile-glow-icon{ background: var(--gv-blue-tint); box-shadow: inset 0 0 0 1px rgba(0, 87, 251, .10); }
+
+/* Orders: status chips and a four-step progress strip. */
+.glowvai-root .orders-badge{ padding: 5px 11px; font-weight: 700; letter-spacing: .01em; }
+.glowvai-root .orders-order-card.is-active{ border-left: 3px solid var(--gv-blue); }
+.glowvai-root .orders-strip{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 2px 0 0; padding: 0; list-style: none; }
+.glowvai-root .orders-strip li{ display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.glowvai-root .orders-strip-bar{ position: relative; height: 5px; overflow: hidden; border-radius: 999px; background: #dce6ff; }
+.glowvai-root .orders-strip li.is-done .orders-strip-bar,
+.glowvai-root .orders-strip li.is-current .orders-strip-bar{ background: var(--gv-blue); }
+.glowvai-root .orders-strip li.is-current .orders-strip-bar::after{
+  content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+  transform: translateX(-100%); animation: gvAccountShimmer 1.6s ease-in-out infinite;
+}
+.glowvai-root .orders-strip-label{ overflow: hidden; color: var(--gv-muted); font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .orders-strip li.is-current .orders-strip-label{ color: var(--gv-blue); font-weight: 700; }
+.glowvai-root .orders-primary-button{ box-shadow: 0 8px 18px rgba(0, 87, 251, .22); }
+
+/* Notifications: grouped list, blue icon tile, unread dot. */
+.glowvai-root .notif-group{ display: flex; flex-direction: column; margin-top: 14px; }
+.glowvai-root .notif-group-title{ color: var(--gv-muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.glowvai-root .notif-item{ align-items: center; gap: 12px; border-radius: 18px; }
+.glowvai-root .notif-item.is-unread{ border-color: rgba(0, 87, 251, .28); background: linear-gradient(90deg, #eef3ff, #fff 70%); }
+.glowvai-root .notif-icon-tile{ display: grid; width: 40px; height: 40px; flex: none; place-items: center; border-radius: 14px; background: var(--gv-blue-tint); color: var(--gv-blue); box-shadow: inset 0 0 0 1px rgba(0, 87, 251, .10); }
+.glowvai-root .notif-item.is-unread .notif-icon-tile{ background: var(--gv-blue); color: #fff; }
+.glowvai-root .notif-item .notif-dot{ order: 3; width: 9px; height: 9px; margin: 0; background: var(--gv-blue); box-shadow: 0 0 0 3px rgba(0, 87, 251, .15); }
+.glowvai-root .notif-item-title{ color: var(--gv-ink); font-size: 14px; }
+.glowvai-root .notif-item-time{ font-weight: 500; }
+.glowvai-root .notif-empty{ display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 36px 20px; border: 1px dashed rgba(0, 87, 251, .25); border-radius: 22px; background: #fff; color: var(--gv-muted); text-align: center; }
+.glowvai-root .notif-empty > svg{ box-sizing: content-box; padding: 14px; border-radius: 50%; background: var(--gv-blue-tint); color: var(--gv-blue); }
+.glowvai-root .notif-skeleton{ display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.glowvai-root .notif-skeleton-row{ position: relative; display: block; height: 76px; overflow: hidden; border-radius: 18px; background: #e8eefc; }
+.glowvai-root .notif-skeleton-row::after{
+  content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .7), transparent);
+  transform: translateX(-100%); animation: gvAccountShimmer 1.4s ease-in-out infinite;
+}
+
+/* Buttons feel the same across scan, sign-in, orders and notifications. */
+.glowvai-root :is(.orders-primary-button, .notif-primary){ transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
+
+/* Wide screens: keep account content readable instead of stretched. */
+@media (min-width: 1024px){
+  .glowvai-root .orders-body{ max-width: 880px; margin-inline: auto; }
+  .glowvai-root .notif-header{ box-sizing: content-box; max-width: 720px; margin-inline: auto; }
+  .glowvai-root .orders-strip-label{ font-size: 12px; }
+}
+
+@keyframes gvAccountShimmer{ to{ transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce){
+  .glowvai-root :is(.orders-strip-bar, .notif-skeleton-row)::after{ animation: none; }
+  .glowvai-root :is(.profile-tile, .orders-order-card, .notif-item, .profile-card){ transition: none; }
+  .glowvai-root :is(.profile-tile, .orders-order-card, .notif-item):hover{ transform: none; }
+}
