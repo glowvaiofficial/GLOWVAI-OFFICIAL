@@ -74,6 +74,8 @@ if (process.env.VERCEL_ENV === 'production' && missingShopEnv.length > 0) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Do not announce the framework in a response header.
+  poweredByHeader: false,
   ...(isStaticExport ? { output: 'export' } : {}),
   env: {
     CUSTOM_DOMAIN: 'true',

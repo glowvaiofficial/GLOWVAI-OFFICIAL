@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 
 // Fonts: the shop uses Roboto, self-hosted by next/font in app/layout.tsx (--font-roboto), through the one token --gv-font in glowvai-app/glowvai.css.
 
+// The shop is one screen at /shop. Any other /shop/<path> is a real 404 instead of a 200 with the home screen.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return [{ slug: [] }];
 }

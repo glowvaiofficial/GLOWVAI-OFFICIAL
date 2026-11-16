@@ -100,7 +100,7 @@ export function readSettingsMap(value: unknown): Partial<Record<HomeBlockId, Blo
     const items: BlockItem[] = (Array.isArray(r.items) ? r.items : []).flatMap((it): BlockItem[] => {
       if (!it || typeof it !== 'object') return [];
       const i = it as Record<string, unknown>;
-      const item: BlockItem = { label: str(i.label), sub: str(i.sub), link: str(i.link, 500), image: str(i.image, 1000) };
+      const item: BlockItem = { label: str(i.label), sub: str(i.sub), link: str(i.link, 500), image: str(i.image, 200_000) };
       if (typeof i.accent === 'string' && HEX.test(i.accent)) item.accent = i.accent;
       return [item];
     });
