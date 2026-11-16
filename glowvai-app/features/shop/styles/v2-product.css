@@ -51,7 +51,7 @@
 .glowvai-root .pcp-trust svg{ transition: transform .2s ease; }
 @media (hover: hover){
   .glowvai-root .pcp-rail-row > *{ transition: transform .2s ease, box-shadow .2s ease; }
-  .glowvai-root .pcp-rail-row > *:hover{ transform: translateY(-3px); }
+  .glowvai-root .pcp-rail-row > *:hover{ }
 }
 
 @media (prefers-reduced-motion: reduce){

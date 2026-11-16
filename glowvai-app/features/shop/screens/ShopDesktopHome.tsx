@@ -8,6 +8,7 @@ import { useCartStore } from '../../../core/state/cartStore';
 import { useCustomerStore } from '../../../core/state/customerStore';
 import { useInbox } from '../../../core/notifications/inboxStore';
 import { siteConfig } from '../../../../config/site';
+import { coolAccent, coolSectionAccent } from '../../../../lib/shop/accents';
 import { fromPrice } from '../../../../lib/shop/variants';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { itemsLabel, useShellCart } from '../../../components/common/useShellCart';
@@ -33,6 +34,7 @@ import { useDesignerCard } from '../shared/designerCard';
 import '../styles/shop-desktop-home.css';
 import '../styles/v2-home-pc.css';
 import '../styles/shop-type.css';
+import '../styles/v3-glass-pc.css';
 
 // The desktop home (screens 1024px wide and more, or ?device=desktop): the PC version of the GlowVai home design. It
 // renders the desktop layout the GlowVai team designed in the admin (device=desktop; the mobile layout when none is
@@ -59,7 +61,7 @@ const CATEGORY_ICON: Record<string, LucideIcon> = {
 // ONE colour at rest (design spec 2b): every section is brand blue unless the admin sets an accent on it; the bright category
 // accents appear only in the selected header tab's wash.
 const BRAND = '#0057FB';
-const restAccent = (accent: unknown): string => (isAccent(accent) ? accent : BRAND);
+const restAccent = (accent: unknown, index = -1): string => (isAccent(accent) ? accent : index < 0 ? BRAND : coolAccent(index));
 const SECTION_ACCENT: Record<HomeBlockId | 'concerns' | 'scan' | 'for-you', AccentName> = {
   hero: 'sky',
   'mini-banners': 'teal',
@@ -818,7 +820,7 @@ function DeskPricePoints({ tiles, onOpen }: { tiles: PricePointTile[]; onOpen: (
     <section className="shop-desk-section is-tight" aria-label="Shop by price">
       <div className="shop-desk-prices" style={{ '--price-cols': tiles.length } as React.CSSProperties}>
         {tiles.map((t, i) => (
-          <button key={t.max} type="button" className="shop-desk-price" style={accentStyle(restAccent(null))} onClick={() => onOpen(t.max)} aria-label={`${t.label}, ${t.count} ${t.count === 1 ? 'product' : 'products'}`}>
+          <button key={t.max} type="button" className="shop-desk-price" style={accentStyle(coolSectionAccent('prices'))} onClick={() => onOpen(t.max)} aria-label={`${t.label}, ${t.count} ${t.count === 1 ? 'product' : 'products'}`}>
             <b>{t.label}</b>
             <small>{t.count} {t.count === 1 ? 'product' : 'products'}</small>
             <span className="shop-desk-price-media">{t.sample && <img src={getProductThumbUrl(t.sample, 200)} alt="" width={96} height={96} loading="lazy" decoding="async" />}</span>
@@ -892,10 +894,10 @@ export const ShopDesktopHome: React.FC = () => {
   const openLink = (link: string) => (link ? window.location.assign(link) : navigate('shop-browse'));
 
   // A section's accent: the admin's (block settings, then the reply's sectionAccents), otherwise the section's default.
-  const secAccent = (id: keyof typeof SECTION_ACCENT) => blockAccent(blockSettings[id as HomeBlockId], sectionAccents, id, BRAND);
+  const secAccent = (id: keyof typeof SECTION_ACCENT) => blockAccent(blockSettings[id as HomeBlockId], sectionAccents, id, coolSectionAccent(id));
   const railsAccentSet = blockAccent(blockSettings['product-rails'], sectionAccents, 'product-rails', '') !== '';
   // Each product rail has its own accent (the palette in order) unless the admin set one for the whole block.
-  const railAccent = (i: number) => (railsAccentSet ? secAccent('product-rails') : restAccent(null));
+  const railAccent = (i: number) => (railsAccentSet ? secAccent('product-rails') : coolAccent(i + 2));
   // The hero's accent: the hero's own (from the admin), then the hero block's.
   const heroOwn = itemAccent(heroOverride);
   const heroAccent = isAccent(heroOwn) ? heroOwn.toUpperCase() : secAccent('hero');
@@ -1013,16 +1015,16 @@ export const ShopDesktopHome: React.FC = () => {
             <SectionHead title={blockSettings['categories']?.title || 'Shop by category'} action={<SeeAll label="All categories" onClick={() => navigate('shop-browse')} name="categories" />} />
             <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(adminCategories.length > 0 ? adminCategories.length : HOME_CATEGORY_TILES.length + 1 + (bestsellers.length > 0 ? 1 : 0) + (newLaunches.length > 0 ? 1 : 0), CATEGORY_ROW_MAX) } as React.CSSProperties}>
               {adminCategories.length > 0 ? (
-                adminCategories.map((item, i) => <DeskCategoryTile key={`${i}-${item.label}`} label={item.label} accent={restAccent(itemAccent(item))} photo={item.image || null} Icon={Sparkles} count={item.sub || null} onOpen={() => openLink(item.link)} />)
+                adminCategories.map((item, i) => <DeskCategoryTile key={`${i}-${item.label}`} label={item.label} accent={restAccent(itemAccent(item), i)} photo={item.image || null} Icon={Sparkles} count={item.sub || null} onOpen={() => openLink(item.link)} />)
               ) : (
                 <>
                   {HOME_CATEGORY_TILES.map(({ id: categoryId, label }, i) => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
-                    return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
+                    return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null, i)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null)} photo={extraTiles.best ? getProductThumbUrl(extraTiles.best, 400) : null} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
-                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null)} photo={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 400) : null} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
-                  <DeskCategoryTile label="All Products" accent={restAccent(null)} photo={extraTiles.all ? getProductThumbUrl(extraTiles.all, 400) : null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
+                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null, 5)} photo={extraTiles.best ? getProductThumbUrl(extraTiles.best, 400) : null} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
+                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null, 6)} photo={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 400) : null} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
+                  <DeskCategoryTile label="All Products" accent={restAccent(null, 1)} photo={extraTiles.all ? getProductThumbUrl(extraTiles.all, 400) : null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
             </div>
@@ -1032,7 +1034,7 @@ export const ShopDesktopHome: React.FC = () => {
         return (
           <section className="shop-desk-promos" aria-label="Offers" style={{ '--promo-cols': balancedColumns(adminPromos.length > 0 ? adminPromos.length : 2, PROMO_ROW_MAX) } as React.CSSProperties}>
             {adminPromos.length > 0 ? (
-              adminPromos.map((item, i) => <DeskPromo key={`${i}-${item.label}`} dark={i === 0} accent={restAccent(itemAccent(item))} title={item.label} sub={item.sub} image={item.image || undefined} onOpen={() => openLink(item.link)} />)
+              adminPromos.map((item, i) => <DeskPromo key={`${i}-${item.label}`} dark={i === 0} accent={restAccent(itemAccent(item), i + 4)} title={item.label} sub={item.sub} image={item.image || undefined} onOpen={() => openLink(item.link)} />)
             ) : (
               <>
                 <DeskPromo
@@ -1134,7 +1136,7 @@ export const ShopDesktopHome: React.FC = () => {
           <SectionHead id="shop-desk-concerns-title" icon={Droplets} title="Shop by Concern" action={<SeeAll onClick={() => navigate('shop-browse')} name="concerns" />} />
           <div className="shop-desk-concerns">
             {CONCERNS.map(({ id: concernId, label, Icon }, i) => (
-              <button key={concernId} type="button" className="shop-desk-concern" onClick={() => navigate('shop-browse', { concern: concernId })} style={accentStyle(restAccent(null))}>
+              <button key={concernId} type="button" className="shop-desk-concern" onClick={() => navigate('shop-browse', { concern: concernId })} style={accentStyle(secAccent('concerns'))}>
                 <span className="shop-desk-concern-icon" aria-hidden="true">
                   <Icon size={18} />
                 </span>
@@ -1346,7 +1348,7 @@ export const ShopDesktopHome: React.FC = () => {
   return (
     <DesignerStyleProvider styles={designerStyles} look={designerLook} heroVideo={heroVideo}>
     <LucideProvider strokeWidth={1.75}>
-      <div className="shop-screen shop-desk">
+      <div className="shop-screen shop-desk" style={{ '--wash': headerAccent } as React.CSSProperties}>
         <span ref={topRef} className="shop-desk-top" aria-hidden="true" />
         <header className={`shop-desk-header${scrolled ? ' is-scrolled' : ''}`} style={accentStyle(headerAccent)}>
           <div className="shop-desk-utility">

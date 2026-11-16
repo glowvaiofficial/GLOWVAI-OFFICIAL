@@ -49,7 +49,7 @@
 /* Product cards: deeper at rest, a stronger lift. */
 .glowvai-root .shop-desk .shop-desk-card{ border-color: #e8ecf6; box-shadow: 0 1px 2px rgba(20, 27, 52, .04), 0 8px 18px -16px rgba(20, 27, 52, .3); }
 .glowvai-root .shop-desk .shop-desk-card-media{ background: radial-gradient(90% 80% at 50% 25%, #fff 0%, #f1f4fb 100%); }
-@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-card:hover{ transform: translateY(-5px); box-shadow: 0 2px 4px rgba(20, 27, 52, .04), 0 22px 40px -20px rgba(0, 40, 140, .35); } }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-card:hover{ box-shadow: 0 2px 4px rgba(20, 27, 52, .04), 0 22px 40px -20px rgba(0, 40, 140, .35); } }
 
 /* Price tiles: the product sits on a white disc. */
 .glowvai-root .shop-desk .shop-desk-price{ min-height: 104px; border-radius: 20px; box-shadow: 0 1px 2px rgba(20, 27, 52, .04), 0 10px 22px -18px rgba(20, 27, 52, .35); }
@@ -77,7 +77,7 @@
 .glowvai-root .shop-desk .shop-desk-footer{ position: relative; margin-top: 40px; background: radial-gradient(900px 300px at 15% 0%, rgba(0, 87, 251, .28), transparent 70%), linear-gradient(180deg, #0b1240 0%, #080d30 100%); }
 .glowvai-root .shop-desk .shop-desk-footer::before{ content: ''; position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, transparent, rgba(140, 170, 255, .6), transparent); }
 .glowvai-root .shop-desk .shop-desk-footer-cols :is(a, button){ transition: transform var(--desk-fast) var(--desk-ease), color var(--desk-fast) var(--desk-ease); }
-@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-footer-cols :is(a, button):hover{ transform: translateX(3px); color: #fff; } }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-footer-cols :is(a, button):hover{ color: #fff; } }
 
 /* Grids tuned to the window. */
 @media (min-width: 1024px) and (max-width: 1279px){

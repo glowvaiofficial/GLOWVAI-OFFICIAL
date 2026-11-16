@@ -10,6 +10,7 @@ import { ShopSearchFiltersScreen } from './screens/ShopSearchFiltersScreen';
 import { ShopWishlistScreen } from './screens/ShopWishlistScreen';
 import '../../responsive/shop-ported.css';
 import './styles/v2-shared.css';
+import './styles/v3-phone.css';
 
 export const routes: Partial<Record<PortedScreenName, ComponentType>> = {
   'shop-home': ShopHomeScreen,

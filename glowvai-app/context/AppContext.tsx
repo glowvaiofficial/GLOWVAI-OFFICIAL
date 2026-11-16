@@ -23,6 +23,7 @@ import { useCustomerStore, type ActionResult } from '../core/state/customerStore
 import { AppContext, AppContextType, ScreenName } from './contextDefinition';
 import { useCartStore } from '../core/state/cartStore';
 import { buildState, entryFromState, popDecision, restoreTarget, safeParams, sameEntry, type NavEntry } from './navHistory';
+import { installTransitionHooks, runScreenTransition } from '../core/transitions';
 import { currentScrollY, queueScrollRestore, rememberScroll } from './scrollMemory';
 import { accountStateOf, gateNavigation, startScreenFor, SIGN_IN_SCREEN, type AccountState } from '../features/auth/accountGate';
 import { ensureAccountRecord } from '../features/auth/accountService';
@@ -233,11 +234,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // History unavailable: the in-app stack still works, only Back is limited.
     }
   };
-  const showEntry = (next: NavEntry) => {
+  // The step is current at once (navRef); the screen swap runs inside a direction-aware transition (core/transitions.ts).
+  const showEntry = (next: NavEntry, direction: 'forward' | 'back' = 'forward') => {
+    const from = navRef.current.screen;
     navRef.current = next;
-    setScreenHistory(next.trail as ScreenName[]);
-    setCurrentScreen(next.screen as ScreenName);
-    setActiveParams(next.params);
+    runScreenTransition(from, next.screen, direction, () => {
+      setScreenHistory(next.trail as ScreenName[]);
+      setCurrentScreen(next.screen as ScreenName);
+      setActiveParams(next.params);
+    });
   };
 
   const navigate = (requested: ScreenName, params?: any) => {
@@ -262,7 +267,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (cur.screen === 'home' || popDecision(cur.screen, 'home', bagUnitsNow()) === 'block') return;
       const home: NavEntry = { screen: 'home', params: null, trail: [] };
       writeEntry(home, 'replace');
-      showEntry(home);
+      showEntry(home, 'back');
       return;
     }
     // Normal case: step back in the browser history; the popstate handler applies the same step as the browser Back button.
@@ -272,11 +277,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     const prev: NavEntry = { screen: cur.trail[cur.trail.length - 1], params: null, trail: cur.trail.slice(0, -1) };
     writeEntry(prev, 'replace');
-    showEntry(prev);
+    showEntry(prev, 'back');
   };
 
   // Browser Back, Forward and history traversal. Only entries written by this app are handled.
   useEffect(() => {
+    installTransitionHooks();
     const onPop = (event: PopStateEvent) => {
       const target = entryFromState(event.state);
       if (!target) return;
@@ -293,8 +299,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const next: NavEntry = allowed.screen === restored.screen ? restored : { screen: allowed.screen, params: allowed.params, trail: restored.trail };
       if (fallback || next !== restored) window.history.replaceState(buildState(event.state, next), '', window.location.href);
       if (sameEntry(cur, next)) return;
-      showEntry(next);
       queueScrollRestore(next.screen, next.params);
+      showEntry(next, next.trail.length < cur.trail.length ? 'back' : 'forward');
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);

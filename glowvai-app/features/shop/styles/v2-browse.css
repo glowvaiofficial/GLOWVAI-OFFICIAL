@@ -77,7 +77,7 @@
 .glowvai-root .shop-wishlist-remove:hover{ border-color: #c13f4b; color: #c13f4b; }
 .glowvai-root .shop-wishlist-remove:active{ transform: scale(.96); }
 @media (hover: hover){
-  .glowvai-root .shop-wishlist-row:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(11, 27, 63, .1); }
+  .glowvai-root .shop-wishlist-row:hover{ box-shadow: 0 12px 28px rgba(11, 27, 63, .1); }
 }
 @media (min-width: 1024px){
   .glowvai-root .shop-wishlist-list{ display: grid; max-width: 1200px; margin: 0 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -101,7 +101,7 @@
   .glowvai-root .pc-filters-head{ border-radius: 22px 22px 0 0; }
   .glowvai-root .pc-sortbar{ border-color: var(--gv-hairline); border-radius: 18px; box-shadow: 0 6px 18px rgba(11, 27, 63, .06); }
   .glowvai-root .pc-cat{ border-color: var(--gv-hairline); border-radius: 18px; box-shadow: 0 4px 14px rgba(11, 27, 63, .05); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-  .glowvai-root .pc-cat:hover{ transform: translateY(-3px); border-color: var(--gv-blue); box-shadow: 0 12px 28px rgba(0, 87, 251, .14); }
+  .glowvai-root .pc-cat:hover{ border-color: var(--gv-blue); box-shadow: 0 12px 28px rgba(0, 87, 251, .14); }
   .glowvai-root .pc-cat:active{ transform: scale(.98); }
   .glowvai-root .pc-state{ border: 1px solid var(--gv-hairline); border-radius: 22px; box-shadow: 0 8px 24px rgba(11, 27, 63, .07); }
   .glowvai-root .pc-skel{ border-color: var(--gv-hairline); border-radius: 18px; }

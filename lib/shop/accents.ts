@@ -91,3 +91,44 @@ export function accentName(hex: string): string {
   return i >= 0 ? ACCENT_NAMES[i] : "";
 }
 
+
+// Cool default accents for home sections when the admin has set none (the web v3 look: distinct containers, never a warm
+// hue; see isWarmColour in lib/shop/theme.ts). Admin-set accents always win; callers use readAccent(...) || coolSectionAccent(id).
+export const COOL_ACCENTS = [
+  "#0EA5E9", // sky
+  "#4F46E5", // indigo
+  "#14B8A6", // teal
+  "#7C3AED", // violet
+  "#10B981", // emerald
+  "#C026D3", // plum
+  "#0057FB", // brand blue
+] as const;
+
+const SECTION_DEFAULTS: Readonly<Record<string, string>> = {
+  hero: COOL_ACCENTS[0],
+  scan: COOL_ACCENTS[0],
+  "for-you": COOL_ACCENTS[6],
+  "mini-banners": COOL_ACCENTS[2],
+  offers: COOL_ACCENTS[1],
+  categories: COOL_ACCENTS[3],
+  promos: COOL_ACCENTS[5],
+  deals: COOL_ACCENTS[0],
+  reorder: COOL_ACCENTS[4],
+  "product-rails": COOL_ACCENTS[6],
+  brands: COOL_ACCENTS[1],
+  trust: COOL_ACCENTS[1],
+  "help-gift": COOL_ACCENTS[2],
+  concerns: COOL_ACCENTS[2],
+  prices: COOL_ACCENTS[3],
+  "recently-viewed": COOL_ACCENTS[3],
+  recommended: COOL_ACCENTS[5],
+};
+
+// The cool default accent of a home section (a block id, or "concerns", "scan", "prices"), brand blue when unknown.
+export const coolSectionAccent = (id: string): string => SECTION_DEFAULTS[id] ?? COOL_ACCENTS[6];
+
+// The cool palette by place in a list (rails, tiles), wrapping.
+export function coolAccent(index: number): string {
+  const i = Number.isInteger(index) && index >= 0 ? index : 0;
+  return COOL_ACCENTS[i % COOL_ACCENTS.length];
+}

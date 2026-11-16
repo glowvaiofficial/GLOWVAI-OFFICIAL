@@ -1,0 +1,61 @@
+/* v3 screen transitions: direction aware, 220-340ms, cubic-bezier(.2,.8,.2,1). Only the screen content moves; the header and
+   tab bar stay put. The View Transition rules apply when the browser has the API (the gv-vt class); the keyframe fallback
+   plays on the screen container otherwise. Every animation ends at full opacity, so content is never left hidden. */
+
+.glowvai-root .screen-content{ view-transition-name: gv-screen; }
+
+@media (prefers-reduced-motion: no-preference){
+  /* Browser-made layers: no blend, so the two screens never glow through each other. */
+  ::view-transition-old(gv-screen), ::view-transition-new(gv-screen){ mix-blend-mode: normal; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }
+  ::view-transition-group(root){ animation-duration: .16s; }
+  ::view-transition-group(gv-hero){ animation-duration: .34s; animation-timing-function: cubic-bezier(.2, .8, .2, 1); }
+  ::view-transition-old(gv-hero), ::view-transition-new(gv-hero){ height: 100%; object-fit: cover; mix-blend-mode: normal; }
+
+  /* Forward: the new screen glides in from the right with a slight scale, the old one parallax-shifts left and dims. */
+  :root[data-gv-vt="forward"]::view-transition-old(gv-screen){ animation: gv-out-left .3s both; }
+  :root[data-gv-vt="forward"]::view-transition-new(gv-screen){ animation: gv-in-right .32s both; z-index: 2; }
+
+  /* Back: the reverse. The old screen leaves to the right over the returning one. */
+  :root[data-gv-vt="back"]::view-transition-old(gv-screen){ animation: gv-out-right .3s both; z-index: 2; }
+  :root[data-gv-vt="back"]::view-transition-new(gv-screen){ animation: gv-in-left .32s both; }
+
+  /* Tabs: a quick cross-fade with a 12px vertical settle. */
+  :root[data-gv-vt="tab"]::view-transition-old(gv-screen){ animation: gv-fade-out .14s both; }
+  :root[data-gv-vt="tab"]::view-transition-new(gv-screen){ animation: gv-settle .24s both; }
+
+  /* Product: the tapped image zooms (the gv-hero group); the screen fades in with a small scale. */
+  :root[data-gv-vt="product"]::view-transition-old(gv-screen){ animation: gv-fade-out .2s both; }
+  :root[data-gv-vt="product"]::view-transition-new(gv-screen){ animation: gv-zoom-in .34s both; }
+
+  /* Sheets rise from the bottom with a spring-like curve; the screen behind dims a little. */
+  :root[data-gv-vt="sheet"]::view-transition-old(gv-screen){ animation: gv-dim .34s both; }
+  :root[data-gv-vt="sheet"]::view-transition-new(gv-screen){ animation: gv-sheet-up .34s cubic-bezier(.22, 1.12, .36, 1) both; z-index: 2; }
+  :root[data-gv-vt="sheet-back"]::view-transition-old(gv-screen){ animation: gv-sheet-down .26s both; z-index: 2; }
+  :root[data-gv-vt="sheet-back"]::view-transition-new(gv-screen){ animation: gv-undim .3s both; }
+
+  /* Fallback (no View Transition API): the new screen plays an enter animation chosen by the container direction. */
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction] > *{ animation: gv-in-right .3s cubic-bezier(.2, .8, .2, 1) both; }
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction="back"] > *{ animation-name: gv-in-left; }
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction="tab"] > *{ animation: gv-settle .24s cubic-bezier(.2, .8, .2, 1) both; }
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction="product"] > *{ animation: gv-zoom-in .32s cubic-bezier(.2, .8, .2, 1) both; }
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction="sheet"] > *{ animation: gv-sheet-up .34s cubic-bezier(.22, 1.12, .36, 1) both; }
+  :root:not(.gv-vt) .glowvai-root .screen-content[data-direction="sheet-back"] > *{ animation: gv-fade-in .22s cubic-bezier(.2, .8, .2, 1) both; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  /* A simple, short fade. */
+  .glowvai-root .screen-content[data-direction] > *{ animation: gv-fade-in .12s linear both; }
+}
+
+@keyframes gv-in-right{ from{ opacity: 0; transform: translate3d(7%, 0, 0) scale(.985); } to{ opacity: 1; transform: none; } }
+@keyframes gv-in-left{ from{ opacity: 0; transform: translate3d(-7%, 0, 0) scale(.985); } to{ opacity: 1; transform: none; } }
+@keyframes gv-out-left{ from{ opacity: 1; transform: none; filter: none; } to{ opacity: .55; transform: translate3d(-18%, 0, 0); filter: brightness(.9); } }
+@keyframes gv-out-right{ from{ opacity: 1; transform: none; } to{ opacity: 0; transform: translate3d(14%, 0, 0) scale(.985); } }
+@keyframes gv-fade-in{ from{ opacity: 0; } to{ opacity: 1; } }
+@keyframes gv-fade-out{ from{ opacity: 1; } to{ opacity: 0; } }
+@keyframes gv-settle{ from{ opacity: 0; transform: translate3d(0, 12px, 0); } to{ opacity: 1; transform: none; } }
+@keyframes gv-zoom-in{ from{ opacity: 0; transform: scale(.96); } to{ opacity: 1; transform: none; } }
+@keyframes gv-sheet-up{ from{ opacity: 1; transform: translate3d(0, 100%, 0); } to{ opacity: 1; transform: none; } }
+@keyframes gv-sheet-down{ from{ opacity: 1; transform: none; } to{ opacity: 1; transform: translate3d(0, 100%, 0); } }
+@keyframes gv-dim{ from{ filter: none; } to{ filter: brightness(.92); } }
+@keyframes gv-undim{ from{ filter: brightness(.92); } to{ filter: none; } }
