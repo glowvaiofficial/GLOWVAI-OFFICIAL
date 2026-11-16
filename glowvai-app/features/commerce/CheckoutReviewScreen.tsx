@@ -9,7 +9,7 @@ import { computeCartTotals } from './lib/pricing';
 import { useCheckoutSession } from './lib/checkoutSession';
 import { choiceSummary, type PaymentChoice } from './lib/paymentChoice';
 import { useDeliveryAddress } from './components/shared';
-import { AddressBlock, EmptyState, PremiumHeader, PriceSummary, SavingsBanner, Thumb, rupee } from './components/premium';
+import { AddressBlock, EmptyState, CheckoutSteps, PremiumHeader, PriceSummary, SavingsBanner, Thumb, rupee } from './components/premium';
 import { DeliverySlotPicker } from './components/DeliverySlotPicker';
 import { ShareLocationOption } from './components/ShareLocationOption';
 import { CoinsRedeemCard } from './CoinsRedeemCard';
@@ -89,6 +89,7 @@ export const CheckoutReviewScreen: React.FC = () => {
         }
       />
 
+      <CheckoutSteps step={2} />
       <div className="commerce-body commerce-split gvp-body">
         <div className="commerce-main">
           <AddressBlock

@@ -256,3 +256,19 @@ export const EmptyState: React.FC<{ Icon: LucideIcon; title: string; body: strin
     </button>
   </div>
 );
+
+// The three checkout steps (Cart, Delivery, Payment), as in the app. Display only: it navigates nowhere.
+export const CheckoutSteps: React.FC<{ step: 1 | 2 | 3 }> = ({ step }) => (
+  <ol className="v2c-steps" aria-label="Checkout progress">
+    {['Cart', 'Delivery', 'Payment'].map((label, i) => {
+      const n = i + 1;
+      const state = n < step ? 'is-done' : n === step ? 'is-on' : '';
+      return (
+        <li key={label} className={`v2c-step ${state}`} aria-current={n === step ? 'step' : undefined}>
+          <span className="v2c-step-dot">{n < step ? '✓' : n}</span>
+          <span className="v2c-step-label">{label}</span>
+        </li>
+      );
+    })}
+  </ol>
+);

@@ -5,6 +5,7 @@ import '../../responsive/commerce-ported.css';
 import './checkout.css';
 import './commerce-spacing.css';
 import './premium.css';
+import '../shop/styles/v2-product.css';
 import { CartScreen } from './CartScreen';
 import { CheckoutReviewScreen } from './CheckoutReviewScreen';
 import { PaymentMethodScreen } from './PaymentMethodScreen';

@@ -1,6 +1,6 @@
 import { SearchSuggestions, OutOfStockSimilar } from '../shared/StateScreens';
-import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, PackageSearch, Plus, Share2, ShoppingBag, Star, Zap } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, PackageSearch, Plus, RotateCcw, Share2, ShieldCheck, ShoppingBag, Star, Truck, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import { useLiveCatalog } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
@@ -14,9 +14,12 @@ import { SubscribePanel } from '../../profile/SubscriptionsScreen';
 
 // Most units one customer can add in one go (the server enforces the same cap).
 const MAX_QTY = 10;
+import { ShopProductCard } from '../shared/ShopProductCard';
+import { isServiceablePincode } from '../../commerce/lib/addressStore';
 import { PcProduct } from '../desktop/PcProduct';
 import { useIsPc } from '../desktop/useIsPc';
 import '../styles/shop-product.css';
+import '../styles/v2-product.css';
 
 // Shop category ids mapped to the names used on the browse screen.
 const CATEGORY_LABELS: Record<string, string> = {
@@ -44,6 +47,14 @@ export const ShopProductScreen: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [variantId, setVariantId] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
+  const [pin, setPin] = useState('');
+  const [pinState, setPinState] = useState<'idle' | 'ok' | 'bad' | 'invalid'>('idle');
+  const similar = useMemo(() => {
+    if (!product) return [];
+    const same = catalog.filter((c) => c.id !== product.id && c.category === product.category);
+    const other = catalog.filter((c) => c.id !== product.id && c.category !== product.category);
+    return [...same, ...other].slice(0, 12);
+  }, [catalog, product]);
 
   // Open each product at the top, not at the scroll position of the list it was opened from.
   useEffect(() => {
@@ -52,6 +63,8 @@ export const ShopProductScreen: React.FC = () => {
     setQuantity(1);
     setVariantId(null);
     setImageFailed(false);
+    setPin('');
+    setPinState('idle');
   }, [productId]);
 
   // Remembered for "Continue browsing" (ids only, on this device).
@@ -373,11 +386,48 @@ export const ShopProductScreen: React.FC = () => {
           </button>
         </section>
 
+        <section className="shop-product-panel v2p-check" aria-label="Check delivery">
+          <h2 className="shop-product-section-title">Check delivery</h2>
+          <form
+            className="v2p-check-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = pin.trim();
+              setPinState(!/^\d{6}$/.test(v) ? 'invalid' : isServiceablePincode(v) ? 'ok' : 'bad');
+            }}
+            noValidate
+          >
+            <input value={pin} onChange={(e) => { setPin(e.target.value.replace(/\D/g, '').slice(0, 6)); setPinState('idle'); }} inputMode="numeric" placeholder="Enter 6-digit pincode" aria-label="Pincode" />
+            <button type="submit" className="shop-btn-primary">Check</button>
+          </form>
+          {pinState !== 'idle' && (
+            <p className={`v2p-check-msg is-${pinState}`} role="status">
+              {pinState === 'ok' ? 'Delivery is available to this pincode.' : pinState === 'bad' ? 'We do not deliver to this pincode yet.' : 'Enter a valid 6-digit pincode.'}
+            </p>
+          )}
+          <div className="v2p-trust">
+            <span><Truck size={18} aria-hidden="true" />Fast delivery</span>
+            <span><ShieldCheck size={18} aria-hidden="true" />Genuine products</span>
+            <span><RotateCcw size={18} aria-hidden="true" />Easy returns</span>
+          </div>
+        </section>
+
         {subscribeNode}
 
         <section className="shop-product-reviews-block" aria-label="Customer reviews" style={{ padding: '16px' }}>
           <ProductReviews productId={product.id} />
         </section>
+
+        {similar.length > 0 && (
+          <section className="v2p-rail" aria-label="Similar products">
+            <h2>Similar products</h2>
+            <div className="v2p-rail-row">
+              {similar.map((sp) => (
+                <ShopProductCard key={sp.id} product={sp} rich onOpen={(x) => navigate('shop-product', { productId: x.id })} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <div className="shop-product-buybar">
