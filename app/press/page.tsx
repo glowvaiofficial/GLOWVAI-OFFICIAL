@@ -12,7 +12,7 @@ const DESC =
   "Official GLOW VAI Press & Media Center. Brand facts, founder biographies, high-resolution media assets, and media contact channels.";
 
 export const metadata: Metadata = {
-  title: "Press & Media Center | GLOW VAI",
+  title: "Press & Media Center",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/press` },
   openGraph: {

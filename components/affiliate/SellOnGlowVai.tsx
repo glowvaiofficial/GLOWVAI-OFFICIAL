@@ -8,9 +8,9 @@ export function SellOnGlowVai({ entry }: { entry: SellerEntry }) {
   return (
     <Section pad="tight" labelledBy="sell-title">
       <Eyebrow>Sell on GlowVai</Eyebrow>
-      <h2 id="sell-title" className="mt-4 font-display text-[clamp(2rem,1.4rem+2.5vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.025em]">
+      <h1 id="sell-title" className="mt-4 font-display text-[clamp(2rem,1.4rem+2.5vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.025em]">
         Bring your brand to GlowVai shoppers
-      </h2>
+      </h1>
       <p className="mt-4 max-w-[62ch] text-ink-light">{SELLER_STATEMENT}</p>
       <div className="mt-8">
         {entry.open ? (
