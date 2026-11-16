@@ -16,7 +16,7 @@ const DESC =
   "GLOW VAI 14-day Skin Satisfaction Guarantee. Easy reverse pickups in Vijayawada, replacement for transit damage, and instant UPI refund processing.";
 
 export const metadata: Metadata = {
-  title: "Returns & Refund Policy | 14-Day Skin Guarantee | GLOW VAI",
+  title: "Returns & Refund Policy | 14-Day Skin Guarantee",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/returns` },
   openGraph: {

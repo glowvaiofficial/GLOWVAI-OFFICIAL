@@ -10,7 +10,7 @@ const DESC =
   "Official Statutory Grievance Redressal Mechanism for GLOW VAI in compliance with the Consumer Protection (E-Commerce) Rules, 2020 and DPDP Act, 2023.";
 
 export const metadata: Metadata = {
-  title: "Grievance Redressal Officer | GLOW VAI",
+  title: "Grievance Redressal Officer",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/grievance` },
   openGraph: {

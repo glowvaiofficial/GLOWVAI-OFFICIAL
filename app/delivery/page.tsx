@@ -14,7 +14,7 @@ const DESCRIPTION =
   "Orders are packed at licensed partner pharmacies in Vijayawada and dispatched by local riders, reaching your doorstep in about 15 minutes in covered areas.";
 
 export const metadata: Metadata = {
-  title: "15-Minute Skincare Delivery in Vijayawada | GLOW VAI",
+  title: "15-Minute Skincare Delivery in Vijayawada",
   description: DESCRIPTION,
   alternates: {
     canonical: `${SITE_URL}/delivery`,
