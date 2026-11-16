@@ -206,3 +206,7 @@
 }
 .glowvai-root .shop-screen.shop-desk .shop-desk-cat-media img.shop-desk-cat-mark{ width: 36%; }
 .glowvai-root .shop-screen.shop-desk .shop-desk-search-input:focus-visible{ outline: none; }
+
+/* Trending Now tiles are the admin's banner pictures (landscape): fill a 3:2 frame instead of floating inside a tall square well. */
+.glowvai-root .shop-desk .shop-desk-live-trend-media { aspect-ratio: 3 / 2; }
+.glowvai-root .shop-desk .shop-desk-live-trend-media img { padding: 0; object-fit: cover; mix-blend-mode: normal; }
