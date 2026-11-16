@@ -91,3 +91,6 @@
 @media (prefers-reduced-motion: reduce) {
   .glowvai-root .gvh *, .glowvai-root .mini-cart-bar, .glowvai-root .quick-bottom-nav * { transition: none !important; }
 }
+
+/* A finished poster has its words on the left: on a narrow phone keep the left side, not the centre. */
+.glowvai-root .gvh .gvh-slide.is-hero img.is-poster-img { object-position: left center; }

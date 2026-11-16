@@ -264,7 +264,7 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
       <div className="gvh-hero-track" style={{ transform: `translateX(-${current * 100}%)`, '--gvd-i': current } as React.CSSProperties}>
         <div className="gvh-slide is-hero" aria-hidden={current !== 0} role="group" aria-roledescription="slide" aria-label={`1 of ${count}`}>
           {design.video && <HeroVideo src={design.video} />}
-          <img src={hero?.image || HERO_IMAGE} alt={hero?.image && hero.title ? hero.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
+          <img className={poster ? "is-poster-img" : undefined} src={hero?.image || HERO_IMAGE} alt={hero?.image && hero.title ? hero.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
           {!poster && <span className="gvh-slide-shade" aria-hidden="true" />}
           {!poster && (
           <div className="gvh-slide-copy">
