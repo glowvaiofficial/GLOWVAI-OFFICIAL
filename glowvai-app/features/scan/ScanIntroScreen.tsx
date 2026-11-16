@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronRight, Image as ImageIcon, Lightbulb, ScanFace, Glasses, Eye } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { ScanHeader } from './components/ScanHeader';
+import { warmScanServer } from './services/scanApi';
 
 const STEPS = [
   {
@@ -23,6 +24,10 @@ const STEPS = [
 
 export const ScanIntroScreen: React.FC = () => {
   const { navigate, goBack, accountSignedIn } = useApp();
+  // The scan server may be asleep: start waking it while the customer reads the tips.
+  React.useEffect(() => {
+    warmScanServer();
+  }, []);
 
   return (
     <div className="scan-screen">

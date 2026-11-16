@@ -46,7 +46,8 @@ export class ScanError extends Error {
   }
 }
 
-const REQUEST_TIMEOUT_MS = 20_000;
+// The hosted scan server sleeps when idle (free plan) and takes about 20-25 s to wake: 50 s covers that wake-up plus the scan.
+const REQUEST_TIMEOUT_MS = 50_000;
 
 interface PredictResponse {
   success?: boolean;
@@ -197,4 +198,18 @@ export async function analyzeFaceImage(
     'backend_unreachable',
     `Skin analysis service unreachable: ${String(lastError ?? 'no response')}`
   );
+}
+
+/** Wakes the hosted scan server before the customer needs it (fire and forget; it answers GET /health). Safe to call often. */
+let lastWarm = 0;
+export function warmScanServer(now: number = Date.now()): void {
+  if (now - lastWarm < 4 * 60_000) return;
+  lastWarm = now;
+  try {
+    const base = getCloudBackendUrl();
+    if (!base) return;
+    void fetch(`${base.replace(/\/$/, '')}/health`, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(() => undefined);
+  } catch {
+    // Warming is best effort only.
+  }
 }

@@ -1,0 +1,15 @@
+# The scan server on Render's free plan sleeps after idle and then needs 20-25 s to wake.
+# This pings its /health every 10 minutes so a customer's first scan is not the one that wakes it.
+name: Keep the scan server awake
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping /health
+        run: curl --fail --silent --show-error --max-time 60 https://glowvai-backend-r7u2.onrender.com/health
