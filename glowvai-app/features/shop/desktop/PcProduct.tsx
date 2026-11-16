@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, FlaskConical, Heart, Minus, Plus, RotateCcw, Share2, ShieldCheck, ShoppingBag, Star, Truck, Zap, MapPin, Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
@@ -6,10 +6,12 @@ import { ShopProductCard } from '../shared/ShopProductCard';
 import { formatRupee } from '../shared/shopUtils';
 import { isServiceablePincode } from '../../commerce/lib/addressStore';
 import { ProductReviews } from '../../reviews/ProductReviews';
+import { ProductQuestions } from '../../reviews/ProductQuestions';
+import { readRecentlyViewed } from '../lib/recentlyViewed';
 import '../styles/shop-pc-browse.css';
 import '../styles/v3-glass-pc.css';
 
-type TabId = 'description' | 'how' | 'ingredients' | 'reviews';
+type TabId = 'description' | 'how' | 'ingredients' | 'reviews' | 'qa';
 
 // General guidance by product type. It is not product-specific claims: the pack's own instructions always come first.
 const HOW_TO_USE: Record<string, string[]> = {
@@ -51,6 +53,7 @@ export interface PcProductProps {
 export const PcProduct: React.FC<PcProductProps> = (p) => {
   const { product, catalog, navigate } = p;
   const [tab, setTab] = useState<TabId>('description');
+  const [recent, setRecent] = useState<SkincareProduct[]>([]);
   const [zoom, setZoom] = useState(false);
   const [origin, setOrigin] = useState('50% 50%');
   const [imgFailed, setImgFailed] = useState(false);
@@ -62,6 +65,31 @@ export const PcProduct: React.FC<PcProductProps> = (p) => {
     const other = catalog.filter((c) => c.id !== product.id && c.category !== product.category);
     return [...same, ...other].slice(0, 12);
   }, [catalog, product.id, product.category]);
+
+  // Products looked at before this one (ids only on the device), shown from the live catalogue.
+  useEffect(() => {
+    const byId = new Map(catalog.map((c) => [c.id, c]));
+    setRecent(readRecentlyViewed().filter((id) => id !== product.id).map((id) => byId.get(id)).filter((c): c is SkincareProduct => !!c).slice(0, 12));
+  }, [catalog, product.id]);
+
+  // The section tabs follow the scroll: the section under the sticky tab bar is the active one.
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    const ids: TabId[] = ['description', 'how', 'ingredients', 'reviews', 'qa'];
+    const seen = new Map<string, number>();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => seen.set(e.target.id, e.isIntersecting ? e.boundingClientRect.top : Infinity));
+      const open = ids.filter((id) => (seen.get(`pcp-sec-${id}`) ?? Infinity) !== Infinity);
+      if (open.length > 0) setTab(open[0]);
+    }, { rootMargin: '-150px 0px -55% 0px' });
+    ids.forEach((id) => { const el = document.getElementById(`pcp-sec-${id}`); if (el) io.observe(el); });
+    return () => io.disconnect();
+  }, []);
+
+  const goTo = (id: TabId) => {
+    setTab(id);
+    document.getElementById(`pcp-sec-${id}`)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  };
 
   const checkPin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +109,7 @@ export const PcProduct: React.FC<PcProductProps> = (p) => {
     { id: 'how', label: 'How to use' },
     { id: 'ingredients', label: 'Ingredients' },
     { id: 'reviews', label: `Reviews${product.reviewCount ? ` (${product.reviewCount.toLocaleString('en-IN')})` : ''}` },
+    { id: 'qa', label: 'Questions & answers' },
   ];
   const openReviews = () => navigate('shop-product-reviews', { productId: product.id });
   const save = p.mrp - p.price;
@@ -127,7 +156,7 @@ export const PcProduct: React.FC<PcProductProps> = (p) => {
             {product.rating !== null && product.reviewCount !== null && (
               <div className="pcp-rate">
                 <span className="shop-product-rating"><Star size={12} fill="currentColor" />{product.rating.toFixed(1)}</span>
-                <button type="button" className="shop-product-reviews-link" onClick={() => setTab('reviews')}>
+                <button type="button" className="shop-product-reviews-link" onClick={() => goTo('reviews')}>
                   {product.reviewCount.toLocaleString('en-IN')} reviews
                 </button>
               </div>
@@ -169,6 +198,13 @@ export const PcProduct: React.FC<PcProductProps> = (p) => {
               </div>
               {save > 0 && <p className="pcp-save">Save {formatRupee(save)} ({p.discount}% off)</p>}
             </div>
+            {save > 0 && (
+              <dl className="pcp-offer" aria-label="Offer">
+                <div><dt>MRP</dt><dd><s>{formatRupee(p.mrp)}</s></dd></div>
+                <div><dt>Discount</dt><dd>{p.discount}% off</dd></div>
+                <div><dt>You save</dt><dd>{formatRupee(save)} on this order</dd></div>
+              </dl>
+            )}
             {p.stockState && (
               <p className={`shop-product-stock is-${p.stockState.state}`} role="status" aria-live="polite" style={{ margin: 0 }}>
                 {p.stockState.state === 'out' ? 'Out of stock' : p.stockState.state === 'low' ? `Only ${p.stockState.count} left` : 'In stock'}
@@ -225,54 +261,67 @@ export const PcProduct: React.FC<PcProductProps> = (p) => {
 
         {p.subscribeNode && <div className="pcp-extra">{p.subscribeNode}</div>}
 
-        <section className="pcp-tabs" aria-label="Product information">
-          <div className="pcp-tablist" role="tablist">
+        <nav className="pcp-tabs" aria-label="Product sections">
+          <div className="pcp-tablist">
             {tabs.map((t) => (
-              <button key={t.id} type="button" role="tab" id={`pcp-tab-${t.id}`} aria-selected={tab === t.id} aria-controls="pcp-panel" className={`pcp-tab${tab === t.id ? ' is-on' : ''}`} onClick={() => setTab(t.id)}>
+              <button key={t.id} type="button" aria-current={tab === t.id ? 'true' : undefined} className={`pcp-tab${tab === t.id ? ' is-on' : ''}`} onClick={() => goTo(t.id)}>
                 {t.label}
               </button>
             ))}
           </div>
-          <div className="pcp-panel" role="tabpanel" id="pcp-panel" aria-labelledby={`pcp-tab-${tab}`}>
-            {tab === 'description' && (
+        </nav>
+
+        <div className="pcp-sections">
+          <section className="pcp-sec" id="pcp-sec-description" aria-labelledby="pcp-h-description">
+            <h2 id="pcp-h-description">Description</h2>
+            {product.description ? <p>{product.description}</p> : <p className="pcp-muted">No description has been added for this product yet.</p>}
+            <dl className="shop-product-specs">
+              <div><dt>Brand</dt><dd>{product.brand}</dd></div>
+              <div><dt>Category</dt><dd><button type="button" onClick={() => navigate('shop-category', { categoryId: product.category })}>{p.categoryLabel}</button></dd></div>
+              <div><dt>{p.hasOptions ? 'Option' : 'Size'}</dt><dd>{p.optionNoun}</dd></div>
+            </dl>
+          </section>
+          <section className="pcp-sec" id="pcp-sec-how" aria-labelledby="pcp-h-how">
+            <h2 id="pcp-h-how">How to use</h2>
+            {steps.length > 0 ? (
               <>
-                {product.description ? <p>{product.description}</p> : <p className="pcp-muted">No description has been added for this product yet.</p>}
-                <dl className="shop-product-specs">
-                  <div><dt>Brand</dt><dd>{product.brand}</dd></div>
-                  <div><dt>Category</dt><dd><button type="button" onClick={() => navigate('shop-category', { categoryId: product.category })}>{p.categoryLabel}</button></dd></div>
-                  <div><dt>{p.hasOptions ? 'Option' : 'Size'}</dt><dd>{p.optionNoun}</dd></div>
-                </dl>
+                <ol className="pcp-steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
+                <p className="pcp-muted" style={{ marginTop: 16 }}>General guidance for this type of product. Always follow the instructions on the pack, and do a patch test first.</p>
               </>
-            )}
-            {tab === 'how' && (
-              steps.length > 0 ? (
-                <>
-                  <ol className="pcp-steps">{steps.map((s) => <li key={s}>{s}</li>)}</ol>
-                  <p className="pcp-muted" style={{ marginTop: 16 }}>General guidance for this type of product. Always follow the instructions on the pack, and do a patch test first.</p>
-                </>
-              ) : <p className="pcp-muted">Follow the instructions on the pack.</p>
-            )}
-            {tab === 'ingredients' && (
-              product.keyActives.length > 0 ? (
-                <ul className="shop-product-actives">
-                  {product.keyActives.map((a) => <li key={a}><FlaskConical size={14} />{a}</li>)}
-                </ul>
-              ) : <p className="pcp-muted">The ingredient list has not been added for this product yet.</p>
-            )}
-            {tab === 'reviews' && (
-              <>
-                <ProductReviews productId={product.id} />
-                <button type="button" className="shop-btn-secondary" style={{ width: 'auto', marginTop: 16 }} onClick={openReviews}>See all ratings and reviews</button>
-              </>
-            )}
-          </div>
-        </section>
+            ) : <p className="pcp-muted">Follow the instructions on the pack.</p>}
+          </section>
+          <section className="pcp-sec" id="pcp-sec-ingredients" aria-labelledby="pcp-h-ingredients">
+            <h2 id="pcp-h-ingredients">Ingredients</h2>
+            {product.keyActives.length > 0 ? (
+              <ul className="shop-product-actives">
+                {product.keyActives.map((a) => <li key={a}><FlaskConical size={14} />{a}</li>)}
+              </ul>
+            ) : <p className="pcp-muted">The ingredient list has not been added for this product yet.</p>}
+          </section>
+          <section className="pcp-sec" id="pcp-sec-reviews" aria-label="Ratings and reviews">
+            <ProductReviews productId={product.id} />
+            <button type="button" className="shop-btn-secondary" style={{ width: 'auto', marginTop: 16 }} onClick={openReviews}>See all ratings and reviews</button>
+          </section>
+          <section className="pcp-sec" id="pcp-sec-qa" aria-label="Questions and answers">
+            <ProductQuestions productId={product.id} />
+          </section>
+        </div>
 
         {similar.length > 0 && (
           <section className="pcp-rail" aria-label="Similar products">
             <h2>Similar products</h2>
             <div className="pcp-rail-row">
               {similar.map((s) => (
+                <ShopProductCard key={s.id} product={s} rich onOpen={(x) => navigate('shop-product', { productId: x.id })} />
+              ))}
+            </div>
+          </section>
+        )}
+        {recent.length > 0 && (
+          <section className="pcp-rail" aria-label="Recently viewed">
+            <h2>Recently viewed</h2>
+            <div className="pcp-rail-row">
+              {recent.map((s) => (
                 <ShopProductCard key={s.id} product={s} rich onOpen={(x) => navigate('shop-product', { productId: x.id })} />
               ))}
             </div>
