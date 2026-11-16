@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Store, Truck, Sparkles, Users, CheckCircle2, ShieldCheck, Mail, Phone, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/lib/site-url";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { emailFor } from "@/config/emails";
 import { getAssetPath } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: DESC,
   alternates: { canonical: `${SITE_URL}/partners` },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Partner With GLOW VAI | Stores, Brands & Fleets",
     description: DESC,
     url: `${SITE_URL}/partners`,
@@ -113,12 +114,10 @@ export default function PartnersPage() {
               Whether you operate a licensed pharmacy in Vijayawada, manufacture clinical skincare formulas, or drive in our delivery network, we offer transparent, profitable partnership models.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <a href="#partner-tracks">
-                <Button variant="primary" size="lg">
+              <ButtonLink href="#partner-tracks" variant="primary" size="lg">
                   <span>Explore Partnership Tracks</span>
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </a>
+                </ButtonLink>
               <Link href="/referral" className={`inline-flex items-center gap-2 font-medium underline underline-offset-4 rounded ${focusRing}`}>
                 Auto Driver & Campus Referral Portal
               </Link>

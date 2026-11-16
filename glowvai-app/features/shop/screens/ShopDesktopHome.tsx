@@ -31,6 +31,7 @@ import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
 import { HeroExtras, HeroVideo, useHeroDesign } from '../shared/DesignerBanner';
 import { useDesignerCard } from '../shared/designerCard';
 import '../styles/shop-desktop-home.css';
+import '../styles/v2-home-pc.css';
 import '../styles/shop-type.css';
 
 // The desktop home (screens 1024px wide and more, or ?device=desktop): the PC version of the GlowVai home design. It

@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   title: "Brand Kit",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/press/brand-kit` },
-  openGraph: { title: "Brand Kit | GLOW VAI", description: DESC, url: `${SITE_URL}/press/brand-kit` },
+  openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: "Brand Kit | GLOW VAI", description: DESC, url: `${SITE_URL}/press/brand-kit` },
 };
 
 const colours = [

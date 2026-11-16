@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: "Track Your Order",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/track-order` },
-  openGraph: { title: "Track Your Order | GLOW VAI", description: DESC, url: `${SITE_URL}/track-order` },
+  openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: "Track Your Order | GLOW VAI", description: DESC, url: `${SITE_URL}/track-order` },
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

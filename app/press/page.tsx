@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Download, Mail, Phone, ExternalLink, Sparkles, Shield, Award } from "lucide-react";
 import { SITE_URL } from "@/lib/site-url";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { emailFor } from "@/config/emails";
 import { getAssetPath } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: DESC,
   alternates: { canonical: `${SITE_URL}/press` },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Press & Media Center | GLOW VAI",
     description: DESC,
     url: `${SITE_URL}/press`,
@@ -82,12 +83,10 @@ export default function PressPage() {
               GLOW VAI is the Indian skincare brand redefining routine discovery. We combine on-device smartphone diagnostic intelligence with hyperlocal 15-minute doorstep delivery.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <a href={`mailto:${mail}?subject=Media Inquiry: GLOW VAI`}>
-                <Button variant="primary" size="lg">
+              <ButtonLink href={`mailto:${mail}?subject=Media Inquiry: GLOW VAI`} variant="primary" size="lg">
                   <Mail className="w-5 h-5" aria-hidden="true" />
                   <span>Contact Press Team</span>
-                </Button>
-              </a>
+                </ButtonLink>
               <Link href="/press/brand-kit" className={`inline-flex items-center gap-2 font-medium underline underline-offset-4 rounded ${focusRing}`}>
                 Download Brand Kit
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />

@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   title: "Help Center",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/help` },
-  openGraph: { title: "Help Center | GLOW VAI", description: DESC, url: `${SITE_URL}/help` },
+  openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: "Help Center | GLOW VAI", description: DESC, url: `${SITE_URL}/help` },
 };
 
 const topics = [

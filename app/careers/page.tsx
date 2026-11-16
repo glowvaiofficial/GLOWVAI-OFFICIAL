@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ArrowRight, Briefcase, Sparkles, Zap, Heart, CheckCircle2, MapPin, Clock } from "lucide-react";
 import { SITE_URL } from "@/lib/site-url";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { emailFor } from "@/config/emails";
 import { getAssetPath } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: DESC,
   alternates: { canonical: `${SITE_URL}/careers` },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Careers at GLOW VAI | Join Our Team in Andhra Pradesh",
     description: DESC,
     url: `${SITE_URL}/careers`,
@@ -113,12 +114,10 @@ export default function CareersPage() {
               We pair 30-second camera skin diagnostics with 15-minute doorstep delivery in Andhra Pradesh. We are a fast-moving, high-conviction team looking for craft-focused builders.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <a href="#open-roles">
-                <Button variant="primary" size="lg">
+              <ButtonLink href="#open-roles" variant="primary" size="lg">
                   <span>View Open Roles</span>
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </a>
+                </ButtonLink>
               <Link href="/our-story" className={`inline-flex items-center gap-2 font-medium underline underline-offset-4 rounded ${focusRing}`}>
                 Read our founder story
               </Link>

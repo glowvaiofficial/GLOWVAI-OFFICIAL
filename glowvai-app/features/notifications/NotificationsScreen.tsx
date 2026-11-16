@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bell, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Bell, ChevronRight, MessageSquare, Package, Star, User } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { useInbox } from '../../core/notifications/inboxStore';
 import { fetchNotificationPrefs, saveNotificationPrefs, type InAppNotification, type NotificationPrefs } from '../../core/services/shopApi';
@@ -10,13 +10,32 @@ const formatWhen = (ms: number): string => {
   return new Date(ms).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 };
 
+type NotifGroup = 'Today' | 'Yesterday' | 'Earlier';
+const GROUPS: NotifGroup[] = ['Today', 'Yesterday', 'Earlier'];
+
+const groupOf = (ms: number): NotifGroup => {
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+  if (ms >= startToday.getTime()) return 'Today';
+  if (ms >= startToday.getTime() - 86_400_000) return 'Yesterday';
+  return 'Earlier';
+};
+
+const iconFor = (item: InAppNotification) => {
+  if (item.relatedType === 'order') return <Package size={18} />;
+  if (item.relatedType === 'review') return <Star size={18} />;
+  if (item.relatedType === 'question') return <MessageSquare size={18} />;
+  if (item.relatedType === 'account') return <User size={18} />;
+  return <Bell size={18} />;
+};
+
 const NotificationRow: React.FC<{ item: InAppNotification; onOpen: (item: InAppNotification) => void }> = ({ item, onOpen }) => {
   const unread = item.readAt === null;
   const opens = item.relatedType === 'order' && Boolean(item.relatedId);
   return (
     <li>
       <button type="button" className={unread ? 'notif-item is-unread' : 'notif-item'} onClick={() => onOpen(item)}>
-        <span className="notif-dot" aria-hidden="true" />
+        <span className="notif-icon-tile" aria-hidden="true">{iconFor(item)}</span>
         <span className="notif-item-copy">
           <span className="notif-item-title">
             {item.title}
@@ -25,6 +44,7 @@ const NotificationRow: React.FC<{ item: InAppNotification; onOpen: (item: InAppN
           <span className="notif-item-body">{item.body}</span>
           <span className="notif-item-time">{formatWhen(item.createdAt)}</span>
         </span>
+        {unread && <span className="notif-dot" aria-hidden="true" />}
         {opens && <ChevronRight size={18} aria-hidden="true" />}
       </button>
     </li>
@@ -107,6 +127,47 @@ export const NotificationsScreen: React.FC = () => {
       <div className="notif-body">
         <PushPrompt />
 
+        <section aria-labelledby="notif-list-title">
+          <h2 id="notif-list-title" className="notif-section-title">Recent</h2>
+          {status === 'loading' && items.length === 0 && (
+            <div className="notif-skeleton" role="status" aria-label="Loading your notifications">
+              {[0, 1, 2].map((n) => <span key={n} className="notif-skeleton-row" aria-hidden="true" />)}
+            </div>
+          )}
+          {status === 'error' && (
+            <div className="notif-empty">
+              <p role="alert">{error ?? 'We could not load your notifications.'}</p>
+              <button type="button" className="notif-primary" onClick={() => void refresh()}>Try again</button>
+            </div>
+          )}
+          {status === 'ready' && items.length === 0 && (
+            <div className="notif-empty">
+              <Bell size={28} aria-hidden="true" />
+              <p>No notifications yet. Order and account updates will appear here.</p>
+            </div>
+          )}
+          {GROUPS.map((group) => {
+            const rows = items.filter((item) => groupOf(item.createdAt) === group);
+            if (rows.length === 0) return null;
+            return (
+              <div key={group} className="notif-group">
+                <h3 className="notif-group-title">{group}</h3>
+                <ul className="notif-list">
+                  {rows.map((item) => (
+                    <NotificationRow key={item.id} item={item} onOpen={open} />
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+          {nextCursor && (
+            <button type="button" className="notif-secondary" onClick={() => void loadMore()} disabled={loadingMore}>
+              {loadingMore ? 'Loading...' : 'Show older notifications'}
+            </button>
+          )}
+          {status === 'ready' && error && <p className="notif-error" role="alert">{error}</p>}
+        </section>
+
         {prefs && (
           <section className="notif-card" aria-labelledby="notif-prefs-title">
             <h2 id="notif-prefs-title">What we message you about</h2>
@@ -123,36 +184,6 @@ export const NotificationsScreen: React.FC = () => {
             {prefError && <p className="notif-error" role="alert">{prefError}</p>}
           </section>
         )}
-
-        <section aria-labelledby="notif-list-title">
-          <h2 id="notif-list-title" className="notif-section-title">Recent</h2>
-          {status === 'loading' && items.length === 0 && <p className="notif-note">Loading your notifications...</p>}
-          {status === 'error' && (
-            <div className="notif-empty">
-              <p role="alert">{error ?? 'We could not load your notifications.'}</p>
-              <button type="button" className="notif-primary" onClick={() => void refresh()}>Try again</button>
-            </div>
-          )}
-          {status === 'ready' && items.length === 0 && (
-            <div className="notif-empty">
-              <Bell size={28} aria-hidden="true" />
-              <p>No notifications yet. Order and account updates will appear here.</p>
-            </div>
-          )}
-          {items.length > 0 && (
-            <ul className="notif-list">
-              {items.map((item) => (
-                <NotificationRow key={item.id} item={item} onOpen={open} />
-              ))}
-            </ul>
-          )}
-          {nextCursor && (
-            <button type="button" className="notif-secondary" onClick={() => void loadMore()} disabled={loadingMore}>
-              {loadingMore ? 'Loading...' : 'Show older notifications'}
-            </button>
-          )}
-          {status === 'ready' && error && <p className="notif-error" role="alert">{error}</p>}
-        </section>
       </div>
     </main>
   );

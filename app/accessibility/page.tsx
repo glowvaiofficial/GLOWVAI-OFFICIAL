@@ -10,7 +10,8 @@ export const metadata: Metadata = {
   title: "Accessibility",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/accessibility` },
-  openGraph: { title: "Accessibility | GLOW VAI", description: DESC, url: `${SITE_URL}/accessibility` },
+  openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: "Accessibility | GLOW VAI", description: DESC, url: `${SITE_URL}/accessibility` },
 };
 
 export default function AccessibilityPage() {

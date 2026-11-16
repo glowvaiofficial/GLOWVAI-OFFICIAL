@@ -9,6 +9,7 @@ import { ShopProductCard } from '../shared/ShopProductCard';
 import { getDiscountPercent } from '../shared/shopUtils';
 import { CONCERN_KEYWORDS } from '../lib/firstVisit';
 import '../styles/shop-pc-browse.css';
+import '../styles/v2-browse.css';
 
 export const PC_CATEGORY_LABELS: Record<string, string> = {
   Serums: 'Serums & Actives',

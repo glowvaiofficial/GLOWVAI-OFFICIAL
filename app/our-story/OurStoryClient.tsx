@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, MapPin, ScanLine, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
 import { storyData } from "@/config/story";
 
@@ -64,12 +64,10 @@ export default function OurStoryClient() {
               clear and quick.
             </p>
             <div className="mt-9 flex flex-col sm:flex-row sm:items-center gap-4">
-              <Link href="/face-analysis">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+              <ButtonLink href="/face-analysis" variant="primary" size="lg" className="w-full sm:w-auto">
                   <ScanLine className="w-5 h-5" aria-hidden="true" />
                   <span>Scan my face, free</span>
-                </Button>
-              </Link>
+                </ButtonLink>
               <Link
                 href="/shop"
                 className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
@@ -219,7 +217,7 @@ export default function OurStoryClient() {
             <div>
               <p aria-hidden="true" className="font-display font-semibold leading-[0.8] tracking-[-0.06em] text-brand text-[clamp(7rem,4rem+12vw,13rem)] [font-feature-settings:'tnum']">
                 {String(ti + 1).padStart(2, "0")}
-                <span className="text-ink/25 text-[0.35em] tracking-normal"> / {String(storyData.timeline.length).padStart(2, "0")}</span>
+                <span className="text-ink-muted text-[0.35em] tracking-normal"> / {String(storyData.timeline.length).padStart(2, "0")}</span>
               </p>
               <div className="mt-6 h-1.5 rounded-[3px] bg-ink/10 overflow-hidden" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={storyData.timeline.length} aria-valuenow={ti + 1}>
                 <div className="h-full bg-brand transition-all" style={{ width: `${((ti + 1) / storyData.timeline.length) * 100}%` }} />
@@ -280,11 +278,9 @@ export default function OurStoryClient() {
             <p className="mt-4 text-white/80 max-w-[52ch]">GLOW VAI Retail, Andhra Pradesh, India.</p>
           </div>
           <div className="md:col-span-4 flex flex-col gap-3">
-            <Link href="/face-analysis">
-              <Button variant="primary" size="lg" className="w-full bg-white !text-ink hover:bg-paper">
+            <ButtonLink href="/face-analysis" variant="primary" size="lg" className="w-full bg-white !text-ink hover:bg-paper">
                 <span>Scan my face, free</span>
-              </Button>
-            </Link>
+              </ButtonLink>
             <Link href="/shop" className="text-white underline underline-offset-[5px] font-medium rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white">
               Explore skincare products
             </Link>

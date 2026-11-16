@@ -8,7 +8,7 @@ import { computeCartTotals, FREE_DELIVERY_ABOVE, normaliseCoupon } from './lib/p
 import { useCheckoutSession } from './lib/checkoutSession';
 import { quoteBag } from './lib/bagQuote';
 import { useDeliveryAddress } from './components/shared';
-import { AddressBlock, EmptyState, FreeDeliveryCard, HelpRow, PremiumHeader, PriceSummary, Thumb, rupee } from './components/premium';
+import { AddressBlock, CheckoutSteps, EmptyState, FreeDeliveryCard, HelpRow, PremiumHeader, PriceSummary, Thumb, rupee } from './components/premium';
 
 type SkippedItem = { name: string; reason: string };
 
@@ -196,6 +196,7 @@ export const CartScreen: React.FC = () => {
         }
       />
 
+      <CheckoutSteps step={1} />
       <div className="commerce-body commerce-split gvp-body">
         <div className="commerce-main">
           <AddressBlock
@@ -204,6 +205,7 @@ export const CartScreen: React.FC = () => {
             onChange={() => navigate('address-saved', { returnTo: 'cart-tab' })}
             onAdd={() => navigate('location-setup', { returnTo: 'cart-tab' })}
           />
+          <FreeDeliveryCard totals={totals} threshold={FREE_DELIVERY_ABOVE} />
           <ReorderNotice items={skipped} />
 
           <section aria-labelledby="cart-items-title">
@@ -283,8 +285,6 @@ export const CartScreen: React.FC = () => {
               })}
             </div>
           </section>
-
-          <FreeDeliveryCard totals={totals} threshold={FREE_DELIVERY_ABOVE} />
         </div>
 
         <aside className="commerce-aside">

@@ -10,7 +10,7 @@ import { SUBSTITUTION_OPTIONS } from '../../core/services/shopTracking';
 import { formatAddressForDisplay } from './lib/displayText';
 import { NETBANKING_BANKS, UPI_APPS, choiceSummary, payButtonLabel, sameChoice, type NetbankingBank, type PaymentChoice, type UpiAppId } from './lib/paymentChoice';
 import { useDeliveryAddress } from './components/shared';
-import { EmptyState, PremiumHeader, PriceSummary, SecureNote, rupee } from './components/premium';
+import { EmptyState, CheckoutSteps, PremiumHeader, PriceSummary, SecureNote, rupee } from './components/premium';
 
 const TIP_OPTIONS = [0, 10, 20, 30];
 
@@ -144,6 +144,7 @@ export const PaymentMethodScreen: React.FC = () => {
         }
       />
 
+      <CheckoutSteps step={3} />
       <div className="commerce-body commerce-split gvp-body">
         <div className="commerce-main">
           {!addressConfirmed && (

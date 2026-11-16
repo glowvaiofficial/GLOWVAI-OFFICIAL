@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ScanLine } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { PRIVACY_SHORT } from "@/config/privacy-copy";
 import { focusRing } from "./shared";
 import { PhoneDemo } from "./PhoneDemo";
@@ -33,12 +33,10 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
             </p>
 
             <div className="mt-9 flex flex-col sm:flex-row sm:items-center gap-x-8 gap-y-4">
-              <Link href="/face-analysis" data-track="scan_cta_click" data-track-location="hero">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto">
+              <ButtonLink href="/face-analysis" data-track="scan_cta_click" data-track-location="hero" variant="primary" size="lg" className="w-full sm:w-auto">
                   <ScanLine className="w-5 h-5" aria-hidden="true" />
                   <span>Scan my face, free</span>
-                </Button>
-              </Link>
+                </ButtonLink>
               <Link
                 href="/shop"
                 data-track="shop_cta_click"
