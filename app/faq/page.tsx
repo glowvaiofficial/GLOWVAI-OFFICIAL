@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/faq`,
   },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Frequently Asked Questions & Support | GLOW VAI",
     description: "Instant answers regarding GLOW VAI delivery, AI face scan, return policies, and product formulations.",
     url: `${SITE_URL}/faq`,

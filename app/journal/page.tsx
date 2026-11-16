@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/journal`,
   },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "GLOW VAI Journal | Skincare Basics & Routine Guides",
     description: "Plain-language skincare guides on ingredients, routines, and skin health from the GLOW VAI team in India.",
     url: `${SITE_URL}/journal`,

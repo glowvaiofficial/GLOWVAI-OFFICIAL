@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: DESC,
   alternates: { canonical: `${SITE_URL}/returns` },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Returns & Refund Policy | 14-Day Skin Guarantee | GLOW VAI",
     description: DESC,
     url: `${SITE_URL}/returns`,

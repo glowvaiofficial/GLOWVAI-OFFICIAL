@@ -18,7 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ topic: st
     title: p.title,
     description: p.intro,
     alternates: { canonical: `${SITE_URL}/help/${p.slug}` },
-    openGraph: { title: `${p.title} | GLOW VAI`, description: p.intro, url: `${SITE_URL}/help/${p.slug}` },
+    openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: `${p.title} | GLOW VAI`, description: p.intro, url: `${SITE_URL}/help/${p.slug}` },
   };
 }
 

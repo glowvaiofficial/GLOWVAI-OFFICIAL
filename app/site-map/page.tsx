@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   title: "Site Map",
   description: DESC,
   alternates: { canonical: `${SITE_URL}/site-map` },
-  openGraph: { title: "Site Map | GLOW VAI", description: DESC, url: `${SITE_URL}/site-map` },
+  openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }], title: "Site Map | GLOW VAI", description: DESC, url: `${SITE_URL}/site-map` },
 };
 
 export default function SiteMapPage() {

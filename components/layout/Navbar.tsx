@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { navLinks } from "@/config/nav";
 import { BRAND_NAME } from "@/config/site";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { ShoppingBag, Menu } from "lucide-react";
 import { MobileMenu } from "./MobileMenu";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -16,7 +16,7 @@ function GlowVaiLogo() {
   return (
     <div className="flex items-center gap-2.5 select-none group">
       <Image src={getAssetPath("/brand/glowvai-wordmark.png")} alt="GLOW VAI" width={132} height={35} priority className="h-8 w-auto" />
-      <span className="hidden min-[480px]:inline text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
+      <span className="hidden min-[480px]:inline md:hidden lg:inline text-[10px] font-semibold tracking-widest text-ink uppercase border border-ink px-2 py-0.5 rounded-full">
         Quick commerce
       </span>
     </div>
@@ -64,7 +64,6 @@ export function Navbar() {
           <Link
             href="/"
             className={cn("-ml-1 p-1 rounded-lg min-h-11 inline-flex items-center", focusRing)}
-            aria-label={`${BRAND_NAME} home`}
           >
             <GlowVaiLogo />
           </Link>
@@ -75,7 +74,7 @@ export function Navbar() {
                 key={link.title}
                 href={link.href}
                 className={cn(
-                  "px-3.5 py-2 text-[15px] font-medium text-ink hover:text-brand transition-colors rounded-lg",
+                  "px-3.5 py-2 text-sm lg:text-[15px] font-medium text-ink hover:text-brand transition-colors rounded-lg",
                   focusRing
                 )}
               >
@@ -102,11 +101,9 @@ export function Navbar() {
             </button>
 
             <div className="hidden sm:block">
-              <Link href="/face-analysis" data-track="scan_cta_click" data-track-location="nav">
-                <Button variant="dark" size="sm">
+              <ButtonLink href="/face-analysis" data-track="scan_cta_click" data-track-location="nav" variant="dark" size="sm">
                   <span>Scan my face</span>
-                </Button>
-              </Link>
+                </ButtonLink>
             </div>
 
             <button

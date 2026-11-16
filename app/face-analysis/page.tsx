@@ -11,6 +11,7 @@ export const metadata = {
     canonical: `${SITE_URL}/face-analysis`,
   },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Free AI Face Scan & Skin Analysis | GLOW VAI",
     description: "Instant 30-second camera skin check for hydration, barrier depth, and pore health.",
     url: `${SITE_URL}/face-analysis`,

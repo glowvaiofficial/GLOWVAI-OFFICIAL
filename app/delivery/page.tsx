@@ -7,7 +7,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { buildWebPageSchema } from "@/lib/seo/schema/webpage";
 import { DeliverySection } from "@/components/home/DeliverySection";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { getAssetPath } from "@/lib/utils";
 
 const DESCRIPTION =
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/delivery`,
   },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "15-Minute Skincare Delivery in Vijayawada | GLOW VAI",
     description: DESCRIPTION,
     url: `${SITE_URL}/delivery`,
@@ -82,12 +83,10 @@ export default function DeliveryPage() {
               No waiting 3 to 5 days for long-haul courier trucks. We pack from licensed partner pharmacies right in your Vijayawada neighborhood and send by local rider.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <a href="#pincode-checker">
-                <Button variant="primary" size="lg">
+              <ButtonLink href="#pincode-checker" variant="primary" size="lg">
                   <span>Check Your Pincode</span>
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
-                </Button>
-              </a>
+                </ButtonLink>
               <Link href="/shop" className={`inline-flex items-center gap-2 font-medium underline underline-offset-4 rounded ${focusRing}`}>
                 Browse in-stock formulas
               </Link>

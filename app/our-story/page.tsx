@@ -12,6 +12,7 @@ export const metadata = {
     canonical: `${siteConfig.url}/our-story`,
   },
   openGraph: {
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "Our Story | GLOW VAI Skincare",
     description: entityConfig.brand.description,
     url: `${siteConfig.url}/our-story`,
