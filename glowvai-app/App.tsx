@@ -41,6 +41,7 @@ import { ProfileOverviewScreen } from './features/profile/ProfileOverviewScreen'
 import './features/shop/styles/v4-allscreens.css';
 import './features/shop/styles/v5-home.css';
 import './features/shop/styles/v5-catalogue.css';
+import './features/shop/styles/v5-checkout.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();

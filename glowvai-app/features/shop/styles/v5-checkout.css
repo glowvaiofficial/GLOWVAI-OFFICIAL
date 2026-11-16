@@ -1,0 +1,106 @@
+/* Website v5, checkout group (16 Nov 2026): cart, checkout, payment, result, address and location screens built as a PC
+   checkout flow. Flat white surfaces on a pearl page, hairline borders, one blue accent, no wash, no glass, no texture.
+   Layout and style only. Loaded once from App.tsx after v4-allscreens.css. */
+
+.glowvai-root {
+  --v5c-page: #f6f8fd;
+  --v5c-line: #e3e9f5;
+  --v5c-ink: #0b1b3f;
+  --v5c-muted: #5b6784;
+  --v5c-blue: #0057fb;
+  --v5c-tint: #eef3ff;
+}
+
+/* ---------- Page: plain pearl, no accent wash ---------- */
+.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content > :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location).commerce-screen,
+.glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content:has(> :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location)) {
+  background: var(--v5c-page);
+}
+@media (min-width: 720px) {
+  .glowvai-root.glowvai-root.glowvai-root .app-viewport:has(.screen-content > :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location)) { background: var(--v5c-page); }
+  .glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content > :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location).commerce-screen,
+  .glowvai-root.glowvai-root.glowvai-root .app-viewport .screen-content:has(> :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location)) { background: transparent; }
+}
+
+/* ---------- Surfaces: flat white cards, hairline border ---------- */
+.glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location) :is(.gvp-card, .commerce-card, .commerce-pin-card, .commerce-empty-state, .commerce-address-add-tile) {
+  border: 1px solid var(--v5c-line); background: #fff; border-radius: 12px;
+  box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment, .gvp-processing, .gvp-result, .commerce-addresses, .commerce-location) :is(.gvp-round, .commerce-icon-btn) {
+  border: 1px solid var(--v5c-line); background: #fff; box-shadow: none;
+}
+.glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment, .commerce-addresses, .commerce-location) :is(.gvp-free, .gvp-save, .gvp-notice) { box-shadow: none; }
+
+/* ---------- Step indicator: Cart, Address, Payment ---------- */
+.glowvai-root .app-viewport .v2c-steps { max-width: 560px; padding: 12px 16px 8px; }
+.glowvai-root .app-viewport .v2c-step::before { height: 2px; top: 15px; background: var(--v5c-line); }
+.glowvai-root .app-viewport .v2c-step-dot { border-width: 1.5px; }
+.glowvai-root .app-viewport .v2c-step.is-on .v2c-step-dot { box-shadow: none; }
+.glowvai-root .app-viewport .v2c-step.is-done .v2c-step-label { color: var(--v5c-ink); }
+
+/* ---------- Primary action and sticky phone bar ---------- */
+.glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment, .commerce-addresses, .commerce-location) > :is(.commerce-sticky-bar, .gvp-bar) {
+  background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; border-top: 1px solid var(--v5c-line);
+  box-shadow: 0 -4px 16px rgba(11, 27, 63, .06);
+}
+.glowvai-root .app-viewport :is(.gvp-btn, .commerce-primary):not(:disabled) { box-shadow: none; }
+.glowvai-root .app-viewport :is(.gvp-btn, .commerce-primary, .commerce-ghost) { min-height: 48px; }
+@media (hover: hover) {
+  .glowvai-root .app-viewport :is(.gvp-btn, .commerce-primary):not(:disabled):hover { background-color: var(--gv-blue-dark, #0046cc); }
+}
+
+/* ---------- Address cards: radio selection ---------- */
+.glowvai-root .app-viewport .commerce-address { transition: border-color .15s ease, background-color .15s ease; }
+.glowvai-root .app-viewport .commerce-address.is-selected { border-color: var(--v5c-blue); background: var(--v5c-tint); box-shadow: 0 0 0 1px var(--v5c-blue); }
+.glowvai-root .app-viewport .commerce-address-pick { position: relative; padding-right: 52px; }
+.glowvai-root .app-viewport .v5-radio {
+  position: absolute; top: 16px; right: 16px; width: 20px; height: 20px; border: 2px solid #b7c3dc; border-radius: 50%; background: #fff; box-sizing: border-box;
+}
+.glowvai-root .app-viewport .commerce-address.is-selected .v5-radio { border-color: var(--v5c-blue); background: radial-gradient(circle, var(--v5c-blue) 0 4.5px, #fff 5.5px); }
+.glowvai-root .app-viewport .commerce-address-add-tile { border-style: dashed; border-color: #b7c3dc; background: #fff; color: var(--v5c-blue); }
+@media (hover: hover) {
+  .glowvai-root .app-viewport .commerce-address:not(.is-selected):hover,
+  .glowvai-root .app-viewport .commerce-address-add-tile:hover { transform: none; box-shadow: none; border-color: var(--v5c-blue); background: var(--v5c-tint); }
+}
+
+/* ---------- Serviceability: white result card, quiet status icon ---------- */
+.glowvai-root .app-viewport .commerce-serve.is-ok,
+.glowvai-root .app-viewport .commerce-serve.is-no { background: #fff; border: 1px solid var(--v5c-line); border-radius: 12px; }
+.glowvai-root .app-viewport .commerce-serve.is-ok .commerce-serve-icon { background: var(--success-bg, #eaf7f0); }
+.glowvai-root .app-viewport .commerce-serve.is-no .commerce-serve-icon { background: var(--warning-bg, #fff7e8); }
+
+/* ---------- PC (1024+): a proper checkout layout ---------- */
+@media (min-width: 1024px) {
+  .glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment, .commerce-addresses, .commerce-location).commerce-screen { max-width: 1280px; margin-inline: auto; width: 100%; padding-top: 8px; }
+  .glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment) .commerce-split { grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; }
+  .glowvai-root .app-viewport :is(.gvp-cart, .gvp-review, .gvp-payment) .commerce-aside .gvp-card { padding: 20px; }
+  /* Saved addresses: a two column grid of equal, compact cards. */
+  .glowvai-root .app-viewport .commerce-address-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
+  .glowvai-root .app-viewport .commerce-address-grid > :is(.commerce-warn, .commerce-muted, .commerce-empty-state) { grid-column: 1 / -1; }
+  .glowvai-root .app-viewport .commerce-address-grid .commerce-address-add-tile { min-height: 96px; height: auto; }
+  /* Location setup and map picker: list on the left, pin / form panel on the right. */
+  .glowvai-root .app-viewport .commerce-location .commerce-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
+  .glowvai-root .app-viewport .commerce-location-picker .commerce-pin-card { min-height: 180px; padding: 24px; }
+  .glowvai-root .app-viewport .commerce-serviceability .commerce-serve { min-height: 280px; }
+}
+
+/* The radio is the last child of the pick button, so the copy block is the second child. */
+.glowvai-root .app-viewport .commerce-address-pick > span:nth-child(2) { display: grid; min-width: 0; gap: 4px; }
+.glowvai-root .app-viewport .commerce-address-pick > .v5-radio { display: block; }
+@media (min-width: 1024px) {
+  .glowvai-root .app-viewport .commerce-address-grid { align-content: start; grid-auto-rows: auto; }
+}
+
+/* Result pages: one centred column with the header over it. */
+@media (min-width: 720px) {
+  .glowvai-root .app-viewport .gvp-result.is-failed.commerce-screen,
+  .glowvai-root .app-viewport .gvp-result.is-none.commerce-screen { max-width: 720px; margin-inline: auto; width: 100%; }
+  .glowvai-root .app-viewport .gvp-result.is-failed .gvp-empty { padding: 32px 28px; }
+}
+.glowvai-root .app-viewport .gvp-confirm-main, .glowvai-root .app-viewport .gvp-confirm-side .gvp-card { box-shadow: none; }
+@media (min-width: 720px) {
+  .glowvai-root .app-viewport .commerce-address-grid { align-content: start; grid-auto-rows: auto; align-items: start; }
+  .glowvai-root .app-viewport .commerce-address-grid > :is(.commerce-warn, .commerce-muted, .commerce-empty-state) { grid-column: 1 / -1; }
+  .glowvai-root .app-viewport .commerce-address-grid > .commerce-address { display: block; }
+}

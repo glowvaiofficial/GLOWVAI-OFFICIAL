@@ -132,6 +132,7 @@ export const AddressListScreen: React.FC = () => {
                     {address.landmark ? ` · Landmark: ${address.landmark}` : ''}
                   </small>
                 </span>
+                <i className="v5-radio" aria-hidden="true" />
               </button>
 
               <div className="commerce-address-actions">
