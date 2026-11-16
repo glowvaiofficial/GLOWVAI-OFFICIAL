@@ -126,3 +126,26 @@ describe("routes and client", () => {
     assert.match(c, /signInWithCustomToken/);
   });
 });
+
+import { phoneAccountClaims } from "../../lib/shop/account/rules";
+
+describe("account gate accepts both sign-in paths, never a bare custom token", () => {
+  test("phone provider still works", () => {
+    assert.deepEqual(phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "phone" }, phone_number: P }), { ok: true, uid: "u", phone: P });
+  });
+  test("custom token with otpVia=httpsms uses otpPhone", () => {
+    assert.deepEqual(
+      phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "custom" }, otpVia: "httpsms", otpPhone: P }),
+      { ok: true, uid: "u", phone: P },
+    );
+  });
+  test("custom token without the claim, or with a bad claim, is rejected", () => {
+    assert.equal(phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "custom" }, phone_number: P }).ok, false);
+    assert.equal(phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "custom" }, otpVia: "other", otpPhone: P }).ok, false);
+    assert.equal(phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "custom" }, otpVia: "httpsms" }).ok, false);
+    assert.equal(phoneAccountClaims({ uid: "u", firebase: { sign_in_provider: "password" }, otpVia: "httpsms", otpPhone: P }).ok, false);
+  });
+  test("verify route mints the token with the claims", () => {
+    assert.match(read("app/api/auth/otp/verify/route.ts"), /createCustomToken\(uid, \{ otpPhone: phone, otpVia: "httpsms" \}\)/);
+  });
+});

@@ -90,21 +90,32 @@ export interface DecodedClaims {
   uid?: unknown;
   firebase?: { sign_in_provider?: unknown };
   phone_number?: unknown;
+  // Developer claims set by /api/auth/otp/verify on a custom token (SMS OTP through httpSMS).
+  otpVia?: unknown;
+  otpPhone?: unknown;
 }
 
 export type PhoneTokenCheck =
   | { ok: true; uid: string; phone: string }
   | { ok: false; status: 403 | 400; error: string };
 
-// Only a token from a phone sign-in creates an account, and the phone number comes from the verified token claim.
+// A token from our own SMS OTP flow: provider "custom" AND the otpVia claim our server sets. A bare custom token never counts.
+export function isHttpSmsToken(claims: DecodedClaims): boolean {
+  return claims.firebase?.sign_in_provider === "custom" && claims.otpVia === "httpsms";
+}
+
+// Only a token from a phone sign-in (Firebase, or our httpSMS flow) creates an account, and the phone number comes from
+// the verified token claim (phone_number, or otpPhone for the httpSMS flow).
 export function phoneAccountClaims(claims: DecodedClaims): PhoneTokenCheck {
-  if (claims.firebase?.sign_in_provider !== "phone") {
+  const viaSms = isHttpSmsToken(claims);
+  if (claims.firebase?.sign_in_provider !== "phone" && !viaSms) {
     return { ok: false, status: 403, error: "Sign in with your mobile number to create an account." };
   }
+  const source = viaSms ? claims.otpPhone : claims.phone_number;
   const uid = typeof claims.uid === "string" ? claims.uid : "";
   if (!uid || uid.length > 128) return { ok: false, status: 403, error: "Sign in again to continue." };
-  const phone = indianE164(claims.phone_number);
-  if (!phone || phone !== claims.phone_number) {
+  const phone = indianE164(source);
+  if (!phone || phone !== source) {
     return { ok: false, status: 400, error: "Use an Indian mobile number to create an account." };
   }
   return { ok: true, uid, phone };

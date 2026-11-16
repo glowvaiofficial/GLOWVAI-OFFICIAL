@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       if ((err as { code?: string }).code !== "auth/user-not-found") throw err;
       uid = (await auth.createUser({ phoneNumber: phone })).uid;
     }
-    return json({ ok: true, customToken: await auth.createCustomToken(uid) });
+    return json({ ok: true, customToken: await auth.createCustomToken(uid, { otpPhone: phone, otpVia: "httpsms" }) });
   } catch {
     console.warn(`[otp] token issue failed for ${maskPhone(phone)}`);
     return json({ ok: false, error: "SIGN_IN_FAILED" }, 500);
