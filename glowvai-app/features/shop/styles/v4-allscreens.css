@@ -1,0 +1,129 @@
+/* Website v4, every screen (16 Nov 2026): the Home design on all the other screens.
+   Accent-wash page (fading into pearl), glass chrome (web header, headers, sticky bars), accent-tinted glass containers,
+   calm interaction (no lift, no zoom; colour or border shift on hover, 0.98 press), one 16px gutter, no overflow.
+   Cool palette only: brand blue is the action colour, the wash is sky, containers take --ac-* when a section sets one.
+   Loaded once from GlowVaiShop.tsx after every other stylesheet. Selectors are scoped under .app-viewport so they win. */
+
+.glowvai-root {
+  --v4-wash: #7aa7ff;
+  --v4-page: #f6f8fd;
+  --v4-fill: rgba(255, 255, 255, .72);
+  --v4-fill-strong: rgba(255, 255, 255, .82);
+  --v4-edge: rgba(255, 255, 255, .72);
+  --v4-hi: inset 0 1px 0 rgba(255, 255, 255, .75);
+  --v4-shadow: 0 10px 30px rgba(11, 27, 77, .08);
+  --v4-blur: blur(16px) saturate(1.6);
+  --v4-solid: rgba(255, 255, 255, .94);
+  --v4-card-bg: color-mix(in srgb, var(--ac-tint, #eaf1ff) 42%, rgba(255, 255, 255, .8));
+  --v4-card-edge: color-mix(in srgb, var(--ac-ring, #dbe6ff) 75%, #fff);
+}
+
+/* ---------- Page: accent wash fading into pearl ---------- */
+.glowvai-root .app-viewport .screen-content > :is(.profile-screen, .rec-screen, .orders-screen, .commerce-screen, .scan-screen, .settings-page,
+  .notif-screen, .shop-screen:not(.shop-home):not(.shop-desk), .auth-screen, .auth-success, .login-reference-screen, .zq-cat, .zq-search-head, .welcome-screen):not(.scan-camera-screen) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--wash, var(--v4-wash)) 24%, #fff) 0, color-mix(in srgb, var(--wash, var(--v4-wash)) 9%, var(--v4-page)) 340px, var(--v4-page) 700px);
+}
+.glowvai-root .app-viewport .screen-content:has(> :is(.profile-screen, .rec-screen, .orders-screen, .commerce-screen, .scan-screen, .settings-page, .notif-screen, .shop-screen:not(.shop-home), .auth-screen)) {
+  background: color-mix(in srgb, var(--v4-wash) 10%, var(--v4-page));
+}
+/* Phone: the page and its header are one wash, so headers carry no fill of their own. */
+.glowvai-root .app-viewport :is(.scan-header, .profile-header, .rec-header, .orders-header, .notif-header, .settings-header, .commerce-head, .gvp-head, .auth-topbar) {
+  background: transparent;
+}
+.glowvai-root .app-viewport .scan-header {
+  -webkit-backdrop-filter: var(--v4-blur); backdrop-filter: var(--v4-blur);
+  background: color-mix(in srgb, var(--wash, var(--v4-wash)) 16%, rgba(255, 255, 255, .6));
+}
+
+/* Round back / icon buttons in headers: glass discs. */
+.glowvai-root .app-viewport :is(.shop-icon-btn, .profile-back, .rec-back, .orders-back, .scan-back, .notif-back, .settings-back, .commerce-back, .gvp-back, .auth-back, .profile-icon-button) {
+  border: 1px solid var(--v4-edge); background: var(--v4-fill-strong); box-shadow: var(--v4-hi), 0 4px 14px rgba(11, 27, 77, .07);
+}
+.glowvai-root .app-viewport :is(.profile-header, .rec-header, .orders-header, .notif-header, .settings-header, .commerce-head, .gvp-head, .scan-header, .shop-header, .auth-topbar) > button:first-child:not([class*="btn-primary"]):not([class*="primary"]) {
+  border: 1px solid var(--v4-edge); background: var(--v4-fill-strong); box-shadow: var(--v4-hi), 0 4px 14px rgba(11, 27, 77, .07);
+  border-radius: 50%; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; display: inline-grid; place-items: center;
+}
+
+/* ---------- Containers: accent-tinted glass ---------- */
+.glowvai-root .app-viewport :is(.profile-card, .gvp-card, .rec-card, .commerce-card, .commerce-product-card, .commerce-pin-card, .orders-empty-state, .orders-card, .orders-order-card,
+  .profile-tile, .auth-card, .auth-concern, .scan-tip-card, .scan-empty-panel, .scan-diagnostic, .scan-check-list, .scan-dropzone, .settings-card, .settings-list, .shop-empty, .shop-card,
+  .commerce-empty-state, .notif-empty, .notif-prompt, .notif-item, .rec-timeline-item, .rec-link-list, .rec-ph-card, .wallet-card, .wallet-balance) {
+  border: 1px solid var(--v4-card-edge); background: var(--v4-card-bg);
+  box-shadow: var(--v4-hi), var(--v4-shadow);
+}
+.glowvai-root .app-viewport :is(.profile-card, .gvp-card, .rec-card, .commerce-card, .shop-empty, .shop-card, .orders-empty-state, .commerce-empty-state, .notif-empty, .settings-card, .auth-card, .scan-tip-card, .scan-empty-panel) {
+  -webkit-backdrop-filter: var(--v4-blur-sm, blur(12px) saturate(1.5)); backdrop-filter: blur(12px) saturate(1.5);
+}
+/* Icon wells inside containers take the accent. */
+.glowvai-root .app-viewport :is(.shop-empty-icon, .orders-empty-icon, .notif-empty-icon, .scan-empty-icon) {
+  background: var(--ac-tint, #eaf1ff); color: var(--ac-text, var(--gv-blue));
+}
+/* Inputs stay crisp white for readability, with an accent focus ring. */
+.glowvai-root .app-viewport :is(.profile-input, .profile-input-wrap, .auth-field, .login-phone-field, .commerce-search, .shop-input) {
+  background: #fff; border-color: var(--v4-card-edge);
+}
+.glowvai-root .app-viewport :is(.profile-input-wrap, .auth-field, .login-phone-field, .commerce-search, .shop-input):focus-within { border-color: var(--gv-blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gv-blue) 18%, transparent); }
+/* Sticky bottom action bars are glass. */
+.glowvai-root .app-viewport :is(.commerce-sticky-bar, .profile-actions-bar, .auth-footer-bar, .rec-sticky, .orders-sticky) {
+  background: var(--v4-fill-strong); -webkit-backdrop-filter: var(--v4-blur); backdrop-filter: var(--v4-blur); border-top: 1px solid var(--v4-edge);
+}
+
+/* ---------- Calm interaction ---------- */
+@media (hover: hover) {
+  .glowvai-root .app-viewport :is(.auth-concern, .commerce-address-add-tile, .orders-order-card, .profile-tile, .scan-routine-item, .shop-product-card, .shop-browse-cat, .shop-home-concern, .shop-wishlist-item .shop-product-card, .shop-wishlist-heart):hover {
+    transform: none !important;
+  }
+  .glowvai-root .app-viewport :is(.auth-concern, .commerce-address-add-tile, .orders-order-card, .profile-tile, .scan-routine-item, .notif-item, .settings-list > *, .rec-link-list > *):hover {
+    border-color: var(--ac, var(--gv-blue)); background-color: color-mix(in srgb, var(--ac-tint, #eaf1ff) 70%, rgba(255, 255, 255, .6));
+  }
+}
+.glowvai-root .app-viewport :is(.profile-tile, .orders-order-card, .auth-concern, .scan-routine-item, .notif-item):active { transform: scale(.98); }
+.glowvai-root .app-viewport :is(.screen-content *) { scroll-margin-top: 80px; }
+
+/* ---------- Gutters and overflow: one 16px rhythm ---------- */
+.glowvai-root .app-viewport .screen-content > * { max-width: 100%; }
+.glowvai-root .app-viewport :is(.profile-body, .orders-body, .rec-body, .commerce-body, .scan-body, .settings-stack, .settings-list, .notif-body, .auth-body) {
+  padding-left: max(var(--gv-gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gv-gutter), env(safe-area-inset-right, 0px));
+  box-sizing: border-box; min-width: 0;
+}
+.glowvai-root .app-viewport :is(.settings-header) { padding-left: max(var(--gv-gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gv-gutter), env(safe-area-inset-right, 0px)); box-sizing: border-box; }
+.glowvai-root .app-viewport :is(.profile-card, .gvp-card, .rec-card, .commerce-card, .settings-card) :is(p, h1, h2, h3, span, a) { overflow-wrap: anywhere; }
+
+/* ---------- PC and tablet (720px and wider): glass web header, wash across the full window ---------- */
+@media (min-width: 720px) {
+  .glowvai-root .app-viewport:not(:has(.shop-desk)):not(:has(.shop-home)) {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--v4-wash) 22%, #fff) 0, color-mix(in srgb, var(--v4-wash) 8%, var(--v4-page)) 360px, var(--v4-page) 760px);
+  }
+  .glowvai-root .app-viewport .screen-content > :is(.profile-screen, .rec-screen, .orders-screen, .commerce-screen, .scan-screen, .settings-page, .notif-screen,
+    .shop-screen:not(.shop-home):not(.shop-desk), .auth-success, .login-reference-screen, .zq-cat, .zq-search-head, .welcome-screen):not(.scan-camera-screen) { background: transparent; }
+  .glowvai-root .app-viewport .screen-content:has(> :is(.profile-screen, .rec-screen, .orders-screen, .commerce-screen, .scan-screen, .settings-page, .notif-screen, .shop-screen:not(.shop-home))) { background: transparent; }
+  .glowvai-root .app-viewport .web-header {
+    border-bottom: 1px solid var(--v4-edge);
+    background: color-mix(in srgb, var(--v4-wash) 16%, rgba(255, 255, 255, .62));
+    -webkit-backdrop-filter: var(--v4-blur); backdrop-filter: var(--v4-blur);
+    box-shadow: var(--v4-hi), 0 8px 26px rgba(11, 27, 77, .07);
+  }
+  .glowvai-root .app-viewport .web-header-search { border-color: var(--v4-edge); background: var(--v4-fill-strong); box-shadow: var(--v4-hi); }
+  .glowvai-root .app-viewport .web-header-search:hover { border-color: var(--gv-blue); background: #fff; }
+  .glowvai-root .app-viewport .web-header-nav button:hover { background: color-mix(in srgb, var(--v4-wash) 18%, rgba(255, 255, 255, .6)); color: var(--gv-ink); }
+  .glowvai-root .app-viewport .web-header-brand { font-family: var(--font-brand); color: var(--gv-blue); }
+  .glowvai-root .app-viewport .web-header-cart:hover { background: var(--ds-brand-dark, #0046cc); }
+  /* Header controls follow the same blue and press as the rest. */
+  .glowvai-root .app-viewport .web-header :is(button, a):active { transform: scale(.98); }
+  /* Content column: a little more air under the glass header on PC. */
+  .glowvai-root .app-viewport .screen-content > :is(.profile-screen, .rec-screen, .orders-screen, .commerce-screen, .scan-screen, .settings-page, .notif-screen, .shop-screen:not(.shop-home):not(.shop-desk)) { padding-top: 8px; }
+}
+@media (min-width: 720px) and (hover: hover) {
+  .glowvai-root .app-viewport .web-header-back:hover { color: var(--gv-blue); }
+}
+
+/* ---------- Fallbacks ---------- */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .glowvai-root .app-viewport :is(.web-header, .scan-header) { background: var(--v4-solid); }
+  .glowvai-root .app-viewport :is(.profile-card, .gvp-card, .rec-card, .commerce-card, .shop-empty, .shop-card, .settings-card, .auth-card, .commerce-sticky-bar) { background: var(--v4-solid); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .glowvai-root .app-viewport :is(.web-header, .scan-header, .profile-card, .gvp-card, .rec-card, .commerce-card, .shop-empty, .shop-card, .settings-card, .auth-card, .commerce-sticky-bar, .scan-tip-card, .scan-empty-panel, .orders-empty-state, .commerce-empty-state, .notif-empty) {
+    -webkit-backdrop-filter: none; backdrop-filter: none; background: #fff;
+  }
+}
