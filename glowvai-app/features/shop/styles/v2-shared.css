@@ -51,7 +51,7 @@
 @media (hover: hover){
   .glowvai-root .shop-chip:hover{ background: var(--gv-blue-tint); }
   .glowvai-root .shop-chip.is-active:hover{ background: var(--gv-blue-dark); }
-  .glowvai-root .shop-btn-primary:hover:not(:disabled){ transform: translateY(-1px); }
+  .glowvai-root .shop-btn-primary:hover:not(:disabled){ }
 }
 .glowvai-root .gv-badge{ display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; background: var(--gv-blue-tint); color: var(--gv-blue); font-size: 11px; font-weight: 700; line-height: 1.3; }
 .glowvai-root .gv-badge.is-save{ background: var(--gv-save-bg); color: var(--gv-save); }
@@ -98,8 +98,8 @@
 .glowvai-root .shop-product-card.is-rich .shop-product-media{ background: var(--gv-blue-tint); }
 .glowvai-root .shop-product-card.is-rich.is-list .shop-product-media{ flex: 0 0 180px; margin: 10px; }
 @media (hover: hover){
-  .glowvai-root .shop-product-card.shop-product-card:hover{ transform: translateY(-3px); box-shadow: var(--gv-shadow-card-hover); border-color: #cfdcfb; }
-  .glowvai-root .shop-product-card:hover .shop-product-open img{ transform: scale(1.04); }
+  .glowvai-root .shop-product-card.shop-product-card:hover{ box-shadow: var(--gv-shadow-card-hover); border-color: #cfdcfb; }
+  .glowvai-root .shop-product-card:hover .shop-product-open img{ }
   .glowvai-root .shop-product-card .shop-product-add:hover{ background: var(--gv-blue-dark); }
 }
 .glowvai-root .shop-product-card:active{ transform: scale(.985); }

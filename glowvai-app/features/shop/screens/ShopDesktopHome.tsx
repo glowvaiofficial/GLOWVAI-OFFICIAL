@@ -33,6 +33,7 @@ import { useDesignerCard } from '../shared/designerCard';
 import '../styles/shop-desktop-home.css';
 import '../styles/v2-home-pc.css';
 import '../styles/shop-type.css';
+import '../styles/v3-glass-pc.css';
 
 // The desktop home (screens 1024px wide and more, or ?device=desktop): the PC version of the GlowVai home design. It
 // renders the desktop layout the GlowVai team designed in the admin (device=desktop; the mobile layout when none is
@@ -1346,7 +1347,7 @@ export const ShopDesktopHome: React.FC = () => {
   return (
     <DesignerStyleProvider styles={designerStyles} look={designerLook} heroVideo={heroVideo}>
     <LucideProvider strokeWidth={1.75}>
-      <div className="shop-screen shop-desk">
+      <div className="shop-screen shop-desk" style={{ '--wash': headerAccent } as React.CSSProperties}>
         <span ref={topRef} className="shop-desk-top" aria-hidden="true" />
         <header className={`shop-desk-header${scrolled ? ' is-scrolled' : ''}`} style={accentStyle(headerAccent)}>
           <div className="shop-desk-utility">

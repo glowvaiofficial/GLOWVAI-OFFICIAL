@@ -7,6 +7,7 @@ import { formatRupee } from '../shared/shopUtils';
 import { isServiceablePincode } from '../../commerce/lib/addressStore';
 import { ProductReviews } from '../../reviews/ProductReviews';
 import '../styles/shop-pc-browse.css';
+import '../styles/v3-glass-pc.css';
 
 type TabId = 'description' | 'how' | 'ingredients' | 'reviews';
 

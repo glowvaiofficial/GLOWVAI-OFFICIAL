@@ -1,0 +1,172 @@
+/* Web v3, PC (1024px and wider): liquid glass over the accent wash. Loaded last, so it refines shop-desktop-home.css,
+   v2-home-pc.css and the PC browse/product chrome. Surfaces are translucent and tinted by their own accent (--acc and
+   friends, set per section by the admin or the category); product cards stay crisp white. Hover changes colour or
+   border only: nothing lifts, scales or slides. Blur is limited to the header, the greeting strip, the hero side tiles
+   and the trust strip (never on long scrolling lists). */
+
+.glowvai-root .shop-screen.shop-desk{
+  --g-wash: var(--wash, #0057FB);
+  --g-fill: rgba(255, 255, 255, .62);
+  --g-edge: rgba(255, 255, 255, .7);
+  --g-blur: blur(18px) saturate(1.6);
+  --g-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), 0 10px 30px rgba(11, 27, 77, .08);
+  --g-spec: linear-gradient(135deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 42%);
+}
+
+/* Page: an accent wash from the header colour, with soft glows so the glass has something to refract. */
+.glowvai-root .shop-screen.shop-desk{
+  background-color: #f1f5fd;
+  background-image:
+    radial-gradient(900px 520px at 6% 380px, color-mix(in srgb, var(--g-wash) 16%, transparent), transparent 70%),
+    radial-gradient(900px 520px at 96% 980px, color-mix(in srgb, var(--g-wash) 13%, transparent), transparent 70%),
+    radial-gradient(1200px 520px at 50% -60px, color-mix(in srgb, var(--g-wash) 30%, transparent), transparent 72%),
+    linear-gradient(180deg, color-mix(in srgb, var(--g-wash) 14%, #ffffff) 0, #eef3fd 420px, #f3f6fd 900px, #f1f5fd 100%);
+  background-repeat: no-repeat;
+}
+
+/* Header: glass in the section accent, with the sticky section links. */
+.glowvai-root .shop-desk .shop-desk-header{
+  background-color: color-mix(in srgb, var(--acc, #0057FB) 93%, transparent);
+  -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .22), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+.glowvai-root .shop-desk .shop-desk-header.is-scrolled{ box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .22), 0 10px 30px rgba(11, 27, 77, .16); }
+.glowvai-root .shop-desk .shop-desk-jump{ background: rgba(255, 255, 255, .1); border-top-color: rgba(255, 255, 255, .28); }
+.glowvai-root .shop-desk .shop-desk-jump-inner button{ border-color: rgba(255, 255, 255, .45); background: rgba(255, 255, 255, .16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3); }
+.glowvai-root .shop-desk .shop-desk-jump-inner button:hover{ background: rgba(255, 255, 255, .92); color: var(--acc-ink, var(--desk-brand)); }
+.glowvai-root .shop-desk .shop-desk-search{ background: rgba(255, 255, 255, .92); border-color: rgba(255, 255, 255, .8); }
+.glowvai-root .shop-desk .shop-desk-action.is-icon{ background: rgba(255, 255, 255, .9); }
+.glowvai-root .shop-desk .shop-desk-mega,
+.glowvai-root .shop-desk .shop-desk-suggest{ background: rgba(255, 255, 255, .88); -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur); border: 1px solid var(--g-edge); box-shadow: var(--g-shadow); }
+
+/* Glass panels: greeting, hero side tiles, trust strip. */
+.glowvai-root .shop-desk :is(.shop-desk-greet, .shop-desk-side-tile:not(.is-scan), .shop-desk-trust){
+  position: relative;
+  border: 1px solid var(--g-edge);
+  background: var(--g-spec), color-mix(in srgb, var(--acc, #0057FB) 9%, var(--g-fill));
+  -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+  box-shadow: var(--g-shadow);
+}
+.glowvai-root .shop-desk .shop-desk-greet{ --acc: var(--wash, #0057FB); }
+.glowvai-root .shop-desk .shop-desk-side-tile.is-scan{
+  border: 1px solid rgba(255, 255, 255, .4);
+  background: var(--g-spec), color-mix(in srgb, var(--acc-deep, var(--acc, #0057FB)) 88%, transparent);
+  -webkit-backdrop-filter: var(--g-blur); backdrop-filter: var(--g-blur);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 14px 34px rgba(11, 27, 77, .18);
+}
+.glowvai-root .shop-desk .shop-desk-hero{ box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 14px 38px rgba(11, 27, 77, .12); }
+
+/* Section panels: translucent accent tint, specular edge, no blur (they hold long rails). */
+.glowvai-root .shop-desk .shop-desk-main > .shop-desk-section:not(.is-help){
+  border: 1px solid var(--g-edge);
+  background-color: transparent;
+  background-image: var(--g-spec), linear-gradient(180deg, rgba(255, 255, 255, .66) 0%, color-mix(in srgb, var(--acc, #0057FB) 9%, rgba(255, 255, 255, .56)) 100%);
+  background-size: 100% 100%;
+  box-shadow: var(--g-shadow);
+}
+
+/* Tiles inside panels: tinted glass at rest; on hover a deeper tint and an accent border, never a solid fill. */
+.glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-concern, .shop-desk-brand, .shop-desk-promo:not(.is-dark), .shop-desk-live-tile, .shop-desk-live-chip){
+  border: 1px solid var(--g-edge);
+  background: var(--g-spec), color-mix(in srgb, var(--acc, #0057FB) 11%, rgba(255, 255, 255, .6));
+  box-shadow: var(--g-shadow);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.glowvai-root .shop-desk .shop-desk-price{ background: var(--g-spec), linear-gradient(120deg, color-mix(in srgb, var(--acc, #0057FB) 9%, rgba(255, 255, 255, .62)), color-mix(in srgb, var(--acc, #0057FB) 20%, rgba(255, 255, 255, .5))); }
+.glowvai-root .shop-desk .shop-desk-price-media,
+.glowvai-root .shop-desk .shop-desk-concern-icon,
+.glowvai-root .shop-desk .shop-desk-brand-mark,
+.glowvai-root .shop-desk .shop-desk-head-icon,
+.glowvai-root .shop-desk .shop-desk-trust svg{ background: rgba(255, 255, 255, .85); box-shadow: inset 0 1px 0 #fff, inset 0 0 0 1px var(--acc-line, rgba(0, 87, 251, .15)), 0 6px 14px -8px var(--acc, #0057FB); color: var(--acc-ink, var(--desk-brand)); }
+.glowvai-root .shop-desk .shop-desk-cat-media{ background: color-mix(in srgb, var(--acc, #0057FB) 10%, rgba(255, 255, 255, .6)); border: 1px solid var(--g-edge); box-shadow: var(--g-shadow); transition: border-color 160ms ease, background-color 160ms ease; }
+.glowvai-root .shop-desk .shop-desk-trust > div + div{ border-left-color: rgba(255, 255, 255, .8); }
+
+@media (hover: hover){
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media,
+  .glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-concern, .shop-desk-brand, .shop-desk-promo:not(.is-dark), .shop-desk-live-tile, .shop-desk-live-chip, .shop-desk-side-tile:not(.is-scan)):hover{
+    border-color: var(--acc, var(--desk-brand));
+    background-color: color-mix(in srgb, var(--acc, #0057FB) 16%, rgba(255, 255, 255, .6));
+    color: var(--desk-ink);
+    box-shadow: var(--g-shadow);
+    transform: none;
+  }
+  .glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-promo:not(.is-dark)):hover :is(b, small, span, strong){ color: inherit; }
+  .glowvai-root .shop-desk .shop-desk-price:hover b{ color: var(--acc-ink, var(--desk-ink)); }
+  .glowvai-root .shop-desk .shop-desk-concern:hover .shop-desk-concern-icon{ background: rgba(255, 255, 255, .9); color: var(--acc-ink, var(--desk-brand)); }
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media img{ mix-blend-mode: multiply; }
+  .glowvai-root .shop-desk .shop-desk-card:hover{ border-color: var(--acc-line, #c9d6f5); box-shadow: 0 1px 2px rgba(20, 27, 52, .04), 0 8px 18px -16px rgba(20, 27, 52, .3); }
+}
+/* Press: a quiet 0.98 squeeze; the tile never goes solid. */
+.glowvai-root .shop-desk .shop-desk-cat:active .shop-desk-cat-media,
+.glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-concern, .shop-desk-promo:not(.is-dark)):active{
+  border-color: var(--acc, var(--desk-brand));
+  background-color: color-mix(in srgb, var(--acc, #0057FB) 18%, rgba(255, 255, 255, .6));
+  color: var(--desk-ink);
+  transform: scale(.98);
+}
+.glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-promo:not(.is-dark)):active :is(b, small, span, strong){ color: inherit; }
+.glowvai-root .shop-desk .shop-desk-concern:active .shop-desk-concern-icon{ background: rgba(255, 255, 255, .9); color: var(--acc-ink, var(--desk-brand)); }
+
+/* Product cards: crisp white, with a glass media well. */
+.glowvai-root .shop-desk .shop-desk-card{ background: #fff; border: 1px solid #e3e9f6; }
+.glowvai-root .shop-desk .shop-desk-card-media{ background: linear-gradient(160deg, rgba(255, 255, 255, .9), color-mix(in srgb, var(--acc, #0057FB) 8%, #f4f7fd)); box-shadow: inset 0 1px 0 #fff; }
+
+/* Buttons and chips: colour only. */
+.glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-cart, .shop-desk-add, .shop-desk-chip, .shop-desk-hero-arrow):hover{ transform: none; }
+.glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-btn-dark, .shop-desk-cart, .shop-desk-add):hover{ box-shadow: none; filter: brightness(1.07); }
+.glowvai-root .shop-desk :where(button, a):focus-visible{ outline: 2px solid var(--acc-ink, var(--desk-brand)); outline-offset: 3px; }
+
+/* Grids tuned to the window. */
+.glowvai-root .shop-desk .shop-desk-concerns{ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.glowvai-root .shop-desk .shop-desk-brand-row{ grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+@media (min-width: 1024px) and (max-width: 1279px){
+  .glowvai-root .shop-desk .shop-desk-hero-row{ grid-template-columns: minmax(0, 1fr) 240px; }
+  .glowvai-root .shop-desk .shop-desk-side-tile{ padding: 14px 16px; }
+  .glowvai-root .shop-desk .shop-desk-side-tile strong{ font-size: 16px; }
+  .glowvai-root .shop-desk .shop-desk-prices{ gap: 12px; }
+  .glowvai-root .shop-desk .shop-desk-price{ padding-right: 104px; }
+  .glowvai-root .shop-desk .shop-desk-price-media{ width: 76px; height: 76px; margin-top: -38px; }
+  .glowvai-root .shop-desk .shop-desk-concerns{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .glowvai-root .shop-desk .shop-desk-trust > div{ padding: 16px 14px; gap: 10px; }
+}
+@media (min-width: 1700px){
+  .glowvai-root .shop-screen.shop-desk{ --desk-max: 1560px; --desk-pad: 40px; }
+  .glowvai-root .shop-desk .shop-desk-hero{ height: 340px; }
+  .glowvai-root .shop-desk .shop-desk-hero-row{ grid-template-columns: minmax(0, 1fr) 380px; }
+}
+
+/* Fallbacks: solid where blur is not available or the visitor asks for less transparency or more contrast. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
+  .glowvai-root .shop-desk :is(.shop-desk-greet, .shop-desk-side-tile:not(.is-scan), .shop-desk-trust, .shop-desk-mega, .shop-desk-suggest){ background: rgba(255, 255, 255, .92); }
+  .glowvai-root .shop-desk .shop-desk-header{ background-color: var(--acc, #0057FB); }
+  .glowvai-root .shop-desk .shop-desk-side-tile.is-scan{ background: var(--acc-deep, var(--acc, #0057FB)); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more){
+  .glowvai-root .shop-desk .shop-desk-header{ background-color: var(--acc, #0057FB); }
+  .glowvai-root .shop-desk :is(.shop-desk-greet, .shop-desk-side-tile:not(.is-scan), .shop-desk-trust, .shop-desk-mega, .shop-desk-suggest, .shop-desk-price, .shop-desk-concern, .shop-desk-brand){ background: #fff; }
+  .glowvai-root .shop-desk .shop-desk-main > .shop-desk-section:not(.is-help){ background: #fbfcff; }
+  .glowvai-root .shop-desk .shop-desk-side-tile.is-scan{ background: var(--acc-deep, var(--acc, #0057FB)); }
+  .glowvai-root .shop-desk *{ -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}
+
+/* ---- PC listing and product screens: the same wash, glass filter panel and sort bar, white cards, calm hover. */
+@media (min-width: 1024px){
+  .glowvai-root .pc-browse, .glowvai-root .pcp{
+    background: radial-gradient(1100px 420px at 50% -40px, rgba(0, 87, 251, .14), transparent 72%), linear-gradient(180deg, #eaf1fe 0, #f3f6fd 420px);
+  }
+  .glowvai-root .pc-filters, .glowvai-root .pc-sortbar{
+    border: 1px solid rgba(255, 255, 255, .7);
+    background: linear-gradient(135deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 42%), rgba(255, 255, 255, .66);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), 0 10px 30px rgba(11, 27, 77, .08);
+  }
+  .glowvai-root .pc-filters-head{ background: rgba(255, 255, 255, .5); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+  .glowvai-root .pc-cat:hover{ transform: none; box-shadow: none; border-color: var(--ds-brand); }
+  .glowvai-root .shop-product-card.is-rich{ background: #fff; }
+}
+@supports not (backdrop-filter: blur(1px)){
+  .glowvai-root .pc-filters, .glowvai-root .pc-sortbar, .glowvai-root .pc-filters-head{ background: rgba(255, 255, 255, .92); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more){
+  .glowvai-root .pc-filters, .glowvai-root .pc-sortbar, .glowvai-root .pc-filters-head{ background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

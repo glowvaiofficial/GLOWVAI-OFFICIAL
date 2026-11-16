@@ -168,7 +168,7 @@
 .glowvai-root .shop-desk .shop-desk-btn-outline{ border: 1.5px solid var(--desk-brand); background: transparent; color: var(--desk-brand); }
 .glowvai-root .shop-desk .shop-desk-btn-outline:hover{ background: var(--desk-brand); color: #fff; }
 .glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-btn-dark, .shop-desk-btn-outline, .shop-desk-see-all, .shop-desk-chip.is-link) svg:last-child{ transition: transform var(--desk-mid) var(--desk-ease); }
-.glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-btn-dark, .shop-desk-btn-outline, .shop-desk-see-all, .shop-desk-chip.is-link):hover svg:last-child{ transform: translateX(3px); }
+.glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-btn-dark, .shop-desk-btn-outline, .shop-desk-see-all, .shop-desk-chip.is-link):hover svg:last-child{ }
 
 /* ---------------------------------------------------------------- Hero carousel */
 /* Full column width, about 340px tall. Slides lie on top of each other and crossfade. A slide: a soft gradient of its
@@ -185,7 +185,7 @@
 .glowvai-root .shop-desk .shop-desk-slide-shapes::after{ bottom: -120px; left: -80px; width: 320px; height: 320px; border: 1px solid var(--acc-line, rgba(79, 142, 247, .35)); opacity: .6; }
 .glowvai-root .shop-desk .shop-desk-slide-media{ position: absolute; top: 0; right: 0; bottom: 0; width: 56%; }
 .glowvai-root .shop-desk .shop-desk-slide-media img{ width: 100%; height: 100%; object-fit: cover; object-position: 67% center; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 26%); mask-image: linear-gradient(90deg, transparent 0%, #000 26%); transition: transform 6s linear; }
-.glowvai-root .shop-desk .shop-desk-slide.is-active .shop-desk-slide-media img{ transform: scale(1.04); }
+.glowvai-root .shop-desk .shop-desk-slide.is-active .shop-desk-slide-media img{ transform: none; }
 .glowvai-root .shop-desk .shop-desk-slide.is-cover{ color: #fff; }
 .glowvai-root .shop-desk .shop-desk-slide.is-cover .shop-desk-slide-media{ width: 100%; }
 .glowvai-root .shop-desk .shop-desk-slide.is-cover .shop-desk-slide-media img{ -webkit-mask-image: none; mask-image: none; object-position: center; }
@@ -460,21 +460,21 @@
 
 /* Hover: a small lift, a soft shadow and a slight zoom of the photo. Press: a short squeeze. */
 @media (hover: hover){
-  .glowvai-root .shop-desk .shop-desk-card:hover{ border-color: transparent; transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-card:hover{ border-color: transparent; box-shadow: var(--desk-shadow-hover); }
   .glowvai-root .shop-desk .shop-desk-card:hover .shop-desk-card-media img,
   .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media img,
-  .glowvai-root .shop-desk .shop-desk-live-item:hover .shop-desk-live-trend-media img{ transform: scale(1.05); }
-  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ transform: translateY(-3px); box-shadow: inset 0 0 0 2px var(--acc-line, transparent), var(--desk-shadow-hover); }
-  .glowvai-root .shop-desk .shop-desk-promo:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
-  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go{ background: var(--acc, var(--desk-brand)); color: var(--acc-on, #fff); transform: translateX(3px); }
-  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-art{ transform: scale(1.06) rotate(-3deg); }
-  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--acc-line, var(--desk-line-strong)); background: var(--acc-softer, var(--desk-surface)); transform: translateY(-2px); box-shadow: var(--desk-shadow); }
+  .glowvai-root .shop-desk .shop-desk-live-item:hover .shop-desk-live-trend-media img{ }
+  .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media{ box-shadow: inset 0 0 0 2px var(--acc-line, transparent), var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover{ box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-go{ background: var(--acc, var(--desk-brand)); color: var(--acc-on, #fff); }
+  .glowvai-root .shop-desk .shop-desk-promo:hover .shop-desk-promo-art{ }
+  .glowvai-root .shop-desk .shop-desk-concern:hover{ border-color: var(--acc-line, var(--desk-line-strong)); background: var(--acc-softer, var(--desk-surface)); box-shadow: var(--desk-shadow); }
   .glowvai-root .shop-desk .shop-desk-concern:hover .shop-desk-concern-go{ opacity: 1; transform: none; }
-  .glowvai-root .shop-desk .shop-desk-chip:hover{ transform: translateY(-1px); box-shadow: var(--desk-shadow); }
-  .glowvai-root .shop-desk .shop-desk-live-item:hover :is(.shop-desk-live-card, .shop-desk-live-tile, .shop-desk-live-chip, .shop-desk-live-trend, .shop-desk-plus){ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-chip:hover{ box-shadow: var(--desk-shadow); }
+  .glowvai-root .shop-desk .shop-desk-live-item:hover :is(.shop-desk-live-card, .shop-desk-live-tile, .shop-desk-live-chip, .shop-desk-live-trend, .shop-desk-plus){ box-shadow: var(--desk-shadow-hover); }
   .glowvai-root .shop-desk .shop-desk-live-item:hover :is(.shop-desk-live-tile, .shop-desk-live-chip, .is-promise){ border-color: var(--acc-line, var(--desk-line-strong)); }
-  .glowvai-root .shop-desk .shop-desk-live-item:hover .shop-desk-plus-cta svg{ transform: translateX(3px); }
-  .glowvai-root .shop-desk .shop-desk-hero-arrow:hover{ transform: scale(1.06); }
+  .glowvai-root .shop-desk .shop-desk-live-item:hover .shop-desk-plus-cta svg{ }
+  .glowvai-root .shop-desk .shop-desk-hero-arrow:hover{ }
 }
 .glowvai-root .shop-desk :is(.shop-desk-btn-primary, .shop-desk-btn-dark, .shop-desk-btn-outline, .shop-desk-cart, .shop-desk-add, .shop-desk-heart, .shop-desk-retry, .shop-desk-arrow, .shop-desk-chip, .shop-desk-promo, .shop-desk-concern, .shop-desk-cat, .shop-desk-action, .shop-quiz-banner-cta):active:not(:disabled){ transform: scale(.97); transition-duration: 100ms; }
 
@@ -561,7 +561,7 @@
 .glowvai-root .shop-desk .shop-desk-price-media{ position: absolute; top: 8px; right: 12px; bottom: 8px; width: 96px; }
 .glowvai-root .shop-desk .shop-desk-price-media img{ width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 @media (hover: hover){
-  .glowvai-root .shop-desk .shop-desk-price:hover{ transform: translateY(-2px); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk .shop-desk-price:hover{ box-shadow: var(--desk-shadow-hover); }
 }
 
 /* ---------------------------------------------------------------- Accent tiles */
@@ -574,7 +574,7 @@
 .glowvai-root .shop-desk .shop-desk-concern:active .shop-desk-concern-icon{ background: var(--acc-on, #fff); color: var(--acc); }
 @media (hover: hover){
   .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media,
-  .glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-concern, .shop-desk-promo:not(.is-dark)):hover{ border-color: var(--acc); background: var(--acc); color: var(--acc-on, #fff); transform: scale(1.03); box-shadow: var(--desk-shadow-hover); }
+  .glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-concern, .shop-desk-promo:not(.is-dark)):hover{ border-color: var(--acc); background: var(--acc); color: var(--acc-on, #fff); box-shadow: var(--desk-shadow-hover); }
   .glowvai-root .shop-desk :is(.shop-desk-price, .shop-desk-promo:not(.is-dark)):hover :is(b, small, span, strong){ color: var(--acc-on, #fff); }
   .glowvai-root .shop-desk .shop-desk-concern:hover .shop-desk-concern-icon{ background: var(--acc-on, #fff); color: var(--acc); }
   .glowvai-root .shop-desk .shop-desk-cat:hover .shop-desk-cat-media img{ mix-blend-mode: normal; }
@@ -680,7 +680,7 @@
 .glowvai-root .shop-desk .shop-desk-side-tile strong{ font-size: 19px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; }
 .glowvai-root .shop-desk .shop-desk-side-go{ display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; color: var(--desk-brand); }
 .glowvai-root .shop-desk .shop-desk-side-tile.is-scan .shop-desk-side-go{ color: #fff; }
-@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-side-tile:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); } }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-side-tile:hover{ box-shadow: var(--desk-shadow-hover); } }
 
 /* Product cards: brand line */
 .glowvai-root .shop-desk .shop-desk-card-brand{ overflow: hidden; color: var(--desk-faint); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
@@ -692,7 +692,7 @@
 .glowvai-root .shop-desk .shop-desk-brand-mark{ display: grid; width: 44px; height: 44px; margin-bottom: 8px; place-items: center; border-radius: 12px; background: var(--gv-blue-tint); color: var(--desk-brand); font-size: 20px; font-weight: 700; }
 .glowvai-root .shop-desk .shop-desk-brand strong{ max-width: 100%; overflow: hidden; font-size: 15px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .glowvai-root .shop-desk .shop-desk-brand small{ color: var(--desk-muted); font-size: 12.5px; }
-@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-brand:hover{ transform: translateY(-3px); box-shadow: var(--desk-shadow-hover); } }
+@media (hover: hover){ .glowvai-root .shop-desk .shop-desk-brand:hover{ box-shadow: var(--desk-shadow-hover); } }
 
 /* Trust strip */
 .glowvai-root .shop-desk .shop-desk-trust{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: var(--desk-section); border: 1px solid var(--desk-line); border-radius: var(--desk-r-lg); background: var(--desk-surface); box-shadow: var(--desk-shadow); }

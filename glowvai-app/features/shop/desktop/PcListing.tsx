@@ -10,6 +10,7 @@ import { getDiscountPercent } from '../shared/shopUtils';
 import { CONCERN_KEYWORDS } from '../lib/firstVisit';
 import '../styles/shop-pc-browse.css';
 import '../styles/v2-browse.css';
+import '../styles/v3-glass-pc.css';
 
 export const PC_CATEGORY_LABELS: Record<string, string> = {
   Serums: 'Serums & Actives',
