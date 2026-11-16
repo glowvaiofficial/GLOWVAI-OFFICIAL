@@ -16,6 +16,8 @@ import type { BlockItem, BlockSettings, HeaderSettings, HeroOverride } from '../
 import { DeliveryModeSwitch } from '../shared/NewBlocks';
 import { HOME_TABS, ctaLabelForLink, endsInText, safeInternalLink, type HomeTab } from './homeChrome';
 import { BrandLogo } from '../../../shared/BrandLogo';
+import { useDesignerCard } from '../shared/designerCard';
+import { HeroExtras, HeroVideo, useHeroDesign } from '../shared/DesignerBanner';
 import { accentVars, itemAccent, readableTextOn, tintOf } from './accentTheme';
 
 // The mobile-web home's pieces (styles in mobile-home.css, under .gvh). Content, pictures, order, on/off and accents come
@@ -237,6 +239,11 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
   const heroSub = hero?.subtitle || (deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.');
   const heroLink = hero?.ctaLink || '';
   const poster = isPosterOnlyHero(hero);
+  const design = useHeroDesign();
+  const designSlides = [
+    { title: heroTitle, image: hero?.image || HERO_IMAGE, onOpen: () => (heroLink ? window.location.assign(heroLink) : navigate('shop-browse')) },
+    ...banners.map((b) => ({ title: b.title, image: b.image, onOpen: () => window.location.assign(safeInternalLink(b.link) ?? '/shop') })),
+  ];
 
   return (
     <section
@@ -250,8 +257,9 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
       onBlur={() => setPaused(false)}
     >
       {previewing && <p className="gvh-preview-note">Staff preview: these banners are a draft and are not live for customers yet.</p>}
-      <div className="gvh-hero-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+      <div className="gvh-hero-track" style={{ transform: `translateX(-${current * 100}%)`, '--gvd-i': current } as React.CSSProperties}>
         <div className="gvh-slide is-hero" aria-hidden={current !== 0} role="group" aria-roledescription="slide" aria-label={`1 of ${count}`}>
+          {design.video && <HeroVideo src={design.video} />}
           <img src={hero?.image || HERO_IMAGE} alt={hero?.image && hero.title ? hero.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
           {!poster && <span className="gvh-slide-shade" aria-hidden="true" />}
           {!poster && (
@@ -301,6 +309,7 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
           ))}
         </div>
       )}
+      <HeroExtras layout={design.layout} slides={designSlides} current={current} onGo={setIndex} ms={SLIDE_MS} />
     </section>
   );
 }
@@ -388,9 +397,11 @@ export function HomeProductCard({ product, sale, accent }: { product: SkincarePr
   const discount = sale ? (mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0) : getDiscountPercent(product);
   const saved = wishlist.includes(product.id);
   const open = () => navigate('shop-product', { productId: product.id });
+  const add = () => addItem({ productId: product.id, name: product.name, brand: product.brand, image: getProductImageUrl(product), price: product.price, mrp: product.originalPrice });
+  const ds = useDesignerCard(product, { discount, hasOptions: options, add, open, names: { add: options ? `Choose options for ${product.name}` : `Add ${product.name} to cart` } });
 
   return (
-    <article className="gvh-card" style={varsStyle(accent)}>
+    <article className={`gvh-card${ds.cls ? ` ${ds.cls}` : ''}`} style={varsStyle(accent)}>
       <div className="gvh-card-media">
         <button type="button" className="gvh-card-open" onClick={open} aria-label={`View ${product.name}`}>
           {imageFailed ? <span className="gvh-card-fallback">{product.brand}</span> : <img src={getProductThumbUrl(product)} alt="" width={400} height={400} loading="lazy" decoding="async" onError={() => setImageFailed(true)} />}
@@ -399,6 +410,7 @@ export function HomeProductCard({ product, sale, accent }: { product: SkincarePr
           <Heart size={15} aria-hidden="true" fill={saved ? 'currentColor' : 'none'} />
         </button>
         {discount > 0 && <span className="gvh-off">{discount}% OFF</span>}
+        {ds.overlay}
       </div>
       <div className="gvh-card-body">
         <p className="gvh-card-price">
@@ -421,8 +433,9 @@ export function HomeProductCard({ product, sale, accent }: { product: SkincarePr
             {mrp > price && !options && <span className="gvh-save">Save {formatRupee(mrp - price)}</span>}
           </p>
         )}
+        {ds.extra}
         <div className="gvh-card-foot">
-          {!options && quantity > 0 ? (
+          {ds.foot ?? (!options && quantity > 0 ? (
             <span className="gvh-stepper" aria-label={`${quantity} in cart`}>
               <button type="button" onClick={() => decrementItem(product.id)} aria-label={`Remove one ${product.name}`}>
                 <Minus size={14} aria-hidden="true" />
@@ -448,7 +461,7 @@ export function HomeProductCard({ product, sale, accent }: { product: SkincarePr
             >
               {options ? 'Choose' : 'Add'} <Plus size={14} aria-hidden="true" />
             </button>
-          )}
+          ))}
         </div>
       </div>
     </article>

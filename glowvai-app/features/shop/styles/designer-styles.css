@@ -1,0 +1,276 @@
+/* Designer style options on the website homes (phone .gvh and PC .shop-desk) and the shared empty / error states.
+   Everything hangs off attributes that only exist when the admin picked a style (.gvd-block[data-gv-*], .gvd-root[data-gv-*]),
+   so a home with no style looks exactly as it did. Colours: the brand blue and neutrals only (campaign palettes are cool,
+   checked in code by isWarmColour). Content is visible by default: motion is an animation that ends in the natural state,
+   it never hides anything waiting for a scroll, and every motion is off under prefers-reduced-motion. */
+
+.glowvai-root .gvd-root,
+.glowvai-root .gvd-block { display: contents; }
+
+.glowvai-root {
+  --gvd-blue: var(--gv-blue, #0057fb);
+  --gvd-blue-tint: var(--gv-blue-tint, #eaf1ff);
+  --gvd-ink: var(--gv-ink, #0b1b4d);
+  --gvd-muted: var(--gv-muted, #5b6782);
+  --gvd-hairline: var(--gv-hairline, #e4eaf5);
+  --gvd-font: var(--gv-font, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+}
+
+/* ---------------------------------------------------------------- Campaign palettes (page wash, tints, banners) */
+.glowvai-root .gvd-root[data-gv-campaign] .shop-home.gvh { --gvh-page: var(--gvd-wash); }
+.glowvai-root .gvd-root[data-gv-campaign] .shop-desk { --desk-bg: var(--gvd-wash); background: var(--gvd-wash); }
+.glowvai-root .gvd-root[data-gv-campaign] .gvh-hero { background: linear-gradient(135deg, var(--gvd-tint), var(--gvd-wash)); }
+.glowvai-root .gvd-root[data-gv-campaign] .shop-desk-hero { background: linear-gradient(110deg, var(--gvd-wash), var(--gvd-tint)); }
+.glowvai-root .gvd-root[data-gv-campaign] .gvh-head h2,
+.glowvai-root .gvd-root[data-gv-campaign] .shop-desk-head h2 { text-decoration: underline 3px var(--gvd-tint); text-underline-offset: 6px; }
+.glowvai-root .gvd-root[data-gv-campaign] .gvd-countdown { background: var(--gvd-tint); color: var(--gvd-accent); }
+.glowvai-root .gvd-root[data-gv-campaign] .gvd-stockbar-fill { background: var(--gvd-accent); }
+
+/* ---------------------------------------------------------------- Entrance motion (ends in the natural state) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gvd-fade { from { opacity: 0; } }
+  @keyframes gvd-up { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes gvd-ease { from { opacity: 0; transform: translateY(6px) scale(.985); } }
+  .glowvai-root .gvd-block[data-gv-motion="fade-in"] > :not(.gvd-countdown) { animation: gvd-fade .55s ease backwards; }
+  .glowvai-root .gvd-block[data-gv-motion="slide-up"] > :not(.gvd-countdown) { animation: gvd-up .5s cubic-bezier(.22, .61, .36, 1) backwards; }
+  .glowvai-root .gvd-block[data-gv-motion="ease-out"] > :not(.gvd-countdown) { animation: gvd-ease .65s cubic-bezier(.16, 1, .3, 1) backwards; }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > * { animation: gvd-up .45s cubic-bezier(.22, .61, .36, 1) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(2) { --i: 1; }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(3) { --i: 2; }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(4) { --i: 3; }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(5) { --i: 4; }
+  .glowvai-root .gvd-block[data-gv-motion="stagger"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-promos, .shop-desk-live-grid, .hp-grid, .hp-brands) > :nth-child(n + 6) { --i: 5; }
+}
+
+/* ---------------------------------------------------------------- Loading skeletons: shimmer or pulse */
+@keyframes gvd-sweep { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes gvd-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+@media (prefers-reduced-motion: no-preference) {
+  .glowvai-root .gvd-block[data-gv-skel="shimmer"] :is(.gvh-skel-line, .gvh-card.is-skel .gvh-card-media, .shop-desk-shimmer) { background: linear-gradient(100deg, #edf0f8 30%, #f9faff 50%, #edf0f8 70%) 100% 0 / 300% 100%; animation: gvd-sweep 1.3s linear infinite; }
+  .glowvai-root .gvd-block[data-gv-skel="shimmer"] .gvh-card.is-skel { animation: none; }
+  .glowvai-root .gvd-block[data-gv-skel="pulse"] :is(.gvh-skel-line, .gvh-card.is-skel, .shop-desk-shimmer) { background: #edf0f8; animation: gvd-pulse 1.4s ease-in-out infinite; }
+}
+
+/* ---------------------------------------------------------------- Sticky section header */
+.glowvai-root .gvd-block[data-gv-sticky="on"] .gvh-head { position: sticky; top: 0; z-index: 6; margin-bottom: 0; padding: 8px var(--gv-gutter, 16px); background: var(--gvh-page, #f6f8fd); }
+.glowvai-root .gvd-block[data-gv-sticky="on"] .shop-desk-head { position: sticky; top: 72px; z-index: 6; padding-block: 8px; background: var(--desk-bg, #f5f7fd); }
+
+/* ---------------------------------------------------------------- Countdown */
+.glowvai-root .gvd-countdown { display: flex; width: fit-content; align-items: center; gap: 8px; margin: 10px var(--gv-gutter, 16px) 0; padding: 6px 14px; border-radius: 999px; background: var(--gvd-blue-tint); color: var(--gvd-blue); font: 500 13px/1.2 var(--gvd-font); }
+.glowvai-root .gvd-countdown b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.glowvai-root .gvd-countdown-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.glowvai-root .shop-desk .gvd-countdown { margin-inline: 0; }
+
+/* ---------------------------------------------------------------- Row layouts (sections that are rows of items) */
+.glowvai-root .gvd-block[data-gv-family="row"][data-gv-layout="grid"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-chips, .shop-desk-live-grid) { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; overflow: visible; scroll-snap-type: none; }
+.glowvai-root .shop-desk .gvd-block[data-gv-family="row"][data-gv-layout="grid"] :is(.shop-desk-rail, .shop-desk-chips, .shop-desk-live-grid) { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.glowvai-root .gvd-block[data-gv-family="row"][data-gv-layout="two-column"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-live-grid) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; overflow: visible; scroll-snap-type: none; }
+.glowvai-root .gvd-block[data-gv-family="row"][data-gv-layout="stacked-list"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-live-grid) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; overflow: visible; scroll-snap-type: none; }
+.glowvai-root .gvd-block[data-gv-family="row"][data-gv-layout="banner-strip"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-live-grid) { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; }
+.glowvai-root .gvd-block[data-gv-family="row"][data-gv-layout="banner-strip"] :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-live-grid) > * { flex: 0 0 min(100%, 520px); scroll-snap-align: start; }
+/* Items fill their grid cell instead of keeping the rail's fixed width. */
+.glowvai-root .gvd-block[data-gv-family="row"]:is([data-gv-layout="grid"], [data-gv-layout="two-column"], [data-gv-layout="stacked-list"]) :is(.gvh-rail, .gvh-trend-row, .gvh-brands, .gvh-cats, .gvh-promos, .gvn-row, .shop-desk-rail, .shop-desk-cats, .shop-desk-chips, .shop-desk-live-grid) > * { width: auto; min-width: 0; max-width: none; flex: none; }
+
+/* ---------------------------------------------------------------- Product card styles */
+.glowvai-root .gvd-card.is-clean :is(.gvh-card-meta, .shop-desk-card-meta, .shop-desk-card-size, .shop-desk-card-eta) { display: none; }
+
+.glowvai-root .gvd-card.is-price-band :is(.gvh-card-price, .shop-desk-card-price) { margin-inline: -10px; padding: 6px 10px; border-radius: 10px; background: var(--gvd-blue-tint); }
+.glowvai-root .gvd-card.is-price-band :is(.gvh-card-price, .shop-desk-card-price) b { color: var(--gvd-blue); }
+
+/* Compact row: a small card with the picture on the left (also used for the stacked list). */
+.glowvai-root .gvd-card.is-compact-row,
+.glowvai-root .gvd-block[data-gv-layout="stacked-list"] .gvd-card { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: center; height: auto; }
+.glowvai-root .gvd-card.is-compact-row :is(.gvh-card-media, .shop-desk-card-media),
+.glowvai-root .gvd-block[data-gv-layout="stacked-list"] .gvd-card :is(.gvh-card-media, .shop-desk-card-media) { aspect-ratio: 1; width: 92px; }
+.glowvai-root .gvd-block[data-gv-card="compact-row"] .gvh-rail > .gvh-card { flex: 0 0 min(300px, 84%); }
+.glowvai-root .gvd-block[data-gv-card="compact-row"] .shop-desk-rail-item { flex: 0 0 300px; }
+
+/* Quick add: one round Add button over the picture. */
+.glowvai-root .gvd-quick { position: absolute; right: 8px; bottom: 8px; z-index: 3; display: grid; width: 40px; height: 40px; place-items: center; border: 0; border-radius: 50%; background: var(--gvd-blue); color: #fff; box-shadow: 0 2px 8px rgba(11, 27, 77, .25); cursor: pointer; }
+.glowvai-root .gvd-quick:focus-visible { outline: 2px solid var(--gvd-ink); outline-offset: 2px; }
+.glowvai-root .gvd-card.is-quick-add :is(.gvh-add, .shop-desk-add) { display: none; }
+.glowvai-root .gvd-card.is-quick-add .gvh-card-foot:empty { display: none; }
+
+/* Stepper card: plus and minus right on the card. */
+.glowvai-root .gvd-stepper { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--gvd-blue); border-radius: 999px; color: var(--gvd-blue); font: 600 14px var(--gvd-font); }
+.glowvai-root .gvd-stepper button { display: grid; width: 32px; height: 32px; min-height: 0; place-items: center; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; }
+.glowvai-root .gvd-stepper button:disabled { opacity: .35; cursor: default; }
+.glowvai-root .gvd-stepper b { min-width: 22px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* Badges: the admin's chosen list replaces the single built-in % OFF badge. */
+.glowvai-root .gvd-block[data-gv-badges="on"] :is(.gvh-off, .shop-desk-card-badge) { display: none; }
+.glowvai-root .gvd-badges { position: absolute; left: 8px; top: 8px; z-index: 2; display: flex; max-width: 70%; flex-direction: column; align-items: flex-start; gap: 4px; pointer-events: none; }
+.glowvai-root .gvd-badge { padding: 3px 8px; border-radius: 999px; background: var(--gvd-blue); color: #fff; font: 600 10.5px/1.2 var(--gvd-font); white-space: nowrap; }
+.glowvai-root .gvd-badge.is-new { background: #0b7f63; }
+.glowvai-root .gvd-badge.is-bestseller { background: var(--gvd-ink); }
+.glowvai-root .gvd-badge.is-low-stock { background: #e6ebf6; color: #26324f; }
+.glowvai-root .gvd-badge.is-delivery-time { background: #e3f3ea; color: #146c3c; }
+.glowvai-root .gvd-badge.is-sponsored { background: #eef0f5; color: var(--gvd-muted); }
+
+/* Stock bar: from real stock only. */
+.glowvai-root .gvd-stockbar { display: grid; gap: 3px; margin: 4px 0 2px; }
+.glowvai-root .gvd-stockbar-track { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: var(--gvd-hairline); }
+.glowvai-root .gvd-stockbar-fill { display: block; height: 100%; border-radius: inherit; background: var(--gvd-blue); }
+.glowvai-root .gvd-stockbar small { color: var(--gvd-muted); font: 500 11px/1.2 var(--gvd-font); }
+
+/* Sold-out card: greyed, with Notify me. */
+.glowvai-root .gvd-card.is-soldout :is(.gvh-card-media img, .shop-desk-card-media img, .gvh-card-fallback, .shop-desk-card-fallback) { filter: grayscale(1); opacity: .5; }
+.glowvai-root .gvd-card.is-soldout :is(.gvh-card-price, .gvh-card-name, .shop-desk-card-price, .shop-desk-card-name) { opacity: .6; }
+.glowvai-root .gvd-soldout-tag { position: absolute; left: 8px; bottom: 8px; z-index: 2; padding: 3px 9px; border-radius: 999px; background: #26324f; color: #fff; font: 600 11px/1.2 var(--gvd-font); }
+.glowvai-root .gvd-notify { display: inline-flex; min-height: 36px; align-items: center; gap: 6px; padding: 0 14px; border: 1px solid var(--gvd-blue); border-radius: 999px; background: #fff; color: var(--gvd-blue); font: 600 13px var(--gvd-font); cursor: pointer; }
+.glowvai-root .gvd-notify:focus-visible { outline: 2px solid var(--gvd-ink); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------- Banner layouts (the hero carousel) */
+.glowvai-root .gvd-hero-video { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; object-fit: cover; }
+
+.glowvai-root .gvd-arrow { position: absolute; top: 50%; z-index: 4; display: grid; width: 38px; height: 38px; margin-top: -19px; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--gvd-ink); box-shadow: 0 2px 8px rgba(11, 27, 77, .2); cursor: pointer; }
+.glowvai-root .gvd-arrow.is-prev { left: 8px; }
+.glowvai-root .gvd-arrow.is-next { right: 8px; }
+.glowvai-root .gvd-block[data-gv-layout="arrows"] .shop-desk-hero-arrow { opacity: 1; }
+
+/* Progress bars on top (like stories) instead of dots. */
+.glowvai-root .gvd-block[data-gv-layout="progress-bars"] :is(.gvh-dots, .shop-desk-dots) { display: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"] .shop-desk-hero-wrap { position: relative; }
+.glowvai-root .gvd-bars { position: absolute; top: 10px; right: 14px; left: 14px; z-index: 5; display: flex; gap: 4px; }
+.glowvai-root .gvd-bars button { position: relative; height: 4px; min-height: 0; flex: 1; padding: 0; overflow: hidden; border: 0; border-radius: 999px; background: rgba(11, 27, 77, .2); cursor: pointer; }
+.glowvai-root .gvd-bars button::after { content: ''; position: absolute; inset: -12px 0; }
+.glowvai-root .gvd-bars button > span { position: absolute; inset: 0; width: 0; background: var(--gvd-blue); }
+.glowvai-root .gvd-bars button.is-done > span { width: 100%; }
+.glowvai-root .gvd-bars button.is-on > span { width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gvd-fill { from { width: 0; } to { width: 100%; } }
+  .glowvai-root .gvd-bars button.is-on > span { width: 0; animation: gvd-fill var(--gvd-ms, 5000ms) linear forwards; }
+}
+
+/* Story circles that open a full-screen slide. */
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="story-strip"] .gvh-hero { margin-inline: 0; overflow: visible; border-radius: 0; background: none; box-shadow: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="story-strip"] :is(.gvh-hero-track, .gvh-dots, .shop-desk-hero) { display: none; }
+.glowvai-root .gvd-stories { display: flex; gap: 14px; padding: 6px var(--gv-gutter, 16px) 4px; overflow-x: auto; scrollbar-width: none; }
+.glowvai-root .gvd-stories::-webkit-scrollbar { display: none; }
+.glowvai-root .gvd-story { display: grid; width: 74px; flex: 0 0 auto; justify-items: center; gap: 6px; padding: 0; border: 0; background: none; color: var(--gvd-ink); font: 500 12px/1.2 var(--gvd-font); cursor: pointer; }
+.glowvai-root .gvd-story-ring { display: grid; width: 68px; height: 68px; place-items: center; overflow: hidden; border: 3px solid var(--gvd-blue); border-radius: 50%; background: var(--gvd-blue-tint); color: var(--gvd-blue); box-shadow: inset 0 0 0 2px #fff; }
+.glowvai-root .gvd-story-ring img { width: 100%; height: 100%; object-fit: cover; }
+.glowvai-root .gvd-story-label { display: -webkit-box; max-width: 74px; overflow: hidden; text-align: center; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.glowvai-root .shop-desk .gvd-stories { padding-inline: 0; }
+
+.glowvai-root .gvd-story-view { position: fixed; inset: 0; z-index: 1300; display: grid; place-items: center; background: #0b1220; color: #fff; font-family: var(--gvd-font); }
+.glowvai-root .gvd-story-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.glowvai-root .gvd-story-blank { position: absolute; inset: 0; background: linear-gradient(160deg, #0b2a7a, #0b1220); }
+.glowvai-root .gvd-story-bars { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; left: 12px; z-index: 3; display: flex; gap: 4px; }
+.glowvai-root .gvd-story-bars > span { position: relative; height: 3px; flex: 1; overflow: hidden; border-radius: 999px; background: rgba(255, 255, 255, .3); }
+.glowvai-root .gvd-story-bars > span > span { position: absolute; inset: 0; width: 0; background: #fff; }
+.glowvai-root .gvd-story-bars > span.is-done > span { width: 100%; }
+.glowvai-root .gvd-story-bars > span.is-on > span { width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .glowvai-root .gvd-story-bars > span.is-on > span { width: 0; animation: gvd-fill 5s linear forwards; }
+}
+.glowvai-root .gvd-story-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 22px); right: 10px; z-index: 4; display: grid; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 50%; background: rgba(0, 0, 0, .4); color: #fff; cursor: pointer; }
+.glowvai-root .gvd-story-prev,
+.glowvai-root .gvd-story-next { position: absolute; top: 60px; bottom: 90px; z-index: 2; width: 40%; border: 0; background: transparent; cursor: pointer; }
+.glowvai-root .gvd-story-prev { left: 0; }
+.glowvai-root .gvd-story-next { right: 0; }
+.glowvai-root .gvd-story-copy { position: absolute; right: 0; bottom: 0; left: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 40px 18px calc(env(safe-area-inset-bottom, 0px) + 22px); background: linear-gradient(0deg, rgba(0, 0, 0, .7), transparent); }
+.glowvai-root .gvd-story-copy strong { font-size: 18px; font-weight: 600; }
+.glowvai-root .gvd-story-copy button { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; padding: 0 20px; border: 0; border-radius: 999px; background: var(--gvd-blue); color: #fff; font: 600 14px var(--gvd-font); cursor: pointer; }
+
+/* Full width: edge to edge. */
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="full-bleed"] .gvh-hero { margin-inline: 0; border-radius: 0; }
+.glowvai-root .shop-desk .gvd-block[data-gv-block="hero"][data-gv-layout="full-bleed"] .shop-desk-hero-row { display: block; }
+.glowvai-root .shop-desk .gvd-block[data-gv-block="hero"][data-gv-layout="full-bleed"] .shop-desk-side { display: none; }
+.glowvai-root .shop-desk .gvd-block[data-gv-block="hero"][data-gv-layout="full-bleed"] .shop-desk-hero { border-radius: 0; }
+
+/* Split: words on one side, picture on the other. */
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .gvh-slide { display: grid; grid-template-columns: 1fr 1fr; min-height: 190px; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .gvh-slide > img { position: static; order: 2; object-position: center; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .gvh-slide-shade { display: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .gvh-slide-copy { max-width: none; order: 1; align-self: stretch; align-content: center; padding: 16px 14px 28px; background: var(--gvd-blue-tint); }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .gvh-slide-copy :is(h1, strong) { font-size: 20px; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .shop-desk-slide-media { width: 50%; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .shop-desk-slide-media img { -webkit-mask-image: none; mask-image: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="split"] .shop-desk-slide-copy { max-width: 50%; }
+
+/* Peek: the next banner shows at the edge. */
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="peek"] .gvh-hero { background: none; box-shadow: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="peek"] .gvh-hero-track { gap: 10px; transform: translateX(calc(var(--gvd-i, 0) * (-86% - 10px))) !important; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="peek"] .gvh-slide { flex: 0 0 86%; border-radius: 18px; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="peek"] .shop-desk-hero { display: flex; gap: 12px; background: none; box-shadow: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="peek"] .shop-desk-slide { position: relative; flex: 0 0 84%; border-radius: var(--desk-r-xl, 24px); opacity: 1; visibility: visible; transform: translateX(calc(var(--gvd-i, 0) * (-100% - 12px))); transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+
+/* Stacked: banners one under the other. */
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .gvh-hero { overflow: visible; background: none; box-shadow: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .gvh-hero-track { display: grid; gap: 10px; transform: none !important; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .gvh-slide { border-radius: 18px; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .gvh-dots { display: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .shop-desk-hero { display: grid; height: auto; gap: 12px; overflow: visible; background: none; box-shadow: none; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] .shop-desk-slide { position: relative; height: clamp(220px, 16vw, 270px); border-radius: var(--desk-r-xl, 24px); opacity: 1; visibility: visible; }
+.glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="stacked"] :is(.shop-desk-dots, .shop-desk-hero-arrow) { display: none; }
+
+/* Parallax: the picture drifts as the page scrolls (browsers that support scroll timelines; a still picture elsewhere). */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    @keyframes gvd-drift { from { transform: translateY(-7%) scale(1.14); } to { transform: translateY(7%) scale(1.14); } }
+    .glowvai-root .gvd-block[data-gv-block="hero"][data-gv-layout="parallax"] :is(.gvh-slide > img, .shop-desk-slide-media img) { animation: gvd-drift linear both; animation-timeline: view(); }
+  }
+}
+
+/* ---------------------------------------------------------------- Feedback: toast, bag bounce, tick, spinner, confetti */
+.glowvai-root .gvd-toast { position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); left: 50%; z-index: 1100; display: inline-flex; max-width: calc(100vw - 32px); align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; background: var(--gvd-ink); color: #fff; box-shadow: 0 8px 24px rgba(11, 27, 77, .3); font: 500 14px/1.3 var(--gvd-font); transform: translateX(-50%); }
+.glowvai-root .gvd-toast svg { flex: none; color: #7fe0b0; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gvd-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } }
+  @keyframes gvd-tick { 0% { transform: scale(.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes gvd-bounce { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-9px); } 55% { transform: translateY(0); } 75% { transform: translateY(-4px); } }
+  .glowvai-root .gvd-toast { animation: gvd-toast-in .25s ease-out; }
+  .glowvai-root .gvd-toast svg { animation: gvd-tick .45s ease-out; }
+  .glowvai-root .gvd-root[data-gvd-bounce="on"] :is(.shop-home-cart-pill, .shop-home-cart, .shop-desk-cart) { animation: gvd-bounce .6s ease; }
+}
+
+.glowvai-root .gvd-spinner { display: inline-flex; align-items: center; justify-content: center; gap: 4px; width: 26px; height: 26px; vertical-align: middle; }
+.glowvai-root .gvd-spinner.is-ring { border: 3px solid var(--gvd-hairline); border-top-color: var(--gvd-blue); border-radius: 50%; box-sizing: border-box; }
+.glowvai-root .gvd-spinner.is-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--gvd-blue); }
+.glowvai-root .gvd-spinner.is-bars i { width: 4px; height: 18px; border-radius: 2px; background: var(--gvd-blue); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gvd-spin { to { transform: rotate(360deg); } }
+  @keyframes gvd-dot { 0%, 80%, 100% { transform: scale(.6); opacity: .5; } 40% { transform: scale(1); opacity: 1; } }
+  @keyframes gvd-bar { 0%, 100% { transform: scaleY(.45); } 50% { transform: scaleY(1); } }
+  .glowvai-root .gvd-spinner.is-ring { animation: gvd-spin .8s linear infinite; }
+  .glowvai-root .gvd-spinner.is-dots i { animation: gvd-dot 1s ease-in-out infinite; animation-delay: calc(var(--i, 0) * .15s); }
+  .glowvai-root .gvd-spinner.is-bars i { animation: gvd-bar .9s ease-in-out infinite; animation-delay: calc(var(--i, 0) * .12s); }
+}
+
+.glowvai-root .gvd-confetti { position: fixed; inset: 0; z-index: 1200; overflow: hidden; pointer-events: none; }
+.glowvai-root .gvd-confetti i { position: absolute; top: -16px; left: var(--x); width: 8px; height: 14px; border-radius: 2px; background: hsl(var(--h) 80% 55%); opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gvd-fall { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0; transform: translateY(105vh) rotate(540deg); } }
+  .glowvai-root .gvd-confetti i { animation: gvd-fall 2.8s ease-in var(--d) forwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root .gvd-confetti { display: none; }
+}
+
+/* ---------------------------------------------------------------- Empty and error states (shared) */
+.glowvai-root .gvd-state { display: grid; justify-items: center; gap: 10px; margin: 24px auto; padding: 28px 20px; max-width: 420px; border: 1px solid var(--gvd-hairline); border-radius: 20px; background: #fff; color: var(--gvd-ink); text-align: center; font-family: var(--gvd-font); }
+.glowvai-root .gvd-state-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 50%; background: var(--gvd-blue-tint); color: var(--gvd-blue); }
+.glowvai-root .gvd-state h2,
+.glowvai-root .gvd-state h3 { margin: 0; font-size: 17px; font-weight: 600; }
+.glowvai-root .gvd-state p { margin: 0; color: var(--gvd-muted); font-size: 14px; line-height: 1.45; }
+.glowvai-root .gvd-state-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+.glowvai-root .gvd-state-btn { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; padding: 0 20px; border: 1px solid var(--gvd-blue); border-radius: 999px; background: var(--gvd-blue); color: #fff; font: 600 14px var(--gvd-font); text-decoration: none; cursor: pointer; }
+.glowvai-root .gvd-state-btn.is-ghost { background: #fff; color: var(--gvd-blue); }
+.glowvai-root .gvd-state-btn:focus-visible { outline: 2px solid var(--gvd-ink); outline-offset: 2px; }
+.glowvai-root .gvd-state-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.glowvai-root .gvd-state-chips button { min-height: 36px; padding: 0 14px; border: 1px solid var(--gvd-hairline); border-radius: 999px; background: var(--gvd-blue-tint); color: var(--gvd-blue); font: 500 13px var(--gvd-font); cursor: pointer; }
+.glowvai-root .gvd-state-list { display: grid; width: 100%; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; text-align: left; }
+.glowvai-root .gvd-state-list button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 8px 14px; border: 1px solid var(--gvd-hairline); border-radius: 14px; background: #fff; color: var(--gvd-ink); font: 500 14px var(--gvd-font); text-align: left; cursor: pointer; }
+.glowvai-root .gvd-state-list small { color: var(--gvd-muted); font-weight: 400; }
+
+/* Offline notice and search suggestions */
+.glowvai-root .gvd-offline { display: flex; align-items: center; gap: 10px; margin: 8px 16px 0; padding: 10px 14px; border-radius: 12px; background: var(--gvd-blue-tint); color: var(--gvd-ink); font: 500 13px/1.3 var(--gvd-font); }
+.glowvai-root .gvd-offline svg { flex: none; color: var(--gvd-blue); }
+.glowvai-root .gvd-offline span { flex: 1; }
+.glowvai-root .gvd-offline button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--gvd-blue); color: #fff; font: 600 13px var(--gvd-font); cursor: pointer; }
+.glowvai-root .gvd-suggest { display: grid; justify-items: center; gap: 8px; margin-top: 8px; }
+.glowvai-root .gvd-suggest p { margin: 0; color: var(--gvd-muted); font: 500 13px var(--gvd-font); }
+.glowvai-root .gvd-oos { margin: 16px 0; max-width: none; }
+.glowvai-root .gvd-card.is-compact-row :is(.gvh-heart, .shop-desk-heart),
+.glowvai-root .gvd-block[data-gv-layout="stacked-list"] .gvd-card :is(.gvh-heart, .shop-desk-heart) { width: 28px; height: 28px; top: 4px; right: 4px; }

@@ -1,3 +1,4 @@
+import { SearchSuggestions, OutOfStockSimilar } from '../shared/StateScreens';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, ArrowUpDown, Check, ChevronRight, LayoutGrid, List, PackageSearch, RefreshCw, SlidersHorizontal, Star, X } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -361,6 +362,7 @@ export const PcListing: React.FC<PcListingProps> = ({ title, subtitle, crumbs, p
                 <span className="pc-state-icon"><PackageSearch size={26} /></span>
                 <h2>{emptyHint ? `No products found for "${emptyHint}"` : chips.length > 0 ? 'No products match these filters' : 'No products here yet'}</h2>
                 <p>{chips.length > 0 ? 'Try removing a filter or widening the price range.' : 'Check back soon, new products are added often.'}</p>
+                {emptyHint && <SearchSuggestions />}
                 {chips.length > 0 && (
                   <>
                     {chipList(true)}

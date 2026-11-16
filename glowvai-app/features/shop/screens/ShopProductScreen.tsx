@@ -1,3 +1,4 @@
+import { SearchSuggestions, OutOfStockSimilar } from '../shared/StateScreens';
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronRight, FlaskConical, Heart, Minus, PackageSearch, Plus, Share2, ShoppingBag, Star, Zap } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
@@ -304,6 +305,8 @@ export const ShopProductScreen: React.FC = () => {
                 Buy now
               </button>
             </div>
+
+            {!canBuy && <OutOfStockSimilar product={product} />}
 
             {inCartCount > 0 && (
               <button type="button" className="shop-product-incart" onClick={() => navigate('cart-tab')}>

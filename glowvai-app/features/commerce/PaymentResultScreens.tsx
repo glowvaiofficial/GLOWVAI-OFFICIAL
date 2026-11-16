@@ -7,6 +7,9 @@ import { useDeliveryAddress } from './components/shared';
 import { PAY_METHOD_LABEL, parsePayMethod } from './lib/paymentMethod';
 import { formatAddressForDisplay } from './lib/displayText';
 import { PremiumHeader, Wordmark, rupee } from './components/premium';
+import { FirstOrderConfetti } from '../shop/shared/DesignerStyle';
+import { useHomeLayout } from '../shop/lib/useHomeLayout';
+import { useCustomerStore } from '../../core/state/customerStore';
 
 interface PaymentResultParams {
   orderId?: string;
@@ -156,6 +159,14 @@ export const PaymentSuccessScreen: React.FC = () => {
   }, [autoForward, orderId, navigate]);
 
   // Fail closed: success is shown only when the server confirmed this order and returned its id.
+  // Confetti, only when the designer turned it on and this is the customer's first order (their real order count).
+  const { look: designerLook } = useHomeLayout('mobile');
+  const orderCount = useCustomerStore((s) => s.orders.length);
+  const ordersStatus = useCustomerStore((s) => s.ordersStatus);
+  useEffect(() => {
+    if (orderId && designerLook?.feedback?.confetti && useCustomerStore.getState().ordersStatus === 'idle') void useCustomerStore.getState().loadOrders();
+  }, [orderId, designerLook]);
+
   if (!orderId) return <NoResult />;
 
   const cancelled = view.phase === 'cancelled';
@@ -171,6 +182,7 @@ export const PaymentSuccessScreen: React.FC = () => {
 
   return (
     <main className="commerce-screen gvp gvp-result gvp-confirming">
+      {!cancelled && <FirstOrderConfetti look={designerLook} orderKey={orderId} isFirstOrder={ordersStatus === 'ready' && orderCount <= 1} />}
       <div className="gvp-confirm-top">
         <button type="button" className="gvp-link" onClick={() => navigate('home')}>
           Close

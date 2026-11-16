@@ -10,6 +10,7 @@ import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { ITEM_BLOCK_IDS, useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
 import { NewItemBlock } from '../shared/NewBlocks';
+import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
 import { useHomeData } from '../lib/useHomeData';
 import { skinMatchedPicks } from '../lib/firstVisit';
 import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
@@ -76,7 +77,7 @@ type ShopHomeScreenProps = { embedded?: boolean };
 // Content, pictures, on/off and accents come from the admin layout; empty admin slots show nothing (placeholders only in
 // a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails, header: headerSettings } = useHomeLayout('mobile');
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails, header: headerSettings, styles: designerStyles, look: designerLook, heroVideo } = useHomeLayout('mobile');
   const { catalog, feed, loading, failed, noProducts, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
@@ -394,6 +395,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   );
 
   return (
+    <DesignerStyleProvider styles={designerStyles} look={designerLook} heroVideo={heroVideo}>
     <div className="shop-screen shop-home gvh">
       <MobileHomeHeader header={headerSettings} tab={tab} onTab={setTab} location={userLocation} embedded={embedded} unread={unread} initial={initial} />
 
@@ -408,11 +410,12 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
       <ConcernPicks tab={tab} products={concernProducts} onSeeAll={() => navigate('shop-browse', tab.concern ? { concern: tab.concern } : undefined)} />
 
       {homeSequence(layoutOrder).filter((id) => id !== 'footer').map((id) => (
-        <React.Fragment key={id}>{renderBlock(id)}</React.Fragment>
+        <React.Fragment key={id}><StyledBlock id={id}>{renderBlock(id)}</StyledBlock></React.Fragment>
       ))}
       {pinnedTail}
       {renderBlock('footer')}
     </div>
+    </DesignerStyleProvider>
   );
 };
 

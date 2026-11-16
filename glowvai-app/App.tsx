@@ -10,6 +10,7 @@ import { WebHeader } from './components/common/WebHeader';
 import { portedRoutes } from './routes';
 import { startProductFeed } from './core/services/productFeed';
 import { ProductFeedNotice } from './components/common/ProductFeedNotice';
+import { OfflineNotice } from './features/shop/shared/StateScreens';
 import { OrderNotifications } from './core/notifications/OrderNotifications';
 import { InboxBridge } from './core/notifications/InboxBridge';
 import { applyScroll, takeScrollRestore } from './context/scrollMemory';
@@ -133,6 +134,7 @@ const AppContent: React.FC = () => {
       <AndroidStatusBar tone={['welcome', 'onboarding', 'login', 'otp'].includes(currentScreen) ? 'brand' : 'light'} />
       <WebHeader />
       <ProductFeedNotice />
+      <OfflineNotice />
       <div className="screen-content">{renderScreen()}</div>
       <BottomNavBar />
       {toastMessage && (

@@ -17,8 +17,8 @@ export const ProductFeedNotice: React.FC = () => {
         margin: '8px 16px 0',
         padding: '10px 14px',
         borderRadius: '10px',
-        backgroundColor: '#FEF3C7',
-        color: '#78350F',
+        backgroundColor: '#EAF1FF',
+        color: '#0B1B4D',
         fontSize: '13px',
         fontWeight: 600,
       }}
@@ -27,9 +27,9 @@ export const ProductFeedNotice: React.FC = () => {
       <button
         type="button"
         onClick={retry}
-        style={{ border: 0, borderRadius: '8px', padding: '6px 12px', background: '#78350F', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer' }}
+        style={{ border: 0, borderRadius: '8px', padding: '6px 12px', background: '#0057FB', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer' }}
       >
-        Retry
+        Try again
       </button>
     </div>
   );
