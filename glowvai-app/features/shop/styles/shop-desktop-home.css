@@ -601,3 +601,6 @@
 /* Category tile with no picture: brand-blue tile with the GlowVai mark. */
 .glowvai-root .shop-desk .shop-desk-cat.is-brand .shop-desk-cat-media{ background: #0057fb; }
 .glowvai-root .shop-desk .shop-desk-cat-media img.shop-desk-cat-mark{ width: 28%; height: auto; padding: 0; mix-blend-mode: normal; object-fit: contain; }
+.glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-shapes{ display: none; }
+.glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-media{ width: 100%; }
+.glowvai-root .shop-desk .shop-desk-slide.is-poster .shop-desk-slide-media img{ -webkit-mask-image: none; mask-image: none; object-position: center; }

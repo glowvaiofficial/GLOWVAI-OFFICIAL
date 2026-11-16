@@ -1,3 +1,4 @@
+import { isPosterOnlyHero } from '../lib/heroPoster';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BadgePercent, ChevronDown, Crown, Droplets, Flower2, Gift, Headset, Heart, LayoutGrid, Leaf, MapPin, Minus, Plus, RotateCcw, ScanFace, Search, ShieldCheck, Sparkles, Star, Sun, Ticket, Truck, User, Wind, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -235,6 +236,7 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
   const heroTitle = hero?.title || 'Glow your way.';
   const heroSub = hero?.subtitle || (deliveryEta ? `Skincare delivered in ${deliveryEta} mins.` : 'Skincare, delivered to your door.');
   const heroLink = hero?.ctaLink || '';
+  const poster = isPosterOnlyHero(hero);
 
   return (
     <section
@@ -251,7 +253,8 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
       <div className="gvh-hero-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         <div className="gvh-slide is-hero" aria-hidden={current !== 0} role="group" aria-roledescription="slide" aria-label={`1 of ${count}`}>
           <img src={hero?.image || HERO_IMAGE} alt={hero?.image && hero.title ? hero.title : 'GlowVAI skincare campaign'} width={1891} height={831} fetchPriority="high" decoding="async" />
-          <span className="gvh-slide-shade" aria-hidden="true" />
+          {!poster && <span className="gvh-slide-shade" aria-hidden="true" />}
+          {!poster && (
           <div className="gvh-slide-copy">
             <span className="gvh-slide-tag">Discover. Shop. Glow.</span>
             <h1>{heroTitle}</h1>
@@ -260,6 +263,7 @@ export function HeroCarousel({ hero, deliveryEta, accent }: { hero: (HeroOverrid
               {hero?.ctaLabel || 'Shop Now'} <ArrowRight size={15} aria-hidden="true" />
             </button>
           </div>
+          )}
         </div>
         {banners.map((b, i) => {
           const shown = current === i + 1;
