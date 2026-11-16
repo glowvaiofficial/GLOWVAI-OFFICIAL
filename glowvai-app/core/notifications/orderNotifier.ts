@@ -26,11 +26,15 @@ const toMessages = (events: OrderEvent[]): NotificationMessage[] => {
 };
 
 // Records the statuses and raises messages for any change. The very first record for a customer is silent.
-const processOrders = (uid: string, orders: ShopOrder[]) => {
+// The first orders loaded for a customer in this page session only refresh the stored record. A status that changed
+// while the site was closed (an old cancellation, say) is never replayed as a dialog on a later visit.
+const processOrders = (uid: string, orders: ShopOrder[], baselined: Set<string>) => {
   const seen = readSeen(uid);
-  const { events, next } = collectOrderEvents(orders, seen);
+  const announce = baselined.has(uid);
+  baselined.add(uid);
+  const { events, next } = collectOrderEvents(orders, seen, announce);
   writeSeen(uid, next);
-  if (seen && events.length > 0) useNotificationStore.getState().push(toMessages(events));
+  if (announce && seen && events.length > 0) useNotificationStore.getState().push(toMessages(events));
 };
 
 // Starts watching. Returns a function that stops everything (used when the component unmounts).
@@ -39,6 +43,7 @@ export function startOrderNotifier(): () => void {
   let uid: string | null = null;
   let timer: number | null = null;
   let lastFetchAt = 0;
+  const baselined = new Set<string>();
 
   const fetchIfDue = () => {
     if (stopped || !uid) return;
@@ -61,7 +66,7 @@ export function startOrderNotifier(): () => void {
   // Orders loaded by any screen are compared too, so a message is not missed when a screen refreshes first.
   const unsubscribeOrders = useCustomerStore.subscribe((state, previous) => {
     if (stopped || !uid || state.orders === previous.orders) return;
-    processOrders(uid, state.orders);
+    processOrders(uid, state.orders, baselined);
   });
 
   const onVisibility = () => {
