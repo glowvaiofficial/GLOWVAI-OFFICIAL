@@ -34,8 +34,8 @@ export const BottomNavBar: React.FC = () => {
       {cart.count > 0 && showsMiniCart(currentScreen) && (
         <button onClick={() => navigate(TAB_TARGET.cart)} className="mini-cart-bar" aria-label={`View cart, ${itemsLabel(cart.count)}, ${cart.totalLabel}`}>
           <span className="mini-cart-icon" aria-hidden="true"><ShoppingCart size={20} /></span>
-          <span className="mini-cart-copy"><b>View cart</b><small>{itemsLabel(cart.count)} · {cart.totalLabel}</small></span>
-          <span className="mini-cart-action" aria-hidden="true"><ChevronRight size={20} /></span>
+          <span className="mini-cart-copy"><b>{cart.totalLabel}</b><small>{itemsLabel(cart.count)}</small></span>
+          <span className="mini-cart-action" aria-hidden="true">View cart <ChevronRight size={18} /></span>
         </button>
       )}
       <nav className="quick-bottom-nav" aria-label="Primary navigation">

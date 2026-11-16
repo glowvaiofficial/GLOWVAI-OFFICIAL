@@ -1,0 +1,93 @@
+/* Website v2, phone home (under 1024px): drawn to the native app home (design-reference/app-reference/app-home-16nov.png).
+   Loaded after mobile-home.css, so it only restyles; every admin style, accent and tab keeps working. Roboto 400/500/700. */
+
+/* ---------- Sticky sky-blue top area: the chosen tab's accent as a soft wash fading into the page ---------- */
+.glowvai-root .gvh .gvh-header {
+  --wash-on: var(--gv-ink);
+  margin-bottom: -10px; padding: 12px var(--gv-gutter) 18px; color: var(--gv-ink);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--wash) 46%, #fff) 0%, color-mix(in srgb, var(--wash) 30%, #fff) 55%, color-mix(in srgb, var(--wash) 10%, #f6f8fd) 88%, transparent 100%);
+}
+.glowvai-root .gvh .gvh-top { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'logo loc actions' 'search search search'; gap: 12px 10px; }
+.glowvai-root .gvh .gvh-logo { padding-right: 10px; border-right: 1px solid rgba(11, 27, 77, .14); }
+.glowvai-root .gvh .gvh-location { position: relative; margin: 0; min-height: 44px; flex-direction: column; align-items: flex-start; justify-content: center; justify-self: start; gap: 0; padding: 0 18px 0 0; }
+.glowvai-root .gvh .gvh-location svg:first-child { display: none; }
+.glowvai-root .gvh .gvh-location > svg:last-child { position: absolute; right: 0; top: 50%; margin-top: -7px; }
+.glowvai-root .gvh .gvh-loc-label { font-size: 14px; font-weight: 700; opacity: 1; color: var(--gv-ink); line-height: 1.2; }
+.glowvai-root .gvh .gvh-loc-name { max-width: 100%; overflow: hidden; color: var(--gvh-muted); font-size: 13px; font-weight: 400; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gvh .gvh-scan-out { display: none; }
+.glowvai-root .gvh .gvh-scan-in { display: inline-flex; flex: 0 0 auto; min-height: 40px; align-items: center; gap: 6px; padding: 0 14px; border-radius: 999px; background: var(--gv-blue); color: #fff; font-size: 14px; font-weight: 500; white-space: nowrap; transition: transform .16s ease, background .16s ease; }
+.glowvai-root .gvh .gvh-scan-in:active { transform: scale(.96); }
+.glowvai-root .gvh .gvh-search { height: 52px; padding: 0 5px 0 16px; border: 0; box-shadow: 0 0 0 3px rgba(255, 255, 255, .55), 0 6px 18px rgba(11, 27, 77, .1); }
+.glowvai-root .gvh .gvh-search .shop-home-voice { display: none; }
+.glowvai-root .gvh .gvh-search-btn { font-size: 15px; }
+.glowvai-root .gvh .gvh-avatar { width: 42px; height: 42px; background: #0b1b4d; box-shadow: 0 0 0 2px rgba(255, 255, 255, .8); }
+.glowvai-root .gvh .gvh-icon { color: var(--gv-ink); }
+
+.glowvai-root .gvh .gvh-tabs { margin-top: 10px; padding-bottom: 4px; }
+.glowvai-root .gvh .gvh-tab { min-height: 44px; font-size: 15px; font-weight: 400; border-color: rgba(11, 27, 77, .08); box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
+.glowvai-root .gvh .gvh-tab.is-on { font-weight: 500; border-color: transparent; box-shadow: 0 0 0 2px rgba(255, 255, 255, .6), 0 6px 14px rgba(11, 27, 77, .16); }
+.glowvai-root .gvh .gvh-tab:active { transform: scale(.96); }
+
+/* Wider phones and tablets: the Skin scan pill leaves the search bar and sits with the actions again. */
+@media (min-width: 560px) {
+  .glowvai-root .gvh .gvh-top { grid-template-columns: auto minmax(0, 190px) minmax(0, 1fr) auto; grid-template-areas: 'logo loc search actions'; }
+  .glowvai-root .gvh .gvh-scan-in { display: none; }
+  .glowvai-root .gvh .gvh-scan-out { display: inline-flex; background: var(--gv-blue); color: #fff; box-shadow: none; }
+  .glowvai-root .gvh .gvh-search .shop-home-voice { display: inline-grid; }
+  .glowvai-root .gvh .gvh-loc-label { display: block; }
+}
+
+/* ---------- Page body ---------- */
+.glowvai-root .shop-home.gvh { --gvh-page: #f6f8fd; background: linear-gradient(180deg, #eaf0ff 0, #f6f8fd 320px); }
+.glowvai-root .gvh .gvh-greet { margin-top: 4px; border: 0; border-radius: 16px; box-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 4px 14px rgba(11, 27, 77, .05); }
+.glowvai-root .shop-home.gvh .gvh-hero { margin-top: 12px; border-radius: 22px; box-shadow: 0 2px 4px rgba(11, 27, 77, .05), 0 12px 28px rgba(11, 27, 77, .1); }
+@media (max-width: 719px) {
+  .glowvai-root .shop-home.gvh .gvh-hero { margin-top: 12px; border-radius: 22px; }
+  .glowvai-root .gvh .gvh-slide { min-height: 178px; }
+  .glowvai-root .gvh .gvh-slide h1, .glowvai-root .gvh .gvh-slide strong { font-size: 26px; letter-spacing: -.01em; }
+}
+.glowvai-root .gvh .gvh-head h2 { font-size: 20px; }
+.glowvai-root .gvh .gvh-head { margin-bottom: 10px; }
+.glowvai-root .gvh .gvh-section { margin-top: 22px; }
+.glowvai-root .gvh .gvh-see-all { font-weight: 500; }
+
+/* White category tiles, soft tint only on press */
+.glowvai-root .gvh .gvh-cat-media { border-radius: 20px; box-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 4px 12px rgba(11, 27, 77, .05); }
+.glowvai-root .gvh .gvh-cat-label { font-size: 13px; font-weight: 400; }
+
+/* Premium product cards: tinted picture well, price first, solid Add / stepper */
+.glowvai-root .gvh .gvh-card { border: 0; border-radius: 22px; box-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 22px rgba(11, 27, 77, .07); }
+.glowvai-root .gvh .gvh-card-media { margin: 8px 8px 0; border-radius: 16px; background: linear-gradient(160deg, #f4f7ff, #e7eeff); }
+.glowvai-root .gvh .gvh-card-body { padding: 10px 12px 12px; }
+.glowvai-root .gvh .gvh-card-name { font-size: 14px; font-weight: 400; }
+.glowvai-root .gvh .gvh-card-price b { font-size: 18px; }
+.glowvai-root .gvh .gvh-add { min-height: 38px; padding: 0 18px; border: 0; background: var(--gv-blue); color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 4px 10px rgba(0, 87, 251, .25); }
+.glowvai-root .gvh .gvh-add:hover { background: #0046cc; color: #fff; }
+.glowvai-root .gvh .gvh-stepper { height: 38px; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--gv-ink); }
+.glowvai-root .gvh .gvh-stepper b { font-weight: 700; font-size: 14px; }
+.glowvai-root .gvh .gvh-offer, .glowvai-root .gvh .gvh-price { border-radius: 18px; }
+.glowvai-root .gvh .gvh-trust { border: 0; border-radius: 22px; box-shadow: 0 1px 2px rgba(11, 27, 77, .04), 0 8px 22px rgba(11, 27, 77, .06); }
+.glowvai-root .gvh .gvh-card.is-skel { border-radius: 22px; }
+
+/* ---------- Shell: slim white mini-cart pill above a floating tab bar with the raised Face scan button ---------- */
+.glowvai-root .bottom-commerce-shell { padding: 0 10px calc(8px + var(--safe-bottom)); border-top: 0; background: linear-gradient(180deg, rgba(246, 248, 253, 0), #f6f8fd 28%); }
+.glowvai-root .mini-cart-bar { width: 100%; max-width: 440px; height: 60px; margin: 0 auto 8px; padding: 8px 8px 8px 14px; border: 1px solid rgba(11, 27, 77, .06); border-radius: 999px; background: #fff; color: var(--gv-ink); box-shadow: 0 8px 24px rgba(11, 27, 77, .14); transition: transform .16s ease; }
+.glowvai-root .mini-cart-bar:hover { background: #fff; }
+.glowvai-root .mini-cart-bar:active { transform: scale(.98); }
+.glowvai-root .mini-cart-icon { background: var(--gv-blue-tint); color: var(--gv-blue); border-radius: 50%; }
+.glowvai-root .mini-cart-copy b { font-size: 18px; font-weight: 700; color: var(--gv-ink); }
+.glowvai-root .mini-cart-copy small { color: var(--gv-muted, #5b6782); font-size: 13px; font-weight: 400; }
+.glowvai-root .mini-cart-action { display: inline-flex; width: auto; height: 44px; align-items: center; gap: 2px; padding: 0 16px 0 20px; border-radius: 999px; background: var(--gv-blue); color: #fff; font-size: 16px; font-weight: 500; }
+.glowvai-root .quick-bottom-nav { position: relative; height: 66px; max-width: 460px; margin: 0 auto; border: 1px solid rgba(11, 27, 77, .06); border-radius: 28px; background: #fff; box-shadow: 0 8px 28px rgba(11, 27, 77, .14); }
+.glowvai-root .quick-bottom-nav > button { gap: 3px; font-size: 12px; font-weight: 400; color: #4a5575; }
+.glowvai-root .quick-bottom-nav > button.is-active { color: var(--gv-blue); font-weight: 500; }
+.glowvai-root .quick-bottom-nav > button.is-active::after { display: none; }
+.glowvai-root .quick-bottom-nav > button.is-active svg { fill: var(--gv-blue); stroke-width: 2; }
+.glowvai-root .quick-bottom-nav > button:active { transform: scale(.94); }
+.glowvai-root .quick-bottom-nav > button:nth-child(3) { justify-content: flex-end; padding-bottom: 7px; color: #4a5575; }
+.glowvai-root .quick-bottom-nav > button:nth-child(3) svg { position: absolute; top: -22px; left: 50%; box-sizing: content-box; width: 26px; height: 26px; margin-left: -23px; padding: 10px; border: 4px solid #fff; border-radius: 50%; background: var(--gv-blue); color: #fff; fill: none; stroke-width: 2; box-shadow: 0 8px 18px rgba(0, 87, 251, .35); transition: transform .16s ease; }
+.glowvai-root .quick-bottom-nav > button:nth-child(3):active svg { transform: scale(.92); }
+
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root .gvh *, .glowvai-root .mini-cart-bar, .glowvai-root .quick-bottom-nav * { transition: none !important; }
+}
