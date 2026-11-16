@@ -70,8 +70,8 @@ export function MobileHomeHeader({
   return (
     <header className="gvh-header" style={{ '--wash': tab.accent, '--wash-on': readableTextOn(tab.accent) } as React.CSSProperties}>
       <div className="gvh-top">
-        <span className={readableTextOn(tab.accent) === '#FFFFFF' ? 'gvh-logo' : 'gvh-logo is-ink'}>
-          <BrandLogo height={26} white={readableTextOn(tab.accent) === '#FFFFFF'} />
+        <span className="gvh-logo">
+          <BrandLogo height={28} />
         </span>
         {embedded ? (
           <span className="gvh-location is-static">
@@ -93,13 +93,17 @@ export function MobileHomeHeader({
             <SearchHint hints={header.searchHints} />
           </button>
           <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
+          <button type="button" className="gvh-scan-in" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
+            <ScanFace size={16} aria-hidden="true" />
+            Skin scan
+          </button>
         </div>
         <DeliveryModeSwitch header={header} />
         <div className="gvh-actions">
           <span className="gvh-cart-slot">
             <HeaderCartButton onOpen={() => navigate('cart-tab')} />
           </span>
-          <button type="button" className="gvh-scan-pill" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
+          <button type="button" className="gvh-scan-pill gvh-scan-out" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
             <ScanFace size={16} aria-hidden="true" />
             Skin scan
           </button>

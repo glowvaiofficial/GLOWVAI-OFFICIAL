@@ -47,6 +47,7 @@ import {
 } from '../mobile/MobileHomeParts';
 import '../styles/shop-home.css';
 import '../mobile/mobile-home.css';
+import '../styles/v2-home-phone.css';
 import '../styles/shop-type.css';
 
 // Admin settings and items may carry an accent ("#RRGGBB", lib/shop/accents.ts); the layout types do not list it.
