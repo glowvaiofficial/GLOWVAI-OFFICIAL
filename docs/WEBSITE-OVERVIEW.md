@@ -27,7 +27,7 @@ The same Firebase project (`glowvai-38bde`) is shared with the admin console and
 | PC browse, category, search and product pages | Live (PR #143) | `features/shop/desktop/PcListing.tsx`, `PcProduct.tsx` |
 | Blank gap on PC home fix | Live (PR #145) | commit `778f27a`, `useRevealOnScroll` in `ShopDesktopHome.tsx` |
 | Vendor portal: orders, ready for pickup, read-only returns, payouts ledger | Live (PRs #135, #138) | [VENDOR-PORTAL.md](VENDOR-PORTAL.md) |
-| Roboto font parity, 400/500/700 weights, one colour set, shared hover motion | **Pending: PR #146 (`web-font-parity`) is OPEN, not merged** | see [WEBSITE-DESIGN-SYSTEM.md](WEBSITE-DESIGN-SYSTEM.md) |
+| Roboto font parity, 400/500/700 weights, one colour set, shared hover motion | **Done: PR #146 (`web-font-parity`) merged 16 Nov 2026** | see [WEBSITE-DESIGN-SYSTEM.md](WEBSITE-DESIGN-SYSTEM.md) |
 | Phone-verified accounts required for orders and payments | **Held: PR #127 (`web-auth`) is not merged** (owner decision: wait for real OTP) | `MORNING-REPORT-2026-11-16.md` |
 | Real SMS for phone sign-in | Not set up (Firebase test number only) | `PROGRESS.md` owner to-do 4 |
 
@@ -53,7 +53,7 @@ The repository has 394 commits. First commit 3 Oct 2026 ("Complete GLOW VAI quic
 | 16 Nov, 08:27 | #141, #142 | Page titles and `/sell` h1; **PC shop home rebuilt** (utility strip, two-line delivery chip, search suggestions, category hover panels, hero with side tiles, sticky section links, brands and trust strips, richer footer) |
 | 16 Nov, 08:30 | #143, #144 | **PC browse, category, search and product pages**; home category tiles white at rest, soft tint on press |
 | 16 Nov, 08:56 | #145 | **Blank gap fix**: PC home sections can no longer stay invisible; scroll reveal arms only after a real scroll |
-| 16 Nov, 08:59 | #146 (open) | Roboto font parity (pending) |
+| 16 Nov, 08:59 | #146 (merged) | Roboto font parity, one colour set, shared hover motion |
 
 ## How the home page is controlled
 
