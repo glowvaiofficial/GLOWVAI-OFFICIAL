@@ -133,13 +133,19 @@ export const HOME_FOOTER_GROUPS: FooterGroup[] = [
     links: [
       { label: 'Help & Support', screen: 'profile-support' },
       { label: 'Returns & Refunds', screen: 'profile-support' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Delivery', href: '/delivery' },
+      { label: 'FAQ', href: '/faq' },
     ],
   },
   {
     title: 'Company',
     links: [
       { label: 'About us', href: '/about' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Press', href: '/press' },
+      { label: 'Careers', href: '/careers' },
+      { label: 'Sell on GlowVai', href: '/sell' },
+      { label: 'Affiliate', href: '/affiliate' },
     ],
   },
   {
@@ -147,6 +153,8 @@ export const HOME_FOOTER_GROUPS: FooterGroup[] = [
     links: [
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Use', href: '/terms' },
+      { label: 'Grievance', href: '/grievance' },
+      { label: 'Accessibility', href: '/accessibility' },
     ],
   },
 ];
