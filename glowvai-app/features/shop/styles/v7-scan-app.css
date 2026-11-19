@@ -1,0 +1,30 @@
+/* Web v7, "Skin scan is in the GlowVai app" screen (every website scan entry opens it). White, hairline, brand blue. */
+.glowvai-root .gv7sa{ --s-ink: #0B1B3F; --s-muted: #5B6784; --s-line: #E3E9F5; --s-brand: #0057FB; --s-tint: #EEF3FF; display: grid; justify-items: center; padding: 32px var(--gv-gutter, 16px) calc(96px + env(safe-area-inset-bottom, 0px)); color: var(--s-ink); }
+.glowvai-root .gv7sa-card{ display: grid; justify-items: center; gap: 16px; width: 100%; max-width: 520px; padding: 32px 24px; border: 1px solid var(--s-line); border-radius: 16px; background: #fff; text-align: center; }
+.glowvai-root .gv7sa-icon{ display: inline-grid; width: 72px; height: 72px; place-items: center; border-radius: 20px; background: var(--s-tint); color: var(--s-brand); }
+.glowvai-root .gv7sa-title{ margin: 0; font-size: 24px; font-weight: 700; line-height: 1.25; }
+.glowvai-root .gv7sa-text{ margin: 0; max-width: 40ch; color: var(--s-muted); font-size: 14px; font-weight: 400; line-height: 1.5; }
+.glowvai-root .gv7sa-stores{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.glowvai-root .gv7sa-stores a{ display: grid; min-height: 48px; align-content: center; padding: 4px 20px; border-radius: 10px; background: var(--s-ink); color: #fff; text-align: left; text-decoration: none; line-height: 1.15; }
+.glowvai-root .gv7sa-stores small{ font-size: 10px; font-weight: 500; }
+.glowvai-root .gv7sa-stores strong{ font-size: 15px; font-weight: 700; }
+.glowvai-root .gv7sa-notice{ display: flex; align-items: center; gap: 12px; margin: 0; padding: 12px 16px; border: 1px solid var(--s-line); border-radius: 12px; background: #fff; color: var(--s-muted); font-size: 14px; text-align: left; }
+.glowvai-root .gv7sa-notice svg{ flex: 0 0 auto; color: var(--s-brand); }
+.glowvai-root .gv7sa-notice span{ display: grid; gap: 2px; }
+.glowvai-root .gv7sa-notice strong{ color: var(--s-ink); font-weight: 700; }
+.glowvai-root .gv7sa-actions{ display: grid; gap: 10px; width: 100%; margin-top: 8px; }
+.glowvai-root .gv7sa-actions button{ display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 20px; border-radius: 12px; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.glowvai-root .gv7sa-primary{ border: 1px solid var(--s-brand); background: var(--s-brand); color: #fff; }
+.glowvai-root .gv7sa-secondary{ border: 1px solid var(--s-line); background: #fff; color: var(--s-ink); }
+.glowvai-root .gv7sa-actions button:active{ transform: scale(.98); }
+.glowvai-root .gv7sa :is(a, button):focus-visible{ outline: 2px solid var(--s-brand); outline-offset: 2px; }
+@media (hover: hover){
+  .glowvai-root .gv7sa-secondary:hover{ border-color: var(--s-brand); background: var(--s-tint); }
+  .glowvai-root .gv7sa-primary:hover{ background: #004BD6; }
+}
+@media (min-width: 1024px){
+  .glowvai-root .gv7sa{ padding-top: 64px; padding-bottom: 64px; }
+  .glowvai-root .gv7sa-title{ font-size: 28px; }
+  .glowvai-root .gv7sa-actions{ grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce){ .glowvai-root .gv7sa-actions button:active{ transform: none; } }

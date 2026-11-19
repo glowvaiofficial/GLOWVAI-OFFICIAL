@@ -160,7 +160,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
               <h2 id="gv7-pstory-title">Find the routine that fits your skin</h2>
               <p>Scan one clear photo, get products matched to your skin, delivered{deliveryEta ? ` in ~${deliveryEta} mins` : ' to your door'}.</p>
               <div className="gv7-pstory-actions">
-                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-camera')}>
+                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-tab')}>
                   Start free skin scan
                   <ArrowRight size={16} aria-hidden="true" />
                 </button>
@@ -336,7 +336,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
       <span>{SCAN_PRIVACY}</span>
     </p>
     <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
-    <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
+    <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-tab')}>
       Start free skin scan
       <ArrowRight size={16} />
     </button>

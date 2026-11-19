@@ -72,7 +72,7 @@ describe("the decision table: which screens open without an account", () => {
   });
 
   test("the bag, checkout, orders, profile, wishlist and scan need an account", () => {
-    for (const screen of ["checkout", "checkout-payment-method", "customer-details", "orders-list", "order-history", "profile-tab", "shop-wishlist", "face-prep", "scan-camera", "scan-gallery", "wallet-home", "support", "notifications-list"]) {
+    for (const screen of ["checkout", "checkout-payment-method", "customer-details", "orders-list", "order-history", "profile-tab", "shop-wishlist", "wallet-home", "support", "notifications-list"]) {
       assert.equal(screenOpensWithoutAccount(screen), false, screen);
     }
   });
@@ -260,11 +260,10 @@ describe("what a guest may do (requiresSignIn)", () => {
     assert.equal(requiresSignIn("something-new"), true);
     assert.equal(requiresSignIn("toString"), true);
   });
-  test("the guest screens open, and starting the scan or checkout goes to sign-in", () => {
-    for (const screen of ["cart-tab", "cart", "location-setup", "location-map-picker", "location-serviceability", "scan-tab", "scan-intro"]) {
+  test("the guest screens open (every scan route shows the app-only screen), and checkout goes to sign-in", () => {
+    for (const screen of ["cart-tab", "cart", "location-setup", "location-map-picker", "location-serviceability", "scan-tab", "scan-intro", "scan-camera", "scan-gallery", "face-prep", "face-capture"]) {
       assert.equal(gateNavigation(NONE, { screen, params: null }).screen, screen, screen);
     }
-    assert.equal(gateNavigation(NONE, { screen: "scan-camera", params: null }).screen, "auth-login");
     assert.equal(gateNavigation(NONE, { screen: "checkout-review", params: null }).screen, "auth-login");
     assert.equal(gateNavigation(NONE, { screen: "profile-tab", params: null }).screen, "auth-login");
   });

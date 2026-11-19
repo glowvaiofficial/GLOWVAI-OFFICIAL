@@ -22,9 +22,7 @@ import { OnboardingScreen } from './screens/OnboardingScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { PhoneSignInScreen } from './features/auth/PhoneSignInScreen';
 import { OtpScreen } from './features/auth/OtpScreen';
-import { FaceAnalysisPrepScreen } from './screens/FaceAnalysisPrepScreen';
-import { FaceAnalysisCameraScreen } from './screens/FaceAnalysisCameraScreen';
-import { FaceAnalysisLoadingScreen } from './screens/FaceAnalysisLoadingScreen';
+import { ScanInAppScreen } from './features/scan/ScanInAppScreen';
 import { SkinReportScreen } from './screens/SkinReportScreen';
 import { ShopHomeScreen } from './features/shop/screens/ShopHomeScreen';
 import { CategoryScreen } from './screens/CategoryScreen';
@@ -51,6 +49,7 @@ import './features/shop/styles/v7-home.css';
 import './features/shop/styles/v7-fixes.css';
 import './features/shop/styles/v7-footer.css';
 import './features/shop/styles/v7-account.css';
+import './features/shop/styles/v7-scan-app.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate } = useApp();
@@ -101,12 +100,11 @@ const AppContent: React.FC = () => {
         return <OtpScreen />;
       case 'customer-details':
         return <LoginScreen />;
+      // Older face-scan routes open the app-only scan screen.
       case 'face-prep':
-        return <FaceAnalysisPrepScreen />;
       case 'face-capture':
-        return <FaceAnalysisCameraScreen />;
       case 'face-loading':
-        return <FaceAnalysisLoadingScreen />;
+        return <ScanInAppScreen />;
       case 'skin-report':
         return <SkinReportScreen />;
       case 'home':

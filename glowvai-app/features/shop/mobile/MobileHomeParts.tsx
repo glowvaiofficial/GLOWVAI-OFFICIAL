@@ -67,7 +67,6 @@ export function MobileHomeHeader({
   initial: string;
 }) {
   const navigate = useHomeNavigate();
-  const { accountSignedIn } = useApp();
   return (
     <header className="gvh-header" style={{ '--wash': tab.accent, '--wash-on': readableTextOn(tab.accent) } as React.CSSProperties}>
       <div className="gvh-top">
@@ -90,7 +89,7 @@ export function MobileHomeHeader({
         )}
         <div className="gvh-search">
           <HeaderSearch hints={header.searchHints} className="gvh-search-box" />
-          <button type="button" className="gvh-scan-in" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
+          <button type="button" className="gvh-scan-in" onClick={() => navigate('scan-tab')}>
             <ScanFace size={16} aria-hidden="true" />
             Skin scan
           </button>
@@ -100,7 +99,7 @@ export function MobileHomeHeader({
           <span className="gvh-cart-slot">
             <HeaderCartButton onOpen={() => navigate('cart-tab')} />
           </span>
-          <button type="button" className="gvh-scan-pill gvh-scan-out" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
+          <button type="button" className="gvh-scan-pill gvh-scan-out" onClick={() => navigate('scan-tab')}>
             <ScanFace size={16} aria-hidden="true" />
             Skin scan
           </button>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Camera, Image as ImageIcon, ScanFace } from 'lucide-react';
+import { Camera, ScanFace } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import type { SkinAnalysisResult } from '../../core/services/skinModelService';
 import { ScanHeader } from './components/ScanHeader';
@@ -37,17 +37,12 @@ export const ScanReportEmpty: React.FC = () => {
       </span>
       <h2 className="scan-headline">No skin report yet</h2>
       <p className="scan-lead">
-        Take a clear photo or upload one, and your report will show your skin type and five visible concerns. It is a cosmetic check, not a medical
-        diagnosis.
+        Skin scans are done in the GlowVai app. Scan your face with your phone camera and your report will show up here to read.
       </p>
       <div className="scan-empty-actions">
-        <button type="button" className="scan-primary-button" onClick={() => navigate('scan-camera')}>
+        <button type="button" className="scan-primary-button" onClick={() => navigate('scan-tab')}>
           <Camera size={18} />
-          Start face scan
-        </button>
-        <button type="button" className="scan-secondary-button" onClick={() => navigate('scan-gallery')}>
-          <ImageIcon size={18} />
-          Upload a photo
+          Get the GlowVai app
         </button>
       </div>
     </div>
@@ -63,7 +58,7 @@ export const ScanReportScreen: React.FC = () => {
       <ScanHeader title="Your skin report" subtitle="Cosmetic skin assessment" onBack={goBack} />
       {loaded && (
         <div className={`scan-body scan-report-body${result ? '' : ' scan-empty'}`}>
-          {result ? <ScanResultView result={result} onRetake={() => navigate('scan-camera')} /> : <ScanReportEmpty />}
+          {result ? <ScanResultView result={result} onRetake={() => navigate('scan-tab')} /> : <ScanReportEmpty />}
         </div>
       )}
     </div>
