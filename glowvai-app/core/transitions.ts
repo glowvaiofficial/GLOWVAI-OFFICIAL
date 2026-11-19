@@ -24,6 +24,17 @@ export function classifyTransition(from: string, to: string, direction: 'forward
   return 'forward';
 }
 
+// Pure: moving between two sections of the Account area on a wide screen (the sidebar stays, only the section changes).
+// Those steps get no screen transition at all: a plain, instant swap, like switching tabs inside one page.
+// AccountMenu registers which screens carry the sidebar (it owns that list), so this module stays free of React components.
+let accountScreenTest: (screen: string) => boolean = () => false;
+export function registerAccountScreens(test: (screen: string) => boolean): void {
+  accountScreenTest = test;
+}
+export function isAccountSectionSwitch(from: string, to: string, wide: boolean): boolean {
+  return wide && accountScreenTest(from) && accountScreenTest(to);
+}
+
 type VtDocument = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<unknown>; skipTransition: () => void } };
 
 const reducedMotion = (): boolean => {
@@ -82,6 +93,13 @@ let activeTransition: { skipTransition: () => void } | null = null;
 export function runScreenTransition(from: string, to: string, direction: 'forward' | 'back', update: () => void): void {
   if (typeof document === 'undefined') {
     update();
+    return;
+  }
+  const wide = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(min-width: 1024px)').matches;
+  if (isAccountSectionSwitch(from, to, wide)) {
+    screenBox()?.removeAttribute('data-direction');
+    update();
+    window.setTimeout(focusHeading, 0);
     return;
   }
   const heroImg = direction === 'forward' ? takeHero() : null;

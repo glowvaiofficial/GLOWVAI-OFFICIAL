@@ -1,3 +1,4 @@
+import { registerAccountScreens } from '../../core/transitions';
 import React from 'react';
 import { Bell, CreditCard, Gift, HelpCircle, MapPin, Package, Repeat, Settings, ShieldCheck, Smartphone, UserRound, Users, Wallet } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -35,6 +36,7 @@ const ITEMS: MenuItem[] = [
 // The screens that carry the menu. The public shared tracking page and the live tracking map keep the full width.
 const WITH_MENU = new Set<string>(ITEMS.flatMap((item) => item.screens));
 export const showsAccountMenu = (screen: string): boolean => WITH_MENU.has(screen);
+registerAccountScreens(showsAccountMenu);
 
 export const AccountMenu: React.FC = () => {
   const { currentScreen, navigate, user } = useApp();

@@ -2,9 +2,19 @@ import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { classifyTransition } from "../../glowvai-app/core/transitions";
+import { classifyTransition, isAccountSectionSwitch, registerAccountScreens } from "../../glowvai-app/core/transitions";
 
 describe("screen transitions", () => {
+  test("switching Account sections on a wide screen has no transition", () => {
+    const menu = new Set(["orders-list", "notifications-list", "profile-settings", "profile-support"]);
+    registerAccountScreens((screen) => menu.has(screen));
+    assert.equal(isAccountSectionSwitch("orders-list", "notifications-list", true), true);
+    assert.equal(isAccountSectionSwitch("profile-settings", "profile-support", true), true);
+    assert.equal(isAccountSectionSwitch("orders-list", "notifications-list", false), false);
+    assert.equal(isAccountSectionSwitch("shop-home", "orders-list", true), false);
+    assert.equal(isAccountSectionSwitch("orders-list", "shop-home", true), false);
+  });
+
   test("direction and kind", () => {
     assert.equal(classifyTransition("shop-home", "shop-browse", "forward"), "tab");
     assert.equal(classifyTransition("shop-browse", "shop-category", "forward"), "forward");
