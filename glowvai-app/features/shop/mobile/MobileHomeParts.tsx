@@ -606,9 +606,12 @@ export function FlashSaleRows({ sales, catalog, now, accent }: { sales: FlashSal
 // ---------- Categories: pastel accent tiles ----------
 
 export function CategoryTile({ label, accent, onOpen, image, sub, Icon }: { label: string; accent: string; onOpen: () => void; image?: string | null; Icon?: LucideIcon; sub?: string | null }) {
+  // A picture that fails to load falls back to the tile's icon, never a broken-image box.
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(image) && !failed;
   return (
-    <button type="button" className={`gvh-cat${image ? '' : ' is-brand'}`} style={varsStyle(accent)} onClick={onOpen} aria-label={sub ? `${label}, ${sub}` : label}>
-      <span className="gvh-cat-media">{image ? <img src={image} alt="" width={200} height={200} loading="lazy" decoding="async" /> : <span className="gvh-cat-ico" aria-hidden="true">{Icon ? <Icon size={26} /> : <Package size={26} />}</span>}</span>
+    <button type="button" className={`gvh-cat${showImage ? '' : ' is-brand'}`} style={varsStyle(accent)} onClick={onOpen} aria-label={sub ? `${label}, ${sub}` : label}>
+      <span className="gvh-cat-media">{showImage ? <img src={image ?? undefined} alt="" width={200} height={200} loading="lazy" decoding="async" ref={(el) => { if (el && el.complete && el.naturalWidth === 0) setFailed(true); }} onError={() => setFailed(true)} /> : <span className="gvh-cat-ico" aria-hidden="true">{Icon ? <Icon size={26} /> : <Package size={26} />}</span>}</span>
       <span className="gvh-cat-label">{label}</span>
     </button>
   );
