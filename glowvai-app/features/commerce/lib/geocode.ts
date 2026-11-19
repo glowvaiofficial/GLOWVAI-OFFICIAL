@@ -1,5 +1,10 @@
 import { getDeviceCurrentLocation } from '../../../core/services/locationService';
 // Free OpenStreetMap Nominatim search, the same geocoder the mobile location screens used. No API key.
+// Nominatim allows 1 request per second, so every call goes through one shared queue.
+import { NOMINATIM_GAP_MS, cleanPincode, createThrottle, readableAddress } from './placeRules';
+
+const throttled = createThrottle(NOMINATIM_GAP_MS);
+const nominatim = (url: string, signal?: AbortSignal) => throttled(() => fetch(url, { headers: { Accept: 'application/json' }, signal }));
 
 export interface PlaceResult {
   id: string;
@@ -10,35 +15,37 @@ export interface PlaceResult {
   pincode?: string;
 }
 
-export const searchPlaces = async (query: string, limit = 8): Promise<PlaceResult[]> => {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&addressdetails=1&limit=${limit}`;
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+export const searchPlaces = async (query: string, limit = 8, signal?: AbortSignal): Promise<PlaceResult[]> => {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&accept-language=en&addressdetails=1&limit=${limit}`;
+  const res = await nominatim(url, signal);
   if (!res.ok) throw new Error('search failed');
   const data = (await res.json()) as any[];
   return (Array.isArray(data) ? data : []).map((r, idx) => ({
     id: `place-${r.place_id ?? idx}`,
     name: r.display_name?.split(',').slice(0, 2).join(',').trim() || r.display_name,
-    locality: r.display_name,
+    locality: readableAddress(r.address, r.display_name) || r.display_name,
     latitude: parseFloat(r.lat),
     longitude: parseFloat(r.lon),
-    pincode: r.address?.postcode,
+    pincode: cleanPincode(r.address?.postcode),
   }));
 };
 
 // Address for a coordinate from the same Nominatim service. Null when nothing is found.
-export const reversePlace = async (latitude: number, longitude: number): Promise<PlaceResult | null> => {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`;
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+export const reversePlace = async (latitude: number, longitude: number, signal?: AbortSignal): Promise<PlaceResult | null> => {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&accept-language=en&addressdetails=1`;
+  const res = await nominatim(url, signal);
   if (!res.ok) throw new Error('reverse lookup failed');
   const r = (await res.json()) as any;
   if (!r || !r.display_name) return null;
+  const locality = readableAddress(r.address, r.display_name);
+  if (!locality) return null;
   return {
     id: `place-${r.place_id ?? 'reverse'}`,
-    name: r.display_name.split(',').slice(0, 2).join(',').trim(),
-    locality: r.display_name,
+    name: locality.split(',').slice(0, 2).join(',').trim(),
+    locality,
     latitude,
     longitude,
-    pincode: r.address?.postcode,
+    pincode: cleanPincode(r.address?.postcode),
   };
 };
 

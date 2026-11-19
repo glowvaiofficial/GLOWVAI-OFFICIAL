@@ -58,3 +58,30 @@ describe("CSP connect-src for the Firebase hosts the shop calls", () => {
     }
   });
 });
+
+const directiveSources = (policy: string, name: string): string[] => {
+  const directive = policy.split(";").map((d) => d.trim()).find((d) => d.startsWith(`${name} `));
+  assert.ok(directive, `${name} is present`);
+  return directive.split(/\s+/).slice(1);
+};
+
+describe("CSP for the delivery map (OpenStreetMap tiles and Nominatim)", () => {
+  for (const [label, match] of [["/shop", (s: string) => s === "/shop"], ["site-wide", SITE_WIDE]] as const) {
+    test(`${label}: tiles load from the exact OSM tile host and search from Nominatim`, async () => {
+      const policy = await policyFor(match);
+      assert.ok(directiveSources(policy, "img-src").includes("https://tile.openstreetmap.org"));
+      assert.ok(directiveSources(policy, "connect-src").includes("https://nominatim.openstreetmap.org"));
+    });
+    test(`${label}: no wildcard OSM host and no blanket image source`, async () => {
+      const img = directiveSources(await policyFor(match), "img-src");
+      for (const bad of ["*", "https:", "http:", "https://*.openstreetmap.org"]) assert.ok(!img.includes(bad), `img-src must not contain ${bad}`);
+    });
+  }
+
+  test("/shop: nothing else (default-src, style-src) blocks tile images", async () => {
+    const policy = await policyFor((s) => s === "/shop");
+    // img-src is set explicitly, so default-src does not apply to images; tiles are plain <img>, not CSS backgrounds or workers.
+    assert.ok(policy.includes("img-src "));
+    assert.ok(!/img-src[^;]*'none'/.test(policy));
+  });
+});

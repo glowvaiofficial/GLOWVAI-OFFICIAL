@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Crosshair, MapPin, Pencil, Search } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { VIJAYAWADA_AREAS } from '../../data/serviceability';
-import { locateDevice, searchPlaces, type PlaceResult } from './lib/geocode';
+import { locateDevice, reversePlace, searchPlaces, type PlaceResult } from './lib/geocode';
+import { SEARCH_DEBOUNCE_MS } from './lib/placeRules';
+import { PinMap } from './components/PinMap';
 import { isServiceablePincode, useAddressStore } from './lib/addressStore';
 import { FlowHeader, useDeliveryAddress } from './components/shared';
 import { readReturnTo } from './AddressScreens';
@@ -170,60 +172,148 @@ export const LocationSetupScreen: React.FC = () => {
   );
 };
 
-// Step 2: confirm the area and pincode. Web has no map view, so the pin comes from search or the device location.
+// Step 2: confirm the spot. A real map (OpenStreetMap tiles) with the pin at the centre: drag the map, search a place or use
+// the device location; the address and pincode are filled from the pin and can be edited.
+const DEFAULT_CENTER = { latitude: 16.5062, longitude: 80.648 }; // Vijayawada
+type LatLng = { latitude: number; longitude: number };
+type GeoState = 'idle' | 'asking' | 'denied' | 'unavailable' | 'timeout' | 'insecure';
+
+const GEO_NOTE: Record<Exclude<GeoState, 'idle' | 'asking'>, string> = {
+  denied: 'Location access is blocked for this site. Allow it in the browser address bar, or search a place or drag the map instead.',
+  unavailable: 'Your device could not find its location. Search a place or drag the map instead.',
+  timeout: 'Finding your location took too long. Try again, or search a place or drag the map instead.',
+  insecure: 'Your browser only shares location on secure pages. Search a place or drag the map instead.',
+};
+
+// Delivery message from the delivery-area data (data/serviceability.ts) and the pincode rule.
+export const serviceMessage = (pincode: string): { ok: boolean; text: string } | null => {
+  if (pincode.length < 6) return null;
+  if (!isServiceablePincode(pincode)) return { ok: false, text: 'We do not deliver to this pincode yet. We deliver to Vijayawada (520xxx) right now.' };
+  const area = SERVICE_AREAS.find((a) => a.pincode === pincode);
+  return { ok: true, text: area ? `We deliver here, about ${area.estimatedMinutes} min.` : 'We deliver to this pincode.' };
+};
+
 export const LocationMapPickerScreen: React.FC = () => {
-  const { activeParams, goBack, navigate, showToast, accountSignedIn, selectAddress } = useApp();
+  const { activeParams, goBack, navigate, accountSignedIn, selectAddress } = useApp();
   const returnTo = readReturnTo(activeParams);
   const params = (activeParams || {}) as { address?: string; latitude?: number; longitude?: number; pincode?: string };
-  const initialPin =
-    typeof params.latitude === 'number' && typeof params.longitude === 'number' ? { latitude: params.latitude, longitude: params.longitude } : null;
+  const initialPin: LatLng | null = typeof params.latitude === 'number' && typeof params.longitude === 'number' ? { latitude: params.latitude, longitude: params.longitude } : null;
 
   const [address, setAddress] = useState(params.address || '');
-  const [pin, setPin] = useState<{ latitude: number; longitude: number } | null>(initialPin);
+  const [pin, setPin] = useState<LatLng | null>(initialPin);
   const [pincode, setPincode] = useState(params.pincode || '');
   const [query, setQuery] = useState('');
-  const [busy, setBusy] = useState<'search' | 'locate' | null>(null);
+  const [results, setResults] = useState<PlaceResult[]>([]);
+  const [searchState, setSearchState] = useState<'idle' | 'searching' | 'empty' | 'error'>('idle');
+  const [geo, setGeo] = useState<GeoState>('idle');
+  const [lookup, setLookup] = useState<LatLng | null>(null);
+  const [lookupState, setLookupState] = useState<'idle' | 'busy' | 'failed'>('idle');
   const [addressError, setAddressError] = useState<string | null>(null);
+  const startedFromText = useRef(Boolean(!initialPin && params.address));
 
-  const useCurrent = async () => {
-    setBusy('locate');
-    try {
-      const spot = await locateDevice();
-      if (!spot) {
-        showToast('Location is off or blocked. Search or type your address instead.');
-        return;
-      }
-      setPin({ latitude: spot.latitude, longitude: spot.longitude });
-      if (spot.address) setAddress(spot.address);
-      if (spot.pincode) setPincode(spot.pincode);
-    } catch {
-      showToast('Could not read your location');
-    } finally {
-      setBusy(null);
-    }
+  // A pin moved by the customer (drag, double click, device location) looks its address up; a pin chosen from a search result already has one.
+  const movePin = (next: LatLng, withLookup: boolean) => {
+    setPin(next);
+    if (withLookup) setLookup(next);
   };
 
-  const search = async () => {
+  // Typed address from the previous step: find it on the map once, without replacing what the customer typed.
+  useEffect(() => {
+    if (!startedFromText.current) return;
+    startedFromText.current = false;
+    const ctl = new AbortController();
+    searchPlaces(params.address || '', 1, ctl.signal)
+      .then(([first]) => {
+        if (first && Number.isFinite(first.latitude)) setPin({ latitude: first.latitude, longitude: first.longitude });
+      })
+      .catch(() => undefined);
+    return () => ctl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reverse lookup, 500 ms after the pin stops moving (and never faster than 1 request a second, see lib/geocode).
+  useEffect(() => {
+    if (!lookup) return;
+    const ctl = new AbortController();
+    setLookupState('busy');
+    const timer = setTimeout(async () => {
+      try {
+        const place = await reversePlace(lookup.latitude, lookup.longitude, ctl.signal);
+        if (ctl.signal.aborted) return;
+        if (place) {
+          setAddress(place.locality);
+          if (place.pincode) setPincode(place.pincode);
+          setAddressError(null);
+          setLookupState('idle');
+        } else {
+          setLookupState('failed');
+        }
+      } catch {
+        if (!ctl.signal.aborted) setLookupState('failed');
+      }
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      ctl.abort();
+      clearTimeout(timer);
+    };
+  }, [lookup]);
+
+  // Place search as the customer types: debounced 500 ms, 3 letters or more.
+  useEffect(() => {
     const q = query.trim();
     if (q.length < 3) {
-      showToast('Type at least 3 letters to search');
+      setResults([]);
+      setSearchState('idle');
       return;
     }
-    setBusy('search');
-    try {
-      const [first] = await searchPlaces(q, 1);
-      if (!first) {
-        showToast('No place found for that search');
-        return;
+    const ctl = new AbortController();
+    setSearchState('searching');
+    const timer = setTimeout(async () => {
+      try {
+        const found = await searchPlaces(q, 5, ctl.signal);
+        if (ctl.signal.aborted) return;
+        setResults(found);
+        setSearchState(found.length ? 'idle' : 'empty');
+      } catch {
+        if (!ctl.signal.aborted) setSearchState('error');
       }
-      setPin({ latitude: first.latitude, longitude: first.longitude });
-      setAddress(first.locality);
-      setPincode(first.pincode || pincode);
-    } catch {
-      showToast('Could not reach location search');
-    } finally {
-      setBusy(null);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      ctl.abort();
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  const choose = (place: PlaceResult) => {
+    movePin({ latitude: place.latitude, longitude: place.longitude }, false);
+    setLookup(null);
+    setLookupState('idle');
+    setAddress(place.locality);
+    if (place.pincode) setPincode(place.pincode);
+    setAddressError(null);
+    setResults([]);
+    setQuery('');
+    setSearchState('idle');
+  };
+
+  const useCurrent = () => {
+    if (typeof window !== 'undefined' && window.isSecureContext === false) {
+      setGeo('insecure');
+      return;
     }
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGeo('unavailable');
+      return;
+    }
+    setGeo('asking');
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setGeo('idle');
+        movePin({ latitude: p.coords.latitude, longitude: p.coords.longitude }, true);
+      },
+      (err) => setGeo(err.code === 1 ? 'denied' : err.code === 3 ? 'timeout' : 'unavailable'),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    );
   };
 
   const confirm = () => {
@@ -246,55 +336,78 @@ export const LocationMapPickerScreen: React.FC = () => {
     navigate('address-add', { ...(returnTo ? { returnTo } : {}), address: address.trim(), latitude: pin?.latitude, longitude: pin?.longitude, pincode });
   };
 
+  const service = serviceMessage(pincode);
+  const geoNote = geo === 'idle' || geo === 'asking' ? null : GEO_NOTE[geo];
+
   return (
-    <main className="commerce-screen commerce-location commerce-location-picker">
-      <FlowHeader title="Confirm location" subtitle="Check the area and pincode before adding details" onBack={goBack} />
+    <main className="commerce-screen commerce-location commerce-location-picker v7-picker">
+      <FlowHeader title="Confirm location" subtitle="Move the map so the pin is on your door" onBack={goBack} />
 
       <div className="commerce-body commerce-split">
-        <div className="commerce-main">
-          <section className="commerce-pin-card" aria-label="Selected location">
-            <span className="commerce-pin-icon">
-              <MapPin size={20} />
-            </span>
-            <div>
-              <b>{pin ? 'Location pinned' : 'No pin yet'}</b>
-              <small>
-                {pin ? `${pin.latitude.toFixed(4)}, ${pin.longitude.toFixed(4)}` : 'Search or use your current location to pin it. You can also just type the address.'}
-              </small>
-            </div>
-          </section>
-
-          <form
-            className="commerce-search-row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              search();
-            }}
-          >
+        <div className="commerce-main v7-map-col">
+          <div className="v7-search">
             <label className="commerce-search">
               <Search size={18} />
-              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search a place to pin it" aria-label="Search a place to pin it" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && results[0]) {
+                    e.preventDefault();
+                    choose(results[0]);
+                  }
+                }}
+                placeholder="Search area, street or landmark"
+                aria-label="Search a place to pin it"
+                autoComplete="off"
+              />
             </label>
-            <button className="commerce-ghost" type="submit" disabled={busy !== null}>
-              {busy === 'search' ? 'Searching…' : 'Search'}
-            </button>
-          </form>
+            {searchState === 'searching' && <p className="v7-note" role="status">Searching…</p>}
+            {searchState === 'empty' && <p className="v7-note" role="status">No matching places found. Try a different search.</p>}
+            {searchState === 'error' && <p className="v7-note is-error" role="alert">Could not reach location search. Drag the map instead.</p>}
+            {results.length > 0 && (
+              <ul className="v7-results" aria-label="Search results">
+                {results.map((place) => (
+                  <li key={place.id}>
+                    <button type="button" onClick={() => choose(place)}>
+                      <MapPin size={16} />
+                      <span>
+                        <b>{place.name}</b>
+                        <small>{place.locality}</small>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
-          <button className="commerce-locate" onClick={useCurrent} disabled={busy !== null}>
-            <span>
+          <div className="v7-stage">
+            <PinMap center={pin || DEFAULT_CENTER} zoom={pin ? 17 : 13} pinned={Boolean(pin)} onMoveEnd={(c) => movePin(c, true)} />
+            <button type="button" className="v7-locate" onClick={useCurrent} disabled={geo === 'asking'}>
               <Crosshair size={18} />
-            </span>
-            <div>
-              <b>{busy === 'locate' ? 'Finding your location…' : 'Use my current location'}</b>
-              <small>Uses your browser location permission</small>
-            </div>
-            <ArrowRight size={16} />
-          </button>
+              <span>{geo === 'asking' ? 'Finding your location…' : 'Use my current location'}</span>
+            </button>
+            {geoNote && (
+              <div className="v7-note is-error v7-geo-note" role="alert">
+                <span>{geoNote}</span>
+                <span className="v7-note-actions">
+                  {geo !== 'denied' && geo !== 'insecure' && <button type="button" onClick={useCurrent}>Try again</button>}
+                  <button type="button" onClick={() => setGeo('idle')}>Dismiss</button>
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="commerce-aside">
           <section className="commerce-card commerce-form" aria-labelledby="pick-addr">
-            <h2 id="pick-addr">Address</h2>
+            <h2 id="pick-addr">Delivery address</h2>
+            <p className="v7-coords" aria-live="polite">
+              <MapPin size={14} />
+              {pin ? `Pinned ${pin.latitude.toFixed(4)}, ${pin.longitude.toFixed(4)}` : 'Not pinned yet. Drag the map, search, or type the address.'}
+            </p>
             <label>
               <span>Area and street</span>
               <textarea
@@ -305,14 +418,20 @@ export const LocationMapPickerScreen: React.FC = () => {
                   setAddressError(null);
                 }}
               />
+              {lookupState === 'busy' && <em className="v7-hint">Finding the address for this pin…</em>}
+              {lookupState === 'failed' && <em className="v7-hint">Could not read an address for this pin. Type it in.</em>}
               {addressError && <em className="commerce-error">{addressError}</em>}
             </label>
             <label>
               <span>Pincode</span>
               <input inputMode="numeric" maxLength={6} value={pincode} onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))} autoComplete="postal-code" />
             </label>
+            {service && (
+              <p className={service.ok ? 'v7-serve is-ok' : 'v7-serve is-no'} role="status">
+                {service.text}
+              </p>
+            )}
             {!accountSignedIn && <p className="commerce-warn">Browsing as a guest: we keep this area on your device. Sign in to save a named address.</p>}
-            {pincode.length === 6 && !isServiceablePincode(pincode) && <p className="commerce-warn">We deliver to Vijayawada pincodes (520xxx) right now.</p>}
             <button className="commerce-primary is-wide commerce-aside-cta" onClick={confirm}>
               {accountSignedIn ? 'Confirm and add details' : 'Use this area'}
             </button>
