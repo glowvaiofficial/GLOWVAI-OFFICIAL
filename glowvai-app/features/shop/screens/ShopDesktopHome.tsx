@@ -16,8 +16,8 @@ import { isActiveOrder } from '../../orders/orderUtils';
 import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeFacts } from '../shared/HomeFacts';
-import { SearchHint } from '../shared/SearchHint';
-import { VoiceSearchButton } from '../shared/VoiceSearchButton';
+import { REQUIRE_PHONE_SIGN_IN } from '../../auth/accountGate';
+import { HeaderSearch } from '../shared/HeaderSearch';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { ITEM_BLOCK_IDS, useHomeLayout, type BlockItem, type BlockSettings, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
 import { DeliveryModeSwitch, NewItemBlock } from '../shared/NewBlocks';
@@ -871,6 +871,8 @@ export const ShopDesktopHome: React.FC = () => {
   const navigate = useHomeNavigate();
   const { currentAddress, accountSignedIn, requireSignIn, wishlist: wishlistIds } = useApp();
   const wishlistCount = wishlistIds.length;
+  // With the temporary phone sign-in gate off, guests open Orders, Account and the rest too.
+  const canOpenAccount = accountSignedIn || !REQUIRE_PHONE_SIGN_IN;
   const cart = useShellCart();
   const unread = useInbox((s) => s.unreadCount);
   const { banners, previewing } = useHomeBanners();
@@ -1335,31 +1337,7 @@ export const ShopDesktopHome: React.FC = () => {
               <ChevronDown size={16} aria-hidden="true" />
             </button>
             <div className="shop-desk-search">
-              <button type="button" className="shop-desk-search-input" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
-                <Search size={18} aria-hidden="true" />
-                <SearchHint hints={headerSettings.searchHints} />
-              </button>
-              <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
-              <div className="shop-desk-suggest" role="region" aria-label="Search suggestions">
-                {suggestions.length > 0 && <p className="shop-desk-suggest-title">Popular searches</p>}
-                <div className="shop-desk-suggest-list">
-                  {suggestions.map((q) => (
-                    <button key={q} type="button" onClick={() => navigate('shop-search-filters', { q })}>
-                      <Search size={14} aria-hidden="true" />
-                      {q}
-                    </button>
-                  ))}
-                </div>
-                <p className="shop-desk-suggest-title">Shop by concern</p>
-                <div className="shop-desk-suggest-list">
-                  {CONCERNS.map(({ id: concernId, label, Icon }) => (
-                    <button key={concernId} type="button" onClick={() => navigate('shop-browse', { concern: concernId })}>
-                      <Icon size={14} aria-hidden="true" />
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <HeaderSearch hints={headerSettings.searchHints} />
             </div>
             <DeliveryModeSwitch header={headerSettings} wide />
             <nav className="shop-desk-actions" aria-label="Account and cart">
@@ -1367,19 +1345,19 @@ export const ShopDesktopHome: React.FC = () => {
                 <ScanFace size={18} aria-hidden="true" />
                 Skin scan
               </button>
-              <button type="button" className="shop-desk-action" aria-label="Orders" onClick={() => (accountSignedIn ? navigate('orders-list') : requireSignIn())}>
+              <button type="button" className="shop-desk-action" aria-label="Orders" onClick={() => (canOpenAccount ? navigate('orders-list') : requireSignIn())}>
                 <Package size={20} aria-hidden="true" />
                 <span>Orders</span>
               </button>
-              <button type="button" className="shop-desk-action is-icon" aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} saved` : 'Wishlist'} onClick={() => (accountSignedIn ? navigate('shop-wishlist') : requireSignIn())}>
+              <button type="button" className="shop-desk-action is-icon" aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} saved` : 'Wishlist'} onClick={() => (canOpenAccount ? navigate('shop-wishlist') : requireSignIn())}>
                 <Heart size={20} aria-hidden="true" />
                 {wishlistCount > 0 && <b className="shop-desk-badge" aria-hidden="true">{wishlistCount > 99 ? '99+' : wishlistCount}</b>}
               </button>
-              <button type="button" className="shop-desk-action is-icon" aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} onClick={() => (accountSignedIn ? navigate('notifications-list') : requireSignIn())}>
+              <button type="button" className="shop-desk-action is-icon" aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} onClick={() => (canOpenAccount ? navigate('notifications-list') : requireSignIn())}>
                 <Bell size={20} aria-hidden="true" />
                 {unread > 0 && <b className="shop-desk-badge" aria-hidden="true">{unread > 99 ? '99+' : unread}</b>}
               </button>
-              <button type="button" className="shop-desk-action is-account" aria-label={accountSignedIn ? 'Account' : 'Log in'} onClick={() => (accountSignedIn ? navigate('profile-tab') : requireSignIn())}>
+              <button type="button" className="shop-desk-action is-account" aria-label={accountSignedIn ? 'Account' : 'Log in'} onClick={() => (canOpenAccount ? navigate('profile-tab') : requireSignIn())}>
                 <span className="shop-desk-avatar" aria-hidden="true">
                   {accountSignedIn && firstName ? firstName.charAt(0).toUpperCase() : <User size={18} />}
                 </span>

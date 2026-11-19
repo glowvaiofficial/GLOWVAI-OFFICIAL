@@ -1,0 +1,81 @@
+/* Web v7 fixes: header search (in place, with suggestions), the 'Sign in' empty state, and the sign-in hero picture.
+   Loaded after the v5 files. Calm: hover is a tint, focus ring is 2px brand, no orange, no textures. */
+
+/* ---------- Header search: a real input in the bar, a suggestions list under it ---------- */
+.glowvai-root .shop-desk .shop-desk-search,
+.glowvai-root .gvh .gvh-search,
+.glowvai-root .web-header-search{ position: relative; }
+.glowvai-root .gv7-hsearch{ display: flex; flex: 1 1 auto; min-width: 0; height: 100%; align-items: center; }
+.glowvai-root .gv7-hsearch-field{ position: relative; display: flex; flex: 1 1 auto; min-width: 0; height: 100%; align-items: center; gap: 10px; }
+.glowvai-root .gv7-hsearch-icon{ flex: 0 0 auto; color: #5B6784; }
+.glowvai-root .gv7-hsearch-input{ flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #0B1B3F; font: 400 15px/1.3 inherit; font-family: inherit; text-overflow: ellipsis; outline: none; -webkit-appearance: none; appearance: none; }
+.glowvai-root .gv7-hsearch-input:focus,
+.glowvai-root .gv7-hsearch-input:focus-visible{ outline: none; box-shadow: none; }
+.glowvai-root .gv7-hsearch-hint{ position: absolute; top: 50%; right: 44px; left: 28px; overflow: hidden; color: #5B6784; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; transform: translateY(-50%); pointer-events: none; }
+.glowvai-root .gv7-hsearch-hint .shop-home-hint{ display: block; overflow: hidden; text-overflow: ellipsis; }
+.glowvai-root .gv7-hsearch-clear{ display: inline-grid; flex: 0 0 auto; width: 32px; height: 32px; min-width: 32px; place-items: center; padding: 0; border: 0; border-radius: 50%; background: #F1F5FF; color: #0B1B3F; cursor: pointer; }
+.glowvai-root .gv7-hsearch-clear:active{ transform: scale(.98); }
+.glowvai-root .gv7-hsearch-clear:focus-visible{ outline: 2px solid #0057FB; outline-offset: 2px; }
+
+.glowvai-root .gv7-hsearch-list{ position: absolute; top: calc(100% + 8px); right: 0; left: 0; z-index: 160; max-height: min(70dvh, 460px); margin: 0; padding: 8px; overflow-y: auto; border: 1px solid #E3E9F5; border-radius: 12px; background: #fff; box-shadow: 0 16px 40px -20px rgba(11, 27, 63, .35); list-style: none; text-align: left; overscroll-behavior: contain; }
+.glowvai-root .gv7-hsearch-title{ margin: 0; padding: 8px 12px 4px; color: #5B6784; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.glowvai-root .gv7-hsearch-title:not(:first-child){ margin-top: 4px; }
+.glowvai-root .gv7-hsearch-row{ display: flex; min-height: 44px; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #0B1B3F; font-size: 14px; font-weight: 500; cursor: pointer; }
+.glowvai-root .gv7-hsearch-row > svg{ flex: 0 0 auto; color: #5B6784; }
+.glowvai-root .gv7-hsearch-label{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glowvai-root .gv7-hsearch-row small{ flex: 0 0 auto; margin-left: auto; color: #5B6784; font-size: 12px; font-weight: 500; }
+.glowvai-root .gv7-hsearch-row.is-active{ background: #EEF3FF; }
+.glowvai-root .gv7-hsearch-row.is-active > svg{ color: #0057FB; }
+
+/* The shared header search keeps its pill shape: the wrapper is the pill, the field fills it. */
+.glowvai-root .web-header-search.gv7-hsearch{ cursor: text; }
+.glowvai-root .web-header-search .gv7-hsearch-field{ gap: 10px; }
+.glowvai-root .web-header-search .gv7-hsearch-hint{ right: 8px; font-size: 14px; }
+.glowvai-root .web-header-search .gv7-hsearch-list{ right: -8px; left: -18px; }
+
+/* Phone header: the bar is the pill, the list opens under the whole bar. */
+.glowvai-root .gvh .gvh-search .gv7-hsearch-input{ font-size: 16px; }
+.glowvai-root .gvh .gvh-search .gv7-hsearch-hint{ right: 8px; font-size: 15px; }
+.glowvai-root .gvh .gvh-search .gv7-hsearch-icon{ color: var(--gvh-ink, #0B1B3F); }
+@media (max-width: 1023px){
+  .glowvai-root .gvh .gvh-search .gv7-hsearch-list{ right: 0; left: 0; }
+}
+.glowvai-root .gv7-hsearch .shop-home-voice-msg{ z-index: 170; }
+
+/* ---------- 'Sign in' empty state (shown only while the phone sign-in gate is off) ---------- */
+.glowvai-root .gv7-signin-prompt{ display: grid; min-height: 60dvh; place-items: center; padding: 48px 16px; }
+.glowvai-root .gv7-signin-prompt-card{ display: grid; width: 100%; max-width: 420px; justify-items: center; gap: 12px; padding: 32px 24px; border: 1px solid #E3E9F5; border-radius: 16px; background: #fff; text-align: center; }
+.glowvai-root .gv7-signin-prompt-icon{ display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: #EEF3FF; color: #0057FB; }
+.glowvai-root .gv7-signin-prompt-card h1{ margin: 0; color: #0B1B3F; font-size: 22px; font-weight: 700; line-height: 1.25; }
+.glowvai-root .gv7-signin-prompt-card p{ margin: 0; color: #5B6784; font-size: 14px; line-height: 1.5; }
+.glowvai-root .gv7-signin-prompt-btn{ min-height: 48px; width: 100%; margin-top: 8px; border: 0; border-radius: 12px; background: #0057FB; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.glowvai-root .gv7-signin-prompt-btn:active{ transform: scale(.98); }
+.glowvai-root .gv7-signin-prompt-link{ min-height: 44px; border: 0; background: transparent; color: #0057FB; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.glowvai-root .gv7-signin-prompt-btn:focus-visible,
+.glowvai-root .gv7-signin-prompt-link:focus-visible{ outline: 2px solid #0057FB; outline-offset: 2px; }
+@media (hover: hover){ .glowvai-root .gv7-signin-prompt-btn:hover{ background: #0048D1; } }
+
+/* ---------- Sign-in split screen on PC: the whole photo shows, the copy sits under it ---------- */
+/* The picture is 900x1101; the face, the Skin Analysis card and the chin sit in rows 150 to 890. The art box keeps that
+   window (cover, face-tuned position), its height follows the half-width and never takes more than the viewport leaves
+   for the copy block (about 250px) below, so the text never overlaps the face. Short screens scroll instead of cropping. */
+@media (min-width: 1024px){
+  .glowvai-root.glowvai-root .app-viewport .login-reference-hero{ min-height: 100dvh; }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-art{ order: 0; flex: 0 0 auto; width: 100%; height: min(43.5vw, max(40vw, calc(100dvh - 250px))); object-fit: cover; object-position: 50% 42%; }
+  .glowvai-root.glowvai-root .app-viewport .login-brand-lockup{ padding-top: 24px; }
+  .glowvai-root.glowvai-root .app-viewport .login-wordmark{ font-size: 40px; }
+  .glowvai-root.glowvai-root .app-viewport .login-brand-lockup > p{ margin-top: 8px; }
+  .glowvai-root.glowvai-root .app-viewport .v5-hero-points{ flex: 1 1 auto; align-content: start; gap: 8px; padding-top: 14px; padding-bottom: 28px; }
+}
+
+/* The bar draws the focus ring (focus-within); the bare input inside must not draw a second square one. */
+.glowvai-root .gv7-hsearch .gv7-hsearch-input,
+.glowvai-root .gv7-hsearch .gv7-hsearch-input:focus,
+.glowvai-root .gv7-hsearch .gv7-hsearch-input:focus-visible{ outline: none !important; box-shadow: none !important; border: 0 !important; background: transparent !important; }
+.glowvai-root .gvh .gvh-search:focus-within,
+.glowvai-root .web-header-search:focus-within{ border-color: #0057FB; box-shadow: 0 0 0 2px rgba(0, 87, 251, .25); }
+
+/* Phone: while the search is in use the header sits above the tab row and cards under it, so the list is not covered. */
+.glowvai-root .gvh .gvh-header:focus-within{ z-index: 70; }
+.glowvai-root .gvh .gvh-search:focus-within{ z-index: 5; }
+.glowvai-root .web-header-search.gv7-hsearch{ height: 44px; }

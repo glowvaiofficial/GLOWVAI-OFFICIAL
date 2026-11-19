@@ -11,6 +11,21 @@
 
 export type AccountState = 'none' | 'phone';
 
+// TEMPORARY SWITCH while phone verification is not live. Default (unset, or anything but 'true') is OFF: every visitor may
+// open Orders, Account, wishlist, wallet and so on, and the first screen is the shop. Set NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN=true
+// to restore the gate described above. Each decision function takes the switch as its last argument, so both values are tested.
+export const REQUIRE_PHONE_SIGN_IN: boolean = process.env.NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN === 'true';
+
+// Screens that read the signed-in customer's own data. With the gate off and no account they show a 'Sign in' empty state.
+const ACCOUNT_DATA_SCREENS = new Set<string>([
+  'orders-list', 'orders-detail', 'orders-tracking', 'orders-rate', 'returns-request', 'order-history', 'order-tracking',
+  'wallet-home', 'settings-wallet', 'profile-tab', 'profile',
+]);
+
+export function needsProfileEmptyState(screen: string, account: AccountState, required: boolean = REQUIRE_PHONE_SIGN_IN): boolean {
+  return !required && account === 'none' && ACCOUNT_DATA_SCREENS.has(screen);
+}
+
 export const ONBOARDING_SCREEN = 'auth-onboarding';
 export const SIGN_IN_SCREEN = 'auth-login';
 export const SHOP_SCREEN = 'shop-home';
@@ -84,7 +99,8 @@ const GUEST_ACTIONS: Record<GuestAction, boolean> = {
   'open-account': true,
 };
 
-export function requiresSignIn(action: string): boolean {
+export function requiresSignIn(action: string, required: boolean = REQUIRE_PHONE_SIGN_IN): boolean {
+  if (!required) return false;
   return Object.prototype.hasOwnProperty.call(GUEST_ACTIONS, action) ? GUEST_ACTIONS[action as GuestAction] : true;
 }
 
@@ -101,8 +117,8 @@ export function accountStateOf(user: UserLike | null | undefined): AccountState 
 }
 
 // The first screen for this visitor when no step was saved.
-export function startScreenFor(account: AccountState): string {
-  return account === 'phone' ? SHOP_SCREEN : ONBOARDING_SCREEN;
+export function startScreenFor(account: AccountState, required: boolean = REQUIRE_PHONE_SIGN_IN): string {
+  return account === 'phone' || !required ? SHOP_SCREEN : ONBOARDING_SCREEN;
 }
 
 export function screenOpensWithoutAccount(screen: string): boolean {
@@ -116,9 +132,9 @@ export interface ScreenTarget {
 
 // Where a navigation really goes. A refused screen becomes the sign-in screen, which remembers where to return.
 // A sign-in screen opened by a signed-in account goes to the return target (or the shop) instead.
-export function gateNavigation(account: AccountState, target: ScreenTarget): ScreenTarget {
+export function gateNavigation(account: AccountState, target: ScreenTarget, required: boolean = REQUIRE_PHONE_SIGN_IN): ScreenTarget {
   if (account === 'phone' && SIGN_IN_SCREENS.has(target.screen)) return afterSignIn(target.params);
-  if (account === 'none' && !screenOpensWithoutAccount(target.screen)) {
+  if (required && account === 'none' && !screenOpensWithoutAccount(target.screen)) {
     return { screen: SIGN_IN_SCREEN, params: { returnTo: target.screen, returnParams: target.params ?? null } };
   }
   return target;

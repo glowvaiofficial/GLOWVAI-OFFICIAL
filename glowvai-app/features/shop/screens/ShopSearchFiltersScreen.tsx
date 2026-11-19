@@ -50,6 +50,12 @@ export const ShopSearchFiltersScreen: React.FC = () => {
   const [voiceSupported, setVoiceSupported] = useState(false);
   const resultsRef = useRef<HTMLElement>(null);
 
+  // A new query from the header search while this screen is already open.
+  const incomingQ = typeof activeParams?.q === 'string' ? activeParams.q : null;
+  useEffect(() => {
+    if (incomingQ !== null) setQuery(incomingQ);
+  }, [incomingQ]);
+
   // The mic is shown only in browsers that have speech recognition.
   useEffect(() => {
     const w = window as any;

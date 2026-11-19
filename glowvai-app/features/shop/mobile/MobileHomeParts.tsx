@@ -6,8 +6,7 @@ import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
-import { SearchHint } from '../shared/SearchHint';
-import { VoiceSearchButton } from '../shared/VoiceSearchButton';
+import { HeaderSearch } from '../shared/HeaderSearch';
 import { HeaderCartButton } from '../shared/HeaderCartButton';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { HERO_IMAGE, useHomeNavigate } from '../lib/homeCommon';
@@ -90,11 +89,7 @@ export function MobileHomeHeader({
           </button>
         )}
         <div className="gvh-search">
-          <button type="button" className="gvh-search-btn" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
-            <Search size={18} aria-hidden="true" />
-            <SearchHint hints={header.searchHints} />
-          </button>
-          <VoiceSearchButton onResult={(text) => navigate('shop-search-filters', { q: text })} />
+          <HeaderSearch hints={header.searchHints} className="gvh-search-box" />
           <button type="button" className="gvh-scan-in" onClick={() => navigate(accountSignedIn ? 'scan-camera' : 'scan-intro')}>
             <ScanFace size={16} aria-hidden="true" />
             Skin scan
