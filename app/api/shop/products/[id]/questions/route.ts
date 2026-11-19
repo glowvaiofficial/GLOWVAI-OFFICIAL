@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, json, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
+import { customerFrom, json, jsonPublic, limitByIp, limitByIpShared, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { PRODUCT_ID_PATTERN, reviewFailure } from "@/lib/shop/reviews";
 import { createQuestion, listApprovedQuestions } from "@/lib/shop/qna";
 import { validateQuestionText } from "@/lib/shop/qnaRules";
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (!PRODUCT_ID_PATTERN.test(id)) return json({ ok: false, error: "That product could not be found." }, 404);
   const page = await listApprovedQuestions(id, req.nextUrl.searchParams.get("cursor"));
   if (page === "invalid-cursor") return json({ ok: false, error: "Those questions could not be opened. Start again from the first page." }, 400);
-  return json({ ok: true, productId: id, questions: page.questions, nextCursor: page.nextCursor });
+  return jsonPublic({ ok: true, productId: id, questions: page.questions, nextCursor: page.nextCursor }, 60, 120);
 }
 
 // Asking a question. Anyone signed in (anonymous is fine) may ask, 3 an hour. The question is PENDING until a moderator

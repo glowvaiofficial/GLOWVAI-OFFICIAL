@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { json, limitByIp } from "@/lib/shop/server";
+import { json, jsonPublic, limitByIp } from "@/lib/shop/server";
 import { PRODUCT_ID_PATTERN, listApprovedReviews, ratingSummaryFor } from "@/lib/shop/reviews";
 import { parseSort } from "@/lib/shop/reviewRules";
 
@@ -17,5 +17,5 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const sort = parseSort(req.nextUrl.searchParams.get("sort"));
   const [rating, page] = await Promise.all([ratingSummaryFor(id), listApprovedReviews(id, sort, req.nextUrl.searchParams.get("cursor"))]);
   if (page === "invalid-cursor") return json({ ok: false, error: "Those reviews could not be opened. Start again from the first page." }, 400);
-  return json({ ok: true, productId: id, sort, rating, reviews: page.reviews, nextCursor: page.nextCursor });
+  return jsonPublic({ ok: true, productId: id, sort, rating, reviews: page.reviews, nextCursor: page.nextCursor }, 60, 120);
 }

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIpShared, limitByUserShared } from "@/lib/shop/server";
 import { verifyPaymentSignature } from "@/lib/shop/razorpay";
 import { paymentArrivalTx, refundLatePaymentLive } from "@/lib/shop/pendingOrders";
 import { isClosedUnpaid, lateRefundDue, latePaymentPatch } from "@/lib/shop/latePayment";
@@ -11,11 +11,11 @@ export const dynamic = "force-dynamic";
 // Called by the shop after Razorpay Checkout succeeds. The signature proves the payment is genuine; only then is the
 // order marked paid and placed. Safe to call twice.
 export async function POST(req: NextRequest) {
-  const ipLimited = limitByIp(req, "razorpay-verify-post", 30);
+  const ipLimited = await limitByIpShared(req, "razorpay-verify-post", 30);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "razorpay-verify", 60);
+  const userLimited = await limitByUserShared(customer.uid, "razorpay-verify", 60);
   if (userLimited) return userLimited;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   const razorpayOrderId = String(body?.razorpay_order_id ?? "");

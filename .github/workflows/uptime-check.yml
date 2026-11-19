@@ -1,0 +1,29 @@
+# Free uptime check. Every 15 minutes it requests the shop pages and the scan server's /health. A failing run makes
+# GitHub email the repo owner. Each URL is tried twice before it counts as down.
+name: Uptime check
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Request each URL
+        run: |
+          fail=0
+          for url in \
+            "https://glowvai.in/shop" \
+            "https://glowvai.in/api/shop/layout?device=mobile" \
+            "https://glowvai.in/api/shop/theme" \
+            "https://glowvai-backend-r7u2.onrender.com/health"; do
+            if curl --fail --silent --show-error --output /dev/null --max-time 60 "$url" || { sleep 10; curl --fail --silent --show-error --output /dev/null --max-time 60 "$url"; }; then
+              echo "OK   $url"
+            else
+              echo "DOWN $url"
+              fail=1
+            fi
+          done
+          exit $fail

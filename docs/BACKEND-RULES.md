@@ -109,11 +109,11 @@ The scan routes live on the separate Render server and are at the end of this se
 | `/api/shop/home` | GET | none |  IP 120/min (mem). CDN cache 60 s | none (read) | None. |
 | `/api/shop/layout` | GET | none (staff preview token optional) |  IP 120/min (mem). CDN cache 60 s | preview token | None. |
 | `/api/shop/theme` | GET | none (preview token optional) |  IP 120/min (mem). CDN cache 60 s | preview token | None. |
-| `/api/shop/config` | GET | none |  IP 120/min (mem) | none | No CDN cache header. |
+| `/api/shop/config` | GET | none |  IP 120/min (mem) | none | CDN cache `s-maxage=60`, swr 300 (same for every caller). |
 | `/api/shop/flash-sales` | GET | none |  IP 120/min (mem). CDN cache 30 s | none | None. |
-| `/api/shop/ratings` | GET | none |  IP 60/min (mem) | id list | No cache header: reads per call. |
-| `/api/shop/products/[id]/reviews` | GET | none |  IP 60/min (mem) | parseSort | No cache header: reads per call. |
-| `/api/shop/products/[id]/questions` | GET, POST | GET none; POST customer (guest ok) |  GET IP 60/min (mem). POST IP 20/min (S), user 60/min (mem), 3 questions/hour (S) | validateQuestionText | Guests can ask (held for moderation). |
+| `/api/shop/ratings` | GET | none |  IP 60/min (mem) | id list | CDN cache `s-maxage=60`, swr 300. |
+| `/api/shop/products/[id]/reviews` | GET | none |  IP 60/min (mem) | parseSort | CDN cache `s-maxage=60`, swr 120 (a new review shows within about a minute). |
+| `/api/shop/products/[id]/questions` | GET, POST | GET none; POST customer (guest ok) |  GET IP 60/min (mem). POST IP 20/min (S), user 60/min (mem), 3 questions/hour (S) | validateQuestionText | GET CDN cache `s-maxage=60`, swr 120. Guests can ask (held for moderation). |
 | `/api/shop/offers/quote` | POST | none (customer token optional, adds per-customer caps) |  IP 60/min (mem) | parseCartLines (max 20 lines), code max 40 characters | Public by design. Reads products on every call. |
 | `/api/shop/slots` | GET | customer (guest ok) |  IP 60/min, user 60/min (mem) | none | None. |
 | `/api/shop/affiliate/click` | POST | none (visitor id) |  IP 60/min (mem) | isVisitorId | Public write. In-memory limit only. |
@@ -128,7 +128,7 @@ The scan routes live on the separate Render server and are at the end of this se
 | `/api/shop/orders/[id]/share` | POST, DELETE | customer, owner only |  IP 20/min, user 10 (POST) or 20 (DELETE) per min, order 10/hour (mem) | ORDER_ID_RE | None. |
 | `/api/shop/orders/[id]/tracking` | GET | customer, owner only |  IP 120/min, user 60/min (mem) | ORDER_ID_RE | None. |
 | `/api/shop/reorder-items` | GET | customer |  IP 60/min (mem) | none | No per-user limit (IP only). |
-| `/api/shop/payments/razorpay/verify` | POST | customer, owner only |  IP 30/min, user 60/min (mem) | Razorpay signature check | Money route with an in-memory limit only. Decision 2. |
+| `/api/shop/payments/razorpay/verify` | POST | customer, owner only |  IP 30/min, user 60/min (S, memory fallback) | Razorpay signature check | Shared limiter since 19 Nov (same numbers). |
 | `/api/shop/returns` | GET, POST | customer (guest ok) |  GET IP 30/min, user 60/min (mem). POST IP 20/min (mem), user 5/day (S, changed 19 Nov) | parseReturnRequest, requestId, ORDER_ID_PATTERN | Guests can request returns. Decision 1. |
 | `/api/shop/returns/[id]` | GET | customer, owner only |  IP 60/min, user 120/min (mem) | none | None. |
 | `/api/shop/support` | GET, POST | customer (guest ok) |  GET IP 30/min, user 60/min (mem). POST IP 30/min (S), user 5/hour (S) | text, length caps | Guests can open tickets. Decision 1. |
@@ -153,7 +153,7 @@ The scan routes live on the separate Render server and are at the end of this se
 | `/api/shop/wallet` | GET | customer |  IP 120/min, user 60/min (mem) | none | None. |
 | `/api/shop/wallet/history` | GET | customer |  IP 120/min, user 60/min (mem) | none | None. |
 | `/api/shop/wallet/topup` | GET, POST | customer |  POST IP 20/hour, user 5/hour (S). GET IP 120/min, user 60/min (mem) | amount limits (TOPUP_LIMITS, wallet-config) | Guests can start a wallet top-up. Decision 1. |
-| `/api/shop/wallet/topup/verify` | POST | customer, owner only |  IP 60/hour, user 30/hour (mem) | Razorpay signature check | Money route with an in-memory limit only. Decision 2. |
+| `/api/shop/wallet/topup/verify` | POST | customer, owner only |  IP 60/hour, user 30/hour (S, memory fallback) | Razorpay signature check | Shared limiter since 19 Nov (same numbers). |
 | `/api/shop/wallet/topup/fail` | POST | customer, owner only |  IP 60/hour, user 30/hour (mem) | id check | None. |
 | `/api/shop/gift-cards` | GET | customer (gate) |  IP and user 60/min (mem) | none | None. |
 | `/api/shop/gift-cards/purchase` | POST | customer (gate) |  IP and user 10/min (mem); 10 purchases a day per account (Firestore counter) | validateGiftAmount, validateGiftDetails | Guests can buy. Per-minute limit is in memory. |
@@ -238,13 +238,13 @@ The numbers in the "In code today" column are the ones the routes use now. "Reco
 
 | Class of route | In code today | Recommended | Helper |
 |---|---|---|---|
-| Public read of shared data (home, layout, theme, config, flash sales) | IP 120/min (mem) plus a CDN cache of 30 to 60 s | Same. Add `s-maxage` to `config`, `ratings`, `products/[id]/reviews` | `limitByIp` |
+| Public read of shared data (home, layout, theme, config, flash sales) | IP 120/min (mem) plus a CDN cache of 30 to 60 s | Same. Done: `config`, `ratings`, product reviews and questions carry `s-maxage` | `limitByIp` |
 | Public read by id or search (ratings, product reviews, offer quote, shared tracking) | IP 60/min (mem); shared tracking also 60/min per token | Same | `limitByIp`, `tooMany` |
 | Guest write (affiliate click, `review`, unsubscribe, newsletter confirm) | IP 5 to 60/min (mem) | Same, plus a shared daily cap where an email is sent | `rateLimit`, `limitByIp` |
 | Signed-in read | IP 60/min and user 60/min (mem) | Same | `limitByIp`, `limitByUser` |
 | Signed-in write (profile, addresses, wishlist, prefs, tokens) | IP 20 to 30/min, user 20 to 60/hour (mem) | Same; any write that creates a document per call also gets a shared hourly cap | `limitByIp`, `limitByUser`, `tooMany` |
 | User content with moderation (questions, reviews, support tickets, returns, referral and affiliate applications) | IP 20 to 30/min, per-user hourly or daily caps (S) | Same (affiliate IP daily cap moves to shared) | `limitByIpShared`, `limitByUserShared` |
-| Money, orders, payments (`orders` POST, wallet top-up, gift cards, Razorpay verify) | Orders: IP 60/hour (S), 3 per 10 min (S), 10/day (S). Top-up create: IP 20/hour, user 5/hour (S). Verify routes: IP 30/min, user 60/min (mem) | Keep orders and top-up create. Verify routes and `payment-methods/confirm`: add a shared hourly cap (Decision 2) | `limitByIpShared`, `limitByUserShared` |
+| Money, orders, payments (`orders` POST, wallet top-up, gift cards, Razorpay verify) | Orders: IP 60/hour (S), 3 per 10 min (S), 10/day (S). Top-up create: IP 20/hour, user 5/hour (S). Razorpay and wallet verify: shared (S), same numbers | Keep. Gift-card verify and `payment-methods/confirm` (via `gate`) are still memory only (Decision 2) | `limitByIpShared`, `limitByUserShared` |
 | Auth, OTP and SMS cost | OTP request: IP 10/hour and 30/day, phone 5/hour and 10/day, 30 s cooldown, global 300/day (S). Verify: IP 30/hour (S), 5 tries per code. Account create: IP 10/hour, uid 5/hour (S). Rider sign-in: IP 5 per 15 min (S) plus a per-phone lockout | Same. Lower `OTP_DAILY_CAP` to the SMS credit on the SIM, not to 300 by default | `checkShared` |
 | Vendor API | IP 10 to 120/min, user 5 to 60/min (mem); product requests (S) | Same | `vendorRoute` |
 | Rider API | IP 20 to 120/min, partner 4 to 60/min (mem); sign-in (S) | Same | `riderRoute` |
@@ -358,17 +358,14 @@ except cron (secret) and the retired forms (410).
    purchases, returns, tickets, reviews and referral codes (`customerFrom` allows anonymous sessions). Requiring a verified phone
    account is PR #127, held until phone sign-in works in the app. Owner decision: when OTP sign-in is live on web and app, merge
    #127. Until then guest orders are rate limited (3 per 10 min, 10 a day, 60 an hour per IP) but not tied to a phone.
-2. **Money routes limited only in memory:** `payments/razorpay/verify`, `wallet/topup/verify`, `gift-cards/purchase/verify`,
-   `payment-methods/confirm`. They need a valid Razorpay signature, so abuse is cheap to refuse, but a shared hourly cap would
+2. **Money routes limited only in memory:** `gift-cards/purchase/verify` and `payment-methods/confirm` (both use `gate`). `payments/razorpay/verify` and `wallet/topup/verify` moved to the shared limiter on 19 Nov with the same numbers and a memory fallback. They need a valid Razorpay signature, so abuse is cheap to refuse, but a shared hourly cap would
    cost one read and one write per call. Recommended: yes, shared 60 an hour per user. Not done because it adds quota use on
    live payment paths.
 3. **Delivery code and cash confirmation** (`orders/[id]/delivery-code`, `rider/.../cash`, `rider/.../code`) are limited per
    instance only. The rider code route has a stored lockout (5 wrong, 30 minutes). Acceptable; a shared per-order cap would be
    stricter.
-4. **Public reads without a CDN cache:** `config`, `ratings`, `products/[id]/reviews`, `reorder-items`. Each call is a read.
-   Adding `s-maxage` changes freshness (a new review appears up to a minute later): owner to accept.
-5. **Email has no global daily cap** (Resend free about 100 a day). Decision: add a Firestore counter of 80 a day that stops
-   marketing mail first and keeps order mail.
+4. **Public reads CDN cache: done 19 Nov** for `config`, `ratings`, product `reviews` and `questions` (`jsonPublic`: `s-maxage=60`, swr 300 or 120; only 200 responses). `reorder-items` is per-user and stays `private, no-store`. A new review can show up to a minute late.
+5. **Email daily cap: done 19 Nov** (`lib/email/dailyCap.ts`, called from `sendEmail`). `EMAIL_DAILY_CAP` (default 80) per UTC day in a shared Firestore counter; marketing stops at cap minus 20, transactional uses the whole cap. Fails soft: if the counter is unreadable, transactional still sends and marketing is held. Cost: one read and one write per email.
 6. **Scan server CORS is `*`** unless `GLOWVAI_CORS_ORIGINS` is set on Render. Set it to `https://glowvai.in` (the native app does
    not need CORS). Needs the owner to set the variable. Also `SHEETS_SECRET` is empty, so the Apps Script endpoints accept any
    caller (audit).
@@ -378,7 +375,10 @@ except cron (secret) and the retired forms (410).
    the shared limiter is a trade of free Firestore quota for strictness; the current split is in section 3.
 9. **Cron weekly digest is not scheduled** (Hobby cron limit). Decision: keep unscheduled or swap it for another cron.
 10. **Dependencies:** `npm audit --omit=dev` showed 19 transitive findings through `firebase-admin` (16 Nov review). No change.
-11. **`/api/review` is not retired** and its Apps Script endpoint has no secret. Decide whether to retire it like the other form routes.
+11. **`/api/review` is not retired** and its Apps Script endpoint has no secret. It is still called by the review page (`app/review/[token]/ReviewFormClient.tsx`), so it was left live. Decide with the owner how to replace it.
+
+### Monitoring
+`.github/workflows/uptime-check.yml` runs every 15 minutes (and on demand), requests `/shop`, the layout and theme APIs and the scan server `/health` with a 60 s limit and one retry; a failing run emails the repo owner.
 
 ## 6. How to verify
 
