@@ -102,6 +102,7 @@ Note: the sections above describe the original landing-page build (WhatsApp orde
 - [docs/WEBSITE-HOME-DESIGN.md](docs/WEBSITE-HOME-DESIGN.md): phone and PC home, designer data model, `/api/shop/layout`
 - [docs/WEBSITE-DESIGN-SYSTEM.md](docs/WEBSITE-DESIGN-SYSTEM.md): fonts, colour tokens, motion, accessibility
 - [docs/WEBSITE-ARCHITECTURE.md](docs/WEBSITE-ARCHITECTURE.md): folders, API security and rate limits, Firebase, deploy, tests
+- [docs/BACKEND-RULES.md](docs/BACKEND-RULES.md): rules checklist for new routes, all 116 API routes (auth, rate limit, validation, gaps), rate-limit policy, free-plan quotas (Firestore, OTP SMS, Vercel, Render, Resend), decisions needed (19 Nov 2026)
 - [docs/VENDOR-PORTAL.md](docs/VENDOR-PORTAL.md): vendor web portal pages and API
 - [docs/VENDOR-APP.md](docs/VENDOR-APP.md): the vendor mobile app
 - [docs/WEBSITE-KNOWN-ISSUES-AND-NEXT.md](docs/WEBSITE-KNOWN-ISSUES-AND-NEXT.md): honest issues and next steps

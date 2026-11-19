@@ -49,6 +49,7 @@
     "test:orders-pending": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/orders-pending/*.test.ts\"",
     "test:polish": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/polish/*.test.ts\"",
     "test:scan": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/scan/*.test.ts\"",
+    "test:rules": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/rules/*.test.ts\"",
     "test:all": "node --test --import ./__tests__/vendor/register.mjs \"__tests__/**/*.test.ts\""
   },
   "keywords": [],
