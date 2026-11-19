@@ -61,3 +61,8 @@ Other routes: `/api/vendor/*` (15 routes, see [VENDOR-PORTAL.md](VENDOR-PORTAL.m
 ## Tests
 
 131 files, about 1,742 `test(`/`it(` cases by static count (15 Nov audit: 1,581 passing). Runner: Node's built-in `node --test` through `__tests__/vendor/register.mjs`, one `npm run test:<area>` script per folder (vendor, vendor-web, vendor-remaining, refunds, support, stock, reviews, returns, variants, notify, features, affiliate, growth, wallet, rider, tracking, wishlist-orders, checkout, settings, shop-gaps, orders-paging, privacy, first-visit, account-setup, layout, session, lead, ratelimit, orders-pending, polish, and more), plus `npm test` for entity, schema and email-analytics scripts. Tests call pure modules; none calls Firebase. Style tests such as `__tests__/vendor-web/portal-style.test.ts` fail on warm colours, web fonts or emoji.
+
+## Temporary phone sign-in switch
+
+`REQUIRE_PHONE_SIGN_IN` in `glowvai-app/features/auth/accountGate.ts` (env `NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN`, default off) lets every visitor open Orders, Account, wishlist and wallet while phone verification is not live; screens that need a profile show a "Sign in" empty state, and checkout keeps using the current guest session.
+Set `NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN=true` (and redeploy) to restore the full gate; both values are tested in `__tests__/account-setup/account-gate.test.ts`.

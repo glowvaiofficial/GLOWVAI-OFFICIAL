@@ -24,6 +24,7 @@ export const ACCOUNT_LOCAL_KEYS: readonly string[] = [
   'glowvai_skin_concerns',
   'glowvai_skin_recommendations',
   'glowvai_recent_products_v1',
+  'glowvai_recent_searches_v1',
   'glowvai.push.token',
   'glowvai.push.registeredAt',
   'glowvai_pending_referral_v1',

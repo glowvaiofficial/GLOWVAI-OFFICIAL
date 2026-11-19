@@ -5,12 +5,20 @@ import { join } from "node:path";
 import {
   accountStateOf,
   afterSignIn,
-  gateNavigation,
+  gateNavigation as gateNavigationWith,
+  needsProfileEmptyState,
   screenOpensWithoutAccount,
-  requiresSignIn,
-  startScreenFor,
+  requiresSignIn as requiresSignInWith,
+  startScreenFor as startScreenForWith,
   type AccountState,
+  type ScreenTarget,
 } from "../../glowvai-app/features/auth/accountGate";
+
+// The tests below describe the gate as it behaves with NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN=true. The switch is passed
+// explicitly, so they hold whatever the environment says. The gate-off table is at the end of this file.
+const gateNavigation = (account: AccountState, target: ScreenTarget) => gateNavigationWith(account, target, true);
+const requiresSignIn = (action: string) => requiresSignInWith(action, true);
+const startScreenFor = (account: AccountState) => startScreenForWith(account, true);
 import { guestAreaAddress, isServiceableAreaPincode, parseGuestArea, readGuestArea, saveGuestArea } from "../../glowvai-app/features/commerce/lib/guestArea";
 import { holdAction, takeHeldAction } from "../../glowvai-app/features/auth/resumeAction";
 
@@ -276,5 +284,45 @@ describe("the delivery area kept for a guest", () => {
     assert.equal(isServiceableAreaPincode("520010"), true);
     assert.equal(isServiceableAreaPincode("560001"), false);
     assert.equal(guestAreaAddress({ area: "Benz Circle", pincode: "520010" }).street, "");
+  });
+});
+
+describe("the temporary switch REQUIRE_PHONE_SIGN_IN", () => {
+  test("is off unless the environment says 'true'", () => {
+    const source = read("glowvai-app/features/auth/accountGate.ts");
+    assert.match(source, /REQUIRE_PHONE_SIGN_IN: boolean = process.env.NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN === 'true'/);
+  });
+
+  test("off: a guest opens Orders, Account, wishlist, wallet and every other screen", () => {
+    for (const screen of ["orders-list", "profile-tab", "shop-wishlist", "wallet-home", "checkout-review", "something-new"]) {
+      assert.deepEqual(gateNavigationWith(NONE, { screen, params: { a: 1 } }, false), { screen, params: { a: 1 } }, screen);
+    }
+  });
+
+  test("off: every guest action is allowed and the first screen is the shop", () => {
+    for (const action of ["open-orders", "open-account", "checkout", "place-order", "payment", "start-scan", "unknown-action"]) {
+      assert.equal(requiresSignInWith(action, false), false, action);
+    }
+    assert.equal(startScreenForWith(NONE, false), "shop-home");
+    assert.equal(startScreenForWith(PHONE, false), "shop-home");
+  });
+
+  test("off: a signed-in account still never sees the sign-in screens", () => {
+    assert.deepEqual(gateNavigationWith(PHONE, { screen: "auth-login", params: null }, false), { screen: "shop-home", params: null });
+  });
+
+  test("off: screens that need a profile show the Sign in empty state for a guest only", () => {
+    for (const screen of ["orders-list", "orders-detail", "wallet-home", "profile-tab"]) {
+      assert.equal(needsProfileEmptyState(screen, NONE, false), true, screen);
+      assert.equal(needsProfileEmptyState(screen, PHONE, false), false, screen);
+    }
+    assert.equal(needsProfileEmptyState("shop-home", NONE, false), false);
+  });
+
+  test("on: the gate is exactly as before (guests are sent to sign-in, actions ask, no empty state)", () => {
+    assert.equal(gateNavigationWith(NONE, { screen: "orders-list", params: null }, true).screen, "auth-login");
+    assert.equal(requiresSignInWith("open-orders", true), true);
+    assert.equal(startScreenForWith(NONE, true), "auth-onboarding");
+    assert.equal(needsProfileEmptyState("orders-list", NONE, true), false);
   });
 });

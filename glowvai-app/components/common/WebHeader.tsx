@@ -1,8 +1,9 @@
 import React from 'react';
-import { Bell, LayoutGrid, RotateCcw, ScanFace, Search, ShoppingCart, User } from 'lucide-react';
+import { Bell, LayoutGrid, RotateCcw, ScanFace, ShoppingCart, User } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { activeTabFor, NavTab, showsWebHeader, TAB_TARGET } from './navGroups';
 import { itemsLabel, useShellCart } from './useShellCart';
+import { HeaderSearch } from '../../features/shop/shared/HeaderSearch';
 import { useInbox } from '../../core/notifications/inboxStore';
 
 // Top navigation for tablet and desktop widths. Phones keep the bottom bar, so this is hidden there by CSS.
@@ -30,10 +31,7 @@ export const WebHeader: React.FC = () => {
           <span aria-hidden="true">←</span> <span>glowvai.in</span>
         </a>
         <button className="web-header-brand" onClick={() => go('home')} aria-label="glowvai shop home" aria-current={activeTab === 'home' ? 'page' : undefined}>glowvai</button>
-        <button className="web-header-search" onClick={() => navigate('shop-search-filters')} aria-label="Search products">
-          <Search size={18} aria-hidden="true" />
-          <span>Search for serums, sunscreen and more</span>
-        </button>
+        <HeaderSearch className="web-header-search" voice={false} />
         <nav className="web-header-nav" aria-label="Primary navigation">
           {LINKS.map((link) => {
             const active = activeTab === link.tab;
