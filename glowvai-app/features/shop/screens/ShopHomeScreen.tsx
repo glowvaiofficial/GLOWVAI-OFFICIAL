@@ -5,8 +5,7 @@ import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { useCustomerStore } from '../../../core/state/customerStore';
 import { useInbox } from '../../../core/notifications/inboxStore';
-import { siteConfig } from '../../../../config/site';
-import { BrandLogo } from '../../../shared/BrandLogo';
+import { ShopHomeFooter } from '../shared/ShopHomeFooter';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeFacts } from '../shared/HomeFacts';
 import { ITEM_BLOCK_IDS, useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
@@ -18,7 +17,7 @@ import { CONCERNS, SCAN_PRIVACY, useHomeNavigate, useReorderProducts } from '../
 import { ShopDesktopHome } from './ShopDesktopHome';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
 import { catalogReady, hideEmpty } from '../lib/hideEmpty';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, clampMaxItems, homeSequence, recommendedProducts, type HomeModuleId } from '../lib/homeModel';
 import { getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { HOME_TABS, activeOrder, deliveryCell, greetingLine, homeTab, matchesConcern, soonestLiveSale, type HomeTab } from '../mobile/homeChrome';
 import { itemAccent, sectionAccent } from '../mobile/accentTheme';
@@ -93,6 +92,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const orders = useCustomerStore((s) => s.orders);
   const [tab, setTab] = useState<HomeTab>(() => homeTab('for-you'));
   // A concern tab with no matching product is hidden once the catalogue has loaded (the selected tab always stays).
+  const visibleCategories = hideEmpty(HOME_CATEGORY_TILES, (c) => tiles.find((t) => t.id === c.id)?.count ?? 0, catalogReady(loading, failed));
   const visibleTabs = hideEmpty(HOME_TABS, (t) => (!t.concern || t.id === tab.id ? 1 : catalog.filter((p) => matchesConcern(p, t.concern)).length), catalogReady(loading, failed));
 
   // "Track Order" needs the signed-in customer's orders; the list is loaded once if no screen has loaded it yet.
@@ -131,12 +131,6 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
   const accentOf = (id: HomeBlockId) => sectionAccent(id, (blockSettings[id] as (BlockSettings & Accented) | undefined)?.accent);
   const settingsOf = (id: HomeBlockId) => blockSettings[id] as (BlockSettings & Accented) | undefined;
   const hasItems = (id: HomeBlockId) => (blockSettings[id]?.items.length ?? 0) > 0;
-
-  const socials = configuredSocials(mergeFooterSocials(siteConfig.socials, footerDetails));
-  const storeLinks = [
-    { label: 'App Store', url: footerDetails.appStoreUrl },
-    { label: 'Google Play', url: footerDetails.playStoreUrl },
-  ].filter((s) => s.url !== '');
 
   // Each homepage block. The order comes from the admin layout (useHomeLayout).
   // Scrolls to a rail of this page (the Best sellers and New launches category tiles).
@@ -306,62 +300,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
       case 'footer':
         return (
           <>
-            <footer className="shop-home-footer" aria-label="Site footer">
-              <div className="shop-home-footer-inner">
-                <div className="shop-home-footer-brand">
-                  <span className="shop-home-footer-logo">
-                    <BrandLogo height={28} white />
-                  </span>
-                  <p>Skincare, delivered.</p>
-                  {storeLinks.length > 0 && (
-                    <ul className="shop-home-footer-store" aria-label="Get the app">
-                      {storeLinks.map((s) => (
-                        <li key={s.label}>
-                          <a href={s.url} target="_blank" rel="noopener noreferrer">
-                            {s.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {socials.length > 0 && (
-                    <ul className="shop-home-footer-social" aria-label="Social media">
-                      {socials.map((s) => (
-                        <li key={s.label}>
-                          <a href={s.url} target="_blank" rel="noopener noreferrer">
-                            {s.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <nav className="shop-home-footer-cols" aria-label="Footer links">
-                  {HOME_FOOTER_GROUPS.map((group) => (
-                    <section key={group.title} className="shop-home-footer-col">
-                      <h3>{group.title}</h3>
-                      <ul>
-                        {group.links.map((link) => (
-                          <li key={link.label}>
-                            {'href' in link ? (
-                              <a href={link.href}>{link.label}</a>
-                            ) : (
-                              <button type="button" onClick={() => navigate(link.screen, link.params)}>
-                                {link.label}
-                              </button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </section>
-                  ))}
-                </nav>
-              </div>
-              <div className="shop-home-footer-bottom">
-                <span>© 2026 GlowVai</span>
-                {footerDetails.companyLine !== '' && <p className="shop-home-footer-company">{footerDetails.companyLine}</p>}
-              </div>
-            </footer>
+            <ShopHomeFooter variant="phone" footer={footerDetails} categories={visibleCategories} onNavigate={navigate} />
 
             {totalCount > 0 && (
               <button type="button" className="shop-home-cart-pill" onClick={() => navigate('cart-tab')}>

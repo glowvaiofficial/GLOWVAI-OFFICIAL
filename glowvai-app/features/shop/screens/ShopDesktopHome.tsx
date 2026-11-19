@@ -1,19 +1,19 @@
 import { isPosterOnlyHero } from '../lib/heroPoster';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, ArrowUp, BadgePercent, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
+import { ArrowRight, BadgePercent, Bell, Boxes, ChevronDown, ChevronLeft, ChevronRight, Clock, Crown, Droplets, FlaskConical, Gem, Heart, LucideProvider, MapPin, Minus, Package, PackagePlus, Pipette, Plus, ScanFace, Search, ShieldCheck, ShoppingCart, Sparkles, Star, Sun, Tag, Ticket, Truck, User, Waves, Zap } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useApp } from '../../../context/useApp';
 import type { SkincareProduct } from '../../../core/data/indianSkincareCatalog';
 import { useCartStore } from '../../../core/state/cartStore';
 import { useCustomerStore } from '../../../core/state/customerStore';
 import { useInbox } from '../../../core/notifications/inboxStore';
-import { siteConfig } from '../../../../config/site';
 import { coolAccent, coolSectionAccent } from '../../../../lib/shop/accents';
 import { fromPrice } from '../../../../lib/shop/variants';
 import { COUPON_VALUES, FREE_DELIVERY_ABOVE } from '../../../shared/pricing-rules.mjs';
 import { itemsLabel, useShellCart } from '../../../components/common/useShellCart';
 import { isActiveOrder } from '../../orders/orderUtils';
 import { BrandLogo } from '../../../shared/BrandLogo';
+import { ShopHomeFooter } from '../shared/ShopHomeFooter';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
 import { HomeFacts } from '../shared/HomeFacts';
 import { SearchHint } from '../shared/SearchHint';
@@ -27,7 +27,7 @@ import { balancedColumns } from '../lib/homeDevice';
 import { accentVars, blockAccent, isAccent, itemAccent, type AccentName } from '../lib/desktopAccents';
 import { CONCERNS, HERO_IMAGE, SCAN_PRIVACY, countLabel, useHomeNavigate, useReorderProducts } from '../lib/homeCommon';
 import { catalogReady, hideEmpty } from '../lib/hideEmpty';
-import { HOME_CATEGORY_TILES, HOME_FOOTER_GROUPS, clampMaxItems, configuredSocials, homeSequence, mergeFooterSocials, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
+import { HOME_CATEGORY_TILES, clampMaxItems, homeSequence, recommendedProducts, type HomeModuleId, type PricePointTile } from '../lib/homeModel';
 import type { HomeCategoryTile } from '../lib/homeModel';
 import { formatRupee, getDiscountPercent, getProductImageUrl, getProductThumbUrl, hasProductPhoto } from '../shared/shopUtils';
 import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
@@ -892,12 +892,6 @@ export const ShopDesktopHome: React.FC = () => {
   const userCity = currentAddress?.city || currentAddress?.area || 'Set location';
   const deliveryEta = currentAddress?.serviceable && currentAddress.deliveryMinutes > 0 ? currentAddress.deliveryMinutes : null;
 
-  const socials = configuredSocials(mergeFooterSocials(siteConfig.socials, footerDetails));
-  const storeLinks = [
-    { label: 'App Store', url: footerDetails.appStoreUrl },
-    { label: 'Google Play', url: footerDetails.playStoreUrl },
-  ].filter((s) => s.url !== '');
-
   const openLink = (link: string) => (link ? window.location.assign(link) : navigate('shop-browse'));
 
   // A section's accent: the admin's (block settings, then the reply's sectionAccents), otherwise the section's default.
@@ -1178,78 +1172,7 @@ export const ShopDesktopHome: React.FC = () => {
       }
       case 'footer':
         return (
-          <footer className="shop-desk-footer" aria-label="Site footer">
-            <button type="button" className="shop-desk-totop" onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })}>
-              <ArrowUp size={16} aria-hidden="true" />
-              Back to top
-            </button>
-            <div className="shop-desk-footer-inner">
-              <div className="shop-desk-footer-brand">
-                <span className="shop-desk-footer-logo">
-                  <BrandLogo height={34} white />
-                </span>
-                <p>Skincare, delivered.</p>
-                {storeLinks.length > 0 && (
-                  <ul className="shop-desk-footer-pills is-store" aria-label="Get the app">
-                    {storeLinks.map((s) => (
-                      <li key={s.label}>
-                        <a href={s.url} target="_blank" rel="noopener noreferrer">
-                          {s.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {socials.length > 0 && (
-                  <ul className="shop-desk-footer-pills" aria-label="Social media">
-                    {socials.map((s) => (
-                      <li key={s.label}>
-                        <a href={s.url} target="_blank" rel="noopener noreferrer">
-                          {s.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <nav className="shop-desk-footer-cols" aria-label="Footer links">
-                <section className="shop-desk-footer-col">
-                  <h3>Categories</h3>
-                  <ul>
-                    {visibleCategories.map(({ id: categoryId, label }) => (
-                      <li key={categoryId}>
-                        <button type="button" onClick={() => navigate('shop-category', { categoryId })}>
-                          {label}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-                {HOME_FOOTER_GROUPS.map((group) => (
-                  <section key={group.title} className="shop-desk-footer-col">
-                    <h3>{group.title}</h3>
-                    <ul>
-                      {group.links.map((link) => (
-                        <li key={link.label}>
-                          {'href' in link ? (
-                            <a href={link.href}>{link.label}</a>
-                          ) : (
-                            <button type="button" onClick={() => navigate(link.screen, link.params)}>
-                              {link.label}
-                            </button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ))}
-              </nav>
-            </div>
-            <div className="shop-desk-footer-bottom">
-              <span>© 2026 GlowVai</span>
-              {footerDetails.companyLine !== '' && <p>{footerDetails.companyLine}</p>}
-            </div>
-          </footer>
+          <ShopHomeFooter variant="desk" footer={footerDetails} categories={visibleCategories} onNavigate={navigate} />
         );
       default:
         if ((ITEM_BLOCK_IDS as readonly string[]).includes(id)) return <NewItemBlock id={id as ItemBlockId} settings={blockSettings[id as ItemBlockId]} wide onOpenLink={openLink} />;
