@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, json, limitByIpShared, limitByUserShared } from "@/lib/shop/server";
 import { verifyTopupLive } from "@/lib/shop/wallet/live";
 import { TOPUP_LIMITS } from "@/lib/shop/wallet-config";
 
@@ -11,11 +11,11 @@ const HOUR = 60 * 60 * 1000;
 // Razorpay and must be for this top-up's order and amount. Coins are credited once, in one transaction. A repeat call
 // returns the same result and credits nothing more. Limits: 30 per hour per customer, 60 per hour per IP.
 export async function POST(req: NextRequest) {
-  const ipLimited = limitByIp(req, "wallet-topup-verify", TOPUP_LIMITS.verifyPerIpPerHour, HOUR);
+  const ipLimited = await limitByIpShared(req, "wallet-topup-verify", TOPUP_LIMITS.verifyPerIpPerHour, HOUR);
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  const userLimited = limitByUser(customer.uid, "wallet-topup-verify", TOPUP_LIMITS.verifyPerCustomerPerHour, HOUR);
+  const userLimited = await limitByUserShared(customer.uid, "wallet-topup-verify", TOPUP_LIMITS.verifyPerCustomerPerHour, HOUR);
   if (userLimited) return userLimited;
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   const orderId = typeof body?.razorpay_order_id === "string" ? body.razorpay_order_id : "";

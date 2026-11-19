@@ -39,6 +39,14 @@ export function messaging(): Messaging {
 export const json = (body: unknown, status = 200) =>
   NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
+// A successful public read that does not depend on the caller (no token, cookie or user id in the response), cached by
+// the CDN. Never use it on a route that returns per-user data.
+export function jsonPublic(body: unknown, sMaxAge = 60, staleWhileRevalidate = 300) {
+  const res = NextResponse.json(body, { status: 200 });
+  res.headers.set("Cache-Control", `public, max-age=0, s-maxage=${sMaxAge}, stale-while-revalidate=${staleWhileRevalidate}`);
+  return res;
+}
+
 // The signed-in customer, from the Firebase ID token in the Authorization header. Anonymous sign-in counts: it gives
 // every device a stable id, so its profile, orders and requests stay together.
 export async function customerFrom(req: NextRequest): Promise<{ uid: string; anonymous: boolean } | null> {

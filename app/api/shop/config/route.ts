@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { json, limitByIp } from "@/lib/shop/server";
+import { jsonPublic, limitByIp } from "@/lib/shop/server";
 import { emiAvailable } from "@/glowvai-app/shared/payment-options.mjs";
 
 export const dynamic = "force-dynamic";
@@ -10,5 +10,5 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const ipLimited = limitByIp(req, "config-get", 120);
   if (ipLimited) return ipLimited;
-  return json({ ok: true, payments: { emi: { available: emiAvailable(process.env) } } });
+  return jsonPublic({ ok: true, payments: { emi: { available: emiAvailable(process.env) } } });
 }

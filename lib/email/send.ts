@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { env } from "@/lib/env";
 import { isSuppressed } from "@/lib/email/suppression";
+import { takeEmailSlot } from "@/lib/email/dailyCap";
 import { checkRecipientRateLimit, recordEmailSent } from "@/lib/email/rate-limit";
 import { renderEmail } from "@/lib/email/render";
 import { sendViaResendApi } from "@/lib/email/client";
@@ -38,6 +39,12 @@ export async function sendEmail<T extends Record<string, unknown>>(
     const rateCheck = checkRecipientRateLimit(cleanTo);
     if (!rateCheck.allowed) {
       return { ok: false, error: rateCheck.reason || "Rate limit exceeded" };
+    }
+
+    // 3b. Global daily cap (Resend free plan). Marketing stops before transactional. Never throws.
+    if (!(await takeEmailSlot(stream))) {
+      console.warn(`[email-cap] daily cap reached; ${stream} email not sent`);
+      return { ok: false, skipped: true, error: "Daily email cap reached" };
     }
 
     // 4. Determine From address and Headers based on stream

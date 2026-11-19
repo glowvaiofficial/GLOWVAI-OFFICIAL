@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { db, json, limitByIp } from "@/lib/shop/server";
+import { db, jsonPublic, limitByIp } from "@/lib/shop/server";
 import { RATINGS } from "@/lib/shop/reviews";
 
 export const dynamic = "force-dynamic";
@@ -22,5 +22,5 @@ export async function GET(req: NextRequest) {
       ratings[doc.id] = { average: Math.round(average * 10) / 10, count };
     }
   }
-  return json({ ok: true, ratings });
+  return jsonPublic({ ok: true, ratings });
 }
