@@ -70,6 +70,11 @@ const withTimeout = <T,>(work: Promise<T>, ms: number): Promise<T> =>
     );
   });
 
+// The message apiFetch returns when no customer session (not even a browsing one) could be started. A visitor in that
+// state has no data on the server, so account screens show their plain empty state instead of an error.
+export const NO_SESSION_MESSAGE = 'We could not start your session. Please try again.';
+export const isNoSessionError = (error: string | null | undefined): boolean => error === NO_SESSION_MESSAGE;
+
 // Calls a shop server route with the customer's ID token. Never throws: the result carries the server's message.
 export async function apiFetch<T = Record<string, unknown>>(path: string, init: RequestInit = {}): Promise<ApiResult<T>> {
   let token: string;
@@ -82,7 +87,7 @@ export async function apiFetch<T = Record<string, unknown>>(path: string, init: 
       ? 'Customer sign-in is being set up. Please try again later.'
       : code === 'auth/network-request-failed'
         ? 'Check your internet connection and try again.'
-        : 'We could not start your session. Please try again.';
+        : NO_SESSION_MESSAGE;
     return { ok: false, status: 0, data: null, error };
   }
 

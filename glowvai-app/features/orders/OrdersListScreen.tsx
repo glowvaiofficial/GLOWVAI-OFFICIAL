@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, ChevronRight, Clock, FileText, HelpCircle, MapPin, RefreshCw, RotateCcw, Truck, XCircle } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { fetchOrdersPage, type ShopOrder } from '../../core/services/shopApi';
+import { isNoSessionError } from '../../core/services/customerSession';
 import { openInvoice } from '../../core/services/shopTracking';
 import { ORDER_FILTERS, type OrderFilter } from '../../../lib/shop/orderHistory';
 import { OrdersHeader } from './components/OrdersHeader';
@@ -182,7 +183,12 @@ export const OrdersListScreen: React.FC = () => {
     setMoreLoading(false);
     if (!res.ok || !res.data) {
       if (cursor) showToast(res.error || 'More orders could not be loaded. Try again.');
-      else {
+      else if (isNoSessionError(res.error)) {
+        // A visitor with no session has no orders: the plain empty state, not an error.
+        setOrders([]);
+        setNextCursor(null);
+        setStatus('ready');
+      } else {
         setStatus('error');
         setError(res.error);
       }

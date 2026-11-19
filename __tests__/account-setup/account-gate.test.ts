@@ -6,7 +6,6 @@ import {
   accountStateOf,
   afterSignIn,
   gateNavigation as gateNavigationWith,
-  needsProfileEmptyState,
   screenOpensWithoutAccount,
   requiresSignIn as requiresSignInWith,
   startScreenFor as startScreenForWith,
@@ -311,18 +310,9 @@ describe("the temporary switch REQUIRE_PHONE_SIGN_IN", () => {
     assert.deepEqual(gateNavigationWith(PHONE, { screen: "auth-login", params: null }, false), { screen: "shop-home", params: null });
   });
 
-  test("off: screens that need a profile show the Sign in empty state for a guest only", () => {
-    for (const screen of ["orders-list", "orders-detail", "wallet-home", "profile-tab"]) {
-      assert.equal(needsProfileEmptyState(screen, NONE, false), true, screen);
-      assert.equal(needsProfileEmptyState(screen, PHONE, false), false, screen);
-    }
-    assert.equal(needsProfileEmptyState("shop-home", NONE, false), false);
-  });
-
   test("on: the gate is exactly as before (guests are sent to sign-in, actions ask, no empty state)", () => {
     assert.equal(gateNavigationWith(NONE, { screen: "orders-list", params: null }, true).screen, "auth-login");
     assert.equal(requiresSignInWith("open-orders", true), true);
     assert.equal(startScreenForWith(NONE, true), "auth-onboarding");
-    assert.equal(needsProfileEmptyState("orders-list", NONE, true), false);
   });
 });

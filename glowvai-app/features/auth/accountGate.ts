@@ -16,15 +16,8 @@ export type AccountState = 'none' | 'phone';
 // to restore the gate described above. Each decision function takes the switch as its last argument, so both values are tested.
 export const REQUIRE_PHONE_SIGN_IN: boolean = process.env.NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN === 'true';
 
-// Screens that read the signed-in customer's own data. With the gate off and no account they show a 'Sign in' empty state.
-const ACCOUNT_DATA_SCREENS = new Set<string>([
-  'orders-list', 'orders-detail', 'orders-tracking', 'orders-rate', 'returns-request', 'order-history', 'order-tracking',
-  'wallet-home', 'settings-wallet', 'profile-tab', 'profile',
-]);
-
-export function needsProfileEmptyState(screen: string, account: AccountState, required: boolean = REQUIRE_PHONE_SIGN_IN): boolean {
-  return !required && account === 'none' && ACCOUNT_DATA_SCREENS.has(screen);
-}
+// With the gate off every account screen renders for a visitor too (empty orders, zero wallet, editable profile form).
+// There is deliberately no 'Sign in to see this' wall in front of them.
 
 export const ONBOARDING_SCREEN = 'auth-onboarding';
 export const SIGN_IN_SCREEN = 'auth-login';

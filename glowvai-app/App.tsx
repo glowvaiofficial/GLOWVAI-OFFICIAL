@@ -4,8 +4,6 @@ import { AppProvider } from './context/AppContext';
 import { ThemeLoader } from './core/theme/ThemeLoader';
 import { BagQuoteSync } from './features/commerce/BagQuoteSync';
 import { useApp } from './context/useApp';
-import { needsProfileEmptyState } from './features/auth/accountGate';
-import { SignInPrompt } from './features/auth/SignInPrompt';
 import { AndroidStatusBar } from './components/common/AndroidStatusBar';
 import { BottomNavBar } from './components/common/BottomNavBar';
 import { WebHeader } from './components/common/WebHeader';
@@ -52,9 +50,10 @@ import './features/shop/styles/v7-location.css';
 import './features/shop/styles/v7-home.css';
 import './features/shop/styles/v7-fixes.css';
 import './features/shop/styles/v7-footer.css';
+import './features/shop/styles/v7-account.css';
 
 const AppContent: React.FC = () => {
-  const { currentScreen, activeParams, toastMessage, navigate, accountSignedIn } = useApp();
+  const { currentScreen, activeParams, toastMessage, navigate } = useApp();
 
   // Each screen opens at the top, except when Back returns to a list: that list comes back at the position it was left.
   React.useEffect(() => {
@@ -87,8 +86,6 @@ const AppContent: React.FC = () => {
   }, []);
 
   const renderScreen = () => {
-    // Phone sign-in gate is off: a screen that needs a profile shows a friendly 'Sign in' state when the visitor has none.
-    if (needsProfileEmptyState(currentScreen, accountSignedIn ? 'phone' : 'none')) return <SignInPrompt />;
     const PortedScreen = portedRoutes[currentScreen as keyof typeof portedRoutes];
     if (PortedScreen) return <PortedScreen />;
 

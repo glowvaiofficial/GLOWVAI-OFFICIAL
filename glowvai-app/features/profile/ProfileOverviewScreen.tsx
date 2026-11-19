@@ -23,7 +23,7 @@ export const ProfileOverviewScreen = () => {
       <div className="profile-body">
         <div className="profile-side">
         <section className="profile-card">
-          <button type="button" className="profile-user-button" onClick={() => navigate(customerDetails ? 'profile-edit' : 'customer-details', customerDetails ? undefined : { returnTo: 'profile-tab' })}>
+          <button type="button" className="profile-user-button" onClick={() => navigate('profile-edit')}>
             <span className="profile-hero-avatar">{getInitials(customerDetails?.fullName || user?.name)}</span>
             <span className="profile-user-copy">
               <span className="profile-user-name">{name}</span>

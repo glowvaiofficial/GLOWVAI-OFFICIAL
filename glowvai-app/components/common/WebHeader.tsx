@@ -43,9 +43,11 @@ export const WebHeader: React.FC = () => {
             );
           })}
           <button type="button" className="notif-bell" onClick={() => navigate('notifications-list')} aria-current={currentScreen === 'notifications-list' ? 'page' : undefined} aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'} title="Notifications">
-            <Bell size={18} aria-hidden="true" />
+            <span className="notif-bell-icon" aria-hidden="true">
+              <Bell size={18} />
+              {unread > 0 && <b className="notif-count">{unread > 99 ? '99+' : unread}</b>}
+            </span>
             <span>Alerts</span>
-            {unread > 0 && <b className="notif-count" aria-hidden="true">{unread > 99 ? '99+' : unread}</b>}
           </button>
         </nav>
         <button
@@ -56,7 +58,6 @@ export const WebHeader: React.FC = () => {
         >
           <span className="web-header-cart-icon" aria-hidden="true">
             <ShoppingCart size={20} />
-            {cart.count > 0 && <b className="web-header-cart-count">{cart.count > 99 ? '99+' : cart.count}</b>}
           </span>
           {cart.count > 0 ? (
             <span className="web-header-cart-copy">

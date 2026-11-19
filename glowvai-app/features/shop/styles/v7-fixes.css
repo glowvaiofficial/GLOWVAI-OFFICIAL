@@ -42,19 +42,6 @@
 }
 .glowvai-root .gv7-hsearch .shop-home-voice-msg{ z-index: 170; }
 
-/* ---------- 'Sign in' empty state (shown only while the phone sign-in gate is off) ---------- */
-.glowvai-root .gv7-signin-prompt{ display: grid; min-height: 60dvh; place-items: center; padding: 48px 16px; }
-.glowvai-root .gv7-signin-prompt-card{ display: grid; width: 100%; max-width: 420px; justify-items: center; gap: 12px; padding: 32px 24px; border: 1px solid #E3E9F5; border-radius: 16px; background: #fff; text-align: center; }
-.glowvai-root .gv7-signin-prompt-icon{ display: grid; width: 56px; height: 56px; place-items: center; border-radius: 50%; background: #EEF3FF; color: #0057FB; }
-.glowvai-root .gv7-signin-prompt-card h1{ margin: 0; color: #0B1B3F; font-size: 22px; font-weight: 700; line-height: 1.25; }
-.glowvai-root .gv7-signin-prompt-card p{ margin: 0; color: #5B6784; font-size: 14px; line-height: 1.5; }
-.glowvai-root .gv7-signin-prompt-btn{ min-height: 48px; width: 100%; margin-top: 8px; border: 0; border-radius: 12px; background: #0057FB; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
-.glowvai-root .gv7-signin-prompt-btn:active{ transform: scale(.98); }
-.glowvai-root .gv7-signin-prompt-link{ min-height: 44px; border: 0; background: transparent; color: #0057FB; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
-.glowvai-root .gv7-signin-prompt-btn:focus-visible,
-.glowvai-root .gv7-signin-prompt-link:focus-visible{ outline: 2px solid #0057FB; outline-offset: 2px; }
-@media (hover: hover){ .glowvai-root .gv7-signin-prompt-btn:hover{ background: #0048D1; } }
-
 /* ---------- Sign-in split screen on PC: the whole photo shows, the copy sits under it ---------- */
 /* The picture is 900x1101; the face, the Skin Analysis card and the chin sit in rows 150 to 890. The art box keeps that
    window (cover, face-tuned position), its height follows the half-width and never takes more than the viewport leaves

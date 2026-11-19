@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Briefcase, Home, MapPin, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import type { ScreenName } from '../../context/contextDefinition';
+import { isNoSessionError } from '../../core/services/customerSession';
 import { safeHapticSelection } from '../../core/utils/haptics';
 import type { SavedAddressInput, SavedAddressLabel, SavedAddressView } from '../../core/services/shopApi';
 import { useAddressStore, toNovAddress, isServiceablePincode, type SavedAddress } from './lib/addressStore';
@@ -32,11 +33,15 @@ export const AddressListScreen: React.FC = () => {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [noSession, setNoSession] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     refreshSavedAddresses().then((res) => {
-      if (!cancelled && !res.ok) setLoadError(res.error ?? 'Your addresses could not be loaded.');
+      if (cancelled || res.ok) return;
+      // A visitor with no session has no saved addresses: the empty list with Add address, not an error.
+      if (isNoSessionError(res.error)) setNoSession(true);
+      else setLoadError(res.error ?? 'Your addresses could not be loaded.');
     });
     return () => {
       cancelled = true;
@@ -91,9 +96,9 @@ export const AddressListScreen: React.FC = () => {
             {message}
           </p>
         )}
-        {!loaded && addresses.length === 0 && !loadError && <p className="commerce-muted">Loading your addresses...</p>}
+        {!loaded && !noSession && addresses.length === 0 && !loadError && <p className="commerce-muted">Loading your addresses...</p>}
 
-        {loaded && addresses.length === 0 && (
+        {(loaded || noSession) && addresses.length === 0 && (
           <div className="commerce-empty-state is-card">
             <span className="commerce-empty-icon">
               <MapPin size={28} />

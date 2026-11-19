@@ -20,13 +20,13 @@ const ITEMS: MenuItem[] = [
   { label: 'Profile', target: 'profile-tab', icon: <UserRound size={ICON} />, screens: ['profile', 'profile-tab', 'profile-overview', 'profile-edit', 'profile-student-status', 'settings-language', 'settings-activity'] },
   { label: 'Orders', target: 'orders-list', icon: <Package size={ICON} />, screens: ['order-history', 'orders-list', 'orders-detail', 'orders-rate', 'returns-request'] },
   { label: 'Addresses', target: 'address-list', icon: <MapPin size={ICON} />, screens: ['address-list', 'address-saved', 'address-add'] },
-  { label: 'Wallet and coins', target: 'wallet-home', icon: <Wallet size={ICON} />, screens: ['wallet-home', 'settings-wallet'] },
-  { label: 'Gift cards', target: 'gift-cards', icon: <Gift size={ICON} />, screens: ['gift-cards', 'settings-gift-cards'] },
+  { label: 'Wallet and coins', target: 'wallet-home', icon: <Wallet size={ICON} />, screens: ['wallet-home'] },
+  { label: 'Gift cards', target: 'gift-cards', icon: <Gift size={ICON} />, screens: ['gift-cards'] },
   { label: 'Payment methods', target: 'payment-methods', icon: <CreditCard size={ICON} />, screens: ['payment-methods'] },
   { label: 'Notifications', target: 'notifications-list', icon: <Bell size={ICON} />, screens: ['notifications-list', 'settings-notifications'] },
   { label: 'Referrals', target: 'profile-referrals', icon: <Users size={ICON} />, screens: ['profile-referrals', 'profile-referral-code', 'profile-referral-transactions', 'settings-affiliate', 'student-referral'] },
   { label: 'Subscriptions', target: 'profile-subscriptions', icon: <Repeat size={ICON} />, screens: ['profile-subscriptions'] },
-  { label: 'Privacy', target: 'privacy-center', icon: <ShieldCheck size={ICON} />, screens: ['privacy-center', 'settings-privacy'] },
+  { label: 'Privacy', target: 'privacy-center', icon: <ShieldCheck size={ICON} />, screens: ['privacy-center'] },
   { label: 'Devices', target: 'privacy-devices', icon: <Smartphone size={ICON} />, screens: ['privacy-devices'] },
   { label: 'Settings', target: 'profile-settings', icon: <Settings size={ICON} />, screens: ['profile-settings'] },
   { label: 'Help', target: 'profile-support', icon: <HelpCircle size={ICON} />, screens: ['profile-support', 'support', 'help-index', 'help-faq', 'help-terms', 'help-privacy'] },
@@ -38,8 +38,10 @@ export const showsAccountMenu = (screen: string): boolean => WITH_MENU.has(scree
 
 export const AccountMenu: React.FC = () => {
   const { currentScreen, navigate, user } = useApp();
-  const name = user?.name?.trim() || 'Your account';
-  const initials = name.split(/\s+/).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('') || 'G';
+  // The saved profile name, or a plain guest greeting. Never an invented name.
+  const saved = user?.name?.trim() || '';
+  const name = saved || 'guest';
+  const initials = saved ? saved.split(/\s+/).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join('') : 'G';
 
   return (
     <nav className="v5a-menu" aria-label="Account menu">
