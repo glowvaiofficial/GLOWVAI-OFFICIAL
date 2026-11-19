@@ -48,8 +48,10 @@ import './features/shop/styles/v5-checkout.css';
 import './features/shop/styles/v5-auth-scan.css';
 import './features/shop/styles/v5-audit.css';
 import './features/shop/styles/v5-account.css';
+import './features/shop/styles/v7-location.css';
 import './features/shop/styles/v7-home.css';
 import './features/shop/styles/v7-fixes.css';
+import './features/shop/styles/v7-footer.css';
 
 const AppContent: React.FC = () => {
   const { currentScreen, activeParams, toastMessage, navigate, accountSignedIn } = useApp();
