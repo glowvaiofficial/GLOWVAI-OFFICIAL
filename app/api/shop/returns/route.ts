@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { DAY_MS, ORDER_ID_PATTERN, type Doc } from "@/lib/shop/orderState";
 import { recordActivity } from "@/lib/shop/activity";
 import {
@@ -49,8 +49,9 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);
-  // Five requests a day per customer, counted per attempt.
-  const dailyLimited = limitByUser(customer.uid, "returns-post", 5, DAY_MS);
+  // Five requests a day per customer, counted per attempt. Shared (Firestore) counter: a daily cap kept only in one
+  // server instance would reset whenever the instance does.
+  const dailyLimited = await limitByUserShared(customer.uid, "returns-post", 5, DAY_MS, "You can send up to 5 return requests a day. Try again tomorrow.");
   if (dailyLimited) return dailyLimited;
 
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUser } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIp, limitByUser, limitByUserShared } from "@/lib/shop/server";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { AFFILIATE_CONFIG } from "@/lib/shop/affiliate/config";
 import { parseApplication } from "@/lib/shop/affiliate/application";
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to apply." }, 401);
-  const userLimited = limitByUser(customer.uid, "affiliate-apply", AFFILIATE_CONFIG.rate.applyPerUserPerDay, DAY_MS);
+  const userLimited = await limitByUserShared(customer.uid, "affiliate-apply", AFFILIATE_CONFIG.rate.applyPerUserPerDay, DAY_MS, "Too many applications today. Try again tomorrow.");
   if (userLimited) return userLimited;
 
   const body = await req.json().catch(() => null);

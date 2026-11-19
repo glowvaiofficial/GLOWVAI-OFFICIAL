@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { customerFrom, db, json, limitByIp, limitByUserShared } from "@/lib/shop/server";
+import { customerFrom, db, json, limitByIpShared, limitByUserShared } from "@/lib/shop/server";
 import { firestoreRepo } from "@/lib/shop/growth/firestoreRepo";
 import { applyReferralCode } from "@/lib/shop/growth/referrals";
 import { GROWTH_CONFIG } from "@/lib/shop/growth-config";
@@ -11,7 +11,7 @@ const DAY_MS = 86_400_000;
 // A new customer applies a friend's code once, before their first order. Limits: each customer may try 3 times a day,
 // and each address 10 times a day, so codes cannot be guessed by trying many. Refusals say why, and nothing is written.
 export async function POST(req: NextRequest) {
-  const ipLimited = limitByIp(req, "referral-apply", GROWTH_CONFIG.referral.applyPerIpPerDay, DAY_MS);
+  const ipLimited = await limitByIpShared(req, "referral-apply", GROWTH_CONFIG.referral.applyPerIpPerDay, DAY_MS, "Too many attempts. Try again tomorrow.");
   if (ipLimited) return ipLimited;
   const customer = await customerFrom(req);
   if (!customer) return json({ ok: false, error: "Sign in again to continue." }, 401);

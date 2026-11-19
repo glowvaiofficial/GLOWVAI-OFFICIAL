@@ -3,8 +3,9 @@ import { Webhook } from "svix";
 import { env } from "@/lib/env";
 import { logEmailEvent } from "@/lib/email/log";
 import { addSuppression } from "@/lib/email/suppression";
+import { clientIp, rateLimit } from "@/lib/security/rateLimit";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 /**
  * GLOW VAI Resend Webhook Handler.
@@ -15,6 +16,11 @@ export const dynamic = "force-static";
 const processedEvents = new Set<string>();
 
 export async function POST(req: NextRequest) {
+  // A per-IP limit first, so unsigned floods are turned away before the body is read or any signature work is done.
+  // Generous (300 a minute): Resend sends bursts and retries refused deliveries later.
+  const limit = rateLimit(`resend-webhook:${clientIp(req)}`, 300, 60_000);
+  if (!limit.ok) return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
+
   const secret = env.RESEND_WEBHOOK_SECRET;
   if (!secret || secret === "whsec_abcdef123456") {
     return NextResponse.json({ error: "Webhook is not configured" }, { status: 503 });
@@ -61,6 +67,8 @@ export async function POST(req: NextRequest) {
   if (processedEvents.has(eventKey)) {
     return NextResponse.json({ ok: true, duplicate: true });
   }
+  // The set lives in this server instance only and must not grow without end.
+  if (processedEvents.size > 5000) processedEvents.clear();
   processedEvents.add(eventKey);
 
   // Non-blocking processing
