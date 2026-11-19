@@ -1,0 +1,33 @@
+/* Account area fixes (19 Nov 2026): header badges that sit on their icons, a guest note, and calm empty states that fill
+   the content column. Loaded once from App.tsx after v7-footer.css. Layout and style only. */
+
+/* ---------- Header: badges sit on the icon corner and never cover a label ---------- */
+.glowvai-root .web-header-nav button.notif-bell { gap: 6px; }
+.glowvai-root .notif-bell-icon { position: relative; display: inline-grid; width: 18px; height: 18px; flex: none; place-items: center; }
+.glowvai-root .notif-bell-icon .notif-count {
+  position: absolute; top: -8px; right: -10px; left: auto; min-width: 16px; height: 16px; padding: 0 4px;
+  font: 700 10px/16px var(--font-body); box-shadow: 0 0 0 2px #fff; pointer-events: none;
+}
+/* Room on the label side for the badge overhang, only while there is a badge. */
+.glowvai-root .web-header-nav button.notif-bell:has(.notif-count) { gap: 12px; }
+/* The cart pill carries its own "N items" text, so no second badge is drawn over the icon. */
+.glowvai-root .web-header-cart .web-header-cart-count { display: none; }
+.glowvai-root .web-header-cart-icon { overflow: visible; }
+
+/* ---------- Guest note on the profile form ---------- */
+.glowvai-root .v7a-guest-note {
+  margin: 0 0 12px; padding: 12px 14px; border: 1px solid #e3e9f5; border-radius: 12px; background: #eef3ff;
+  color: #5b6784; font-size: 13px; font-weight: 500; line-height: 1.45;
+}
+
+/* ---------- Empty states fill the content column on PC ---------- */
+@media (min-width: 1024px) {
+  .glowvai-root.glowvai-root .app-viewport .v5a-menu ~ :is(.orders-screen, .profile-screen, .commerce-screen) :is(.orders-empty-state, .commerce-empty-state.is-card) {
+    max-width: none; width: 100%; padding: 56px 24px; border: 1px solid #e3e9f5; border-radius: 12px; background: #fff;
+  }
+  .glowvai-root.glowvai-root .app-viewport .commerce-addresses .commerce-body { max-width: none; padding: 0; }
+  /* Equal top rhythm: every account screen's heading starts on the menu's top edge. */
+  .glowvai-root.glowvai-root .app-viewport .screen-content:has(> .v5a-menu) { padding-top: 24px; padding-bottom: 48px; }
+  .glowvai-root.glowvai-root .app-viewport .screen-content:has(> .v5a-menu) > :not(.v5a-menu) { padding-top: 0; }
+  .glowvai-root.glowvai-root .app-viewport .v5a-menu { max-height: calc(100dvh - 120px); overflow: auto; top: 88px; }
+}

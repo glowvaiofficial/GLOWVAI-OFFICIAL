@@ -24,7 +24,7 @@ interface Demographics {
 export const EditProfileScreen = ({ embedded = false }: { embedded?: boolean }) => {
   const t = useT();
   const dateLabel = useDateLabel();
-  const { goBack } = useApp();
+  const { goBack, accountSignedIn } = useApp();
   const profile = useCustomerStore((s) => s.profile);
   const saveProfile = useCustomerStore((s) => s.saveProfile);
   const [name, setName] = useState(profile?.name ?? '');
@@ -132,6 +132,9 @@ export const EditProfileScreen = ({ embedded = false }: { embedded?: boolean }) 
           </section>
 
           <p className="profile-label">{t('profile.title')}</p>
+          {!accountSignedIn && !embedded && (
+            <p className="v7a-guest-note" data-testid="guest-note">You are browsing as a guest. Adding your name and number is optional, and you can sign in later.</p>
+          )}
           <section className="profile-card profile-card-body">
             <label className="profile-field">
               <span className="profile-field-head"><span className="profile-field-label">{t('profile.name')}</span></span>

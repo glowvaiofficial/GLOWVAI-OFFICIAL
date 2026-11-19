@@ -11,6 +11,7 @@ import {
   type WalletHistoryRow,
   type WalletSummary,
 } from '../../core/services/walletApi';
+import { isNoSessionError } from '../../core/services/customerSession';
 import { ProfileHeader } from '../profile/ProfileShared';
 import { openWalletCheckout, type CheckoutOutcome } from './walletCheckout';
 import './wallet.css';
@@ -44,6 +45,7 @@ export const WalletScreen = () => {
   const [history, setHistory] = useState<WalletHistoryRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [guestZero, setGuestZero] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [preset, setPreset] = useState<number | null>(null);
   const [custom, setCustom] = useState('');
@@ -57,6 +59,10 @@ export const WalletScreen = () => {
       setWallet(result.data.wallet);
       setHistory(result.data.history);
       setCursor(result.data.nextCursor);
+      setLoadError(null);
+    } else if (isNoSessionError(result.error)) {
+      // A visitor with no session: a zero balance and no activity.
+      setGuestZero(true);
       setLoadError(null);
     } else {
       setLoadError(result.error || 'Your wallet could not be loaded. Try again in a moment.');
@@ -181,6 +187,11 @@ export const WalletScreen = () => {
             <span className="profile-card-title profile-inline-title"><Coins size={16} /> Balance</span>
             {loadError ? (
               <p className="profile-card-sub" role="alert">{loadError}</p>
+            ) : guestZero ? (
+              <>
+                <p className="wallet-balance-value" data-testid="wallet-balance">0 <span>Glow Coins</span></p>
+                <p className="profile-card-sub">Your coins appear here once you earn or add some.</p>
+              </>
             ) : wallet ? (
               <>
                 <p className="wallet-balance-value" data-testid="wallet-balance">
