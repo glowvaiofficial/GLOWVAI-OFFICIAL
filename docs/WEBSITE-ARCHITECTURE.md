@@ -66,3 +66,5 @@ Other routes: `/api/vendor/*` (15 routes, see [VENDOR-PORTAL.md](VENDOR-PORTAL.m
 
 `REQUIRE_PHONE_SIGN_IN` in `glowvai-app/features/auth/accountGate.ts` (env `NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN`, default off) lets every visitor open Orders, Account, wishlist and wallet while phone verification is not live; screens that need a profile show a "Sign in" empty state, and checkout keeps using the current guest session.
 Set `NEXT_PUBLIC_REQUIRE_PHONE_SIGN_IN=true` (and redeploy) to restore the full gate; both values are tested in `__tests__/account-setup/account-gate.test.ts`.
+
+Skin scan is app-only: every website scan entry (header, home buttons, bottom bar, `scan-tab`, `scan-intro`, `scan-camera`, `scan-gallery`, `scan-preview`, `scan-analyzing`, `scan-failed`, `face-prep`, `face-capture`, `face-loading`) opens `features/scan/ScanInAppScreen.tsx` ("Skin scan is in the GlowVai app", store links from the admin footer settings). The site has no camera or scan photo upload; `scan-report` and `skin-report` only read saved scans. Styles: `features/shop/styles/v7-scan-app.css`.

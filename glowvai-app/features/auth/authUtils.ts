@@ -17,14 +17,3 @@ export const requestLocationPermission = (): Promise<boolean> =>
     );
   });
 
-// Triggers the browser camera prompt, then releases the stream. Resolves false when unavailable or denied.
-export const requestCameraPermission = async (): Promise<boolean> => {
-  try {
-    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return false;
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    stream.getTracks().forEach((track) => track.stop());
-    return true;
-  } catch {
-    return false;
-  }
-};

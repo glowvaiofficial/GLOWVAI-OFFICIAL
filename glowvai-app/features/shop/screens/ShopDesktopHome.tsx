@@ -984,7 +984,7 @@ export const ShopDesktopHome: React.FC = () => {
                   <li><b>2</b>Get products matched to your skin</li>
                   <li><b>3</b>{deliveryEta ? `Delivered in ~${deliveryEta} mins` : 'Delivered to your door'}</li>
                 </ol>
-                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-camera')}>
+                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-tab')}>
                   Start free skin scan
                   <ArrowRight size={16} aria-hidden="true" />
                 </button>
@@ -1220,7 +1220,7 @@ export const ShopDesktopHome: React.FC = () => {
         <ShieldCheck size={16} aria-hidden="true" />
         <span>{SCAN_PRIVACY}</span>
       </p>
-      <button type="button" className="shop-desk-btn-primary" onClick={() => navigate('scan-camera')}>
+      <button type="button" className="shop-desk-btn-primary" onClick={() => navigate('scan-tab')}>
         Start free skin scan
         <ArrowRight size={16} aria-hidden="true" />
       </button>
@@ -1264,7 +1264,7 @@ export const ShopDesktopHome: React.FC = () => {
             </div>
             <DeliveryModeSwitch header={headerSettings} wide />
             <nav className="shop-desk-actions" aria-label="Account and cart">
-              <button type="button" className="shop-desk-scan-pill" onClick={() => navigate('scan-camera')}>
+              <button type="button" className="shop-desk-scan-pill" onClick={() => navigate('scan-tab')}>
                 <ScanFace size={18} aria-hidden="true" />
                 Skin scan
               </button>

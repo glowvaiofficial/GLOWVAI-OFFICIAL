@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowRight, Camera, Lock, MapPin } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 import { useApp } from '../../context/useApp';
 import { safeHapticImpact } from '../../core/utils/haptics';
 import { AuthShell } from './components/AuthShell';
-import { requestCameraPermission, requestLocationPermission } from './authUtils';
+import { requestLocationPermission } from './authUtils';
 
 interface PermissionToggleProps {
   icon: React.ReactNode;
@@ -31,7 +31,6 @@ export const PermissionsScreen: React.FC = () => {
   const { navigate, goBack, showToast } = useApp();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isCameraGranted, setIsCameraGranted] = useState(true);
   const [isLocationGranted, setIsLocationGranted] = useState(true);
 
   const handleAllowAndContinue = async () => {
@@ -40,12 +39,10 @@ export const PermissionsScreen: React.FC = () => {
     const denied: string[] = [];
     try {
       if (isLocationGranted && !(await requestLocationPermission())) denied.push('location');
-      const cameraAllowed = isCameraGranted ? await requestCameraPermission() : false;
-      if (isCameraGranted && !cameraAllowed) denied.push('camera');
       if (denied.length) {
         showToast(`Not allowed: ${denied.join(', ')}. You can change this in your browser settings.`);
       }
-      navigate(cameraAllowed ? 'scan-camera' : 'shop-home');
+      navigate('shop-home');
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +62,7 @@ export const PermissionsScreen: React.FC = () => {
               <span className="auth-spinner" aria-label="Asking for permissions" />
             ) : (
               <>
-                {isCameraGranted ? 'Allow Access & Start Skin Scan' : 'Save & Continue'}
+                Save & Continue
                 <ArrowRight aria-hidden="true" />
               </>
             )}
@@ -78,19 +75,12 @@ export const PermissionsScreen: React.FC = () => {
     >
       <h1 className="auth-title">Unlock Personalized Skincare</h1>
       <p className="auth-subtitle">
-        GlowVAI asks your browser for a few permissions so the AI skin check and delivery features work. Turn off any you
+        GlowVAI asks your browser for a few permissions so delivery features work. Turn off any you
         do not want.
       </p>
 
       <section className="auth-card">
         <h2 className="auth-card-title">Why We Ask for Permissions</h2>
-        <PermissionToggle
-          icon={<Camera />}
-          title="Camera Access"
-          benefit="Takes the photo for your AI skin check of hydration, acne and other skin signals."
-          checked={isCameraGranted}
-          onChange={setIsCameraGranted}
-        />
         <PermissionToggle
           icon={<MapPin />}
           title="Precise Location"
@@ -100,16 +90,6 @@ export const PermissionsScreen: React.FC = () => {
         />
       </section>
 
-      <section className="auth-privacy-card">
-        <Lock aria-hidden="true" />
-        <div>
-          <strong>Your skin photo</strong>
-          <p>
-            Your photo is sent securely to our server for analysis and is not shared. You can change these permissions any
-            time in your browser settings.
-          </p>
-        </div>
-      </section>
     </AuthShell>
   );
 };
