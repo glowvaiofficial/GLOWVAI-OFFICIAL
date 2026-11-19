@@ -9,6 +9,7 @@ import { useCustomerStore } from '../state/customerStore';
 import type { ShopOrder } from '../services/shopApi';
 import { collectOrderEvents, messageFor, type OrderEvent } from './orderEvents';
 import { readSeen, writeSeen } from './seenStorage';
+import { QUIET_MS, isFreshEventOrder } from './orderPopupGuards';
 import { useNotificationStore, type NotificationMessage } from './notificationStore';
 
 export const POLL_INTERVAL_MS = 60_000;
@@ -28,13 +29,17 @@ const toMessages = (events: OrderEvent[]): NotificationMessage[] => {
 // Records the statuses and raises messages for any change. The very first record for a customer is silent.
 // The first orders loaded for a customer in this page session only refresh the stored record. A status that changed
 // while the site was closed (an old cancellation, say) is never replayed as a dialog on a later visit.
-const processOrders = (uid: string, orders: ShopOrder[], baselined: Set<string>) => {
+const processOrders = (uid: string, orders: ShopOrder[], baselined: Set<string>, startedAt: number) => {
   const seen = readSeen(uid);
-  const announce = baselined.has(uid);
+  const quiet = Date.now() - startedAt < QUIET_MS;
+  const announce = baselined.has(uid) && !quiet;
   baselined.add(uid);
   const { events, next } = collectOrderEvents(orders, seen, announce);
   writeSeen(uid, next);
-  if (announce && seen && events.length > 0) useNotificationStore.getState().push(toMessages(events));
+  if (!announce || !seen || events.length === 0) return;
+  const createdById = new Map(orders.map((o) => [String((o as { orderId?: unknown }).orderId ?? ''), (o as { createdAt?: unknown }).createdAt] as const));
+  const fresh = events.filter((e) => isFreshEventOrder(createdById.get(e.orderId)));
+  if (fresh.length > 0) useNotificationStore.getState().push(toMessages(fresh));
 };
 
 // Starts watching. Returns a function that stops everything (used when the component unmounts).
@@ -44,6 +49,7 @@ export function startOrderNotifier(): () => void {
   let timer: number | null = null;
   let lastFetchAt = 0;
   const baselined = new Set<string>();
+  const startedAt = Date.now();
 
   const fetchIfDue = () => {
     if (stopped || !uid) return;
@@ -66,7 +72,7 @@ export function startOrderNotifier(): () => void {
   // Orders loaded by any screen are compared too, so a message is not missed when a screen refreshes first.
   const unsubscribeOrders = useCustomerStore.subscribe((state, previous) => {
     if (stopped || !uid || state.orders === previous.orders) return;
-    processOrders(uid, state.orders, baselined);
+    processOrders(uid, state.orders, baselined, startedAt);
   });
 
   const onVisibility = () => {
