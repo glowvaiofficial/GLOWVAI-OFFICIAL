@@ -1,0 +1,116 @@
+/* Website v7, location picker (19 Nov 2026): a real OpenStreetMap map with a centred pin, search, device location and the
+   address form. PC: map left, form right. Phone: map on top, the form as a sheet over its lower edge. */
+
+.glowvai-root {
+  --v7m-blue: #0057fb;
+  --v7m-ink: #0b1b3f;
+  --v7m-muted: #5b6784;
+  --v7m-line: #e3e9f5;
+  --v7m-tint: #eef3ff;
+  --v7m-danger: #b42318;
+  --v7m-ok: #0a7a4b;
+  --v7m-ok-bg: #eaf7f0;
+  --v7m-no-bg: #fdeeee;
+}
+
+.glowvai-root .v7-picker .v7-map-col { display: grid; gap: 12px; min-width: 0; align-content: start; }
+
+/* ---------- Search and results ---------- */
+.glowvai-root .v7-search { position: relative; display: grid; gap: 8px; }
+.glowvai-root .v7-note { margin: 0; color: var(--v7m-muted); font-size: 13px; font-weight: 500; }
+.glowvai-root .v7-note.is-error { color: var(--v7m-danger); }
+.glowvai-root .v7-results {
+  position: absolute; z-index: 6; top: calc(100% + 4px); left: 0; right: 0; margin: 0; padding: 4px; list-style: none;
+  max-height: 320px; overflow: auto; border: 1px solid var(--v7m-line); border-radius: 12px; background: #fff;
+  box-shadow: 0 12px 28px rgba(11, 27, 63, .14);
+}
+.glowvai-root .v7-results button {
+  display: flex; width: 100%; min-height: 48px; align-items: flex-start; gap: 10px; padding: 10px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--v7m-blue); text-align: left; cursor: pointer;
+}
+.glowvai-root .v7-results button:hover, .glowvai-root .v7-results button:focus-visible { background: var(--v7m-tint); }
+.glowvai-root .v7-results button > svg { flex: none; margin-top: 2px; }
+.glowvai-root .v7-results b { display: block; color: var(--v7m-ink); font-size: 14px; font-weight: 500; }
+.glowvai-root .v7-results small { display: block; margin-top: 2px; color: var(--v7m-muted); font-size: 12px; line-height: 1.35; }
+
+/* ---------- Map ---------- */
+.glowvai-root .v7-stage { position: relative; min-width: 0; }
+.glowvai-root .v7-map { width: 100%; }
+.glowvai-root .v7-map-frame {
+  position: relative; width: 100%; aspect-ratio: 4 / 3; min-height: 300px; max-height: 70dvh; overflow: hidden;
+  border: 1px solid var(--v7m-line); border-radius: 16px; background: #e9eef7; touch-action: none; cursor: grab;
+  user-select: none; -webkit-user-select: none;
+}
+.glowvai-root .v7-map-frame.is-dragging { cursor: grabbing; }
+.glowvai-root .v7-map-frame:focus-visible { outline: 2px solid var(--v7m-blue); outline-offset: 2px; }
+.glowvai-root .v7-map-tiles { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; pointer-events: none; }
+.glowvai-root .v7-map-tile { position: absolute; display: block; width: 256px; height: 256px; max-width: none; background: #e9eef7; }
+
+/* The tip of the pin sits exactly on the centre of the frame. */
+.glowvai-root .v7-map-pin { position: absolute; left: 50%; top: 50%; width: 36px; height: 50px; transform: translate(-50%, -100%); pointer-events: none; transition: opacity .2s ease; }
+.glowvai-root .v7-map-pin svg { display: block; filter: drop-shadow(0 2px 3px rgba(11, 27, 63, .3)); }
+.glowvai-root .v7-map-pin.is-idle { opacity: .75; }
+.glowvai-root .v7-map-pin-dot { position: absolute; left: 50%; bottom: -2px; width: 10px; height: 4px; margin-left: -5px; border-radius: 50%; background: rgba(11, 27, 63, .28); }
+.glowvai-root .v7-map-frame.is-dragging .v7-map-pin { transform: translate(-50%, calc(-100% - 6px)); }
+
+.glowvai-root .v7-map-zoom { position: absolute; right: 12px; top: 12px; display: grid; overflow: hidden; border: 1px solid var(--v7m-line); border-radius: 12px; background: #fff; box-shadow: 0 2px 8px rgba(11, 27, 63, .16); }
+.glowvai-root .v7-map-zoom button { display: grid; width: 44px; height: 44px; place-items: center; border: 0; background: #fff; color: var(--v7m-ink); cursor: pointer; }
+.glowvai-root .v7-map-zoom button + button { border-top: 1px solid var(--v7m-line); }
+.glowvai-root .v7-map-zoom button:hover:not(:disabled) { background: var(--v7m-tint); }
+.glowvai-root .v7-map-zoom button:active:not(:disabled) { transform: scale(.98); }
+.glowvai-root .v7-map-zoom button:focus-visible { outline: 2px solid var(--v7m-blue); outline-offset: -2px; }
+.glowvai-root .v7-map-zoom button:disabled { opacity: .4; cursor: default; }
+
+.glowvai-root .v7-map-attr { position: absolute; right: 0; bottom: 0; padding: 2px 6px; border-top-left-radius: 6px; background: rgba(255, 255, 255, .85); font-size: 11px; line-height: 1.4; }
+.glowvai-root .v7-map-attr a { color: var(--v7m-ink); text-decoration: none; }
+.glowvai-root .v7-map-attr a:hover { text-decoration: underline; }
+
+.glowvai-root .v7-locate {
+  position: absolute; left: 12px; bottom: 28px; display: inline-flex; min-height: 44px; align-items: center; gap: 8px; padding: 0 16px;
+  border: 1px solid var(--v7m-line); border-radius: 22px; background: #fff; color: var(--v7m-blue); font-size: 14px; font-weight: 500;
+  box-shadow: 0 2px 8px rgba(11, 27, 63, .16); cursor: pointer;
+}
+.glowvai-root .v7-locate:hover:not(:disabled) { background: var(--v7m-tint); }
+.glowvai-root .v7-locate:active:not(:disabled) { transform: scale(.98); }
+.glowvai-root .v7-locate:focus-visible { outline: 2px solid var(--v7m-blue); outline-offset: 2px; }
+.glowvai-root .v7-locate:disabled { opacity: .7; cursor: default; }
+
+.glowvai-root .v7-geo-note {
+  position: absolute; left: 12px; right: 68px; top: 12px; display: grid; gap: 8px; padding: 12px; border: 1px solid #f3c7c3; border-radius: 12px;
+  background: #fff; box-shadow: 0 4px 14px rgba(11, 27, 63, .16); line-height: 1.4;
+}
+.glowvai-root .v7-note-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.glowvai-root .v7-note-actions button { min-height: 44px; padding: 0 14px; border: 1px solid var(--v7m-line); border-radius: 8px; background: #fff; color: var(--v7m-blue); font-size: 13px; font-weight: 500; cursor: pointer; }
+.glowvai-root .v7-note-actions button:hover { background: var(--v7m-tint); }
+.glowvai-root .v7-note-actions button:focus-visible { outline: 2px solid var(--v7m-blue); outline-offset: 2px; }
+
+/* ---------- Form ---------- */
+.glowvai-root .v7-coords { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--v7m-muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.glowvai-root .v7-hint { display: block; margin-top: 4px; color: var(--v7m-muted); font-size: 12px; font-style: normal; }
+.glowvai-root .v7-serve { margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; line-height: 1.4; }
+.glowvai-root .v7-serve.is-ok { background: var(--v7m-ok-bg); color: var(--v7m-ok); }
+.glowvai-root .v7-serve.is-no { background: var(--v7m-no-bg); color: var(--v7m-danger); }
+
+/* ---------- Phone: the form is a sheet that overlaps the lower edge of the map ---------- */
+@media (max-width: 1023px) {
+  .glowvai-root .v7-picker .commerce-split { gap: 0; }
+  .glowvai-root .v7-picker .v7-map-frame { aspect-ratio: 1 / 1; min-height: 280px; max-height: 52dvh; border-radius: 16px; }
+  .glowvai-root .v7-picker .commerce-aside { position: relative; z-index: 2; margin-top: -20px; }
+  .glowvai-root .v7-picker .commerce-aside > .commerce-card { border-radius: 20px 20px 12px 12px; box-shadow: 0 -6px 20px rgba(11, 27, 63, .1); }
+  .glowvai-root .v7-picker .v7-locate { bottom: 36px; }
+  .glowvai-root .v7-picker .v7-map-attr { bottom: 20px; }
+}
+@media (max-width: 420px) {
+  .glowvai-root .v7-picker .v7-geo-note { right: 12px; top: 64px; }
+}
+
+/* ---------- PC: a split, large map left, form right ---------- */
+@media (min-width: 1024px) {
+  .glowvai-root .app-viewport .commerce-location-picker .commerce-split { grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr); gap: 24px; }
+  .glowvai-root .app-viewport .commerce-location-picker .v7-map-frame { aspect-ratio: 4 / 3; min-height: 420px; max-height: 68dvh; }
+  .glowvai-root .app-viewport .commerce-location-picker .commerce-aside { position: sticky; top: 88px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowvai-root .v7-map-pin { transition: none; }
+}
