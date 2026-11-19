@@ -15,6 +15,7 @@ import { itemsLabel, useShellCart } from '../../../components/common/useShellCar
 import { isActiveOrder } from '../../orders/orderUtils';
 import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
+import { HomeFacts } from '../shared/HomeFacts';
 import { SearchHint } from '../shared/SearchHint';
 import { VoiceSearchButton } from '../shared/VoiceSearchButton';
 import { MiniBannersPlaceholder, OffersStripPlaceholder, FlashDealsPlaceholder, BrandStripPlaceholder, TrustBlockPlaceholder, HelpGiftPlaceholder } from '../shared/HomePlaceholders';
@@ -666,10 +667,14 @@ function HeroCarousel({ slides, previewing }: { slides: Slide[]; previewing: boo
 
 // A category tile: a pastel square in the category's accent with its product photo (or icon), the name below.
 function DeskCategoryTile({ label, accent, photo, Icon, count, onOpen }: { label: string; accent: string; photo: string | null; Icon: LucideIcon; count: string | null; onOpen: () => void }) {
+  // A picture that fails to load falls back to the tile's icon, never a broken-image box.
+  const [failed, setFailed] = useState(false);
+  const showPhoto = Boolean(photo) && !failed;
   return (
-    <button type="button" className={`shop-desk-cat${photo ? '' : ' is-brand'}`} onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
-      <span className="shop-desk-cat-media">{photo ? <img src={photo} alt="" width={400} height={400} loading="lazy" decoding="async" /> : <span className="shop-desk-cat-ico" aria-hidden="true"><Icon size={32} /></span>}</span>
+    <button type="button" className={`shop-desk-cat${showPhoto ? '' : ' is-brand'}`} onClick={onOpen} aria-label={count ? `${label}, ${count}` : label} style={accentStyle(accent)}>
+      <span className="shop-desk-cat-media">{showPhoto ? <img src={photo ?? undefined} alt="" width={400} height={400} loading="lazy" decoding="async" ref={(el) => { if (el && el.complete && el.naturalWidth === 0) setFailed(true); }} onError={() => setFailed(true)} /> : <span className="shop-desk-cat-ico" aria-hidden="true"><Icon size={32} /></span>}</span>
       <strong>{label}</strong>
+      {count && <small className="gv7-cat-count">{count}</small>}
     </button>
   );
 }
@@ -972,31 +977,28 @@ export const ShopDesktopHome: React.FC = () => {
           <>
             <div className="shop-desk-hero-row">
               <HeroCarousel slides={slides} previewing={previewing} />
-              <aside className="shop-desk-side" aria-label="Quick offers">
-                <button type="button" className="shop-desk-side-tile is-scan" onClick={() => navigate('scan-camera')}>
-                  <span className="shop-desk-side-kicker">
-                    <ScanFace size={14} aria-hidden="true" />
-                    Face scan
-                  </span>
-                  <strong>Find the routine that fits your skin</strong>
-                  <span className="shop-desk-side-go">
-                    Start skin check
-                    <ArrowRight size={14} aria-hidden="true" />
-                  </span>
+              <aside className="shop-desk-side gv7-story" aria-label="Free skin scan">
+                <span className="gv7-story-kicker">
+                  <ScanFace size={14} aria-hidden="true" />
+                  Free skin scan
+                </span>
+                <strong className="gv7-story-title">Find the routine that fits your skin</strong>
+                <ol className="gv7-story-steps">
+                  <li><b>1</b>Scan one clear photo</li>
+                  <li><b>2</b>Get products matched to your skin</li>
+                  <li><b>3</b>{deliveryEta ? `Delivered in ~${deliveryEta} mins` : 'Delivered to your door'}</li>
+                </ol>
+                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-camera')}>
+                  Start free skin scan
+                  <ArrowRight size={16} aria-hidden="true" />
                 </button>
-                <button type="button" className="shop-desk-side-tile" onClick={() => navigate('cart-tab')}>
-                  <span className="shop-desk-side-kicker">
-                    <Ticket size={14} aria-hidden="true" />
-                    Coupon
-                  </span>
-                  <strong>Flat ₹{COUPON_VALUES.GLOW50} off with GLOW50</strong>
-                  <span className="shop-desk-side-go">
-                    Apply in your cart
-                    <ArrowRight size={14} aria-hidden="true" />
-                  </span>
+                <button type="button" className="gv7-story-alt" onClick={() => navigate('shop-browse')}>
+                  or shop all products
                 </button>
               </aside>
             </div>
+            {!(blockSettings['trust']?.items.length) && !layout.preview && <HomeFacts variant="desk" deliveryEta={deliveryEta} onReturns={() => navigate('profile-support')} />}
+            <SkinQuizBanner />
             {!failed && tab === 'for-you' && (loading ? <DeskSkeletonRail title="Deals of the day" /> : todayDeals.length > 0 ? <DeskProductRail icon={Zap} title="Deals of the day" titleId="shop-desk-today-title" accent={secAccent('deals')} products={todayDeals} /> : null)}
           </>
         );
@@ -1015,7 +1017,7 @@ export const ShopDesktopHome: React.FC = () => {
         return (
           <section className="shop-desk-section is-tight" aria-label="Shop by category" style={accentStyle(secAccent('categories'))}>
             <SectionHead title={blockSettings['categories']?.title || 'Shop by category'} action={<SeeAll label="All categories" onClick={() => navigate('shop-browse')} name="categories" />} />
-            <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(adminCategories.length > 0 ? adminCategories.length : visibleCategories.length + 2 + (bestsellers.length > 0 ? 1 : 0) + (newLaunches.length > 0 ? 1 : 0) + (dealProducts.length > 0 ? 1 : 0), CATEGORY_ROW_MAX) } as React.CSSProperties}>
+            <div className="shop-desk-cats" aria-busy={loading} style={{ '--cat-cols': balancedColumns(adminCategories.length > 0 ? adminCategories.length : visibleCategories.length + 1 + (bestsellers.length > 0 ? 1 : 0) + (newLaunches.length > 0 ? 1 : 0) + (dealProducts.length > 0 ? 1 : 0), CATEGORY_ROW_MAX) } as React.CSSProperties}>
               {adminCategories.length > 0 ? (
                 adminCategories.map((item, i) => <DeskCategoryTile key={`${i}-${item.label}`} label={item.label} accent={restAccent(itemAccent(item), i)} photo={item.image || null} Icon={Sparkles} count={item.sub || null} onOpen={() => openLink(item.link)} />)
               ) : (
@@ -1024,10 +1026,9 @@ export const ShopDesktopHome: React.FC = () => {
                     const tile = tiles.find((t) => t.id === categoryId) ?? null;
                     return <DeskCategoryTile key={categoryId} label={label} accent={restAccent(null, i)} photo={tilePhoto(tile)} Icon={CATEGORY_ICON[categoryId] ?? Sparkles} count={countLabel(loading, failed, tile?.count ?? 0)} onOpen={() => navigate('shop-category', { categoryId })} />;
                   })}
-                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null, 5)} photo={extraTiles.best ? getProductThumbUrl(extraTiles.best, 400) : null} Icon={Star} count={null} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
-                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null, 6)} photo={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 400) : null} Icon={PackagePlus} count={null} onOpen={() => jumpTo('shop-desk-new-title')} />}
-                  {dealProducts.length > 0 && <DeskCategoryTile label="Top deals" accent={restAccent(null, 3)} photo={getProductThumbUrl(dealProducts[0], 400)} Icon={Zap} count={null} onOpen={() => jumpTo('shop-desk-deals-title')} />}
-                  <DeskCategoryTile label="Skin scan" accent={restAccent(null, 4)} photo={null} Icon={ScanFace} count={null} onOpen={() => navigate('scan-camera')} />
+                  {bestsellers.length > 0 && <DeskCategoryTile label="Best sellers" accent={restAccent(null, 5)} photo={extraTiles.best ? getProductThumbUrl(extraTiles.best, 400) : null} Icon={Star} count={countLabel(loading, failed, bestsellers.length)} onOpen={() => jumpTo('shop-desk-bestsellers-title')} />}
+                  {newLaunches.length > 0 && <DeskCategoryTile label="New launches" accent={restAccent(null, 6)} photo={extraTiles.fresh ? getProductThumbUrl(extraTiles.fresh, 400) : null} Icon={PackagePlus} count={countLabel(loading, failed, newLaunches.length)} onOpen={() => jumpTo('shop-desk-new-title')} />}
+                  {dealProducts.length > 0 && <DeskCategoryTile label="Top deals" accent={restAccent(null, 3)} photo={getProductThumbUrl(dealProducts[0], 400)} Icon={Zap} count={countLabel(loading, failed, dealProducts.length)} onOpen={() => jumpTo('shop-desk-deals-title')} />}
                   <DeskCategoryTile label="All Products" accent={restAccent(null, 1)} photo={extraTiles.all ? getProductThumbUrl(extraTiles.all, 400) : null} Icon={Boxes} count={countLabel(loading, failed, catalog.length)} onOpen={() => navigate('shop-browse')} />
                 </>
               )}
@@ -1081,10 +1082,11 @@ export const ShopDesktopHome: React.FC = () => {
             </DeskRail>
           );
         }
+        const bestSaving = dealProducts.reduce((m, p) => Math.max(m, getDiscountPercent(p)), 0);
         if (failed) return <FlashDealsPlaceholder />;
         if (loading) return <DeskSkeletonRail title={dealsTitle} accent={accent} />;
         return dealProducts.length > 0 ? (
-          <DeskRail icon={Zap} title={dealsTitle} titleId="shop-desk-deals-title" sub={adminDeals.length > 0 ? 'Picked by GlowVAI' : 'Priced below their listed MRP'} accent={accent} onSeeAll={() => navigate('shop-browse')}>
+          <DeskRail icon={Zap} title={dealsTitle} titleId="shop-desk-deals-title" sub={adminDeals.length > 0 ? 'Picked by GlowVAI' : bestSaving > 0 ? `Priced below MRP, up to ${bestSaving}% off` : 'Priced below their listed MRP'} accent={accent} onSeeAll={() => navigate('shop-browse')}>
             {dealProducts.map((product) => (
               <div key={product.id} className="shop-desk-rail-item">
                 <DeskProductCard product={product} />
@@ -1169,7 +1171,7 @@ export const ShopDesktopHome: React.FC = () => {
       case 'brands':
         return liveBlock('brands', 'tiles', 'Top brands', 'Top brands', Gem) ?? (layout.preview || catalogBrands.length === 0 ? <BrandStripPlaceholder settings={blockSettings['brands']} /> : brandStrip);
       case 'trust':
-        return liveBlock('trust', 'promises', '', 'Why shop with us', ShieldCheck) ?? (layout.preview ? <TrustBlockPlaceholder settings={blockSettings['trust']} /> : trustStrip);
+        return liveBlock('trust', 'promises', '', 'Why shop with us', ShieldCheck) ?? (layout.preview ? <TrustBlockPlaceholder settings={blockSettings['trust']} /> : null);
       case 'help-gift': {
         const settings = blockSettings['help-gift'];
         return settings && settings.items.length > 0 ? <DeskHelpGift settings={settings} accent={secAccent('help-gift')} /> : <HelpGiftPlaceholder settings={settings} />;
@@ -1275,40 +1277,6 @@ export const ShopDesktopHome: React.FC = () => {
       </div>
     </section>
   );
-  // Facts only: the delivery rule, the coupon, the delivery time of the chosen address and the scan's own limits.
-  const trustStrip = (
-    <section className="shop-desk-trust" aria-label="Why shop with GlowVAI">
-      <div>
-        <Truck size={22} aria-hidden="true" />
-        <span>
-          <strong>Free delivery</strong>
-          <small>On orders above ₹{FREE_DELIVERY_ABOVE}</small>
-        </span>
-      </div>
-      <div>
-        <Clock size={22} aria-hidden="true" />
-        <span>
-          <strong>{deliveryEta ? `Delivery in ${deliveryEta} mins` : 'Delivery to your door'}</strong>
-          <small>{deliveryEta ? 'To your selected address' : 'Set your location for the time'}</small>
-        </span>
-      </div>
-      <div>
-        <BadgePercent size={22} aria-hidden="true" />
-        <span>
-          <strong>Flat ₹{COUPON_VALUES.GLOW50} off</strong>
-          <small>Use code GLOW50 in your cart</small>
-        </span>
-      </div>
-      <div>
-        <ShieldCheck size={22} aria-hidden="true" />
-        <span>
-          <strong>Private skin check</strong>
-          <small>A cosmetic check, not a diagnosis</small>
-        </span>
-      </div>
-    </section>
-  );
-
   const scanCard = (
   <section className="shop-desk-scan" aria-labelledby="shop-desk-scan-title" style={accentStyle(secAccent('scan'))}>
     <div className="shop-desk-scan-copy">
@@ -1328,7 +1296,7 @@ export const ShopDesktopHome: React.FC = () => {
         <span>{SCAN_PRIVACY}</span>
       </p>
       <button type="button" className="shop-desk-btn-primary" onClick={() => navigate('scan-camera')}>
-        Start skin check
+        Start free skin scan
         <ArrowRight size={16} aria-hidden="true" />
       </button>
     </div>
@@ -1483,7 +1451,6 @@ export const ShopDesktopHome: React.FC = () => {
               </button>
             )}
           </section>
-          <SkinQuizBanner />
           {tab !== 'for-you' && (
             <div className="shop-desk-spotlight">
               {spotlight.length > 0 ? (

@@ -8,6 +8,7 @@ import { useInbox } from '../../../core/notifications/inboxStore';
 import { siteConfig } from '../../../../config/site';
 import { BrandLogo } from '../../../shared/BrandLogo';
 import { SkinQuizBanner } from '../shared/SkinQuizBanner';
+import { HomeFacts } from '../shared/HomeFacts';
 import { ITEM_BLOCK_IDS, useHomeDevice, useHomeLayout, type BlockItem, type BlockSettings, type HeroOverride, type HomeBlockId, type ItemBlockId } from '../lib/useHomeLayout';
 import { NewItemBlock } from '../shared/NewBlocks';
 import { DesignerStyleProvider, StyledBlock } from '../shared/DesignerStyle';
@@ -79,7 +80,7 @@ type ShopHomeScreenProps = { embedded?: boolean };
 // Content, pictures, on/off and accents come from the admin layout; empty admin slots show nothing (placeholders only in
 // a staff preview), as before.
 export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false }) => {
-  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, footer: footerDetails, header: headerSettings, styles: designerStyles, look: designerLook, heroVideo } = useHomeLayout('mobile');
+  const { order: layoutOrder, settings: blockSettings, rows: layoutRows, hero: heroOverride, preview: previewMode, footer: footerDetails, header: headerSettings, styles: designerStyles, look: designerLook, heroVideo } = useHomeLayout('mobile');
   const { catalog, feed, loading, failed, noProducts, tiles, todayDeals, extraTiles, recentIds, skinState, bestsellers, newLaunches, picks, pricePoints, recentProducts, configuredRows, adminDeals, dealProducts } = useHomeData({ settings: blockSettings, rows: layoutRows });
   // The category tiles the admin published. None published means the built-in tiles.
   const adminCategories = blockSettings['categories']?.items ?? [];
@@ -157,6 +158,24 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
         return (
           <>
             <HeroCarousel hero={heroOverride as (HeroOverride & Accented) | null} deliveryEta={deliveryEta} accent={(heroOverride as (HeroOverride & Accented) | null)?.accent || accentOf('hero')} />
+            <section className="gv7-pstory" aria-labelledby="gv7-pstory-title">
+              <span className="gv7-story-kicker">
+                <ScanFace size={13} aria-hidden="true" />
+                Free skin scan
+              </span>
+              <h2 id="gv7-pstory-title">Find the routine that fits your skin</h2>
+              <p>Scan one clear photo, get products matched to your skin, delivered{deliveryEta ? ` in ~${deliveryEta} mins` : ' to your door'}.</p>
+              <div className="gv7-pstory-actions">
+                <button type="button" className="gv7-story-cta" onClick={() => navigate('scan-camera')}>
+                  Start free skin scan
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
+                <button type="button" className="gv7-story-alt" onClick={() => navigate('shop-browse')}>
+                  Shop all
+                </button>
+              </div>
+            </section>
+            {!hasItems('trust') && <HomeFacts variant="phone" deliveryEta={deliveryEta} onReturns={() => navigate('profile-support')} />}
             {!failed && !tab.concern && (loading ? <SkeletonRow title="Deals of the day" /> : <ProductRow id="gvh-today-title" title="Deals of the day" sub="Biggest savings today" products={todayDeals} accent={accentOf('deals')} icon={<Zap size={18} aria-hidden="true" className="gvh-zap" fill="currentColor" />} onSeeAll={() => navigate('shop-browse')} />)}
           </>
         );
@@ -203,7 +222,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
       case 'deals':
         return (
           <>
-            {!failed && (
+            {!failed && (loading || dealProducts.length > 0 || previewMode) && (
               <section className="gvh-section" aria-labelledby="shop-home-deals-title">
                 <SectionHead
                   id="shop-home-deals-title"
@@ -227,9 +246,10 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
                   </div>
                 ) : dealProducts.length > 0 ? (
                   <CardRail products={dealProducts} />
-                ) : (
+                ) : previewMode ? (
+                  // Staff preview only: say why the section is empty. Customers never see an empty deals section.
                   <p className="gvh-empty">No discounted products right now.</p>
-                )}
+                ) : null}
               </section>
             )}
             <FlashSaleRows sales={sales} catalog={catalog} now={now} accent={accentOf('deals')} />
@@ -378,7 +398,7 @@ export const ShopMobileHome: React.FC<ShopHomeScreenProps> = ({ embedded = false
     </p>
     <p className="shop-home-scan-note">This is a cosmetic check. It is not a medical diagnosis or a clinical test.</p>
     <button type="button" className="shop-home-scan-btn" onClick={() => navigate('scan-camera')}>
-      Start skin check
+      Start free skin scan
       <ArrowRight size={16} />
     </button>
   </section>
