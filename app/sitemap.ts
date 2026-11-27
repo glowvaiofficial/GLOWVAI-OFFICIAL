@@ -54,12 +54,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...(journalArticles.filter((a) => a.status === "published").length >= 3
       ? [{ url: `${SITE_URL}/journal`, lastModified: sourceDate("app/journal/page.tsx"), changeFrequency: "weekly" as const, priority: 0.8 }]
       : []),
-    {
-      url: `${SITE_URL}/journal/how-to-read-a-skincare-label`,
-      lastModified: sourceDate("config/journal.ts"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+    ...journalArticles
+      .filter((a) => a.status === "published")
+      .map((a) => ({
+        url: `${SITE_URL}/journal/${a.slug}`,
+        lastModified: new Date(a.dateModified),
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      })),
   ];
 
   const productRoutes: MetadataRoute.Sitemap = getProducts().map((product) => ({

@@ -1,17 +1,16 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+import { JournalCover } from "@/components/journal/JournalCover";
 import { SITE_URL } from "@/lib/site-url";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildWebPageSchema } from "@/lib/seo/schema/webpage";
 import { journalArticles } from "@/config/journal";
 import { Section, Eyebrow, SectionTitle, focusRing } from "@/components/home/shared";
-import { getAssetPath } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Skincare Basics & Routine Guides",
-  description: "Plain-language skincare guides on ingredients, routines, and skin health from the GLOW VAI team in India.",
+  description: "Plain-language skincare guides from the GLOW VAI team in India: product safety, fake and unsafe creams, sunscreen, pimples and how to read a label.",
   robots: {
     index: journalArticles.filter((a) => a.status === "published").length >= 3,
     follow: true,
@@ -22,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "GLOW VAI skincare" }],
     title: "GLOW VAI Journal | Skincare Basics & Routine Guides",
-    description: "Plain-language skincare guides on ingredients, routines, and skin health from the GLOW VAI team in India.",
+    description: "Plain-language skincare guides from the GLOW VAI team in India: product safety, fake and unsafe creams, sunscreen, pimples and how to read a label.",
     url: `${SITE_URL}/journal`,
   },
 };
@@ -36,7 +35,7 @@ export default function JournalPage() {
     ...buildWebPageSchema(
       "/journal",
       "GLOW VAI Journal | Skincare Basics & Routine Guides",
-      "Plain-language skincare guides on ingredients, routines, and skin health from the GLOW VAI team in India."
+      "Plain-language skincare guides from the GLOW VAI team in India: product safety, fake and unsafe creams, sunscreen, pimples and how to read a label."
     ),
   };
 
@@ -64,13 +63,7 @@ export default function JournalPage() {
           {publishedArticles.map((article) => (
             <li key={article.id} className="py-8 grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-6 items-center">
               <div className="lg:col-span-4 relative aspect-[16/10] w-full rounded-[16px] overflow-hidden bg-paper-deep border border-ink/15 shadow-2xs">
-                <Image
-                  src={getAssetPath(article.imageSlot || "/images/hero/skincare-studio-hero.jpg")}
-                  alt={article.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 400px"
-                  className="object-cover"
-                />
+                <JournalCover article={article} sizes="(max-width: 1024px) 100vw, 400px" />
               </div>
               <div className="lg:col-span-8">
                 <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.12em] text-brand mb-2">
