@@ -1,3 +1,11 @@
+import { fairnessCreamsMercury } from "./journal-posts/fairness-creams-mercury-kidney-damage";
+import { spotFakeCosmetics } from "./journal-posts/how-to-spot-fake-cosmetics-india";
+import { steroidCreams } from "./journal-posts/steroid-creams-sold-as-fairness-or-pimple-creams";
+import { sunscreenGuide } from "./journal-posts/sunscreen-india-how-much-how-often";
+import { patchTestGuide } from "./journal-posts/how-to-patch-test-a-skincare-product";
+import { pimplesGuide } from "./journal-posts/pimples-home-care-or-dermatologist";
+import { faceScanHonest } from "./journal-posts/what-a-face-scan-can-and-cannot-tell-you";
+
 export interface JournalArticle {
   id: string;
   slug: string;
@@ -17,16 +25,27 @@ export interface JournalArticle {
   summary: string;
   sections: {
     heading: string;
+    /** Plain text. [words](https://...) makes a link; a link that starts with / stays on this site. */
     paragraphs: string[];
     listItems?: string[];
     table?: {
       headers: string[];
       rows: string[][];
     };
+    /** A picture inside the section. Only use images the site owns or may use. */
+    figure?: { src: string; alt: string; caption: string };
   }[];
+  /** Where the facts come from. Shown at the end of the article. */
+  sources?: { label: string; url: string; note?: string }[];
+  /** Short questions people search for. Also written into the page as FAQ data for search engines. */
+  faq?: { q: string; a: string }[];
+  /** Slugs of other articles to suggest at the end. */
+  related?: string[];
+  /** Search words this article is about (shown in the page data only). */
+  keywords?: string[];
 }
 
-export const journalArticles: JournalArticle[] = [
+const labelGuide: JournalArticle[] = [
   {
     id: "how-to-read-a-skincare-label",
     slug: "how-to-read-a-skincare-label",
@@ -107,45 +126,24 @@ export const journalArticles: JournalArticle[] = [
           "Check fragrance: If you have sensitive skin, opt for fragrance-free formulations.",
           "Check alcohols: Fatty alcohols like cetyl alcohol are nourishing; denatured alcohol can feel drying on stripped barriers.",
           "Review batch and expiry dates: Look for the open jar symbol showing how many months the product remains stable after unsealing.",
-          "Always patch test: Apply a drop behind your ear or inner arm 24 hours prior to full-face use.",
+          "Patch test first: put a small amount on your inner arm and watch it for 7 to 10 days before using it on your face. See our [patch test guide](/journal/how-to-patch-test-a-skincare-product).",
         ],
       },
     ],
   },
-  {
-    id: "the-4-step-routine",
-    slug: "the-4-step-routine",
-    title: "The 4-Step Routine: Wash, Treat, Moisturise, Protect",
-    description: "A straightforward daily routine framework for Indian weather without unnecessary extra steps.",
-    category: "Daily Routines",
-    readTime: "5 min read",
-    excerpt: "You do not need a ten-step vanity shelf. Cleanse, treat, hydrate, and apply SPF is all an effective skincare regimen requires.",
-    author: {
-      name: "SK Sardar Musthafa",
-      role: "Founder, GLOW VAI",
-    },
-    datePublished: "2026-10-18",
-    dateModified: "2026-10-18",
-    status: "draft",
-    summary: "A practical guide to building an essential morning and evening routine suited for warm Indian climates.",
-    sections: [],
-  },
-  {
-    id: "sunscreen-mistakes-in-india",
-    slug: "sunscreen-mistakes-in-india",
-    title: "Sunscreen in India: Common Mistakes and Easy Fixes",
-    description: "How to choose between fluid and gel sunscreens for humid summers and high UV exposure.",
-    category: "Sun Protection",
-    readTime: "5 min read",
-    excerpt: "Sweat and humidity break down heavy sunscreens quickly. Here is how lightweight broad-spectrum filters keep you protected without clogged pores.",
-    author: {
-      name: "SK Sardar Musthafa",
-      role: "Founder, GLOW VAI",
-    },
-    datePublished: "2026-10-25",
-    dateModified: "2026-10-25",
-    status: "draft",
-    summary: "Clear rules on sunscreen quantity, reapplication frequency, and texture matching for South Indian weather.",
-    sections: [],
-  },
 ];
+
+
+/** Newest first on the journal page: the order here is the order shown. */
+export const journalArticles: JournalArticle[] = [
+  fairnessCreamsMercury,
+  spotFakeCosmetics,
+  steroidCreams,
+  sunscreenGuide,
+  patchTestGuide,
+  pimplesGuide,
+  faceScanHonest,
+  ...labelGuide,
+];
+
+export const publishedJournalArticles = journalArticles.filter((a) => a.status === "published");
