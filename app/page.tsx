@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { PhoneDemo } from "@/components/home/PhoneDemo";
+import { TaglineReveal } from "@/components/home/TaglineReveal";
 import { Section } from "@/components/home/shared";
 import { WhatScanChecks } from "@/components/home/WhatScanChecks";
 import { ShopByConcernSection } from "@/components/home/ShopByConcernSection";
@@ -68,6 +69,7 @@ export default async function HomePage() {
         </div>
       </Section>
       <HowItWorks />
+      <TaglineReveal />
       <WhatScanChecks />
       <ShopByConcernSection />
       <FeaturedProducts />
