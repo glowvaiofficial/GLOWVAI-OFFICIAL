@@ -28,7 +28,7 @@ const FALLBACK = [
   { src: "/images/products/sunscreen-1.png", alt: "", cls: "left-[52%] top-[6%] w-[24%] z-10", delay: "-1s" },
 ];
 
-export function Hero3D() {
+export function Hero3D({ tone = "light" }: { tone?: "light" | "dark" }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"checking" | "static" | "3d">("checking");
   const [reduced, setReduced] = useState(false);
@@ -70,19 +70,21 @@ export function Hero3D() {
   }, []);
 
   return (
-    <div ref={wrap} aria-hidden="true" className="relative isolate w-full max-w-[560px] mx-auto aspect-[4/5] sm:aspect-square lg:aspect-[9/10] select-none">
-      {/* Soft light behind everything, always present */}
-      <div
-        className="absolute inset-[-6%] -z-10 rounded-full blur-3xl"
-        style={{ background: "radial-gradient(closest-side, rgba(20,71,230,0.30), rgba(124,245,200,0.22) 55%, rgba(255,255,255,0) 76%)" }}
-      />
+    <div ref={wrap} aria-hidden="true" className="relative isolate w-full max-w-[560px] mx-auto aspect-square select-none">
+      {/* Soft light behind everything (light tone only: the dark hero paints its own glow) */}
+      {tone === "light" ? (
+        <div
+          className="absolute inset-[-6%] -z-10 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(closest-side, rgba(20,71,230,0.30), rgba(124,245,200,0.22) 55%, rgba(255,255,255,0) 76%)" }}
+        />
+      ) : null}
 
       {/* Fallback: product photos floating in CSS. Fades out once the 3D scene has drawn its first frame. */}
       <div className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-0" : "opacity-100"}`}>
         {FALLBACK.map((p) => (
           <div
             key={p.src}
-            className={`absolute aspect-square ${p.cls} gv-float rounded-[22px] bg-white/70 ring-1 ring-ink/[0.06] shadow-card backdrop-blur-sm overflow-hidden`}
+            className={`absolute aspect-square ${p.cls} gv-float rounded-[22px] ${tone === "dark" ? "bg-white/12 ring-1 ring-white/25" : "bg-white/70 ring-1 ring-ink/[0.06]"} shadow-card backdrop-blur-sm overflow-hidden`}
             style={{ animationDelay: p.delay }}
           >
             <Image src={getAssetPath(p.src)} alt={p.alt} fill sizes="(max-width: 640px) 40vw, 200px" className="object-contain p-2" priority={p.src.includes("serum")} />
@@ -93,9 +95,9 @@ export function Hero3D() {
       {mode === "3d" && (
         <div
           className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
-          style={{ WebkitMaskImage: "radial-gradient(closest-side, #000 84%, transparent 100%)", maskImage: "radial-gradient(closest-side, #000 84%, transparent 100%)" }}
+          style={tone === "light" ? { WebkitMaskImage: "radial-gradient(closest-side, #000 84%, transparent 100%)", maskImage: "radial-gradient(closest-side, #000 84%, transparent 100%)" } : undefined}
         >
-          <Scene animate={!reduced} active={visible} onReady={() => setReady(true)} />
+          <Scene animate={!reduced} active={visible} tone={tone} onReady={() => setReady(true)} />
         </div>
       )}
     </div>

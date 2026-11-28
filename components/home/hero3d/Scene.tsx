@@ -279,11 +279,11 @@ function ScanRing({ animate }: { animate: boolean }) {
   return (
     <group ref={g} rotation={[Math.PI / 2, 0, 0]}>
       <mesh>
-        <torusGeometry args={[3.6, 0.02, 12, 180]} />
+        <torusGeometry args={[3.4, 0.02, 12, 180]} />
         <meshBasicMaterial color={MINT} transparent opacity={0.95} toneMapped={false} />
       </mesh>
       <mesh>
-        <torusGeometry args={[3.6, 0.1, 12, 180]} />
+        <torusGeometry args={[3.4, 0.1, 12, 180]} />
         <meshBasicMaterial color={MINT} transparent opacity={0.14} toneMapped={false} depthWrite={false} />
       </mesh>
     </group>
@@ -328,13 +328,13 @@ function World({ animate }: { animate: boolean }) {
   );
 }
 
-export default function Scene({ animate, active, onReady }: { animate: boolean; active: boolean; onReady?: () => void }) {
+export default function Scene({ animate, active, onReady, tone = "light" }: { animate: boolean; active: boolean; onReady?: () => void; tone?: "light" | "dark" }) {
   const small = typeof window !== "undefined" && window.innerWidth < 640;
   return (
     <Canvas
       frameloop={active ? "always" : "never"}
       dpr={[1, small ? 1.4 : 1.8]}
-      camera={{ position: [0, 0.6, 12.4], fov: 34 }}
+      camera={{ position: [0, 0.6, small ? 14 : 12.8], fov: 34 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ touchAction: "pan-y" }}
       onCreated={({ gl }) => {
@@ -349,7 +349,7 @@ export default function Scene({ animate, active, onReady }: { animate: boolean; 
       <directionalLight position={[4, 6, 5]} intensity={2.2} color="#ffffff" />
       <pointLight position={[-5, 2, -2]} intensity={40} color="#4d7bff" />
       <pointLight position={[4, -1, 3]} intensity={18} color={MINT} />
-      <Backdrop />
+      {tone === "light" ? <Backdrop /> : null}
       <World animate={animate} />
     </Canvas>
   );
