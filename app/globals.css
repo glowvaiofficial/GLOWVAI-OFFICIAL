@@ -328,3 +328,13 @@ html[data-gv-onboarding] .gv-consent-banner { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .gv-float { animation: none; }
 }
+
+/* Botanical linework: a slow sway from the base, like leaves in a breeze. */
+@keyframes gv-sway {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50% { transform: rotate(0.8deg); }
+}
+.gv-sway { transform-origin: 8% 100%; animation: gv-sway 14s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .gv-sway { animation: none; }
+}
