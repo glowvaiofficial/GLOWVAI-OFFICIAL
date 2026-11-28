@@ -203,12 +203,12 @@ function CatalogContent({ allProducts }: { allProducts: Product[] }) {
                             className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                           />
                           {discount > 0 && (
-                            <span className="absolute top-3 left-3 bg-white text-ink font-mono text-[11px] uppercase tracking-[0.1em] px-2 py-1 rounded-[6px]">
+                            <span className="absolute top-3 left-3 bg-white text-ink font-mono text-xs uppercase tracking-[0.1em] px-2 py-1 rounded-[6px]">
                               {discount}% off
                             </span>
                           )}
                         </div>
-                        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-ink-muted">
+                        <p className="mt-4 font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">
                           {prod.skinTypes.slice(0, 2).join(" · ")}
                         </p>
                         <h2 className="mt-1 font-display font-semibold text-lg leading-snug group-hover:underline underline-offset-4">{prod.name}</h2>

@@ -170,7 +170,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 className="object-cover"
               />
               {discount > 0 && (
-                <span className="absolute top-4 left-4 bg-white text-ink font-mono text-[11px] uppercase tracking-[0.1em] px-2.5 py-1 rounded-[6px]">
+                <span className="absolute top-4 left-4 bg-white text-ink font-mono text-xs uppercase tracking-[0.1em] px-2.5 py-1 rounded-[6px]">
                   {discount}% off
                 </span>
               )}

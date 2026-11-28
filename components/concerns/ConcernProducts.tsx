@@ -33,7 +33,7 @@ export function ConcernProducts({ products }: { products: Product[] }) {
             <div className="relative aspect-[4/5] rounded-[8px] overflow-hidden bg-paper">
               <Image src={getAssetPath(p.images[0] || "/images/hero/product.webp")} alt={p.name} fill sizes="(max-width: 1024px) 50vw, 25vw" className="object-cover" />
             </div>
-            <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-muted">{p.category}</p>
+            <p className="mt-3 font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">{p.category}</p>
             <h3 className="font-display font-semibold text-base leading-snug">{p.name}</h3>
           </Link>
           <p className="mt-1 text-[14px] text-ink-muted line-clamp-2">{p.tagline}</p>

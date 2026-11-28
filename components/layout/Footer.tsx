@@ -244,7 +244,7 @@ export function Footer() {
                     <ArrowRight className="w-3.5 h-3.5 text-ink-light group-hover:text-brand group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                   </div>
                   <p className="mt-1 text-xs text-ink-muted line-clamp-1">{d.desc}</p>
-                  <div className="mt-2.5 pt-2 border-t border-ink/10 flex items-center justify-between text-[11px] font-mono">
+                  <div className="mt-2.5 pt-2 border-t border-ink/10 flex items-center justify-between text-xs font-mono">
                     <span className="text-brand font-medium">Explore page &rarr;</span>
                     <span className="text-ink-light">{d.email}</span>
                   </div>

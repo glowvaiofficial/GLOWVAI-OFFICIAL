@@ -80,7 +80,7 @@ export default async function ConcernLandingPage({ params }: { params: Promise<{
                   <span>See {products.length} product{products.length === 1 ? "" : "s"}</span>
                   <ArrowRight className="w-5 h-5" aria-hidden="true" />
                 </ButtonLink>
-              <Link href="/face-analysis" className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+              <Link href="/face-analysis" className={`inline-flex min-h-11 items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
                 <ScanLine className="w-4 h-4" aria-hidden="true" />
                 Not sure? Take the free scan
               </Link>
@@ -123,7 +123,7 @@ export default async function ConcernLandingPage({ params }: { params: Promise<{
       <Section id="products" pad="tight" labelledBy="products-title">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
           <SectionTitle id="products-title">Products for {c.name.toLowerCase()}</SectionTitle>
-          <Link href={`/shop?concern=${c.key}`} className={`inline-flex items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+          <Link href={`/shop?concern=${c.key}`} className={`inline-flex min-h-11 items-center gap-2 font-medium underline underline-offset-[5px] decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
             Filter in the shop <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>

@@ -184,7 +184,7 @@ export default function PressPage() {
                   <p className="mt-1 text-xs text-ink-muted leading-relaxed">{asset.desc}</p>
                 </div>
                 <div className="mt-4 pt-3 border-t border-ink/10 flex items-center justify-between text-xs">
-                  <span className="font-mono text-[11px] text-ink-light">{asset.fileSize}</span>
+                  <span className="font-mono text-xs text-ink-light">{asset.fileSize}</span>
                   <a
                     href={getAssetPath(asset.preview)}
                     download

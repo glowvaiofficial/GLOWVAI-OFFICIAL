@@ -200,7 +200,7 @@ export default function CareersPage() {
                 <p className="text-sm text-ink-muted leading-relaxed">{r.summary}</p>
                 <div className="pt-2 flex flex-wrap gap-1.5">
                   {r.skills.map((s) => (
-                    <span key={s} className="font-mono text-[11px] px-2 py-0.5 rounded-[6px] bg-paper-deep text-ink-muted border border-ink/10">
+                    <span key={s} className="font-mono text-xs px-2 py-0.5 rounded-[6px] bg-paper-deep text-ink-muted border border-ink/10">
                       {s}
                     </span>
                   ))}

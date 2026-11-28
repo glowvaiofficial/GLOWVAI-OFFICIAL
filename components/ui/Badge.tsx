@@ -25,7 +25,7 @@ export function Badge({
   };
 
   const sizes = {
-    sm: "text-[11px] px-2.5 py-0.5 font-medium rounded-full",
+    sm: "text-xs px-2.5 py-0.5 font-medium rounded-full",
     md: "text-xs px-3 py-1 font-semibold rounded-full",
   };
 

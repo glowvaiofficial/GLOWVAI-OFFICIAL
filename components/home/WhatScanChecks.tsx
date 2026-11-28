@@ -76,7 +76,7 @@ export function WhatScanChecks() {
                         </div>
                         <div>
                           <span className="font-display font-semibold text-lg sm:text-xl text-ink block leading-tight">{m.title}</span>
-                          <span className="font-mono text-[11px] text-ink-light uppercase tracking-wider">Marker 0{i + 1}</span>
+                          <span className="font-mono text-xs text-ink-light uppercase tracking-wider">Marker 0{i + 1}</span>
                         </div>
                       </div>
                     </th>
