@@ -36,13 +36,13 @@ export function HowItWorks() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:items-start gap-6 lg:gap-9">
         {howSteps.map((step, idx) => {
           const img = stepImages[idx];
           return (
             <div
               key={step.title}
-              className="bg-white border border-ink/15 rounded-[20px] overflow-hidden flex flex-col group hover:border-brand/40 transition-colors shadow-2xs"
+              className={`bg-white/90 ring-1 ring-ink/[0.06] rounded-[28px] overflow-hidden flex flex-col group transition-all duration-300 hover:-translate-y-1 shadow-card hover:shadow-card-hover ${["", "md:mt-10", "md:mt-20"][idx] ?? ""}`}
             >
               <div className="relative aspect-[16/10] w-full bg-paper overflow-hidden border-b border-ink/10">
                 <Image
