@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorks } from "@/components/home/HowItWorks";
+import { PhoneDemo } from "@/components/home/PhoneDemo";
+import { Section } from "@/components/home/shared";
 import { WhatScanChecks } from "@/components/home/WhatScanChecks";
 import { ShopByConcernSection } from "@/components/home/ShopByConcernSection";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
@@ -59,6 +61,12 @@ export default async function HomePage() {
       <JsonLd data={homeGraph} />
       <HomeTracking />
       <HomeHero city={locationData.city} />
+      <Section tone="paper" pad="tight" labelledBy="demo-title">
+        <h2 id="demo-title" className="sr-only">See the scan flow</h2>
+        <div className="flex justify-center">
+          <PhoneDemo />
+        </div>
+      </Section>
       <HowItWorks />
       <WhatScanChecks />
       <ShopByConcernSection />
