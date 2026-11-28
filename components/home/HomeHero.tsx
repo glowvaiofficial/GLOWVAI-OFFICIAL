@@ -15,7 +15,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="bg-paper pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-8 lg:pb-8 lg:min-h-[calc(100svh-120px)] flex items-center overflow-hidden"
+      className="relative pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-12 lg:pb-16 lg:min-h-[min(calc(100svh-120px),820px)] flex items-center overflow-hidden"
     >
       <div className="w-full gv-page">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
@@ -104,7 +104,12 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative w-full max-w-[520px] mx-auto flex justify-center">
+            <div className="relative isolate w-full max-w-[520px] mx-auto flex justify-center">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+                style={{ background: "radial-gradient(closest-side, rgba(20,71,230,0.34), rgba(124,245,200,0.26) 55%, rgba(255,255,255,0) 75%)" }}
+              />
               <PhoneDemo />
             </div>
           </div>

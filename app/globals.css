@@ -26,6 +26,12 @@
 
   body {
     background-color: #F6F3EE !important;
+    /* Soft atmosphere instead of one flat colour: a blue wash from the top (as in the app), faint mint and blue glows lower down. */
+    background-image:
+      radial-gradient(1300px 640px at 50% -170px, rgba(20, 71, 230, 0.19), rgba(20, 71, 230, 0) 72%),
+      radial-gradient(820px 520px at 100% 12%, rgba(124, 245, 200, 0.2), rgba(124, 245, 200, 0) 70%),
+      radial-gradient(900px 560px at 0% 46%, rgba(20, 71, 230, 0.085), rgba(20, 71, 230, 0) 72%);
+    background-repeat: no-repeat;
     color: #12161F;
     font-size: 1.0625rem;
     line-height: 1.6;
@@ -289,4 +295,26 @@ html[data-gv-onboarding] .gv-consent-banner { display: none; }
 /* While the analytics bar is visible the page keeps clear of it, so it never rests on the last lines or buttons. */
 @media (max-width: 767px) {
   html[data-gv-consent-open] body { padding-bottom: calc(var(--gv-consent-h, 0px) + 96px); }
+}
+
+
+/* ------------------------------------------------------------------
+   Section tones (components/home/shared.tsx). Backgrounds only.
+   ------------------------------------------------------------------ */
+.gv-tone-paper {
+  background-color: transparent;
+}
+/* A soft pearl band that fades in and out, so sections flow into each other without hard edges. */
+.gv-tone-deep {
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(236, 231, 223, 0.86) 11%, rgba(236, 231, 223, 0.86) 89%, rgba(255, 255, 255, 0) 100%);
+}
+/* The closing call-to-action: deep brand blue with a faint mint glow. White text and white buttons sit on it. */
+.gv-tone-ink {
+  color: #ffffff;
+  background-color: #0B2F9E;
+  background-image:
+    radial-gradient(900px 420px at 88% 0%, rgba(124, 245, 200, 0.16), rgba(124, 245, 200, 0) 62%),
+    radial-gradient(700px 380px at 6% 100%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 66%),
+    linear-gradient(135deg, #1447E6 0%, #0B2F9E 58%, #0A1F66 100%);
 }
