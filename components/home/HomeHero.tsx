@@ -5,7 +5,7 @@ import { ArrowRight, ScanLine } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { PRIVACY_SHORT } from "@/config/privacy-copy";
 import { focusRing } from "./shared";
-import { PhoneDemo } from "./PhoneDemo";
+import { Hero3D } from "./hero3d/Hero3D";
 import { getAssetPath } from "@/lib/utils";
 
 // Alternate headlines kept ready (not rendered):
@@ -104,14 +104,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative isolate w-full max-w-[520px] mx-auto flex justify-center">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-                style={{ background: "radial-gradient(closest-side, rgba(20,71,230,0.34), rgba(124,245,200,0.26) 55%, rgba(255,255,255,0) 75%)" }}
-              />
-              <PhoneDemo />
-            </div>
+            <Hero3D />
           </div>
         </div>
       </div>

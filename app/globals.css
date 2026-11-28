@@ -318,3 +318,13 @@ html[data-gv-onboarding] .gv-consent-banner { display: none; }
     radial-gradient(700px 380px at 6% 100%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 66%),
     linear-gradient(135deg, #1447E6 0%, #0B2F9E 58%, #0A1F66 100%);
 }
+
+/* Hero fallback products (used until the 3D scene is ready, and where 3D cannot run): a slow CSS float. */
+@keyframes gv-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-12px) rotate(1deg); }
+}
+.gv-float { animation: gv-float 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .gv-float { animation: none; }
+}
