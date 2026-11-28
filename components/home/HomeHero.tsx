@@ -18,7 +18,13 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
       className="relative pt-10 pb-14 sm:pt-14 sm:pb-20 lg:pt-12 lg:pb-16 lg:min-h-[min(calc(100svh-120px),820px)] flex items-center overflow-hidden"
     >
       <div className="w-full gv-page">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div
+          className="relative isolate overflow-hidden rounded-[28px] sm:rounded-[36px] lg:rounded-[44px] border border-white/80 ring-1 ring-ink/[0.05] shadow-[0_40px_90px_-48px_rgba(20,71,230,0.45)] px-5 py-9 sm:px-10 sm:py-12 lg:px-9 lg:py-14"
+          style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(231,238,255,0.94) 46%, rgba(219,247,236,0.88) 100%)" }}
+        >
+          <div aria-hidden="true" className="pointer-events-none absolute -right-28 -top-28 -z-10 h-[460px] w-[460px] rounded-full blur-3xl" style={{ background: "radial-gradient(closest-side, rgba(20,71,230,0.20), rgba(20,71,230,0) 72%)" }} />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-24 -z-10 h-[420px] w-[420px] rounded-full blur-3xl" style={{ background: "radial-gradient(closest-side, rgba(124,245,200,0.30), rgba(124,245,200,0) 72%)" }} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-center">
           <div className="lg:col-span-7">
             <h1
               id="hero-title"
@@ -113,6 +119,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
               <PhoneDemo />
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

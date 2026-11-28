@@ -36,26 +36,24 @@ export function ShopByConcernSection() {
           </Link>
         </div>
 
-        <ul className="lg:col-span-8 border-t border-ink/20">
+        <ul className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
           {concernCards.map((c) => {
             const count = filterProducts({ concern: c.slug }).length;
             const img = concernImages[c.slug];
             return (
-              <li key={c.slug} className="relative border-b border-ink/20 group">
-                <div className="flex items-center justify-between gap-4 py-4 sm:py-5">
-                  <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-[14px] bg-paper-deep border border-ink/15 overflow-hidden group-hover:border-brand/50 transition-colors shadow-2xs">
-                      <Image
+              <li key={c.slug} className="relative group rounded-[26px] bg-white/85 ring-1 ring-ink/[0.06] shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover p-3.5 sm:p-4">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[18px] bg-paper-deep">
+                  <Image
                         src={getAssetPath(img?.src || "/images/face-scan/skin_grid.png")}
                         alt={img?.alt || c.title}
                         fill
-                        sizes="(max-width: 640px) 64px, 80px"
+                        sizes="(max-width: 640px) 100vw, 360px"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-display font-semibold text-[clamp(1.5rem,1.1rem+1.5vw,2.25rem)] leading-[1.1] tracking-[-0.02em] text-ink group-hover:text-brand transition-colors">
-                        <Link
+                </div>
+                <div className="px-1.5 pt-4 pb-1.5">
+                  <h3 className="font-display font-semibold text-[clamp(1.375rem,1.1rem+0.9vw,1.75rem)] leading-[1.1] tracking-[-0.02em] text-ink group-hover:text-brand transition-colors">
+                    <Link
                           href={concernPages.find((p) => p.key === c.slug) ? `/concerns/${concernPages.find((p) => p.key === c.slug)!.slug}` : `/shop?concern=${c.slug}`}
                           data-track="concern_card_click"
                           data-track-concern_slug={c.slug}
@@ -63,16 +61,10 @@ export function ShopByConcernSection() {
                         >
                           {c.title}
                         </Link>
-                      </h3>
-                      <p className="mt-1 text-ink-muted text-sm sm:text-base">{c.line}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 shrink-0 font-mono text-xs uppercase tracking-[0.12em] text-ink-light">
-                    {count > 0 && (
-                      <span className="hidden sm:inline">
-                        {count} {count === 1 ? "formula" : "formulas"}
-                      </span>
-                    )}
+                  </h3>
+                  <p className="mt-1.5 text-ink-muted text-[15px] leading-relaxed">{c.line}</p>
+                  <div className="mt-4 flex items-center justify-between font-mono text-xs uppercase tracking-[0.12em] text-ink-light">
+                    <span>{count > 0 ? `${count} ${count === 1 ? "formula" : "formulas"}` : ""}</span>
                     <ArrowRight className="w-5 h-5 text-ink group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                   </div>
                 </div>
