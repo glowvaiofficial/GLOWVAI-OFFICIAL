@@ -32,7 +32,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden text-white lg:min-h-[min(calc(100svh-120px),860px)] lg:flex lg:items-center"
+      className="relative isolate overflow-hidden text-white lg:min-h-[min(calc(100svh-44px),900px)] lg:flex lg:items-center"
       style={{ background: HERO_BG }}
     >
       {hasArt ? (
@@ -48,7 +48,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
         </div>
       )}
 
-      <div className="relative z-10 w-full gv-page py-10 sm:py-12 lg:py-12">
+      <div className="relative z-10 w-full gv-page pb-10 pt-10 sm:pb-12 sm:pt-12 lg:pb-12 lg:pt-[calc(76px+2rem)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
           <div className="lg:col-span-6">
             <h1

@@ -51,7 +51,7 @@ export function HeroSlides({ slides, interval = 7500 }: { slides: HeroSlide[]; i
   return (
     <div
       ref={root}
-      className="relative h-[46svh] min-h-[300px] overflow-hidden lg:absolute lg:inset-0 lg:h-auto lg:min-h-0"
+      className="relative h-[54svh] min-h-[340px] overflow-hidden lg:absolute lg:inset-0 lg:h-auto lg:min-h-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -82,6 +82,8 @@ export function HeroSlides({ slides, interval = 7500 }: { slides: HeroSlide[]; i
 
       {/* Shade for the words: from the left on wide screens, a fade into the page colour under the picture on phones */}
       <div aria-hidden="true" className="absolute inset-0 hidden lg:block" style={{ background: SHADE_DESKTOP }} />
+      {/* A soft shade along the top edge so the white navigation links stay readable over any picture */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#050C2B]/65 to-transparent" />
       <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 lg:hidden bg-gradient-to-t from-[#081C63] to-transparent" />
 
       {slides.length > 1 ? (
