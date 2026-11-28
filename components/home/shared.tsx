@@ -27,12 +27,12 @@ export function Section({
       aria-labelledby={labelledBy}
       className={cn(
         "scroll-mt-20",
-        pad === "tight" && "py-10 sm:py-12 lg:py-16",
-        pad === "md" && "py-14 sm:py-[72px] lg:py-24",
-        pad === "open" && "py-20 sm:py-28 lg:py-40",
-        tone === "paper" && "bg-paper",
-        tone === "deep" && "bg-paper-deep",
-        tone === "ink" && "bg-ink text-white",
+        pad === "tight" && "py-12 sm:py-16 lg:py-20",
+        pad === "md" && "py-16 sm:py-20 lg:py-28",
+        pad === "open" && "py-24 sm:py-32 lg:py-44",
+        tone === "paper" && "gv-tone-paper",
+        tone === "deep" && "gv-tone-deep",
+        tone === "ink" && "gv-tone-ink",
         className
       )}
     >

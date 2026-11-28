@@ -49,11 +49,13 @@ const config: Config = {
         '4xl': '24px',
       },
       boxShadow: {
-        card: "0 1px 2px rgba(10,27,77,.06)",
-        "card-hover": "0 8px 24px rgba(10,27,77,.10)",
-        glow: "0 8px 24px rgba(10,27,77,.10)",
-        "coral-glow": "0 8px 24px rgba(10,27,77,.10)",
-        phone: "0 24px 56px rgba(10,27,77,.18)",
+        "2xs": "0 1px 2px rgba(20,40,110,.06), 0 6px 16px -10px rgba(20,40,110,.14)",
+        xs: "0 1px 2px rgba(20,40,110,.06), 0 10px 24px -14px rgba(20,40,110,.16)",
+        card: "0 1px 2px rgba(20,40,110,.06), 0 12px 28px -16px rgba(20,40,110,.18)",
+        "card-hover": "0 2px 4px rgba(20,40,110,.06), 0 18px 40px -16px rgba(20,40,110,.24)",
+        glow: "0 8px 28px rgba(20,71,230,.14)",
+        "coral-glow": "0 8px 28px rgba(20,71,230,.14)",
+        phone: "0 28px 64px -12px rgba(10,27,77,.28), 0 8px 20px -8px rgba(20,71,230,.18)",
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
