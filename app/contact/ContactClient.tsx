@@ -85,7 +85,7 @@ export function ContactClient() {
                   <Mail className="w-5 h-5 text-brand shrink-0 mt-1" aria-hidden="true" />
                   <div>
                     <p className="font-semibold text-sm">Direct Support Email</p>
-                    <a href={`mailto:${siteConfig.supportEmail}`} className={`text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
+                    <a href={`mailto:${siteConfig.supportEmail}`} className={`inline-flex min-h-11 items-center text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}>
                       {siteConfig.supportEmail}
                     </a>
                     <p className="text-xs text-ink-light mt-0.5">Replies within 2 to 4 business hours</p>
@@ -101,7 +101,7 @@ export function ContactClient() {
                       href={`https://wa.me/${siteConfig.phone.replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
+                      className={`inline-flex min-h-11 items-center text-[16px] text-ink-muted underline underline-offset-4 decoration-ink/30 hover:decoration-ink rounded ${focusRing}`}
                     >
                       {siteConfig.phone}
                     </a>
@@ -118,13 +118,13 @@ export function ContactClient() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2 text-xs">
-              <Link href="/delivery" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+              <Link href="/delivery" className="inline-flex min-h-11 items-center px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
                 15-Min Delivery Info &rarr;
               </Link>
-              <Link href="/returns" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+              <Link href="/returns" className="inline-flex min-h-11 items-center px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
                 Returns & 14-Day Guarantee &rarr;
               </Link>
-              <Link href="/grievance" className="px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
+              <Link href="/grievance" className="inline-flex min-h-11 items-center px-3 py-1.5 rounded-[8px] bg-white border border-ink/15 text-ink hover:border-brand">
                 Grievance Officer &rarr;
               </Link>
             </div>

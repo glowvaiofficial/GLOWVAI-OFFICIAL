@@ -463,7 +463,7 @@ export function ReferralPortalClient() {
           <div className="bg-white p-6 sm:p-10 rounded-[24px] border border-ink/15 max-w-lg mx-auto space-y-6">
             <div className="flex items-center justify-between border-b border-ink/10 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-brand uppercase tracking-[0.1em] block">
                   Step {driverStep} of 3
                 </span>
                 <h2 className="font-display font-bold text-xl text-ink">Auto Driver Registration</h2>
@@ -615,7 +615,7 @@ export function ReferralPortalClient() {
                           onChange={(e) => handlePhotoSelect(e, setDSelfieFile, setDSelfiePreview)}
                         />
                         <Upload className="w-5 h-5 text-brand mb-1" />
-                        <span className="text-[11px] font-bold text-ink">
+                        <span className="text-xs font-bold text-ink">
                           {dSelfieFile ? "Selfie Attached" : "Driver Selfie"}
                         </span>
                       </label>
@@ -629,7 +629,7 @@ export function ReferralPortalClient() {
                           onChange={(e) => handlePhotoSelect(e, setDLicenseFile, setDLicensePreview)}
                         />
                         <Upload className="w-5 h-5 text-brand mb-1" />
-                        <span className="text-[11px] font-bold text-ink">
+                        <span className="text-xs font-bold text-ink">
                           {dLicenseFile ? "License Attached" : "License Photo"}
                         </span>
                       </label>
@@ -667,7 +667,7 @@ export function ReferralPortalClient() {
           <div className="bg-white p-6 sm:p-10 rounded-[24px] border border-ink/15 max-w-lg mx-auto space-y-6">
             <div className="flex items-center justify-between border-b border-ink/10 pb-4">
               <div>
-                <span className="text-[10px] font-bold text-brand uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-brand uppercase tracking-[0.1em] block">
                   Step {studentStep} of 3
                 </span>
                 <h2 className="font-display font-bold text-xl text-ink">Campus Ambassador Registration</h2>
@@ -829,7 +829,7 @@ export function ReferralPortalClient() {
                         onChange={(e) => handlePhotoSelect(e, setSIdFile, setSIdPreview)}
                       />
                       <Upload className="w-5 h-5 text-brand mb-1" />
-                      <span className="text-[11px] font-bold text-ink">
+                      <span className="text-xs font-bold text-ink">
                         {sIdFile ? "College ID Attached" : "Click to upload Student ID Card Photo"}
                       </span>
                     </label>
@@ -880,7 +880,7 @@ export function ReferralPortalClient() {
                 <span className="font-mono text-xs font-bold bg-ink text-white px-3 py-1 rounded-[10px]">
                   {partnerId}
                 </span>
-                <span className="text-[10px] font-semibold text-ink bg-paper-deep px-2 py-0.5 rounded-full flex items-center gap-1 mt-1">
+                <span className="text-xs font-semibold text-ink bg-paper-deep px-2 py-0.5 rounded-full flex items-center gap-1 mt-1">
                   <span className="w-2 h-2 rounded-full bg-brand" />
                   <span>LIVE ACTIVE</span>
                 </span>
@@ -890,43 +890,43 @@ export function ReferralPortalClient() {
             {/* 4 Metric Cards Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Referrals
                 </span>
                 <span className="font-display font-bold text-2xl text-ink block">
                   {metrics.count}
                 </span>
-                <span className="text-[10px] text-ink/60 block">Verified scans</span>
+                <span className="text-xs text-ink/60 block">Verified scans</span>
               </div>
 
               <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Total Earned
                 </span>
                 <span className="font-display font-bold text-2xl text-brand block">
                   ₹{metrics.earned}
                 </span>
-                <span className="text-[10px] text-ink/60 block">₹10 / referral</span>
+                <span className="text-xs text-ink/60 block">₹10 / referral</span>
               </div>
 
               <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Declined
                 </span>
                 <span className="font-display font-bold text-2xl text-coral block">
                   {metrics.declined}
                 </span>
-                <span className="text-[10px] text-ink/60 block">Duplicates</span>
+                <span className="text-xs text-ink/60 block">Duplicates</span>
               </div>
 
               <div className="bg-white p-4 rounded-[10px] border border-ink/10 space-y-1">
-                <span className="text-[10px] font-bold text-ink/60 uppercase tracking-[0.1em] block">
+                <span className="text-xs font-bold text-ink/60 uppercase tracking-[0.1em] block">
                   Payout Cycle
                 </span>
                 <span className="font-display font-bold text-2xl text-brand block">
                   {daysLeftInMonth()} days
                 </span>
-                <span className="text-[10px] text-ink/60 block">Settlement due</span>
+                <span className="text-xs text-ink/60 block">Settlement due</span>
               </div>
             </div>
 
@@ -946,7 +946,7 @@ export function ReferralPortalClient() {
                 />
               </div>
 
-              <div className="flex justify-between text-[11px] text-skymist font-bold">
+              <div className="flex justify-between text-xs text-skymist font-bold">
                 <span>{metrics.count} Referrals Completed</span>
                 <span>{Math.max(0, 100 - metrics.count)} remaining for ₹1,000 bonus</span>
               </div>
@@ -966,7 +966,7 @@ export function ReferralPortalClient() {
 
               {/* Copy Referral URL Input */}
               <div className="space-y-2 max-w-md mx-auto text-left">
-                <label className="block text-[11px] font-bold text-ink/60 uppercase tracking-[0.1em]">
+                <label className="block text-xs font-bold text-ink/60 uppercase tracking-[0.1em]">
                   Official Referral Link
                 </label>
                 <div className="flex items-center gap-2">

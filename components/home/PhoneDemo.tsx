@@ -77,10 +77,10 @@ function ScanScreen({ go }: ScreenProps) {
           <>
             <div className="flex items-end justify-between">
               <div>
-                <p className="inline-block rounded-full bg-ink/[0.06] px-2 py-0.5 text-[11px] font-semibold text-ink-muted">Example result</p>
+                <p className="inline-block rounded-full bg-ink/[0.06] px-2 py-0.5 text-xs font-semibold text-ink-muted">Example result</p>
                 <p className="font-display font-semibold text-4xl leading-none text-ink">84</p>
               </div>
-              <div className="text-right text-[11px] text-ink-muted space-y-0.5">
+              <div className="text-right text-xs text-ink-muted space-y-0.5">
                 <p>
                   Hydration <span className="font-semibold text-ink">92%</span>
                 </p>
@@ -108,7 +108,7 @@ function OrderScreen({ go }: ScreenProps) {
     <div className="w-full h-full bg-white px-4 pb-5 flex flex-col gap-2.5">
       <div className="flex items-baseline justify-between">
         <p className="font-display font-semibold text-ink text-lg">Your routine</p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">Tap to edit</p>
+        <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">Tap to edit</p>
       </div>
       <ul className="flex-1 min-h-0 flex flex-col gap-2">
         {items.map((p, i) => (
@@ -123,7 +123,7 @@ function OrderScreen({ go }: ScreenProps) {
                 <Image src={getAssetPath(p.image)} alt="" fill sizes="64px" className="object-cover" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted">{p.step}</p>
+                <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">{p.step}</p>
                 <p className="text-[13px] font-semibold text-ink leading-tight line-clamp-2">{p.name}</p>
               </div>
               <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${on[i] ? "bg-brand text-white" : "border-2 border-ink/30"}`}>
@@ -286,14 +286,14 @@ function DeliverScreen({ go }: ScreenProps) {
           <circle cx={pos[0]} cy={pos[1]} r="8" fill="#fff" stroke="#1447E6" strokeWidth="3" />
           <circle cx={pos[0]} cy={pos[1]} r="3" fill="#1447E6" />
         </svg>
-        <p className="absolute bottom-1.5 left-3 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted bg-white/90 rounded px-1.5">Partner store</p>
-        <p className="absolute top-[22%] right-3 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-muted bg-white/90 rounded px-1.5">You</p>
+        <p className="absolute bottom-1.5 left-3 font-mono text-xs uppercase tracking-[0.1em] text-ink-muted bg-white/90 rounded px-1.5">Partner store</p>
+        <p className="absolute top-[22%] right-3 font-mono text-xs uppercase tracking-[0.1em] text-ink-muted bg-white/90 rounded px-1.5">You</p>
       </div>
 
       <div className="px-4 pt-3 pb-5 flex flex-col gap-3 bg-white">
         <div className="flex items-end justify-between">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-muted">{delivered ? "Status" : "Arriving in"}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.12em] text-ink-muted">{delivered ? "Status" : "Arriving in"}</p>
             <p className="font-display font-semibold text-ink leading-none text-[40px]">
               {delivered ? (
                 "Delivered"
@@ -326,7 +326,7 @@ function DeliverScreen({ go }: ScreenProps) {
           {labels.map((t, i) => (
             <li key={t}>
               <span className={`block h-1.5 rounded-[3px] ${i <= stage ? "bg-brand" : "bg-ink/15"}`} />
-              <span className={`mt-1 block text-[10px] leading-tight ${i === stage ? "text-ink font-semibold" : "text-ink-muted"}`}>{t}</span>
+              <span className={`mt-1 block text-xs leading-tight ${i === stage ? "text-ink font-semibold" : "text-ink-muted"}`}>{t}</span>
             </li>
           ))}
         </ol>

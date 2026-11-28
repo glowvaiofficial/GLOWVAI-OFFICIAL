@@ -17,7 +17,7 @@ function GlowVaiLogo({ light = false }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5 select-none group">
       <Image src={getAssetPath(light ? "/brand/glowvai-wordmark-white.png" : "/brand/glowvai-wordmark.png")} alt="GLOW VAI" width={132} height={35} priority className="h-8 w-auto" />
-      <span className={cn("hidden min-[480px]:inline md:hidden lg:inline text-[10px] font-semibold tracking-widest uppercase border px-2 py-0.5 rounded-full transition-colors duration-300", light ? "text-white border-white/70" : "text-ink border-ink")}>
+      <span className={cn("hidden min-[480px]:inline md:hidden lg:inline text-xs font-semibold tracking-widest uppercase border px-2 py-0.5 rounded-full transition-colors duration-300", light ? "text-white border-white/70" : "text-ink border-ink")}>
         Quick commerce
       </span>
     </div>
@@ -105,7 +105,7 @@ export function Navbar() {
             >
               <ShoppingBag className="w-5 h-5" aria-hidden="true" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-brand text-white font-semibold text-[11px] flex items-center justify-center ring-2 ring-white">
+                <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 rounded-full bg-brand text-white font-semibold text-xs flex items-center justify-center ring-2 ring-white">
                   {cartItemCount}
                 </span>
               )}

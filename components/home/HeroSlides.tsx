@@ -51,7 +51,7 @@ export function HeroSlides({ slides, interval = 7500 }: { slides: HeroSlide[]; i
   return (
     <div
       ref={root}
-      className="relative h-[54svh] min-h-[340px] overflow-hidden lg:absolute lg:inset-0 lg:h-auto lg:min-h-0"
+      className="relative h-[42svh] min-h-[270px] overflow-hidden lg:absolute lg:inset-0 lg:h-auto lg:min-h-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -95,7 +95,7 @@ export function HeroSlides({ slides, interval = 7500 }: { slides: HeroSlide[]; i
               aria-label={`Show picture ${i + 1} of ${slides.length}`}
               aria-current={i === index}
               onClick={() => setIndex(i)}
-              className="h-11 w-6 flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white"
+              className="h-11 w-9 flex items-center justify-center rounded focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-white"
             >
               <span className={`block h-1.5 rounded-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${i === index ? "w-6 bg-white" : "w-2 bg-white/50"}`} />
             </button>

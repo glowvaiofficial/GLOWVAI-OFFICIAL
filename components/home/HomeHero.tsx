@@ -48,7 +48,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
         </div>
       )}
 
-      <div className="relative z-10 w-full gv-page pb-10 pt-10 sm:pb-12 sm:pt-12 lg:pb-12 lg:pt-[calc(76px+2rem)]">
+      <div className="relative z-10 w-full gv-page pb-10 pt-7 sm:pb-12 sm:pt-12 lg:pb-12 lg:pt-[calc(76px+2rem)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
           <div className="lg:col-span-6">
             <h1
@@ -56,7 +56,7 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
               className="font-display font-semibold text-[clamp(2.75rem,1.3rem+3.4vw,4.5rem)] leading-[1] tracking-[-0.035em] bg-gradient-to-r from-white to-[#A9BEFF] bg-clip-text text-transparent max-w-[680px]"
             >
               Know your skin.
-              <br className="hidden lg:block" /> Fix it in <span className="text-[#7CF5C8]">15 minutes.</span>
+              <br /> Fix it in <span className="text-[#7CF5C8] whitespace-nowrap">15 minutes.</span>
             </h1>
 
             <p className="mt-7 text-[clamp(1.125rem,1.05rem+0.4vw,1.3125rem)] leading-[1.5] text-white/80 max-w-[44ch]">
