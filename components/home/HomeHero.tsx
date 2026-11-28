@@ -4,7 +4,8 @@ import Image from "next/image";
 import { ArrowRight, ScanLine } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { PRIVACY_SHORT } from "@/config/privacy-copy";
-import { HERO_ART } from "@/config/hero-art";
+import { HERO_SLIDES } from "@/config/hero-art";
+import { HeroSlides } from "./HeroSlides";
 import { focusRing } from "./shared";
 import { Hero3D } from "./hero3d/Hero3D";
 import { Botanical } from "./hero3d/Botanical";
@@ -27,31 +28,27 @@ const HERO_BG =
   "linear-gradient(180deg, #0B2F9E 0%, #081C63 48%, #050C2B 100%)";
 
 export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
+  const hasArt = HERO_SLIDES.length > 0;
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative isolate overflow-hidden text-white lg:min-h-[min(calc(100svh-120px),860px)] flex items-center"
+      className="relative isolate overflow-hidden text-white lg:min-h-[min(calc(100svh-120px),860px)] lg:flex lg:items-center"
       style={{ background: HERO_BG }}
     >
-      {/* Optional generated artwork (config/hero-art.ts). A blue shade keeps the text readable over it. */}
-      {HERO_ART ? (
-        <>
-          <Image src={getAssetPath(HERO_ART.src)} alt={HERO_ART.alt} fill priority sizes="100vw" className="object-cover -z-20" />
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-[#050C2B]/85 via-[#081C63]/45 to-transparent" />
-        </>
-      ) : null}
+      {hasArt ? (
+        <HeroSlides slides={HERO_SLIDES} />
+      ) : (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <Botanical className="h-[64%] w-auto opacity-60 hidden sm:block" />
+          <Botanical flip className="h-[56%] w-auto opacity-55 hidden lg:block" />
+          <div
+            className="absolute inset-0 opacity-[0.28]"
+            style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 0.6px, transparent 0.8px)", backgroundSize: "46px 46px", maskImage: "radial-gradient(closest-side at 70% 40%, #000, transparent)", WebkitMaskImage: "radial-gradient(closest-side at 70% 40%, #000, transparent)" }}
+          />
+        </div>
+      )}
 
-      {/* Etched botanical linework on both edges, and a faint dust of light */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <Botanical className="h-[64%] w-auto opacity-60 hidden sm:block" />
-        <Botanical flip className="h-[56%] w-auto opacity-55 hidden lg:block" />
-        <div
-          className="absolute inset-0 opacity-[0.28]"
-          style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.9) 0.6px, transparent 0.8px)", backgroundSize: "46px 46px", maskImage: "radial-gradient(closest-side at 70% 40%, #000, transparent)", WebkitMaskImage: "radial-gradient(closest-side at 70% 40%, #000, transparent)" }}
-        />
-      </div>
-
-      <div className="w-full gv-page py-14 sm:py-16 lg:py-12">
+      <div className="relative z-10 w-full gv-page py-10 sm:py-12 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
           <div className="lg:col-span-6">
             <h1
@@ -113,9 +110,11 @@ export function HomeHero({ city = "Vijayawada" }: { city?: string }) {
             </p>
           </div>
 
-          <div className="lg:col-span-6">
-            <Hero3D tone="dark" />
-          </div>
+          {hasArt ? null : (
+            <div className="lg:col-span-6">
+              <Hero3D tone="dark" />
+            </div>
+          )}
         </div>
       </div>
     </section>
